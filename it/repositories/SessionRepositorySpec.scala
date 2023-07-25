@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SessionRepositorySpec
-  extends AnyFreeSpec
+    extends AnyFreeSpec
     with Matchers
     with DefaultPlayMongoRepositorySupport[UserAnswers]
     with ScalaFutures
@@ -25,7 +25,7 @@ class SessionRepositorySpec
     with OptionValues
     with MockitoSugar {
 
-  private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
+  private val instant          = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
   private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
@@ -33,10 +33,10 @@ class SessionRepositorySpec
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
 
-  protected override val repository = new SessionRepository(
+  override protected val repository = new SessionRepository(
     mongoComponent = mongoComponent,
-    appConfig      = mockAppConfig,
-    clock          = stubClock
+    appConfig = mockAppConfig,
+    clock = stubClock
   )
 
   ".set" - {
@@ -122,4 +122,5 @@ class SessionRepositorySpec
       }
     }
   }
+
 }
