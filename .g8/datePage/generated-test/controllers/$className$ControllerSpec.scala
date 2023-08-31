@@ -24,8 +24,6 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new $className$FormProvider()
   private def form = formProvider()
 
-  def onwardRoute = Call("GET", "/foo")
-
   val validAnswer = LocalDate.now(ZoneOffset.UTC)
 
   lazy val $className;format="decap"$Route = routes.$className$Controller.onPageLoad(NormalMode).url
@@ -77,15 +75,12 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
           .build()
 
