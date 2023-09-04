@@ -14,39 +14,58 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.organisation
 
 import controllers.actions._
-
+import forms.ContactNameFormProvider
 import javax.inject.Inject
-import models.{Mode, NormalMode}
+import models.Mode
 import navigation.Navigator
-import pages.YourContactDetailsPage
+import pages.ContactNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.YourContactDetailsView
+import views.html.organisation.ContactNameView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class YourContactDetailsController @Inject() (
+class ContactNameController @Inject() (
   override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
+  formProvider: ContactNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YourContactDetailsView
+  view: ContactNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() {
+  private val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() {
     implicit request =>
-      Ok(view())
+      val preparedForm = request.userAnswers.get(ContactNamePage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
     implicit request =>
-      Future.successful(Redirect(navigator.nextPage(YourContactDetailsPage, NormalMode, request.userAnswers)))
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactNamePage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(ContactNamePage, mode, updatedAnswers))
+        )
   }
 
 }
