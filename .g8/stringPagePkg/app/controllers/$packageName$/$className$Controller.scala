@@ -1,4 +1,4 @@
-package controllers
+package controllers.$packageName$
 
 import controllers.actions._
 import forms.$className$FormProvider
@@ -10,19 +10,19 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.$className$View
+import views.html.$packageName$.$className$View
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class $className$Controller @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      sessionRepository: SessionRepository,
-                                      navigator: Navigator,
-                                      standardActionSets: StandardActionSets,
-                                      formProvider: $className$FormProvider,
-                                      val controllerComponents: MessagesControllerComponents,
-                                      view: $className$View
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                        override val messagesApi: MessagesApi,
+                                        sessionRepository: SessionRepository,
+                                        navigator: Navigator,
+                                        standardActionSets: StandardActionSets,
+                                        formProvider: $className$FormProvider,
+                                        val controllerComponents: MessagesControllerComponents,
+                                        view: $className$View
+                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
 

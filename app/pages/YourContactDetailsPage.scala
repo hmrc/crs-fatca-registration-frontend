@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+case object YourContactDetailsPage extends QuestionPage[String] {
 
-//Line holder for template scripts
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "yourContactDetails"
 }
