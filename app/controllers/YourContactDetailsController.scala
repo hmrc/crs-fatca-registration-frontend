@@ -44,7 +44,7 @@ class YourContactDetailsController @Inject() (
       Ok(view())
   }
 
-  def onSubmit(): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onSubmit(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData().async {
     implicit request =>
       Future.successful(Redirect(navigator.nextPage(YourContactDetailsPage, NormalMode, request.userAnswers)))
   }

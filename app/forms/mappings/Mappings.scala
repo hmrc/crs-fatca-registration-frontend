@@ -50,4 +50,15 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[LocalDate] =
     of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
 
+  protected def validatedText(
+    requiredKey: String,
+    invalidKey: String,
+    lengthKey: String,
+    regex: String,
+    maxLength: Int,
+    minLength: Int = 1,
+    msgArg: String = ""
+  ): FieldMapping[String] =
+    of(validatedTextFormatter(requiredKey, invalidKey, lengthKey, regex, maxLength, minLength, msgArg))
+
 }

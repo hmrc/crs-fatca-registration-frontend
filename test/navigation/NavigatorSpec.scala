@@ -17,6 +17,7 @@
 package navigation
 
 import base.SpecBase
+import controllers.organisation.routes._
 import controllers.routes
 import pages._
 import models._
@@ -33,6 +34,11 @@ class NavigatorSpec extends SpecBase {
 
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad
+      }
+
+      "must go from YourContactDetailsPage to ContactNamePage" in {
+
+        navigator.nextPage(YourContactDetailsPage, NormalMode, UserAnswers("id")) mustBe ContactNameController.onPageLoad(NormalMode)
       }
     }
 

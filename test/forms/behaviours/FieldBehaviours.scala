@@ -50,4 +50,27 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
     }
   }
 
+  def fieldWithMaxLengthAlpha(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
+    s"must not bind strings longer than $maxLength characters" in {
+
+      forAll(stringsLongerThanAlpha(maxLength) -> "longString") {
+        string =>
+          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+          result.errors mustEqual Seq(lengthError)
+      }
+    }
+
+  def fieldWithNonEmptyWhitespace(form: Form[_], fieldName: String, requiredError: FormError): Unit =
+    s"must not bind strings of only whitespace" in {
+
+      val result = form.bind(Map(fieldName -> " ")).apply(fieldName)
+      result.errors mustEqual Seq(requiredError)
+    }
+
+  def fieldWithInvalidData(form: Form[_], fieldName: String, invalidString: String, error: FormError): Unit =
+    "not bind invalid data" in {
+      val result = form.bind(Map(fieldName -> invalidString)).apply(fieldName)
+      result.errors mustEqual Seq(error)
+    }
+
 }

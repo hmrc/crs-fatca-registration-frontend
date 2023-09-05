@@ -23,3 +23,7 @@ GET         /unauthorised                                controllers.Unauthorise
 GET        /register/your-contact-details                controllers.YourContactDetailsController.onPageLoad()
 POST       /register/your-contact-details                controllers.YourContactDetailsController.onSubmit()
 
+GET        /register/contact-name                        controllers.organisation.ContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/contact-name                        controllers.organisation.ContactNameController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-contact-name                 controllers.organisation.ContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-contact-name                 controllers.organisation.ContactNameController.onSubmit(mode: Mode = CheckMode)
