@@ -17,18 +17,17 @@
 package controllers.organisation
 
 import base.SpecBase
+import controllers.routes
 import forms.ContactNameFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.ContactNamePage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import views.html.organisation.ContactNameView
 
 import scala.concurrent.Future
@@ -36,9 +35,11 @@ import scala.concurrent.Future
 class ContactNameControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new ContactNameFormProvider()
-  val form         = formProvider()
+  private val form = formProvider()
 
-  lazy val contactNameRoute = routes.ContactNameController.onPageLoad(NormalMode).url
+  private lazy val contactNameRoute = controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url
+
+  private lazy val contactNameRouteCheckMode = controllers.organisation.routes.ContactNameController.onPageLoad(CheckMode).url
 
   "ContactName Controller" - {
 
@@ -99,6 +100,44 @@ class ContactNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to next page when valid data is submitted but no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+        )
+        .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, contactNameRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must redirect to CheckYourAnswersPage when valid data is submitted in CheckMode" in {
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, contactNameRouteCheckMode)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad.url
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
@@ -116,22 +155,6 @@ class ContactNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, contactNameRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

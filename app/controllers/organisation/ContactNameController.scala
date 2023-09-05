@@ -54,7 +54,7 @@ class ContactNameController @Inject() (
       Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData().async {
     implicit request =>
       form
         .bindFromRequest()

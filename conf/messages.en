@@ -1,4 +1,4 @@
-service.name = crs-fatca-registration-frontend
+service.name = Send a CRS or FATCA report
 
 site.back = Back
 site.remove = Remove
