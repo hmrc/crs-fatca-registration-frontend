@@ -17,9 +17,7 @@
 package controllers
 
 import controllers.actions._
-
-import javax.inject.Inject
-import models.{Mode, NormalMode}
+import models.NormalMode
 import navigation.Navigator
 import pages.YourContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -27,6 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.YourContactDetailsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class YourContactDetailsController @Inject() (

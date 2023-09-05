@@ -28,6 +28,11 @@ POST       /register/contact-name                        controllers.organisatio
 GET        /register/change-contact-name                 controllers.organisation.ContactNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-contact-name                 controllers.organisation.ContactNameController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/email                               controllers.organisation.ContactEmailController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/email                               controllers.organisation.ContactEmailController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-email                        controllers.organisation.ContactEmailController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-email                        controllers.organisation.ContactEmailController.onSubmit(mode: Mode = CheckMode)
+
 GET        /register/phone                               controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/phone                               controllers.organisation.ContactPhoneController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-phone                        controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = CheckMode)
