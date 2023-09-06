@@ -19,9 +19,9 @@ package forms
 import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
-import utils.RegExConstants
+import utils.RegexConstants
 
-class ContactNameFormProvider @Inject() extends Mappings {
+class ContactNameFormProvider @Inject() extends Mappings with RegexConstants {
 
   private val maxLength = 35
 
@@ -31,7 +31,7 @@ class ContactNameFormProvider @Inject() extends Mappings {
         "contactName.error.required",
         "contactName.error.invalid",
         "contactName.error.length",
-        RegExConstants.orgNameRegex,
+        orgNameRegex,
         maxLength
       )
     )

@@ -18,9 +18,9 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
-import utils.RegExConstants.orgNameRegex
+import utils.RegexConstants
 
-class ContactNameFormProviderSpec extends StringFieldBehaviours {
+class ContactNameFormProviderSpec extends StringFieldBehaviours with RegexConstants {
 
   val requiredKey = "contactName.error.required"
   val lengthKey   = "contactName.error.length"
