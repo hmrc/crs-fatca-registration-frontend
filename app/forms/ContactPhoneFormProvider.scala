@@ -21,19 +21,13 @@ import forms.mappings.Mappings
 import play.api.data.Form
 import utils.RegexConstants
 
-class ContactNameFormProvider @Inject() extends Mappings with RegexConstants {
+class ContactPhoneFormProvider @Inject() extends Mappings with RegexConstants {
 
-  private val maxLength = 35
+  private val maxLength = 24
 
   def apply(): Form[String] =
     Form(
-      "value" -> validatedText(
-        "contactName.error.required",
-        "contactName.error.invalid",
-        "contactName.error.length",
-        orgNameRegex,
-        maxLength
-      )
+      "value" -> validatedText("contactPhone.error.required", "contactPhone.error.invalid", "contactPhone.error.length", digitsAndWhiteSpaceOnly, maxLength)
     )
 
 }

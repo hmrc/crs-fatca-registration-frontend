@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import javax.inject.Inject
-import forms.mappings.Mappings
-import play.api.data.Form
-import utils.RegexConstants
+import play.api.libs.json.JsPath
 
-class ContactNameFormProvider @Inject() extends Mappings with RegexConstants {
+case object ContactPhonePage extends QuestionPage[String] {
 
-  private val maxLength = 35
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> validatedText(
-        "contactName.error.required",
-        "contactName.error.invalid",
-        "contactName.error.length",
-        orgNameRegex,
-        maxLength
-      )
-    )
-
+  override def toString: String = "contactPhone"
 }

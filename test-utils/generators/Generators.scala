@@ -106,6 +106,16 @@ trait Generators extends ModelGenerators {
   def stringsExceptSpecificValues(excluded: Seq[String]): Gen[String] =
     nonEmptyString suchThat (!excluded.contains(_))
 
+  def phoneMaxLength(ln: Int): Gen[String] = for {
+    length <- Gen.chooseNum(ln, 24)
+    chars  <- listOfN(length, Gen.chooseNum(0, 9))
+  } yield "+" + chars.mkString
+
+  def validPhoneNumber(ln: Int): Gen[String] = for {
+    length <- Gen.chooseNum(1, ln - 1)
+    chars  <- listOfN(length, Gen.chooseNum(0, 9))
+  } yield "+" + chars.mkString
+
   def oneOf[T](xs: Seq[Gen[T]]): Gen[T] =
     if (xs.isEmpty) {
       throw new IllegalArgumentException("oneOf called on empty collection")

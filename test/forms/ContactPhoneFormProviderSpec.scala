@@ -18,16 +18,14 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
-import utils.RegexConstants
 
-class ContactNameFormProviderSpec extends StringFieldBehaviours with RegexConstants {
+class ContactPhoneFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "contactName.error.required"
-  val lengthKey   = "contactName.error.length"
-  val invalidKey  = "contactName.error.invalid"
-  val maxLength   = 35
+  val requiredKey = "contactPhone.error.required"
+  val lengthKey   = "contactPhone.error.length"
+  val maxLength   = 24
 
-  val form = new ContactNameFormProvider()()
+  val form = new ContactPhoneFormProvider()()
 
   ".value" - {
 
@@ -36,33 +34,22 @@ class ContactNameFormProviderSpec extends StringFieldBehaviours with RegexConsta
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringMatchingRegexAndLength(orgNameRegex, maxLength)
+      validPhoneNumber(maxLength)
     )
 
-    behave like fieldWithMaxLengthAlpha(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey)
-    )
+    s"must not bind strings longer than $maxLength characters" in {
+
+      forAll(phoneMaxLength(maxLength) -> "longString") {
+        string =>
+          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+          result.errors mustEqual Seq(FormError(fieldName, lengthKey, Seq()))
+      }
+    }
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
-    )
-
-    behave like fieldWithNonEmptyWhitespace(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-
-    behave like fieldWithInvalidData(
-      form,
-      fieldName,
-      "jjdjdj£%^&kfkf",
-      FormError(fieldName, invalidKey)
     )
   }
 

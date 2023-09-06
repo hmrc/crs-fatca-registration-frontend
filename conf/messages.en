@@ -42,6 +42,9 @@ index.guidance = Welcome to your new frontend. Please see the README file for a 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
 
+default.firstContact.name = your first contact
+default.secondContact.name = your second contact
+
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
 journeyRecovery.continue.guidance = [Add content to explain how to proceed.]
@@ -68,3 +71,12 @@ contactName.error.required = Enter a name for the first contact
 contactName.error.length = The name must be 35 characters or less
 contactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 contactName.change.hidden = Change your contact name
+
+contactPhone.checkYourAnswersLabel = Telephone number
+contactPhone.title = What is the telephone number for the first contact?
+contactPhone.heading = What is the telephone number for {0}?
+contactPhone.hint = For international numbers, include the country code.
+contactPhone.error.required = Enter a telephone number for the first contact
+contactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
+contactPhone.error.length = The telephone number must be 24 characters or less
+contactPhone.change.hidden = Change telephone number

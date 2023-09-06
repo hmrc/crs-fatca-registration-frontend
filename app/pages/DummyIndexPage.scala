@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package utils
+package pages
 
-object RegExConstants {
-  final val orgNameRegex = """^[a-zA-Z0-9 &`\-\'\\\^]*$"""
+import play.api.libs.json.JsPath
+
+//TODO remove this once first page of flow is implemented
+case object DummyIndexPage extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "dummyIndex"
 }
