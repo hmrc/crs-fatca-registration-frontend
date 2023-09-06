@@ -18,6 +18,8 @@ package utils
 
 object RegExConstants {
   final val orgNameRegex = """^[a-zA-Z0-9 &`\-\'\\\^]*$"""
+
   final val emailRegex = "^(?:[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+)*)" +
     "@(?:[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+)*)$"
+
 }
