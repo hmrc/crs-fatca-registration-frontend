@@ -68,3 +68,11 @@ contactName.error.required = Enter a name for the first contact
 contactName.error.length = The name must be 35 characters or less
 contactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 contactName.change.hidden = Change your contact name
+
+secondContactEmail.title = What is the email address for the second contact
+secondContactEmail.heading = What is the email address for {0}
+secondContactEmail.checkYourAnswersLabel = Second contact email address
+secondContactEmail.error.required = Enter an email address for the second contact
+secondContactEmail.error.length = The email address must be 132 characters or less
+secondContactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
+secondContactEmail.change.hidden = Change second contact email address

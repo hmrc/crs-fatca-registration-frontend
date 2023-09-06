@@ -16,8 +16,24 @@
 
 package utils
 
-object RegExConstants {
-  final val orgNameRegex = """^[a-zA-Z0-9 &`\-\'\\\^]*$"""
-  final val emailRegex = "^(?:[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+)*)" +
-    "@(?:[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+)*)$"
+import models.UserAnswers
+import pages.{ContactNamePage, SecondContactNamePage}
+import play.api.i18n.Messages
+
+trait ContactHelper {
+
+  def getFirstContactName(userAnswers: UserAnswers)(implicit messages: Messages): String =
+    userAnswers
+      .get(ContactNamePage)
+      .fold(messages("default.firstContact.name"))(
+        contactName => contactName
+      )
+
+  def getSecondContactName(userAnswers: UserAnswers)(implicit messages: Messages): String =
+    userAnswers
+      .get(SecondContactNamePage)
+      .fold(messages("default.secondContact.name"))(
+        contactName => contactName
+      )
+
 }

@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package utils
+package pages
 
-object RegExConstants {
-  final val orgNameRegex = """^[a-zA-Z0-9 &`\-\'\\\^]*$"""
-  final val emailRegex = "^(?:[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+)*)" +
-    "@(?:[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&*+\\/=?^_`{|}~-]+)*)$"
+import play.api.libs.json.JsPath
+
+case object SecondContactNamePage extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "secondContactName"
 }
