@@ -18,9 +18,9 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
-import utils.RegExConstants.emailRegex
+import utils.RegexConstants
 
-class SecondContactEmailFormProviderSpec extends StringFieldBehaviours {
+class SecondContactEmailFormProviderSpec extends StringFieldBehaviours with RegexConstants {
 
   val requiredKey = "secondContactEmail.error.required"
   val invalidKey  = "secondContactEmail.error.invalid"

@@ -16,12 +16,13 @@
 
 package forms
 
-import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
-import utils.RegExConstants
+import utils.RegexConstants
 
-class SecondContactEmailFormProvider @Inject() extends Mappings {
+import javax.inject.Inject
+
+class SecondContactEmailFormProvider @Inject() extends Mappings with RegexConstants {
 
   private val maxLength = 132
 
@@ -31,7 +32,7 @@ class SecondContactEmailFormProvider @Inject() extends Mappings {
         "secondContactEmail.error.required",
         "secondContactEmail.error.invalid",
         "secondContactEmail.error.length",
-        RegExConstants.emailRegex,
+        emailRegex,
         maxLength
       )
     )
