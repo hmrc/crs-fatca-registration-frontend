@@ -27,3 +27,8 @@ GET        /register/contact-name                        controllers.organisatio
 POST       /register/contact-name                        controllers.organisation.ContactNameController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-contact-name                 controllers.organisation.ContactNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-contact-name                 controllers.organisation.ContactNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/phone                               controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/phone                               controllers.organisation.ContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-phone                        controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-phone                        controllers.organisation.ContactPhoneController.onSubmit(mode: Mode = CheckMode)

@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package models.requests
+package pages
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.auth.core.Enrolment
+import play.api.libs.json.JsPath
 
-case class IdentifierRequest[A](request: Request[A], userId: String, enrolments: Set[Enrolment] = Set.empty) extends WrappedRequest[A](request)
+case object ContactPhonePage extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "contactPhone"
+}
