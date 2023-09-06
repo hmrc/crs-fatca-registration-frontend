@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.requests.DataRequest
+import models.requests.{DataRequest, IdentifierRequest}
 import play.api.mvc.{ActionBuilder, AnyContent}
 
 import javax.inject.Inject
@@ -24,7 +24,8 @@ import javax.inject.Inject
 class StandardActionSets @Inject() (identify: IdentifierAction,
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
-                                    initializeData: DataInitializeAction
+                                    initializeData: DataInitializeAction,
+                                    checkEnrolment: CheckEnrolledToServiceAction
 ) {
 
   def identifiedWithoutEnrolmentCheck(): ActionBuilder[DataRequest, AnyContent] =
@@ -33,8 +34,14 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
   def identifiedWithoutEnrolmentCheckInitialisedData(): ActionBuilder[DataRequest, AnyContent] =
     identify andThen getData andThen initializeData
 
+  def identifiedUserWithEnrolmentCheck(): ActionBuilder[IdentifierRequest, AnyContent] =
+    identify andThen checkEnrolment
+
+  def identifiedUserWithInitializedData(): ActionBuilder[DataRequest, AnyContent] =
+    identifiedUserWithEnrolmentCheck() andThen getData andThen initializeData
+
   // ToDo Update with enrolment check when implemented
   def identifiedUserWithData(): ActionBuilder[DataRequest, AnyContent] =
-    identify andThen getData andThen requireData
+    identifiedUserWithEnrolmentCheck() andThen getData andThen requireData
 
 }

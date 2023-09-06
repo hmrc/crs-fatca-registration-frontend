@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package models.requests
+package forms
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.auth.core.Enrolment
+import javax.inject.Inject
 
-case class IdentifierRequest[A](request: Request[A], userId: String, enrolments: Set[Enrolment] = Set.empty) extends WrappedRequest[A](request)
+import forms.mappings.Mappings
+import play.api.data.Form
+
+class ContactPhoneFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("contactPhone.error.required")
+        .verifying(maxLength(24, "contactPhone.error.length"))
+    )
+
+}
