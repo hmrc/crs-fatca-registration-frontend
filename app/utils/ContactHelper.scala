@@ -17,7 +17,7 @@
 package utils
 
 import models.UserAnswers
-import pages.ContactNamePage
+import pages.{ContactNamePage, SecondContactNamePage}
 import play.api.i18n.Messages
 
 trait ContactHelper {
@@ -28,12 +28,12 @@ trait ContactHelper {
       .fold(messages("default.firstContact.name"))(
         contactName => contactName
       )
-  // TODO: implement this with second contact pages
-//  def getSecondContactName(userAnswers: UserAnswers)(implicit messages: Messages): String =
-//    userAnswers
-//      .get(SndContactNamePage)
-//      .fold(messages("default.secondContact.name"))(
-//        contactName => contactName
-//      )
+
+  def getSecondContactName(userAnswers: UserAnswers)(implicit messages: Messages): String =
+    userAnswers
+      .get(SecondContactNamePage)
+      .fold(messages("default.secondContact.name"))(
+        contactName => contactName
+      )
 
 }

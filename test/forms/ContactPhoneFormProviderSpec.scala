@@ -37,14 +37,12 @@ class ContactPhoneFormProviderSpec extends StringFieldBehaviours {
       validPhoneNumber(maxLength)
     )
 
-    s"must not bind strings longer than $maxLength characters" in {
-
-      forAll(phoneMaxLength(maxLength) -> "longString") {
-        string =>
-          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors mustEqual Seq(FormError(fieldName, lengthKey, Seq()))
-      }
-    }
+    behave like fieldWithMaxLengthNumber(
+      form,
+      fieldName,
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, lengthKey)
+    )
 
     behave like mandatoryField(
       form,

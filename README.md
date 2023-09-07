@@ -9,7 +9,7 @@ Service manager: CRS_FATCA_ALL
 
 Port: 10030
 
-Link: http://localhost:10030/crs-fatca-registration-frontend
+Link: http://localhost:10030/register-for-crs-and-fatca
 
 ---
 

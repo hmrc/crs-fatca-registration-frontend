@@ -96,3 +96,12 @@ contactPhone.error.required = Enter a telephone number for the first contact
 contactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 contactPhone.error.length = The telephone number must be 24 characters or less
 contactPhone.change.hidden = Change telephone number
+
+secondContactEmail.title = What is the email address for the second contact
+secondContactEmail.heading = What is the email address for {0}
+secondContactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+secondContactEmail.checkYourAnswersLabel = Second contact email address
+secondContactEmail.error.required = Enter an email address for the second contact
+secondContactEmail.error.length = The email address must be 132 characters or less
+secondContactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
+secondContactEmail.change.hidden = Change second contact email address

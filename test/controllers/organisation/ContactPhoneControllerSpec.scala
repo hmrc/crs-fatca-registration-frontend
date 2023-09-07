@@ -25,10 +25,8 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{ContactNamePage, ContactPhonePage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import views.html.organisation.ContactPhoneView
 
 import scala.concurrent.Future

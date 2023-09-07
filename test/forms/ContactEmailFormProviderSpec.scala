@@ -33,11 +33,10 @@ class ContactEmailFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "value"
 
-    behave like fieldThatBindsValidDataWithoutInvalidError(
+    behave like fieldThatBindsValidData(
       form,
       fieldName,
-      validEmailAddress,
-      invalidKey
+      emailMatchingRegexAndLength(emailRegex, maxLength)
     )
 
     behave like fieldWithInvalidData(
