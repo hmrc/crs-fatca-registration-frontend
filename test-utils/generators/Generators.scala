@@ -140,7 +140,7 @@ trait Generators extends ModelGenerators with RegexConstants {
     RegexpGen
       .from(regex)
       .suchThat(
-        value => value.nonEmpty && value.length <= length
+        value => value.trim.nonEmpty && value.length <= length
       )
 
   def emailMatchingRegexAndLength(emailRegex: String, length: Int): Gen[String] = {
