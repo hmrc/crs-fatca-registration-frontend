@@ -72,6 +72,15 @@ contactName.error.length = The name must be 35 characters or less
 contactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 contactName.change.hidden = Change your contact name
 
+contactEmail.title = What is the email address for the first contact?
+contactEmail.heading = What is the email address for {0}?
+contactEmail.checkYourAnswersLabel = firstContactEmail
+contactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+contactEmail.error.required = Enter an email address for the first contact
+contactEmail.error.length = The email address must be 132 characters or less
+contactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
+contactEmail.change.hidden = Change your email address
+
 contactPhone.checkYourAnswersLabel = Telephone number
 contactPhone.title = What is the telephone number for the first contact?
 contactPhone.heading = What is the telephone number for {0}?
