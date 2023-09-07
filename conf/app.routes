@@ -37,3 +37,8 @@ GET        /register/second-contact-email                controllers.organisatio
 POST       /register/second-contact-email                controllers.organisation.SecondContactEmailController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-second-contact-email         controllers.organisation.SecondContactEmailController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-second-contact-email         controllers.organisation.SecondContactEmailController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/second-contact-name                 controllers.organisation.SecondContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/second-contact-name                 controllers.organisation.SecondContactNameController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-second-contact-name          controllers.organisation.SecondContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-second-contact-name          controllers.organisation.SecondContactNameController.onSubmit(mode: Mode = CheckMode)
