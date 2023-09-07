@@ -136,7 +136,11 @@ trait Generators extends ModelGenerators {
   }
 
   def stringMatchingRegexAndLength(regex: String, length: Int): Gen[String] =
-    RegexpGen.from(regex).suchThat(_.nonEmpty).map(_.take(length))
+    RegexpGen
+      .from(regex)
+      .suchThat(
+        value => value.nonEmpty && value.length <= length
+      )
 
   def emailMatchingRegexAndLength(emailRegex: String, length: Int): Gen[String] = {
 
