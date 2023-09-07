@@ -41,6 +41,18 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(YourContactDetailsPage, NormalMode, UserAnswers("id")) mustBe ContactNameController.onPageLoad(NormalMode)
       }
 
+      "must go from ContactEmailPage to ContactHavePhonePage when user answers yes" in {
+
+        val userAnswers = emptyUserAnswers.set(ContactEmailPage, "test@email").success.value
+        navigator.nextPage(ContactEmailPage, NormalMode, userAnswers) mustBe ContactHavePhoneController.onPageLoad(NormalMode)
+      }
+
+      "must go from ContactHavePhonePage to ContactPhonePage when user answers yes" in {
+
+        val userAnswers = emptyUserAnswers.set(ContactHavePhonePage, true).success.value
+        navigator.nextPage(ContactHavePhonePage, NormalMode, userAnswers) mustBe ContactPhoneController.onPageLoad(NormalMode)
+      }
+
       "must go from SecondContactPhonePage to SecondContactEmailPage" in {
 
         val userAnswers = emptyUserAnswers.set(SecondContactNamePage, "value").success.value

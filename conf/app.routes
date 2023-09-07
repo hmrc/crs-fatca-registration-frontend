@@ -33,6 +33,11 @@ POST       /register/email                               controllers.organisatio
 GET        /register/change-email                        controllers.organisation.ContactEmailController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-email                        controllers.organisation.ContactEmailController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/have-phone                          controllers.organisation.ContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/have-phone                          controllers.organisation.ContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-have-phone                   controllers.organisation.ContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-have-phone                   controllers.organisation.ContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
+
 GET        /register/phone                               controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/phone                               controllers.organisation.ContactPhoneController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-phone                        controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = CheckMode)

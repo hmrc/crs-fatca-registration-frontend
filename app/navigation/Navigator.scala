@@ -28,8 +28,17 @@ class Navigator @Inject() () {
   private val normalRoutes: Page => UserAnswers => Call = {
     case YourContactDetailsPage => _ => controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode)
     case ContactNamePage        => _ => controllers.organisation.routes.ContactEmailController.onPageLoad(NormalMode)
-    case SecondContactNamePage  => _ => controllers.organisation.routes.SecondContactEmailController.onPageLoad(NormalMode)
-    case _                      => _ => routes.IndexController.onPageLoad
+    case ContactEmailPage       => _ => controllers.organisation.routes.ContactHavePhoneController.onPageLoad(NormalMode)
+    case ContactHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          ContactHavePhonePage,
+          controllers.organisation.routes.ContactPhoneController.onPageLoad(NormalMode),
+          controllers.routes.JourneyRecoveryController.onPageLoad()
+        )
+    case SecondContactNamePage => _ => controllers.organisation.routes.SecondContactEmailController.onPageLoad(NormalMode)
+    case _                     => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -42,5 +51,10 @@ class Navigator @Inject() () {
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
+
+  private def yesNoPage(ua: UserAnswers, fromPage: QuestionPage[Boolean], yesCall: => Call, noCall: => Call): Call =
+    ua.get(fromPage)
+      .map(if (_) yesCall else noCall)
+      .getOrElse(controllers.routes.JourneyRecoveryController.onPageLoad())
 
 }
