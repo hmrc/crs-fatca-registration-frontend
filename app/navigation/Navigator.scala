@@ -38,6 +38,15 @@ class Navigator @Inject() () {
           controllers.routes.JourneyRecoveryController.onPageLoad()
         )
     case SecondContactNamePage => _ => controllers.organisation.routes.SecondContactEmailController.onPageLoad(NormalMode)
+    case SecondContactEmailPage => _ => controllers.organisation.routes.SecondContactHavePhoneController.onPageLoad(NormalMode)
+    case ContactHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          SecondContactHavePhonePage,
+          controllers.routes.JourneyRecoveryController.onPageLoad(),
+          controllers.routes.JourneyRecoveryController.onPageLoad()
+        )
     case _                     => _ => routes.IndexController.onPageLoad
   }
 
