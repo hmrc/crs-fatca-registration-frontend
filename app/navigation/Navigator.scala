@@ -44,10 +44,11 @@ class Navigator @Inject() () {
         yesNoPage(
           userAnswers,
           SecondContactHavePhonePage,
-          controllers.routes.JourneyRecoveryController.onPageLoad(),
+          controllers.organisation.routes.SecondContactPhoneController.onPageLoad(NormalMode),
           controllers.routes.JourneyRecoveryController.onPageLoad()
         )
-    case _ => _ => routes.IndexController.onPageLoad
+    case SecondContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad
+    case _                      => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

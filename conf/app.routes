@@ -12,7 +12,7 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad
+GET         /register/check-your-answers                 controllers.CheckYourAnswersController.onPageLoad
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey
@@ -57,3 +57,8 @@ GET        /register/second-contact-have-phone           controllers.organisatio
 POST       /register/second-contact-have-phone           controllers.organisation.SecondContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-second-contact-have-phone    controllers.organisation.SecondContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-second-contact-have-phone    controllers.organisation.SecondContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = CheckMode)

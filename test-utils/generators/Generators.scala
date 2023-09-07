@@ -117,6 +117,10 @@ trait Generators extends ModelGenerators with RegexConstants {
     chars  <- listOfN(length, Gen.chooseNum(0, 9))
   } yield "+" + chars.mkString
 
+  def numericStringLongerThan(ln: Int): Gen[String] = for {
+    chars <- listOfN(ln + 1, Gen.chooseNum(0, 9))
+  } yield chars.mkString
+
   def oneOf[T](xs: Seq[Gen[T]]): Gen[T] =
     if (xs.isEmpty) {
       throw new IllegalArgumentException("oneOf called on empty collection")
@@ -140,8 +144,9 @@ trait Generators extends ModelGenerators with RegexConstants {
     RegexpGen
       .from(regex)
       .suchThat(
-        value => value.trim.nonEmpty && value.length <= length
+        value => value.trim.nonEmpty
       )
+      .map(_.take(length))
 
   def emailMatchingRegexAndLength(emailRegex: String, length: Int): Gen[String] = {
 

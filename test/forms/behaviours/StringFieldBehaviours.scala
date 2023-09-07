@@ -30,6 +30,16 @@ trait StringFieldBehaviours extends FieldBehaviours {
       }
     }
 
+  def numericFieldWithMaxLength(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
+    s"not bind numeric strings longer than $maxLength characters" in {
+
+      forAll(numericStringLongerThan(maxLength) -> "longString") {
+        string =>
+          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+          result.errors must contain only lengthError
+      }
+    }
+
   def fieldWithMaxLengthEmail(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
     s"must not bind strings longer than $maxLength characters" in {
 
