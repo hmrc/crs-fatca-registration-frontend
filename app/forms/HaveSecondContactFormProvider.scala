@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import javax.inject.Inject
 
-trait ModelGenerators {
+import forms.mappings.Mappings
+import play.api.data.Form
+import models.HaveSecondContact
 
-  implicit lazy val arbitraryHaveSecondContact: Arbitrary[HaveSecondContact] =
-    Arbitrary {
-      Gen.oneOf(HaveSecondContact.values.toSeq)
-    }
+class HaveSecondContactFormProvider @Inject() extends Mappings {
 
-//Line holder for template scripts
+  def apply(): Form[HaveSecondContact] =
+    Form(
+      "value" -> enumerable[HaveSecondContact]("haveSecondContact.error.required")
+    )
+
 }
