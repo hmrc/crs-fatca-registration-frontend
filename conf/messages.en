@@ -78,7 +78,7 @@ contactEmail.checkYourAnswersLabel = firstContactEmail
 contactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
 contactEmail.error.required = Enter an email address for the first contact
 contactEmail.error.length = The email address must be 132 characters or less
-contactEmail.error.invalid = Enter and email address in the right format, like yourname@example.com
+contactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
 contactEmail.change.hidden = Change your email address
 
 contactPhone.checkYourAnswersLabel = Telephone number
