@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
+import utils.RegexConstants
 
-trait ModelGenerators {
+class SecondContactPhoneFormProvider @Inject() extends Mappings with RegexConstants {
 
-  implicit lazy val arbitraryIndContactHavePhone: Arbitrary[IndContactHavePhone] =
-    Arbitrary {
-      Gen.oneOf(IndContactHavePhone.values.toSeq)
-    }
+  private val MaxLength = 24
 
-  implicit lazy val arbitraryHaveSecondContact: Arbitrary[HaveSecondContact] =
-    Arbitrary {
-      Gen.oneOf(HaveSecondContact.values.toSeq)
-    }
+  def apply(): Form[String] =
+    Form(
+      "value" -> validatedText(
+        "secondContactPhone.error.required",
+        "secondContactPhone.error.invalid",
+        "secondContactPhone.error.length",
+        digitsAndWhiteSpaceOnly,
+        MaxLength
+      )
+    )
 
-//Line holder for template scripts
 }

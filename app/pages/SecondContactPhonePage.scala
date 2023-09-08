@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+case object SecondContactPhonePage extends QuestionPage[String] {
 
-  implicit lazy val arbitraryIndContactHavePhone: Arbitrary[IndContactHavePhone] =
-    Arbitrary {
-      Gen.oneOf(IndContactHavePhone.values.toSeq)
-    }
+  override def path: JsPath = JsPath \ toString
 
-  implicit lazy val arbitraryHaveSecondContact: Arbitrary[HaveSecondContact] =
-    Arbitrary {
-      Gen.oneOf(HaveSecondContact.values.toSeq)
-    }
-
-//Line holder for template scripts
+  override def toString: String = "secondContactPhone"
 }

@@ -12,7 +12,7 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad
+GET         /register/check-your-answers                 controllers.CheckYourAnswersController.onPageLoad
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey
@@ -48,6 +48,11 @@ POST       /register/second-contact-email                controllers.organisatio
 GET        /register/change-second-contact-email         controllers.organisation.SecondContactEmailController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-second-contact-email         controllers.organisation.SecondContactEmailController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/have-second-contact                 controllers.organisation.HaveSecondContactController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/have-second-contact                 controllers.organisation.HaveSecondContactController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-have-second-contact          controllers.organisation.HaveSecondContactController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-have-second-contact          controllers.organisation.HaveSecondContactController.onSubmit(mode: Mode = CheckMode)
+
 GET        /register/second-contact-name                 controllers.organisation.SecondContactNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/second-contact-name                 controllers.organisation.SecondContactNameController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-second-contact-name          controllers.organisation.SecondContactNameController.onPageLoad(mode: Mode = CheckMode)
@@ -62,3 +67,8 @@ GET        /register/individual-have-phone               controllers.IndContactH
 POST       /register/individual-have-phone               controllers.IndContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-individual-have-phone        controllers.IndContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-individual-have-phone        controllers.IndContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
