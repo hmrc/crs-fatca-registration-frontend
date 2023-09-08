@@ -72,3 +72,9 @@ GET        /register/second-contact-phone                controllers.organisatio
 POST       /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
+
+
+GET        /register/individual-email                    controllers.individual.IndContactEmailController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/individual-email                    controllers.individual.IndContactEmailController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-individual-email             controllers.individual.IndContactEmailController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-individual-email             controllers.individual.IndContactEmailController.onSubmit(mode: Mode = CheckMode)
