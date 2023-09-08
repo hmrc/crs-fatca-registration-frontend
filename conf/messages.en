@@ -97,8 +97,8 @@ contactPhone.error.invalid = The telephone number must only include numbers 0 to
 contactPhone.error.length = The telephone number must be 24 characters or less
 contactPhone.change.hidden = Change telephone number
 
-secondContactEmail.title = What is the email address for the second contact
-secondContactEmail.heading = What is the email address for {0}
+secondContactEmail.title = What is the email address for the second contact?
+secondContactEmail.heading = What is the email address for {0}?
 secondContactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
 secondContactEmail.checkYourAnswersLabel = Second contact email address
 secondContactEmail.error.required = Enter an email address for the second contact
@@ -112,3 +112,12 @@ haveSecondContact.p1 = This can be a team mailbox or another contact.
 haveSecondContact.checkYourAnswersLabel = Do you have a second contact?
 haveSecondContact.checkYourAnswersLabel.hiddenText = Change if you have a second contact
 haveSecondContact.error.required = Select yes if there is someone else we can contact
+
+secondContactName.title = What is the name of the person or team we should contact?
+secondContactName.heading = What is the name of the person or team we should contact?
+secondContactName.hint = For example, ‘Ashley Smith’ or ‘Tax team’.
+secondContactName.checkYourAnswersLabel = Second contact name
+secondContactName.error.required = Enter a name for the second contact
+secondContactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+secondContactName.error.length = The name must be 35 characters or less
+secondContactName.change.hidden = Change second contact name

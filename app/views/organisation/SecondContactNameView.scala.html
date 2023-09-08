@@ -26,9 +26,9 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("contactName.title"))) {
+@layout(pageTitle = title(form, messages("secondContactName.title"))) {
 
-    @formHelper(action = controllers.organisation.routes.ContactNameController.onSubmit(mode)) {
+    @formHelper(action = controllers.organisation.routes.SecondContactNameController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -37,10 +37,10 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("contactName.heading")).asPageHeading()
+                label = LabelViewModel(messages("secondContactName.heading")).asPageHeading()
             )
             .withWidth(ThreeQuarters)
-            .withHint(HintViewModel(Text(messages("contactName.hint"))))
+            .withHint(HintViewModel(Text(messages("secondContactName.hint"))))
         )
 
         @govukButton(
