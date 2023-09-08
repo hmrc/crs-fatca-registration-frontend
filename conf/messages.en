@@ -114,3 +114,10 @@ secondContactName.error.required = Enter a name for the second contact
 secondContactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 secondContactName.error.length = The name must be 35 characters or less
 secondContactName.change.hidden = Change second contact name
+
+secondContactHavePhone.title = Can we contact your second contact by telephone?
+secondContactHavePhone.heading = Can we contact {0} by telephone?
+secondContactHavePhone.p1 = We will call if we have any questions about your reports.
+secondContactHavePhone.checkYourAnswersLabel = secondContactHavePhone
+secondContactHavePhone.error.required = Select yes if they can be contacted by telephone
+secondContactHavePhone.change.hidden = SecondContactHavePhone
