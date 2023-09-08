@@ -121,3 +121,10 @@ secondContactHavePhone.p1 = We will call if we have any questions about your rep
 secondContactHavePhone.checkYourAnswersLabel = secondContactHavePhone
 secondContactHavePhone.error.required = Select yes if they can be contacted by telephone
 secondContactHavePhone.change.hidden = SecondContactHavePhone
+
+indContactHavePhone.title = Can we contact you by telephone?
+indContactHavePhone.heading = Can we contact you by telephone?
+indContactHavePhone.p1 = We will call if we have any questions about your reports.
+indContactHavePhone.checkYourAnswersLabel = Can we contact you by telephone?
+indContactHavePhone.error.required = Select yes if we can contact you by telephone
+indContactHavePhone.change.hidden = Change can we contact you by telephone?
