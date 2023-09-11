@@ -163,3 +163,6 @@ indContactPhone.error.required = Enter your telephone number
 indContactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 indContactPhone.error.length = The telephone number must be 24 characters or less
 indContactPhone.change.hidden = Change your contact telephone number
+
+indIdentityConfirmed.title = We have confirmed your identity
+indIdentityConfirmed.heading = We have confirmed your identity
