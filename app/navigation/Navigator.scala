@@ -47,9 +47,11 @@ class Navigator @Inject() () {
           controllers.organisation.routes.SecondContactPhoneController.onPageLoad(NormalMode),
           controllers.routes.JourneyRecoveryController.onPageLoad()
         )
-    case SecondContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad
-    case IndContactEmailPage    => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
-    case _                      => _ => routes.IndexController.onPageLoad
+    case SecondContactPhonePage  => _ => controllers.routes.CheckYourAnswersController.onPageLoad
+    case IndContactEmailPage     => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
+    case IndContactHavePhonePage => _ => controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode)
+    case IndContactPhonePage     => _ => controllers.routes.CheckYourAnswersController.onPageLoad
+    case _                       => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
