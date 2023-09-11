@@ -22,6 +22,14 @@ import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryIndContactName: Arbitrary[IndContactName] =
+    Arbitrary {
+      for {
+        FirstName <- arbitrary[String]
+        LastName  <- arbitrary[String]
+      } yield IndContactName(FirstName, LastName)
+    }
+
   implicit lazy val arbitraryIndContactHavePhone: Arbitrary[IndContactHavePhone] =
     Arbitrary {
       Gen.oneOf(IndContactHavePhone.values.toSeq)
