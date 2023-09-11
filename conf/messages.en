@@ -139,6 +139,15 @@ secondContactPhone.error.invalid = The telephone number must only include number
 secondContactPhone.error.length = The telephone number must be 24 characters or less
 secondContactPhone.change.hidden = Change second contact telephone number
 
+indContactEmail.title = What is your email address?
+indContactEmail.heading = What is your email address?
+indContactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+indContactEmail.checkYourAnswersLabel = indContactEmail
+indContactEmail.error.required = Enter your email address
+indContactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
+indContactEmail.error.length = The email address must be 132 characters or less
+indContactEmail.change.hidden = IndContactEmail
+
 indContactHavePhone.title = Can we contact you by telephone?
 indContactHavePhone.heading = Can we contact you by telephone?
 indContactHavePhone.p1 = We will call if we have any questions about your reports.

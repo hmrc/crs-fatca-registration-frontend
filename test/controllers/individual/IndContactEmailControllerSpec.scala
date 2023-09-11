@@ -14,44 +14,42 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.individual
 
 import base.SpecBase
-import forms.IndContactHavePhoneFormProvider
-import models.{IndContactHavePhone, NormalMode, UserAnswers}
+import forms.IndContactEmailFormProvider
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.IndContactHavePhonePage
+import pages.IndContactEmailPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
-import views.html.IndContactHavePhoneView
+import views.html.individual.IndContactEmailView
 
 import scala.concurrent.Future
 
-class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
+class IndContactEmailControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val indContactHavePhoneRoute = routes.IndContactHavePhoneController.onPageLoad(NormalMode).url
-
-  val formProvider = new IndContactHavePhoneFormProvider()
+  val formProvider = new IndContactEmailFormProvider()
   val form         = formProvider()
 
-  "IndContactHavePhone Controller" - {
+  lazy val indContactEmailRoute = routes.IndContactEmailController.onPageLoad(NormalMode).url
+
+  "IndContactEmail Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, indContactHavePhoneRoute)
+        val request = FakeRequest(GET, indContactEmailRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndContactHavePhoneView]
+        val view = application.injector.instanceOf[IndContactEmailView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -60,19 +58,19 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndContactHavePhonePage, IndContactHavePhone.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(IndContactEmailPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, indContactHavePhoneRoute)
+        val request = FakeRequest(GET, indContactEmailRoute)
 
-        val view = application.injector.instanceOf[IndContactHavePhoneView]
+        val view = application.injector.instanceOf[IndContactEmailView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IndContactHavePhone.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -89,8 +87,8 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, indContactHavePhoneRoute)
-            .withFormUrlEncodedBody(("value", IndContactHavePhone.values.head.toString))
+          FakeRequest(POST, indContactEmailRoute)
+            .withFormUrlEncodedBody(("value", "email@email.com"))
 
         val result = route(application, request).value
 
@@ -105,12 +103,12 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, indContactHavePhoneRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+          FakeRequest(POST, indContactEmailRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[IndContactHavePhoneView]
+        val view = application.injector.instanceOf[IndContactEmailView]
 
         val result = route(application, request).value
 
@@ -124,29 +122,28 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, indContactHavePhoneRoute)
+        val request = FakeRequest(GET, indContactEmailRoute)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "redirect to Journey Recovery for a POST if no existing data is found" in {
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, indContactHavePhoneRoute)
-            .withFormUrlEncodedBody(("value", IndContactHavePhone.values.head.toString))
+          FakeRequest(POST, indContactEmailRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

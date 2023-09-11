@@ -48,6 +48,7 @@ class Navigator @Inject() () {
           controllers.routes.JourneyRecoveryController.onPageLoad()
         )
     case SecondContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad
+    case IndContactEmailPage    => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
     case _                      => _ => routes.IndexController.onPageLoad
   }
 

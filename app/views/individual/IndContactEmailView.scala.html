@@ -14,32 +14,36 @@
  * limitations under the License.
  *@
 
+@import viewmodels.InputWidth._
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios,
+    govukInput: GovukInput,
     govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("indContactHavePhone.title"))) {
+@layout(pageTitle = title(form, messages("indContactEmail.title"))) {
 
-    @formHelper(action = routes.IndContactHavePhoneController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = controllers.individual.routes.IndContactEmailController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+            @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("indContactHavePhone.heading")</h1>
-        <p class="govuk-body">@messages("indContactHavePhone.p1")</p>
+        <h1 class="govuk-heading-l">@messages("indContactEmail.heading")</h1>
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field  = form("value"),
-                legend = LegendViewModel(messages("indContactHavePhone.heading")).asPageHeading().withCssClass("govuk-visually-hidden")
+        <p  class="govuk-body">@messages("indContactEmail.p1")</p>
+
+        @govukInput(
+            InputViewModel(
+                field = form("value"),
+                    label = LabelViewModel(messages("indContactEmail.heading")).withCssClass( "govuk-visually-hidden")
             )
+            .withWidth(Full)
         )
 
         @govukButton(
