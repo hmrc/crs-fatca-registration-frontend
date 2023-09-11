@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
+import controllers.individual.routes
 import models.{CheckMode, UserAnswers}
 import pages.IndContactHavePhonePage
 import play.api.i18n.Messages

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.individual
 
 import controllers.actions._
 import forms.IndContactHavePhoneFormProvider
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.IndContactHavePhonePage
@@ -26,8 +25,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndContactHavePhoneView
+import views.html.individual.IndContactHavePhoneView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IndContactHavePhoneController @Inject() (
