@@ -154,3 +154,12 @@ indContactHavePhone.p1 = We will call if we have any questions about your report
 indContactHavePhone.checkYourAnswersLabel = Can we contact you by telephone?
 indContactHavePhone.error.required = Select yes if we can contact you by telephone
 indContactHavePhone.change.hidden = Change can we contact you by telephone?
+
+indContactPhone.title = What is your telephone number?
+indContactPhone.heading = What is your telephone number?
+indContactPhone.hint = For international numbers, include the country code.
+indContactPhone.checkYourAnswersLabel = Your contact telephone number
+indContactPhone.error.required = Enter your telephone number
+indContactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
+indContactPhone.error.length = The telephone number must be 24 characters or less
+indContactPhone.change.hidden = Change your contact telephone number

@@ -18,6 +18,7 @@ package navigation
 
 import base.SpecBase
 import controllers.organisation.routes._
+import controllers.individual.routes._
 import controllers.routes
 import pages._
 import models._
@@ -64,6 +65,7 @@ class NavigatorSpec extends SpecBase {
         val userAnswers = emptyUserAnswers.set(SecondContactHavePhonePage, true).success.value
         navigator.nextPage(SecondContactHavePhonePage, NormalMode, userAnswers) mustBe SecondContactPhoneController.onPageLoad(NormalMode)
       }
+
       "must go from SecondContactPhonePage to CheckYourAnswersPage" in {
 
         val userAnswers = emptyUserAnswers.set(SecondContactPhonePage, "123456789").success.value
@@ -74,6 +76,12 @@ class NavigatorSpec extends SpecBase {
         val userAnswers = emptyUserAnswers.set(IndContactEmailPage, "test@email").success.value
         navigator.nextPage(IndContactEmailPage, NormalMode, userAnswers) mustBe
           controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
+      }
+
+      "must go from IndContactPhonePage to CheckYourAnswersPage" in {
+
+        val userAnswers = emptyUserAnswers.set(IndContactPhonePage, "123456789").success.value
+        navigator.nextPage(IndContactPhonePage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
       }
     }
 

@@ -63,15 +63,20 @@ POST       /register/second-contact-have-phone           controllers.organisatio
 GET        /register/change-second-contact-have-phone    controllers.organisation.SecondContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-second-contact-have-phone    controllers.organisation.SecondContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
+
 GET        /register/individual-have-phone               controllers.individual.IndContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/individual-have-phone               controllers.individual.IndContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-individual-have-phone        controllers.individual.IndContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-individual-have-phone        controllers.individual.IndContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
+GET        /register/individual-phone                    controllers.individual.IndContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/individual-phone                    controllers.individual.IndContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-individual-phone             controllers.individual.IndContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-individual-phone             controllers.individual.IndContactPhoneController.onSubmit(mode: Mode = CheckMode)
 
 GET        /register/individual-email                    controllers.individual.IndContactEmailController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/individual-email                    controllers.individual.IndContactEmailController.onSubmit(mode: Mode = NormalMode)
