@@ -23,6 +23,8 @@ import controllers.routes
 import pages._
 import models._
 
+import java.time.LocalDate
+
 class NavigatorSpec extends SpecBase {
 
   val navigator = new Navigator
@@ -82,6 +84,12 @@ class NavigatorSpec extends SpecBase {
 
         val userAnswers = emptyUserAnswers.set(IndContactPhonePage, "123456789").success.value
         navigator.nextPage(IndContactPhonePage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
+      }
+
+      "must go from IndDateOfBirthPage to IndIdentityConfirmedPage" in {
+
+        val userAnswers = emptyUserAnswers.set(IndDateOfBirthPage, LocalDate.now()).success.value
+        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
       }
     }
 
