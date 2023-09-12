@@ -25,5 +25,7 @@
 
     <h1 class="govuk-heading-l">@messages("indIdentityConfirmed.heading")</h1>
 
-    <a href=@url role="button" draggable="false" class="govuk-button" data-module="govuk-button">@messages("site.continue")</a>
+    @govukButton(
+        ButtonViewModel(messages("site.continue")).asLink(url)
+    )
 }
