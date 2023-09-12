@@ -83,4 +83,9 @@ POST       /register/individual-email                    controllers.individual.
 GET        /register/change-individual-email             controllers.individual.IndContactEmailController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-individual-email             controllers.individual.IndContactEmailController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/date-of-birth                        controllers.individual.IndDateOfBirthController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/date-of-birth                        controllers.individual.IndDateOfBirthController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-date-of-birth                 controllers.individual.IndDateOfBirthController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-date-of-birth                 controllers.individual.IndDateOfBirthController.onSubmit(mode: Mode = CheckMode)
+
 GET        /register/identity-confirmed                  controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)

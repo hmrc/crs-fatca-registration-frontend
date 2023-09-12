@@ -42,13 +42,36 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey, args))
 
-  protected def localDate(invalidKey: String,
-                          allRequiredKey: String,
-                          twoRequiredKey: String,
-                          requiredKey: String,
-                          args: Seq[String] = Seq.empty
+  protected def localDate(
+    invalidKey: String,
+    notRealDateKey: String,
+    allRequiredKey: String,
+    dayRequiredKey: String,
+    monthRequiredKey: String,
+    yearRequiredKey: String,
+    dayAndMonthRequiredKey: String,
+    dayAndYearRequiredKey: String,
+    monthAndYearRequiredKey: String,
+    futureDateKey: String,
+    tooEarlyDateKey: String,
+    args: Seq[String] = Seq.empty
   ): FieldMapping[LocalDate] =
-    of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
+    of(
+      new LocalDateFormatter(
+        invalidKey,
+        notRealDateKey,
+        allRequiredKey,
+        dayRequiredKey,
+        monthRequiredKey,
+        yearRequiredKey,
+        dayAndMonthRequiredKey,
+        dayAndYearRequiredKey,
+        monthAndYearRequiredKey,
+        futureDateKey,
+        tooEarlyDateKey,
+        args
+      )
+    )
 
   protected def validatedText(
     requiredKey: String,

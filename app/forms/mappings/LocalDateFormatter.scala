@@ -16,8 +16,7 @@
 
 package forms.mappings
 
-import java.time.LocalDate
-
+import java.time.{LocalDate, Month, ZoneOffset}
 import play.api.data.FormError
 import play.api.data.format.Formatter
 
@@ -25,21 +24,31 @@ import scala.util.{Failure, Success, Try}
 
 private[mappings] class LocalDateFormatter(
   invalidKey: String,
+  notRealDateKey: String,
   allRequiredKey: String,
-  twoRequiredKey: String,
-  requiredKey: String,
+  dayRequiredKey: String,
+  monthRequiredKey: String,
+  yearRequiredKey: String,
+  dayAndMonthRequiredKey: String,
+  dayAndYearRequiredKey: String,
+  monthAndYearRequiredKey: String,
+  futureDateKey: String,
+  tooEarlyDateKey: String,
   args: Seq[String] = Seq.empty
 ) extends Formatter[LocalDate]
     with Formatters {
 
   private val fieldKeys: List[String] = List("day", "month", "year")
 
+  private val EarliestYear          = 1900
+  private val earliestAllowableDate = LocalDate.of(EarliestYear, Month.JANUARY, 1)
+
   private def toDate(key: String, day: Int, month: Int, year: Int): Either[Seq[FormError], LocalDate] =
     Try(LocalDate.of(year, month, day)) match {
       case Success(date) =>
         Right(date)
       case Failure(_) =>
-        Left(Seq(FormError(key, invalidKey, args)))
+        Left(Seq(FormError(key, notRealDateKey, args)))
     }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
@@ -73,17 +82,43 @@ private[mappings] class LocalDateFormatter(
 
     fields.count(_._2.isDefined) match {
       case 3 =>
-        formatDate(key, data).left.map {
-          _.map(_.copy(key = key, args = args))
-        }
+        formatDate(key, data).left
+          .map {
+            _.map(_.copy(key = key, args = args))
+          }
+          .flatMap {
+            case validDate if validDate.isAfter(LocalDate.now(ZoneOffset.UTC)) =>
+              Left(List(FormError(key, futureDateKey, args)))
+            case validDate if validDate.isBefore(earliestAllowableDate) =>
+              Left(List(FormError(key, tooEarlyDateKey, args)))
+            case validDate => Right(validDate)
+          }
       case 2 =>
-        Left(List(FormError(key, requiredKey, missingFields ++ args)))
+        singleFieldMissing(key, missingFields)
       case 1 =>
-        Left(List(FormError(key, twoRequiredKey, missingFields ++ args)))
+        twoFieldsMissing(key, missingFields)
       case _ =>
         Left(List(FormError(key, allRequiredKey, args)))
     }
   }
+
+  private def twoFieldsMissing(key: String, missingFields: => List[String]) =
+    if (!missingFields.exists(_.toLowerCase.contains("day"))) {
+      Left(List(FormError(key, monthAndYearRequiredKey, missingFields ++ args)))
+    } else if (!missingFields.exists(_.toLowerCase.contains("month"))) {
+      Left(List(FormError(key, dayAndYearRequiredKey, missingFields ++ args)))
+    } else {
+      Left(List(FormError(key, dayAndMonthRequiredKey, missingFields ++ args)))
+    }
+
+  private def singleFieldMissing(key: String, missingFields: => List[String]) =
+    if (missingFields.exists(_.toLowerCase.contains("day"))) {
+      Left(List(FormError(key, dayRequiredKey, missingFields ++ args)))
+    } else if (missingFields.exists(_.toLowerCase.contains("month"))) {
+      Left(List(FormError(key, monthRequiredKey, missingFields ++ args)))
+    } else {
+      Left(List(FormError(key, yearRequiredKey, missingFields ++ args)))
+    }
 
   override def unbind(key: String, value: LocalDate): Map[String, String] =
     Map(
