@@ -166,3 +166,8 @@ indContactPhone.change.hidden = Change your contact telephone number
 
 indIdentityConfirmed.title = We have confirmed your identity
 indIdentityConfirmed.heading = We have confirmed your identity
+
+indCouldNotConfirmIdentity.title = We could not confirm your identity
+indCouldNotConfirmIdentity.heading = We could not confirm your identity
+indCouldNotConfirmIdentity.p1 = The information you have entered does not match our records.
+indCouldNotConfirmIdentity.button = Try again
