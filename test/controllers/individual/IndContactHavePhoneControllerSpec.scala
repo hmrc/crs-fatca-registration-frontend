@@ -18,11 +18,13 @@ package controllers.individual
 
 import base.SpecBase
 import forms.IndContactHavePhoneFormProvider
-import models.{IndContactHavePhone, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalacheck.Arbitrary
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.IndContactHavePhonePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -58,7 +60,7 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndContactHavePhonePage, IndContactHavePhone.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(IndContactHavePhonePage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -70,30 +72,36 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IndContactHavePhone.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      forAll(Arbitrary.arbitrary[Boolean]) {
+        booleanAnswer =>
+          val booleanAnswerAsString = booleanAnswer.toString
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
-          .build()
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, indContactHavePhoneRoute)
-            .withFormUrlEncodedBody(("value", IndContactHavePhone.values.head.toString))
+          val userAnswers = emptyUserAnswers
+          val application =
+            applicationBuilder(userAnswers = Some(userAnswers))
+              .overrides(
+                bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+              )
+              .build()
 
-        val result = route(application, request).value
+          running(application) {
+            val request =
+              FakeRequest(POST, indContactHavePhoneRoute)
+                .withFormUrlEncodedBody(("value", booleanAnswerAsString))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual onwardRoute.url
+          }
       }
     }
 
@@ -138,7 +146,7 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, indContactHavePhoneRoute)
-            .withFormUrlEncodedBody(("value", IndContactHavePhone.values.head.toString))
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 

@@ -29,7 +29,7 @@
     @formHelper(action = controllers.organisation.routes.HaveSecondContactController.onSubmit(mode), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+            @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
         <h1 class="govuk-heading-l">@messages("haveSecondContact.heading", contactName)</h1>
