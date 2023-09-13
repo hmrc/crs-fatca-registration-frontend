@@ -88,4 +88,9 @@ POST       /register/date-of-birth                        controllers.individual
 GET        /register/change-date-of-birth                 controllers.individual.IndDateOfBirthController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-date-of-birth                 controllers.individual.IndDateOfBirthController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/name                                controllers.individual.IndContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/name                                controllers.individual.IndContactNameController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-name                         controllers.individual.IndContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-name                         controllers.individual.IndContactNameController.onSubmit(mode: Mode = CheckMode)
+
 GET        /register/identity-confirmed                  controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)
