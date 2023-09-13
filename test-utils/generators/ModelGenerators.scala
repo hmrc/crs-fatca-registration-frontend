@@ -30,15 +30,5 @@ trait ModelGenerators {
       } yield IndContactName(FirstName, LastName)
     }
 
-  implicit lazy val arbitraryIndContactHavePhone: Arbitrary[IndContactHavePhone] =
-    Arbitrary {
-      Gen.oneOf(IndContactHavePhone.values.toSeq)
-    }
-
-  implicit lazy val arbitraryHaveSecondContact: Arbitrary[HaveSecondContact] =
-    Arbitrary {
-      Gen.oneOf(HaveSecondContact.values.toSeq)
-    }
-
 //Line holder for template scripts
 }
