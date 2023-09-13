@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import models.IndContactName
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+case object IndContactNamePage extends QuestionPage[IndContactName] {
 
-  implicit lazy val arbitraryIndContactName: Arbitrary[IndContactName] =
-    Arbitrary {
-      for {
-        FirstName <- arbitrary[String]
-        LastName  <- arbitrary[String]
-      } yield IndContactName(FirstName, LastName)
-    }
+  override def path: JsPath = JsPath \ toString
 
-//Line holder for template scripts
+  override def toString: String = "indContactName"
 }

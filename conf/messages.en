@@ -181,5 +181,20 @@ indDateOfBirth.error.futureDate = Date of birth must be before [today’s date]
 indDateOfBirth.error.tooEarlyDate = Date of birth must be after 1900
 indDateOfBirth.change.hidden = Change your date of birth
 
+indContactName.title = What is your name?
+indContactName.heading = What is your name?
+indContactName.firstName = First name
+indContactName.lastName = Last name
+indContactName.checkYourAnswersLabel = IndContactName
+indContactName.error.firstName.required = Enter your first name
+indContactName.error.lastName.required = Enter your last name
+indContactName.error.firstName.invalid = The first name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+indContactName.error.lastName.invalid = The last name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+indContactName.error.firstName.length = The first name must be 35 characters or less
+indContactName.error.lastName.length = The last name must be 35 characters or less
+indContactName.firstName.change.hidden = firstName
+indContactName.lastName.change.hidden = lastName
+
+
 indIdentityConfirmed.title = We have confirmed your identity
 indIdentityConfirmed.heading = We have confirmed your identity
