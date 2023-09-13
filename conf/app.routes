@@ -94,3 +94,6 @@ GET        /register/change-name                         controllers.individual.
 POST       /register/change-name                         controllers.individual.IndContactNameController.onSubmit(mode: Mode = CheckMode)
 
 GET        /register/identity-confirmed                  controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)
+
+
+GET        /register/could-not-confirm-identity          controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad()

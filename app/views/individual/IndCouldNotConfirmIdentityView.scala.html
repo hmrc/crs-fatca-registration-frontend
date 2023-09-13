@@ -19,13 +19,17 @@
         govukButton: GovukButton
 )
 
-@(mode: Mode, url: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("indIdentityConfirmed.title"))) {
+@layout(pageTitle = titleNoForm(messages("indCouldNotConfirmIdentity.title"))) {
 
-    <h1 class="govuk-heading-l">@messages("indIdentityConfirmed.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("indCouldNotConfirmIdentity.heading")</h1>
 
+    <p class="govuk-body">@messages("indCouldNotConfirmIdentity.p1")</p>
+
+    <!-- ToDo update asLink with href when available -->
     @govukButton(
-        ButtonViewModel(messages("site.continue")).asLink(url)
+        ButtonViewModel(messages("indCouldNotConfirmIdentity.button")).asLink("#")
     )
+
 }
