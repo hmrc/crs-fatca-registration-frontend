@@ -18,7 +18,7 @@ package controllers.organisation
 
 import base.SpecBase
 import forms.HaveSecondContactFormProvider
-import models.{HaveSecondContact, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -61,7 +61,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(HaveSecondContactPage, HaveSecondContact.values.head)
+        .set(HaveSecondContactPage, true)
         .success
         .value
         .set(ContactNamePage, contactName)
@@ -78,7 +78,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(HaveSecondContact.values.head), contactName, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), contactName, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -96,7 +96,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, haveSecondContactRoute)
-            .withFormUrlEncodedBody(("value", HaveSecondContact.values.head.toString))
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
@@ -146,7 +146,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, haveSecondContactRoute)
-            .withFormUrlEncodedBody(("value", HaveSecondContact.values.head.toString))
+            .withFormUrlEncodedBody(("value", ""))
 
         val result = route(application, request).value
 
