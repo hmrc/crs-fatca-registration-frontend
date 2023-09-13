@@ -95,5 +95,9 @@ POST       /register/change-name                         controllers.individual.
 
 GET        /register/identity-confirmed                  controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)
 
-
 GET        /register/could-not-confirm-identity          controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad()
+
+GET        /register/ni-number                        controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/ni-number                        controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-ni-number                  controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-ni-number                  controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)

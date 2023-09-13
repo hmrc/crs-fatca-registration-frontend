@@ -203,3 +203,13 @@ indCouldNotConfirmIdentity.title = We could not confirm your identity
 indCouldNotConfirmIdentity.heading = We could not confirm your identity
 indCouldNotConfirmIdentity.p1 = The information you have entered does not match our records.
 indCouldNotConfirmIdentity.button = Try again
+
+whatIsYourNINumber.title = What is your National Insurance number?
+whatIsYourNINumber.heading = What is your National Insurance number?
+whatIsYourNINumber.checkYourAnswersLabel = Your National Insurance number
+whatIsYourNINumber.checkYourAnswersLabel.hiddentText = your National Insurance number
+whatIsYourNINumber.hint = It is on your National Insurance card, benefit letter, payslip or P60.  For example, ''QQ 12 34 56 C''.
+whatIsYourNINumber.error.required = Enter your National Insurance number
+whatIsYourNINumber.error.format.invalid = Enter your National Insurance number in the correct format
+whatIsYourNINumber.error.invalid = Enter a real National Insurance number
+whatIsYourNINumber.error.length = Your National Insurance Number must be 9 characters or less
