@@ -97,3 +97,8 @@ GET        /register/identity-confirmed                  controllers.individual.
 
 
 GET        /register/could-not-confirm-identity          controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad()
+
+GET        /register/without-id/business-name            controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/business-name            controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-business-name     controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-business-name     controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
