@@ -209,4 +209,4 @@ haveNINumber.heading = Do you have a National Insurance number?
 haveNINumber.hint = You can find your National Insurance number on your payslip, P60 or letters about tax, pensions and benefits.
 haveNINumber.checkYourAnswersLabel =  Do you have a National Insurance number?
 haveNINumber.checkYourAnswersLabel.hiddenText = Change if you have a National Insurance number
-haveNINumber.error.required = Select yes if you have National Insurance number
+haveNINumber.error.required = Select yes if you have a National Insurance number
