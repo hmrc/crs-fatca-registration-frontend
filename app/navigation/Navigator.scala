@@ -57,10 +57,11 @@ class Navigator @Inject() () {
         yesNoPage(
           userAnswers,
           HaveTradingNamePage,
-          controllers.routes.IndexController.onPageLoad, // ToDo update to what is your trading name page
+          controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(NormalMode),
           controllers.routes.IndexController.onPageLoad // ToDo update to business address page
         )
-    case _ => _ => routes.IndexController.onPageLoad
+    case BusinessTradingNameWithoutIDPage => _ => controllers.routes.IndexController.onPageLoad // ToDo update to business address page
+    case _                                => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
