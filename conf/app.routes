@@ -102,3 +102,8 @@ GET        /register/have-ni-number                      controllers.organisatio
 POST       /register/have-ni-number                      controllers.organisation.HaveNINumberController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-have-ni-number               controllers.organisation.HaveNINumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-have-ni-number               controllers.organisation.HaveNINumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/without-id/business-name            controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/business-name            controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-business-name     controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-business-name     controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
