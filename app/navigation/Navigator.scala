@@ -57,8 +57,8 @@ class Navigator @Inject() () {
         yesNoPage(
           userAnswers,
           HaveTradingNamePage,
-          controllers.routes.JourneyRecoveryController.onPageLoad(), // ToDo update to what is your trading name page
-          controllers.routes.JourneyRecoveryController.onPageLoad() // ToDo update to business address page
+          controllers.routes.IndexController.onPageLoad, // ToDo update to what is your trading name page
+          controllers.routes.IndexController.onPageLoad // ToDo update to business address page
         )
     case _ => _ => routes.IndexController.onPageLoad
   }
