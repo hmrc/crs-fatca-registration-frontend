@@ -218,3 +218,9 @@ indDoYouHaveNINumber.hint = You can find your National Insurance number on your 
 indDoYouHaveNINumber.checkYourAnswersLabel = Do you have a National Insurance number?
 indDoYouHaveNINumber.checkYourAnswersLabel.hiddenText = Change if you have a National Insurance number
 indDoYouHaveNINumber.error.required = Select yes if you have a National Insurance number
+
+haveTradingName.title = Does your business trade under a different name?
+haveTradingName.heading = Does your business trade under a different name?
+haveTradingName.checkYourAnswersLabel = haveTradingName
+haveTradingName.error.required = Select yes if your business trades under a different name
+haveTradingName.change.hidden = HaveTradingName
