@@ -17,7 +17,6 @@
 package forms.mappings
 
 import java.time.LocalDate
-
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
 import models.Enumerable
@@ -53,7 +52,9 @@ trait Mappings extends Formatters with Constraints {
     dayAndYearRequiredKey: String,
     monthAndYearRequiredKey: String,
     futureDateKey: String,
-    tooEarlyDateKey: String,
+    pastDateKey: String,
+    maxDate: LocalDate,
+    minDate: LocalDate,
     args: Seq[String] = Seq.empty
   ): FieldMapping[LocalDate] =
     of(
@@ -68,7 +69,9 @@ trait Mappings extends Formatters with Constraints {
         dayAndYearRequiredKey,
         monthAndYearRequiredKey,
         futureDateKey,
-        tooEarlyDateKey,
+        pastDateKey,
+        maxDate,
+        minDate,
         args
       )
     )
