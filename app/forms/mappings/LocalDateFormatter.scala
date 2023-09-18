@@ -70,26 +70,13 @@ private[mappings] class LocalDateFormatter(
 
   val returnKey: (String, String) => String = (key: String, fieldName: String) => s"$key.$fieldName"
 
-  private def validateDay(day: String): Boolean = Try(day.toInt) match {
-    case Success(dateField) => dateField >= 1 && dateField <= 31
-    case Failure(_)         => false
-  }
-
-  private def validateMonth(month: String): Boolean = Try(month.toInt) match {
-    case Success(dateField) => dateField >= 1 && dateField <= 12
-    case Failure(_)         => false
-  }
-
-  private def validateYear(year: String): Boolean = Try(year.toInt) match {
-    case Success(_) => true
-    case Failure(_) => false
-  }
+  private def isNumber(dateField: String): Boolean = Try(dateField.toInt).isSuccess
 
   private def validateDateField(field: String, value: String): Option[String] =
     field match {
-      case fieldValue if fieldValue.matches(""".*[.]day$""")   => if (validateDay(value)) None else Some("day")
-      case fieldValue if fieldValue.matches(""".*[.]month$""") => if (validateMonth(value)) None else Some("month")
-      case fieldValue if fieldValue.matches(""".*[.]year$""")  => if (validateYear(value)) None else Some("year")
+      case fieldValue if fieldValue.matches(""".*[.]day$""")   => if (isNumber(value)) None else Some("day")
+      case fieldValue if fieldValue.matches(""".*[.]month$""") => if (isNumber(value)) None else Some("month")
+      case fieldValue if fieldValue.matches(""".*[.]year$""")  => if (isNumber(value)) None else Some("year")
     }
 
   private def missingFields(key: String, data: Map[String, String]): Either[Seq[FormError], Map[String, String]] = {

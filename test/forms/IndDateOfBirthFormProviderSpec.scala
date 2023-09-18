@@ -101,6 +101,21 @@ class IndDateOfBirthFormProviderSpec extends DateBehaviours {
       result.errors.head.message mustBe "indDateOfBirth.error.pastDate"
     }
 
+    "must not allow a date that is not real e.g. 30th of Feb" in {
+      val key  = "value"
+      val date = minDate.minusDays(1)
+      val data = Map(
+        s"$key.day"   -> "30",
+        s"$key.month" -> "02",
+        s"$key.year"  -> date.getYear.toString
+      )
+
+      val result: Form[LocalDate] = form.bind(data)
+
+      result.errors.size mustBe 1
+      result.errors.head.message mustBe "indDateOfBirth.error.notRealDate"
+    }
+
   }
 
 }
