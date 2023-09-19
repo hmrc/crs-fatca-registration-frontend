@@ -35,7 +35,7 @@ class IndDateOfBirthFormProviderSpec extends DateBehaviours {
 
     behave like dateField(form, "value", validData)
 
-    behave like mandatoryDateField(form, "value.day", "indDateOfBirth.error.required.all")
+    behave like mandatoryDateField(form, "value", "indDateOfBirth.error.required.all")
 
     "must return a FormError when month is missing" in {
       val key  = "value"
@@ -68,7 +68,6 @@ class IndDateOfBirthFormProviderSpec extends DateBehaviours {
 
       result.errors.size mustBe 1
       result.errors.head.message mustBe "indDateOfBirth.error.invalid"
-      result.errors.head.args mustBe Seq("month")
     }
 
     "must not allow a date later than today" in {

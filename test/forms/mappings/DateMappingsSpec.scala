@@ -76,7 +76,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
     val result = form.bind(Map.empty[String, String])
 
-    result.errors must contain only FormError("value.day", "error.required.all", List.empty)
+    result.errors must contain only FormError("value", "error.required.all", List.empty)
   }
 
   "must fail to bind a date with a missing day" in {
@@ -95,7 +95,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.day", "error.required.day", List("day"))
+        result.errors must contain only FormError("value", "error.required.day", List("day"))
     }
   }
 
@@ -112,7 +112,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
         val result = form.bind(data)
 
         result.errors must contain(
-          FormError("value.day", "error.invalid", List("day"))
+          FormError("value", "error.invalid", List())
         )
     }
   }
@@ -133,7 +133,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.month", "error.required.month", List("month"))
+        result.errors must contain only FormError("value", "error.required.month", List("month"))
     }
   }
 
@@ -150,7 +150,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
         val result = form.bind(data)
 
         result.errors must contain(
-          FormError("value.month", "error.invalid", List("month"))
+          FormError("value", "error.invalid", List())
         )
     }
   }
@@ -171,7 +171,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.year", "error.required.year", List("year"))
+        result.errors must contain only FormError("value", "error.required.year", List("year"))
     }
   }
 
@@ -188,7 +188,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
         val result = form.bind(data)
 
         result.errors must contain(
-          FormError("value.year", "error.invalid", List("year"))
+          FormError("value", "error.invalid", List())
         )
     }
   }
@@ -213,7 +213,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.day", "error.required.dayAndMonth", List("day", "month"))
+        result.errors must contain only FormError("value", "error.required.dayAndMonth", List("day", "month"))
     }
   }
 
@@ -237,7 +237,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.day", "error.required.dayAndYear", List("day", "year"))
+        result.errors must contain only FormError("value", "error.required.dayAndYear", List("day", "year"))
     }
   }
 
@@ -261,7 +261,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.month", "error.required.monthAndYear", List("month", "year"))
+        result.errors must contain only FormError("value", "error.required.monthAndYear", List("month", "year"))
     }
   }
 
@@ -277,7 +277,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.day", "error.invalid", List.empty)
+        result.errors must contain only FormError("value", "error.invalid", List.empty)
     }
   }
 
@@ -293,7 +293,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.day", "error.invalid", List.empty)
+        result.errors must contain only FormError("value", "error.invalid", List.empty)
     }
   }
 
@@ -309,7 +309,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.day", "error.invalid", List.empty)
+        result.errors must contain only FormError("value", "error.invalid", List.empty)
     }
   }
 
@@ -325,7 +325,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value.day", "error.invalid", List.empty)
+        result.errors must contain only FormError("value", "error.invalid", List.empty)
     }
   }
 

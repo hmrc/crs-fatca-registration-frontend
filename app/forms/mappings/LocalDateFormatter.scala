@@ -68,85 +68,53 @@ private[mappings] class LocalDateFormatter(
     } yield date
   }
 
-  val returnKey: (String, String) => String = (key: String, fieldName: String) => s"$key.$fieldName"
+  override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
+    val fields = fieldKeys
+      .map(
+        field => field -> data.get(s"$key.$field").filter(_.nonEmpty)
+      )
+      .toMap
 
-  private def isNumber(dateField: String): Boolean = Try(dateField.toInt).isSuccess
+    lazy val missingFields = fields
+      .withFilter(_._2.isEmpty)
+      .map(_._1)
+      .toList
 
-  private def validateDateField(field: String, value: String): Option[String] =
-    field match {
-      case fieldValue if fieldValue.matches(""".*[.]day$""")   => if (isNumber(value)) None else Some("day")
-      case fieldValue if fieldValue.matches(""".*[.]month$""") => if (isNumber(value)) None else Some("month")
-      case fieldValue if fieldValue.matches(""".*[.]year$""")  => if (isNumber(value)) None else Some("year")
-    }
-
-  private def missingFields(key: String, data: Map[String, String]): Either[Seq[FormError], Map[String, String]] = {
-
-    def messageNeeded(missingFields: List[String]) =
-      missingFields.size match {
-        case 3 => allRequiredKey
-        case 2 => twoFieldsMissing(missingFields)
-        case 1 => singleFieldMissing(missingFields)
-      }
-
-    val missingFields = fieldKeys flatMap {
-      field => if (!data.contains(s"$key.$field") || data(s"$key.$field").isEmpty) Some(field) else None
-    }
-
-    if (missingFields.isEmpty) {
-      Right(data)
-    } else {
-      if (fieldKeys.size == missingFields.size) {
-        Left(Seq(FormError(returnKey(key, missingFields.head), messageNeeded(missingFields), args)))
-      } else {
-        Left(Seq(FormError(returnKey(key, missingFields.head), messageNeeded(missingFields), missingFields ++ args)))
-      }
+    fields.count(_._2.isDefined) match {
+      case 3 => noMissingField(key, data)
+      case 2 => singleFieldMissing(key, missingFields)
+      case 1 => twoFieldsMissing(key, missingFields)
+      case _ => Left(List(FormError(key, allRequiredKey, args)))
     }
   }
 
-  private def validNumbers(key: String, data: Map[String, String]): Either[Seq[FormError], Map[String, String]] =
-    data.toList
-      .filter(_._1 != "csrfToken")
-      .flatMap(
-        (dateField: (String, String)) => validateDateField(dateField._1, dateField._2)
-      ) match {
-      case Nil                      => Right(data)
-      case items if items.size == 1 => Left(Seq(FormError(returnKey(key, items.head), invalidKey, items ++ args)))
-      case _                        => Left(Seq(FormError(returnKey(key, "day"), invalidKey, args)))
-    }
+  private def noMissingField(key: String, data: Map[String, String]) =
+    formatDate(key, data).left
+      .map(_.map(_.copy(key = key, args = args)))
+      .flatMap {
+        case validDate if validDate.isAfter(maxDate) =>
+          Left(List(FormError(key, futureDateKey, List(formatDateToString(maxDate)) ++ args)))
+        case validDate if validDate.isBefore(minDate) =>
+          Left(List(FormError(key, pastDateKey, args)))
+        case validDate => Right(validDate)
+      }
 
-  private def datePredicate(key: String, date: LocalDate, testDate: LocalDate, message: String)(f: LocalDate => Boolean): Either[Seq[FormError], LocalDate] =
-    if (f(date)) Left(Seq(FormError(returnKey(key, "day"), message, List(formatDateToString(testDate)) ++ args))) else Right(date)
-
-  private def trimMap(data: Map[String, String]) =
-    data.foldLeft(Map.empty[String, String])(
-      (accumulator, values) => accumulator + (values._1 -> values._2.trim)
-    )
-
-  override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] =
-    for {
-      missing    <- missingFields(key, trimMap(data))
-      valid      <- validNumbers(key, missing)
-      dateValid  <- formatDate(key, valid)
-      dateBefore <- datePredicate(key, dateValid, minDate, pastDateKey)(_.isBefore(minDate))
-      dateAfter  <- datePredicate(key, dateBefore, maxDate, futureDateKey)(_.isAfter(maxDate))
-    } yield dateAfter
-
-  private def twoFieldsMissing(missingFields: List[String]) =
+  private def twoFieldsMissing(key: String, missingFields: => List[String]) =
     if (!missingFields.exists(_.toLowerCase.contains("day"))) {
-      monthAndYearRequiredKey
+      Left(List(FormError(key, monthAndYearRequiredKey, missingFields ++ args)))
     } else if (!missingFields.exists(_.toLowerCase.contains("month"))) {
-      dayAndYearRequiredKey
+      Left(List(FormError(key, dayAndYearRequiredKey, missingFields ++ args)))
     } else {
-      dayAndMonthRequiredKey
+      Left(List(FormError(key, dayAndMonthRequiredKey, missingFields ++ args)))
     }
 
-  private def singleFieldMissing(missingFields: List[String]) =
+  private def singleFieldMissing(key: String, missingFields: => List[String]) =
     if (missingFields.exists(_.toLowerCase.contains("day"))) {
-      dayRequiredKey
+      Left(List(FormError(key, dayRequiredKey, missingFields ++ args)))
     } else if (missingFields.exists(_.toLowerCase.contains("month"))) {
-      monthRequiredKey
+      Left(List(FormError(key, monthRequiredKey, missingFields ++ args)))
     } else {
-      yearRequiredKey
+      Left(List(FormError(key, yearRequiredKey, missingFields ++ args)))
     }
 
   override def unbind(key: String, value: LocalDate): Map[String, String] =
