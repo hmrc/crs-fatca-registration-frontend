@@ -46,7 +46,7 @@ class BusinessAddressWithoutIDController @Inject() (
     with I18nSupport
     with Logging {
 
-  val countriesList: Option[Seq[Country]] = countryListFactory.countryListWithoutGB
+  private val countriesList: Option[Seq[Country]] = countryListFactory.countryListWithoutGB
 
   def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
@@ -70,7 +70,7 @@ class BusinessAddressWithoutIDController @Inject() (
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")
           // TODO: Change this to ThereIsAProblemController when implemented
-          Redirect(routes.BusinessAddressWithoutIDController.onPageLoad(mode))
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
   }
 
@@ -103,7 +103,7 @@ class BusinessAddressWithoutIDController @Inject() (
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")
           // TODO: Change this to ThereIsAProblemController when implemented
-          Future.successful(Redirect(routes.BusinessAddressWithoutIDController.onPageLoad(mode)))
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 

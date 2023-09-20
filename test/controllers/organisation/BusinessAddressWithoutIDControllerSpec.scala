@@ -20,6 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import forms.AddressWithoutIdFormProvider
 import models.{Address, Country, NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -44,7 +45,8 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
   val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   val countryListFactory: CountryListFactory = new CountryListFactory(app.environment, mockAppConfig) {
-    override lazy val countryList: Option[Seq[Country]] = Some(testCountryList)
+    override lazy val countryList: Option[Seq[Country]]          = Some(testCountryList)
+    override lazy val countryListWithoutGB: Option[Seq[Country]] = Some(testCountryList)
   }
 
   lazy val SubmitBusinessAddressWithoutIDRoute = routes.BusinessAddressWithoutIDController.onSubmit(NormalMode).url
@@ -54,7 +56,11 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[CountryListFactory].to(countryListFactory)
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, LoadBusinessAddressWithoutIDRoute)
@@ -78,7 +84,11 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
       val userAnswers = UserAnswers(userAnswersId).set(BusinessAddressWithoutIDPage, address).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(
+          bind[CountryListFactory].to(countryListFactory)
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, LoadBusinessAddressWithoutIDRoute)
@@ -102,9 +112,10 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder()
+      val application = applicationBuilder(Some(emptyUserAnswers))
         .overrides(
-          bind[CountryListFactory].to(countryListFactory)
+          bind[CountryListFactory].to(countryListFactory),
+          bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
         )
         .build()
 
@@ -128,7 +139,11 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[CountryListFactory].to(countryListFactory)
+        )
+        .build()
 
       running(application) {
         val request =
