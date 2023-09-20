@@ -1,0 +1,14 @@
+[
+  {"code": "GB", "state":  "valid", "description": "United Kingdom"},
+  {"code": "SV", "state":  "valid", "description": "El Salvador"},
+  {"code": "SX", "state":  "valid", "description": "Sint Maarten (Dutchpart)"},
+  {"code": "UM", "state":  "valid", "description": "US Minor Outlying Islands"},
+  {"code": "US", "state":  "valid", "description": "United States"},
+  {"code": "UY", "state":  "valid", "description": "Uruguay"},
+  {"code": "UZ", "state":  "valid", "description": "Uzbekistan"},
+  {"code": "VA", "state":  "valid", "description": "Vatican City"},
+  {"code": "VC", "state":  "valid", "description": "St Vincent"},
+  {"code": "VE", "state":  "valid", "description": "Venezuela"},
+  {"code": "VG", "state":  "valid", "description": "British Virgin Islands"},
+  {"code": "VI", "state":  "valid", "description": "United States Virgin Islands"}
+]

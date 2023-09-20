@@ -22,7 +22,7 @@ import models.Enumerable
 
 import scala.util.control.Exception.nonFatalCatch
 
-trait Formatters {
+trait Formatters extends Transforms {
 
   private[mappings] def stringFormatter(errorKey: String, args: Seq[String] = Seq.empty): Formatter[String] = new Formatter[String] {
 
@@ -155,6 +155,56 @@ trait Formatters {
 
       override def unbind(key: String, value: String): Map[String, String] =
         Map(key -> value)
+
+    }
+
+  protected def validatedOptionalTextFormatter(invalidKey: String, lengthKey: String, regex: String, length: Int): Formatter[Option[String]] =
+    new Formatter[Option[String]] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] =
+        data.get(key) match {
+          case Some(str) if str.trim.length == 0 => Right(None)
+          case Some(str) if !str.matches(regex)  => Left(Seq(FormError(key, invalidKey)))
+          case Some(str) if str.length > length  => Left(Seq(FormError(key, lengthKey)))
+          case Some(str)                         => Right(Some(str))
+          case _                                 => Right(None)
+        }
+
+      override def unbind(key: String, value: Option[String]): Map[String, String] =
+        Map(key -> value.getOrElse(""))
+
+    }
+
+  private[mappings] def optionalPostcodeFormatter(requiredKey: String,
+                                                  lengthKey: String,
+                                                  invalidKey: String,
+                                                  regex: String,
+                                                  countryFieldName: String
+  ): Formatter[Option[String]] =
+    new Formatter[Option[String]] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
+        val postCode                        = postCodeDataTransform(data.get(key))
+        val country                         = countryDataTransform(data.get(countryFieldName))
+        val maxLengthPostcode               = 10
+        val countryCodesThatRequirePostcode = List("JE", "GG", "IM")
+
+        (postCode, country) match {
+          case (Some(postcode), Some(countryCode)) if countryCodesThatRequirePostcode.contains(countryCode) && !stripSpaces(postcode).matches(regex) =>
+            Left(Seq(FormError(key, invalidKey)))
+
+          case (None, Some(countryCode)) if countryCodesThatRequirePostcode.contains(countryCode) => Left(Seq(FormError(key, requiredKey)))
+
+          case (Some(postcode), _) if postcode.length <= maxLengthPostcode => Right(Some(postcode))
+
+          case (Some(_), _) => Left(Seq(FormError(key, lengthKey)))
+
+          case _ => Right(None)
+        }
+      }
+
+      override def unbind(key: String, value: Option[String]): Map[String, String] =
+        Map(key -> value.getOrElse(""))
 
     }
 

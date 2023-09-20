@@ -49,9 +49,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     "en" -> Lang("en")
   )
 
-  val timeout: Int         = configuration.get[Int]("timeout-dialog.timeout")
-  val countdown: Int       = configuration.get[Int]("timeout-dialog.countdown")
-  val enrolmentKey: String = configuration.get[String](s"keys.enrolmentKey.crsFatca")
+  val timeout: Int                 = configuration.get[Int]("timeout-dialog.timeout")
+  val countdown: Int               = configuration.get[Int]("timeout-dialog.countdown")
+  val enrolmentKey: String         = configuration.get[String](s"keys.enrolmentKey.crsFatca")
+  lazy val countryCodeJson: String = configuration.get[String]("json.countries")
 
   val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 }
