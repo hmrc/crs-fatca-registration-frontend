@@ -16,44 +16,105 @@
 
 package forms
 
-import java.time.{LocalDate, Month, ZoneOffset}
+import java.time.{LocalDate, ZoneOffset}
 import forms.behaviours.DateBehaviours
-import play.api.data.FormError
+import play.api.data.Form
 
 class IndDateOfBirthFormProviderSpec extends DateBehaviours {
 
   val form = new IndDateOfBirthFormProvider()()
 
-  private val fieldName = "value"
-
   ".value" - {
 
-    val now          = LocalDate.now(ZoneOffset.UTC)
-    val tooEarlyDate = LocalDate.of(1900, Month.JANUARY, 1)
-    val testDate     = LocalDate.of(2000, 1, 1)
+    val minDate = LocalDate.of(1900, 1, 1)
 
     val validData = datesBetween(
-      min = testDate,
-      max = now
+      min = minDate,
+      max = LocalDate.now(ZoneOffset.UTC)
     )
 
-    behave like dateField(form, fieldName, validData)
+    behave like dateField(form, "value", validData)
 
-    behave like mandatoryDateField(form, fieldName, "indDateOfBirth.error.required.all")
+    behave like mandatoryDateField(form, "value", "indDateOfBirth.error.required.all")
 
-    behave like dateFieldWithMax(
-      form,
-      fieldName,
-      now,
-      FormError(fieldName, "indDateOfBirth.error.futureDate")
-    )
+    "must return a FormError when month is missing" in {
+      val key  = "value"
+      val date = LocalDate.now()
 
-    behave like dateFieldWithMin(
-      form,
-      fieldName,
-      tooEarlyDate,
-      FormError(fieldName, "indDateOfBirth.error.tooEarlyDate")
-    )
+      val data = Map(
+        s"$key.day"   -> date.getDayOfMonth.toString,
+        s"$key.month" -> "",
+        s"$key.year"  -> date.getYear.toString
+      )
+
+      val result = form.bind(data)
+
+      result.errors.size mustBe 1
+      result.errors.head.message mustBe "indDateOfBirth.error.required.month"
+      result.errors.head.args mustBe Seq("month")
+    }
+
+    "must return a FormError when month is invalid" in {
+      val key  = "value"
+      val date = LocalDate.now()
+
+      val data = Map(
+        s"$key.day"   -> date.getDayOfMonth.toString,
+        s"$key.month" -> "a",
+        s"$key.year"  -> date.getYear.toString
+      )
+
+      val result = form.bind(data)
+
+      result.errors.size mustBe 1
+      result.errors.head.message mustBe "indDateOfBirth.error.invalid"
+    }
+
+    "must not allow a date later than today" in {
+      val key  = "value"
+      val date = LocalDate.now().plusYears(1)
+      val data = Map(
+        s"$key.day"   -> date.getDayOfMonth.toString,
+        s"$key.month" -> date.getMonthValue.toString,
+        s"$key.year"  -> date.getYear.toString
+      )
+
+      val result: Form[LocalDate] = form.bind(data)
+
+      result.errors.size mustBe 1
+      result.errors.head.message mustBe "indDateOfBirth.error.futureDate"
+    }
+
+    "must not allow a date earlier than 01/01/1900" in {
+      val key  = "value"
+      val date = minDate.minusDays(1)
+      val data = Map(
+        s"$key.day"   -> date.getDayOfMonth.toString,
+        s"$key.month" -> date.getMonthValue.toString,
+        s"$key.year"  -> date.getYear.toString
+      )
+
+      val result: Form[LocalDate] = form.bind(data)
+
+      result.errors.size mustBe 1
+      result.errors.head.message mustBe "indDateOfBirth.error.pastDate"
+    }
+
+    "must not allow a date that is not real e.g. 30th of Feb" in {
+      val key  = "value"
+      val date = minDate.minusDays(1)
+      val data = Map(
+        s"$key.day"   -> "30",
+        s"$key.month" -> "02",
+        s"$key.year"  -> date.getYear.toString
+      )
+
+      val result: Form[LocalDate] = form.bind(data)
+
+      result.errors.size mustBe 1
+      result.errors.head.message mustBe "indDateOfBirth.error.notRealDate"
+    }
+
   }
 
 }

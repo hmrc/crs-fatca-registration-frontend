@@ -17,8 +17,9 @@
 package forms
 
 import java.time.LocalDate
-
 import forms.mappings.Mappings
+import models.DateHelper.today
+
 import javax.inject.Inject
 import play.api.data.Form
 
@@ -37,7 +38,9 @@ class IndDateOfBirthFormProvider @Inject() extends Mappings {
         dayAndYearRequiredKey = "indDateOfBirth.error.required.dayAndYear",
         monthAndYearRequiredKey = "indDateOfBirth.error.required.monthAndYear",
         futureDateKey = "indDateOfBirth.error.futureDate",
-        tooEarlyDateKey = "indDateOfBirth.error.tooEarlyDate"
+        pastDateKey = "indDateOfBirth.error.pastDate",
+        maxDate = today,
+        minDate = LocalDate.of(1900, 1, 1)
       )
     )
 

@@ -177,8 +177,8 @@ indDateOfBirth.error.required.dayAndYear = Enter the day and year you were born
 indDateOfBirth.error.required.monthAndYear = Enter the month and year you were born
 indDateOfBirth.error.invalid = Date of birth must only include numbers 0 to 9
 indDateOfBirth.error.notRealDate = Enter a real date of birth
-indDateOfBirth.error.futureDate = Date of birth must be before [today’s date]
-indDateOfBirth.error.tooEarlyDate = Date of birth must be after 1900
+indDateOfBirth.error.futureDate = Date of birth must be before {0}
+indDateOfBirth.error.pastDate = Date of birth must be after 1900
 indDateOfBirth.change.hidden = Change your date of birth
 
 indContactName.title = What is your name?

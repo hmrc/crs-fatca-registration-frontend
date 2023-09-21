@@ -16,16 +16,18 @@
 
 package forms.mappings
 
-import java.time.{LocalDate, Month, ZoneOffset}
+import base.SpecBase
+
+import java.time.{LocalDate, Month}
 import generators.Generators
+import models.DateHelper.today
 import org.scalacheck.Gen
-import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.{Form, FormError}
 
-class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators with OptionValues with Mappings {
+class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Generators with Mappings {
+
+  private val minDate: LocalDate = LocalDate.of(1900, Month.JANUARY, 1)
 
   private val form = Form(
     "value" -> localDate(
@@ -38,14 +40,16 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
       monthAndYearRequiredKey = "error.required.monthAndYear",
       notRealDateKey = "error.notRealDate",
       futureDateKey = "error.future",
-      tooEarlyDateKey = "error.tooEarlyDate",
-      invalidKey = "error.invalid"
+      pastDateKey = "error.tooEarlyDate",
+      invalidKey = "error.invalid",
+      maxDate = today,
+      minDate = minDate
     )
   )
 
   private val validData = datesBetween(
-    min = LocalDate.of(1900, Month.JANUARY, 1),
-    max = LocalDate.now(ZoneOffset.UTC)
+    min = minDate,
+    max = today
   )
 
   val invalidField: Gen[String] = Gen.alphaStr.suchThat(_.nonEmpty)
@@ -108,7 +112,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
         val result = form.bind(data)
 
         result.errors must contain(
-          FormError("value", "error.invalid", List.empty)
+          FormError("value", "error.invalid", List())
         )
     }
   }
@@ -146,7 +150,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
         val result = form.bind(data)
 
         result.errors must contain(
-          FormError("value", "error.invalid", List.empty)
+          FormError("value", "error.invalid", List())
         )
     }
   }
@@ -184,7 +188,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
         val result = form.bind(data)
 
         result.errors must contain(
-          FormError("value", "error.invalid", List.empty)
+          FormError("value", "error.invalid", List())
         )
     }
   }

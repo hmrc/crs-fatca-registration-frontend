@@ -17,7 +17,6 @@
 package controllers.individual
 
 import java.time.{LocalDate, ZoneOffset}
-
 import base.SpecBase
 import forms.IndDateOfBirthFormProvider
 import models.{NormalMode, UserAnswers}
