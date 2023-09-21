@@ -91,6 +91,12 @@ class NavigatorSpec extends SpecBase {
         val userAnswers = emptyUserAnswers.set(IndDateOfBirthPage, LocalDate.now()).success.value
         navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
       }
+
+      "must go from HaveTradingNamePage to BusinessTradingNameWithoutIDPage when user answers yes" in {
+
+        val userAnswers = emptyUserAnswers.set(HaveTradingNamePage, true).success.value
+        navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe BusinessTradingNameWithoutIDController.onPageLoad(NormalMode)
+      }
     }
 
     "in Check mode" - {

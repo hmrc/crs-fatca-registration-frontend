@@ -14,44 +14,42 @@
  * limitations under the License.
  */
 
-package controllers.individual
+package controllers.organisation
 
 import base.SpecBase
-import forms.IndContactPhoneFormProvider
+import forms.BusinessNameWithoutIDFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.IndContactPhonePage
+import pages.BusinessNameWithoutIDPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.individual.IndContactPhoneView
+import views.html.organisation.BusinessNameWithoutIDView
 
 import scala.concurrent.Future
 
-class IndContactPhoneControllerSpec extends SpecBase with MockitoSugar {
+class BusinessNameWithoutIDControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new IndContactPhoneFormProvider()
-  private val form = formProvider()
+  val formProvider = new BusinessNameWithoutIDFormProvider()
+  val form         = formProvider()
 
-  private val PhoneNumber = "07 777 777"
+  lazy val businessNameWithoutIDRoute = routes.BusinessNameWithoutIDController.onPageLoad(NormalMode).url
 
-  private lazy val indContactPhoneRoute = routes.IndContactPhoneController.onPageLoad(NormalMode).url
-
-  "IndContactPhone Controller" - {
+  "BusinessNameWithoutID Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, indContactPhoneRoute)
+        val request = FakeRequest(GET, businessNameWithoutIDRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndContactPhoneView]
+        val view = application.injector.instanceOf[BusinessNameWithoutIDView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -60,19 +58,19 @@ class IndContactPhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndContactPhonePage, PhoneNumber).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(BusinessNameWithoutIDPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, indContactPhoneRoute)
+        val request = FakeRequest(GET, businessNameWithoutIDRoute)
 
-        val view = application.injector.instanceOf[IndContactPhoneView]
+        val view = application.injector.instanceOf[BusinessNameWithoutIDView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(PhoneNumber), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -89,8 +87,8 @@ class IndContactPhoneControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, indContactPhoneRoute)
-            .withFormUrlEncodedBody(("value", PhoneNumber))
+          FakeRequest(POST, businessNameWithoutIDRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
@@ -105,12 +103,12 @@ class IndContactPhoneControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, indContactPhoneRoute)
+          FakeRequest(POST, businessNameWithoutIDRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[IndContactPhoneView]
+        val view = application.injector.instanceOf[BusinessNameWithoutIDView]
 
         val result = route(application, request).value
 
@@ -124,7 +122,7 @@ class IndContactPhoneControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, indContactPhoneRoute)
+        val request = FakeRequest(GET, businessNameWithoutIDRoute)
 
         val result = route(application, request).value
 
@@ -139,8 +137,8 @@ class IndContactPhoneControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, indContactPhoneRoute)
-            .withFormUrlEncodedBody(("value", PhoneNumber))
+          FakeRequest(POST, businessNameWithoutIDRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 

@@ -20,13 +20,12 @@ import javax.inject.Inject
 
 import forms.mappings.Mappings
 import play.api.data.Form
-import models.HaveSecondContact
 
 class HaveSecondContactFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[HaveSecondContact] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> enumerable[HaveSecondContact]("haveSecondContact.error.required")
+      "value" -> boolean("haveSecondContact.error.required")
     )
 
 }

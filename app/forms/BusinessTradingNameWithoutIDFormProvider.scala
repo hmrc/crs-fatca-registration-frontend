@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import play.api.libs.json.JsPath
+import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
+import utils.RegexConstants
 
-case object IndContactHavePhonePage extends QuestionPage[Boolean] {
+class BusinessTradingNameWithoutIDFormProvider @Inject() extends Mappings with RegexConstants {
 
-  override def path: JsPath = JsPath \ toString
+  private val MaxLength = 80
 
-  override def toString: String = "indContactHavePhone"
+  def apply(): Form[String] =
+    Form(
+      "value" -> validatedText(
+        "businessTradingNameWithoutID.error.required",
+        "businessTradingNameWithoutID.error.invalid",
+        "businessTradingNameWithoutID.error.length",
+        orgNameRegex,
+        MaxLength
+      )
+    )
+
 }

@@ -52,7 +52,16 @@ class Navigator @Inject() () {
     case IndContactHavePhonePage => _ => controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode)
     case IndContactPhonePage     => _ => controllers.routes.CheckYourAnswersController.onPageLoad
     case IndDateOfBirthPage      => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
-    case _                       => _ => routes.IndexController.onPageLoad
+    case HaveTradingNamePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          HaveTradingNamePage,
+          controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(NormalMode),
+          controllers.routes.IndexController.onPageLoad // ToDo update to business address page
+        )
+    case BusinessTradingNameWithoutIDPage => _ => controllers.routes.IndexController.onPageLoad // ToDo update to business address page
+    case _                                => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

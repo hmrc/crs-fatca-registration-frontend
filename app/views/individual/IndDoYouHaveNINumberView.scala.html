@@ -22,25 +22,22 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, secondContactName: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("secondContactHavePhone.title"))) {
+@layout(pageTitle = title(form, messages("indDoYouHaveNINumber.title"))) {
 
-    @formHelper(action = controllers.organisation.routes.SecondContactHavePhoneController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.individual.routes.IndDoYouHaveNINumberController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("secondContactHavePhone.heading", secondContactName)</h1>
-
-        <p class="govuk-body">@messages("secondContactHavePhone.p1")</p>
-
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("secondContactHavePhone.heading", secondContactName)).withCssClass("govuk-visually-hidden")
+                legend = LegendViewModel(messages("indDoYouHaveNINumber.heading")).asPageHeading()
             )
+            .withHint(HintViewModel(Text(messages("indDoYouHaveNINumber.hint"))))
         )
 
         @govukButton(
