@@ -16,6 +16,7 @@
 
 package forms.behaviours
 
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
@@ -57,6 +58,16 @@ trait StringFieldBehaviours extends FieldBehaviours {
         country =>
           val result = form.bind(Map("country" -> country)).apply(fieldName)
           result.errors.head mustEqual invalidError
+      }
+    }
+
+  def fieldWithMaxLengthAndInvalid(form: Form[_], fieldName: String, maxLength: Int, errors: Seq[FormError]): Unit =
+    s"must not bind strings longer than $maxLength characters" in {
+
+      forAll(stringsLongerThan(maxLength) -> "longString") {
+        string =>
+          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+          result.errors shouldEqual errors
       }
     }
 

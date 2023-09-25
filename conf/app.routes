@@ -95,7 +95,6 @@ POST       /register/change-name                         controllers.individual.
 
 GET        /register/identity-confirmed                  controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)
 
-
 GET        /register/could-not-confirm-identity          controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad()
 
 GET        /register/without-id/business-name            controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
@@ -117,6 +116,11 @@ GET        /register/without-id/trading-name             controllers.organisatio
 POST       /register/without-id/trading-name             controllers.organisation.BusinessTradingNameWithoutIDController.onSubmit(mode: Mode = NormalMode)
 GET        /register/without-id/change-trading-name      controllers.organisation.BusinessTradingNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/change-trading-name      controllers.organisation.BusinessTradingNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/ni-number                        controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/ni-number                        controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-ni-number                  controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-ni-number                  controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)

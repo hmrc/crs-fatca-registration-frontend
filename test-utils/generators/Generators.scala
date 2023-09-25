@@ -121,6 +121,13 @@ trait Generators extends ModelGenerators with RegexConstants {
     chars <- listOfN(ln + 1, Gen.chooseNum(0, 9))
   } yield chars.mkString
 
+  def validNino: Gen[String] = for {
+    first   <- Gen.oneOf("ACEHJLMOPRSWXY".toCharArray)
+    second  <- Gen.oneOf("ABCEGHJKLMNPRSTWXYZ".toCharArray)
+    numbers <- listOfN(6, Gen.oneOf(List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)))
+    last    <- Gen.oneOf("ABCD".toCharArray)
+  } yield s"$first$second${numbers.mkString}$last"
+
   def oneOf[T](xs: Seq[Gen[T]]): Gen[T] =
     if (xs.isEmpty) {
       throw new IllegalArgumentException("oneOf called on empty collection")

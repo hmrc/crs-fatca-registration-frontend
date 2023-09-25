@@ -14,76 +14,65 @@
  * limitations under the License.
  */
 
-package controllers.individual
+package controllers
 
-import java.time.{LocalDate, ZoneOffset}
 import base.SpecBase
-import forms.IndDateOfBirthFormProvider
+import forms.WhatIsYourNINumberFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.IndDateOfBirthPage
+import pages.WhatIsYourNINumberPage
 import play.api.inject.bind
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.individual.IndDateOfBirthView
+import repositories.SessionRepository
+import views.html.WhatIsYourNINumberView
 
 import scala.concurrent.Future
 
-class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar {
+class WhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new IndDateOfBirthFormProvider()
-  private def form = formProvider()
+  val formProvider = new WhatIsYourNINumberFormProvider()
+  val form         = formProvider()
 
-  private val validAnswer = LocalDate.now(ZoneOffset.UTC)
+  lazy val whatIsYourNINumberRoute = routes.WhatIsYourNINumberController.onPageLoad(NormalMode).url
 
-  private lazy val indDateOfBirthRoute = controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode).url
-
-  override val emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
-
-  def getRequest: FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest(GET, indDateOfBirthRoute)
-
-  def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
-    FakeRequest(POST, indDateOfBirthRoute)
-      .withFormUrlEncodedBody(
-        "value.day"   -> validAnswer.getDayOfMonth.toString,
-        "value.month" -> validAnswer.getMonthValue.toString,
-        "value.year"  -> validAnswer.getYear.toString
-      )
-
-  "IndDateOfBirth Controller" - {
+  "WhatIsYourNINumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val result = route(application, getRequest).value
+        val request = FakeRequest(GET, whatIsYourNINumberRoute)
 
-        val view = application.injector.instanceOf[IndDateOfBirthView]
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[WhatIsYourNINumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndDateOfBirthPage, validAnswer).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(WhatIsYourNINumberPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val view = application.injector.instanceOf[IndDateOfBirthView]
+        val request = FakeRequest(GET, whatIsYourNINumberRoute)
 
-        val result = route(application, getRequest).value
+        val view = application.injector.instanceOf[WhatIsYourNINumberView]
+
+        val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -99,7 +88,11 @@ class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val result = route(application, postRequest()).value
+        val request =
+          FakeRequest(POST, whatIsYourNINumberRoute)
+            .withFormUrlEncodedBody(("value", "CC 12 34 56 C"))
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
@@ -110,14 +103,14 @@ class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-      val request =
-        FakeRequest(POST, indDateOfBirthRoute)
-          .withFormUrlEncodedBody(("value", "invalid value"))
-
       running(application) {
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val request =
+          FakeRequest(POST, whatIsYourNINumberRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val view = application.injector.instanceOf[IndDateOfBirthView]
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[WhatIsYourNINumberView]
 
         val result = route(application, request).value
 
@@ -131,10 +124,12 @@ class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val result = route(application, getRequest).value
+        val request = FakeRequest(GET, whatIsYourNINumberRoute)
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -143,10 +138,14 @@ class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val result = route(application, postRequest()).value
+        val request =
+          FakeRequest(POST, whatIsYourNINumberRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

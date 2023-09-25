@@ -177,8 +177,8 @@ indDateOfBirth.error.required.dayAndYear = Enter the day and year you were born
 indDateOfBirth.error.required.monthAndYear = Enter the month and year you were born
 indDateOfBirth.error.invalid = Date of birth must only include numbers 0 to 9
 indDateOfBirth.error.notRealDate = Enter a real date of birth
-indDateOfBirth.error.futureDate = Date of birth must be before [today’s date]
-indDateOfBirth.error.tooEarlyDate = Date of birth must be after 1900
+indDateOfBirth.error.futureDate = Date of birth must be before {0}
+indDateOfBirth.error.pastDate = Date of birth must be after 1900
 indDateOfBirth.change.hidden = Change your date of birth
 
 indContactName.title = What is your name?
@@ -232,6 +232,16 @@ businessTradingNameWithoutID.error.required = Enter the trading name of your bus
 businessTradingNameWithoutID.error.invalid = Trading name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 businessTradingNameWithoutID.error.length = Trading name must be 80 characters or less
 businessTradingNameWithoutID.change.hidden = Change your business trading name
+
+whatIsYourNINumber.title = What is your National Insurance number?
+whatIsYourNINumber.heading = What is your National Insurance number?
+whatIsYourNINumber.checkYourAnswersLabel = Your National Insurance number
+whatIsYourNINumber.change.hidden = Change your National Insurance number
+whatIsYourNINumber.hint = It’s on your National Insurance card, benefit letter, payslip or P60.  For example, ‘QQ 12 34 56 C’.
+whatIsYourNINumber.error.required = Enter your National Insurance number
+whatIsYourNINumber.error.format.invalid = Enter your National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ123456C
+whatIsYourNINumber.error.invalid = Enter a real National Insurance number
+whatIsYourNINumber.error.length = Your National Insurance Number must be 9 characters or less
 
 addressWithoutId.business.title = What is the main address of your business?
 addressWithoutId.business.heading = What is the main address of your business?

@@ -14,40 +14,39 @@
  * limitations under the License.
  */
 
-package controllers.individual
+package controllers
 
 import controllers.actions._
-import forms.IndDateOfBirthFormProvider
-
+import forms.WhatIsYourNINumberFormProvider
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.IndDateOfBirthPage
+import pages.WhatIsYourNINumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.individual.IndDateOfBirthView
+import views.html.WhatIsYourNINumberView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndDateOfBirthController @Inject() (
+class WhatIsYourNINumberController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
-  formProvider: IndDateOfBirthFormProvider,
+  formProvider: WhatIsYourNINumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IndDateOfBirthView
+  view: WhatIsYourNINumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private def form = formProvider()
+  val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
-      val preparedForm = request.userAnswers.get(IndDateOfBirthPage) match {
+      val preparedForm = request.userAnswers.get(WhatIsYourNINumberPage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
@@ -63,9 +62,9 @@ class IndDateOfBirthController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndDateOfBirthPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatIsYourNINumberPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IndDateOfBirthPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(WhatIsYourNINumberPage, mode, updatedAnswers))
         )
   }
 
