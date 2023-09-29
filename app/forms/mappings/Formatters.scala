@@ -190,14 +190,14 @@ trait Formatters extends Transforms {
         val countryCodesThatRequirePostcode = List("JE", "GG", "IM")
 
         (postCode, country) match {
+          case (None, Some(countryCode)) if countryCodesThatRequirePostcode.contains(countryCode) => Left(Seq(FormError(key, requiredKey)))
+
+          case (Some(postCode), _) if postCode.length > maxLengthPostcode => Left(Seq(FormError(key, lengthKey)))
+
           case (Some(postcode), Some(countryCode)) if countryCodesThatRequirePostcode.contains(countryCode) && !stripSpaces(postcode).matches(regex) =>
             Left(Seq(FormError(key, invalidKey)))
 
-          case (None, Some(countryCode)) if countryCodesThatRequirePostcode.contains(countryCode) => Left(Seq(FormError(key, requiredKey)))
-
-          case (Some(postcode), _) if postcode.length <= maxLengthPostcode => Right(Some(postcode))
-
-          case (Some(_), _) => Left(Seq(FormError(key, lengthKey)))
+          case (Some(postcode), _) => Right(Some(postcode))
 
           case _ => Right(None)
         }
