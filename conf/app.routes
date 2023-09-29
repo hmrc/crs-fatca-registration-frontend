@@ -149,3 +149,7 @@ POST       /register/without-id/address-uk         controllers.individual.IndAdd
 GET        /register/without-id/change-address-uk  controllers.individual.IndAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/change-address-uk  controllers.individual.IndAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/is-this-your-address                  controllers.IsThisYourAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/is-this-your-address                  controllers.IsThisYourAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-is-this-your-address           controllers.IsThisYourAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-is-this-your-address           controllers.IsThisYourAddressController.onSubmit(mode: Mode = CheckMode)

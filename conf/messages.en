@@ -307,3 +307,8 @@ indWhatIsYourName.error.lastName.required = Enter your family name
 indWhatIsYourName.error.lastName.invalid = The family name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 indWhatIsYourName.error.lastName.length = 	The family name must be 35 characters or less
 
+isThisYourAddress.title = Is this your address?
+isThisYourAddress.heading = Is this your address?
+isThisYourAddress.checkYourAnswersLabel = Is this your address?
+isThisYourAddress.error.required = Select yes if this is your address
+isThisYourAddress.change.hidden = Change is this your address?
