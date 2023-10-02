@@ -14,24 +14,32 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models
 
-package object govuk {
+import play.api.libs.json._
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with LabelFluency
-      with RadiosFluency
-      with SelectFluency
-      with SummaryListFluency
-      with TagFluency
+case class Address(
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: String,
+  addressLine4: Option[String],
+  postCode: Option[String],
+  country: Country
+) {
 
+  def lines: Seq[String] = Seq(
+    Some(addressLine1),
+    addressLine2,
+    Some(addressLine3),
+    addressLine4,
+    postCode,
+    Some(country.description)
+  ).flatten
+
+  val isGB: Boolean           = this.country.code == "GB"
+  val isOtherCountry: Boolean = this.country.code != "GB"
+}
+
+object Address {
+  implicit val format = Json.format[Address]
 }
