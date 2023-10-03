@@ -153,3 +153,8 @@ GET        /register/is-this-your-address                  controllers.IsThisYou
 POST       /register/is-this-your-address                  controllers.IsThisYourAddressController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-is-this-your-address           controllers.IsThisYourAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-is-this-your-address           controllers.IsThisYourAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/without-id/is-this-your-address                  controllers.IsThisYourAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/is-this-your-address                  controllers.IsThisYourAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-is-this-your-address           controllers.IsThisYourAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-is-this-your-address           controllers.IsThisYourAddressController.onSubmit(mode: Mode = CheckMode)

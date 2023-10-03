@@ -32,6 +32,14 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+
+      <div class="govuk-body">
+       <p class="govuk-body">@registrationInfo.name</p>
+       @for(addressLine <- registrationInfo.address.asList){
+      <p class="govuk-body govuk-!-margin-bottom-0">@addressLine</p>
+      }
+      </div>
+
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
