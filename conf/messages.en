@@ -251,7 +251,7 @@ addressWithoutId.addressLine1 = Address line 1
 addressWithoutId.addressLine2 = Address line 2 (optional)
 addressWithoutId.addressLine3 = City
 addressWithoutId.addressLine4 = Region (optional)
-addressWithoutId.postCode = Postcode (if applicable)
+addressWithoutId.postCode = Postcode (optional)
 addressWithoutId.countryCode = Country
 
 addressWithoutId.individual.checkYourAnswersLabel = Your home address

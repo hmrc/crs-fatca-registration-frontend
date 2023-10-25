@@ -74,8 +74,7 @@ class IndNonUKAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         contentAsString(result) mustEqual view(
           form,
           countryListFactory.countrySelectList(form.data, testCountryList),
-          Call(POST, SubmitIndNonUKAddressWithoutIDRoute),
-          "business",
+          "individual",
           NormalMode
         )(request, messages(application)).toString
       }
@@ -102,8 +101,7 @@ class IndNonUKAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         contentAsString(result) mustEqual view(
           form.fill(address),
           countryListFactory.countrySelectList(form.data, testCountryList),
-          Call(POST, SubmitIndNonUKAddressWithoutIDRoute),
-          "business",
+          "individual",
           NormalMode
         )(request, messages(application)).toString
       }
@@ -161,8 +159,7 @@ class IndNonUKAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         contentAsString(result) mustEqual view(
           boundForm,
           countryListFactory.countrySelectList(form.data, testCountryList),
-          Call(POST, SubmitIndNonUKAddressWithoutIDRoute),
-          "business",
+          "individual",
           NormalMode
         )(request, messages(application)).toString
       }
