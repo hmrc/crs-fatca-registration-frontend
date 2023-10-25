@@ -39,7 +39,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages(s"addressWithoutId.$key.heading")</h1>
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-fieldset__heading">
+                @messages(s"addressWithoutId.$key.heading")
+            </h1>
+        </legend>
 
         @govukInput(
             InputViewModel(
@@ -100,6 +105,8 @@
                     autoSelect = true)
             ))
         )
+
+    </fieldset>
 
         @govukButton(
             ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
