@@ -62,7 +62,6 @@ class IndNonUKAddressWithoutIdController @Inject() (
             view(
               preparedForm,
               countryListFactory.countrySelectList(form.data, countries),
-              routes.IndNonUKAddressWithoutIdController.onSubmit(mode),
               "individual",
               mode
             )
@@ -87,7 +86,6 @@ class IndNonUKAddressWithoutIdController @Inject() (
                     view(
                       formWithErrors,
                       countryListFactory.countrySelectList(form.data, countries),
-                      routes.IndNonUKAddressWithoutIdController.onSubmit(mode),
                       "individual",
                       mode
                     )
