@@ -126,3 +126,8 @@ GET        /register/without-id/business-address                        controll
 POST       /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)
 GET        /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/without-id/name                              controllers.WhatIsYourNameController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST       /register/without-id/name                                controllers.WhatIsYourNameController.onSubmit(mode: models.Mode = models.NormalMode)
+GET        /register/without-id/change-name                         controllers.WhatIsYourNameController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST       /register/without-id/change-name                         controllers.WhatIsYourNameController.onSubmit(mode: models.Mode = models.CheckMode)

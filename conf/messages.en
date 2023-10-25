@@ -270,3 +270,17 @@ addressWithoutId.error.addressLine4.invalid = Region must only include letters a
 addressWithoutId.error.postcode.required = Enter a postcode, like AA1 1AA
 addressWithoutId.error.postcode.length = Postcode must be 10 characters or less
 addressWithoutId.error.postcode.invalid = Postcode must only include letters a to z and numbers 0 to 9
+
+whatIsYourName.title = What is your name?
+whatIsYourName.heading = What is your name?
+whatIsYourName.firstName = Given name
+whatIsYourName.lastName = Family name
+whatIsYourName.checkYourAnswersLabel = Your name
+whatIsYourName.checkYourAnswersLabel.hiddenText = Change your name
+whatIsYourName.error.firstName.required = Enter your given name
+whatIsYourName.error.firstName.invalid = The given name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+whatIsYourName.error.firstName.length = The given name must be 35 characters or less
+whatIsYourName.error.lastName.required = Enter your family name
+whatIsYourName.error.lastName.invalid = The family name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+whatIsYourName.error.lastName.length = 	The family name must be 35 characters or less
+
