@@ -23,30 +23,98 @@ class WhatIsYourNameFormProviderSpec extends StringFieldBehaviours {
 
   val form = new WhatIsYourNameFormProvider()()
 
+//  ".firstName" - {
+//
+//    val fieldName   = "firstName"
+//    val requiredKey = "whatIsYourName.error.firstName.required"
+//    val lengthKey   = "whatIsYourName.error.firstName.length"
+//    val maxLength   = 35
+//
+//    behave like fieldThatBindsValidData(
+//      form,
+//      fieldName,
+//      stringsWithMaxLength(maxLength)
+//    )
+//
+//    behave like fieldWithMaxLength(
+//      form,
+//      fieldName,
+//      maxLength = maxLength,
+//      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+//    )
+//
+//    behave like mandatoryField(
+//      form,
+//      fieldName,
+//      requiredError = FormError(fieldName, requiredKey)
+//    )
+//  }
+//
+//  ".lastName" - {
+//
+//    val fieldName   = "lastName"
+//    val requiredKey = "whatIsYourName.error.lastName.required"
+//    val lengthKey   = "whatIsYourName.error.lastName.length"
+//    val maxLength   = 35
+//
+//    behave like fieldThatBindsValidData(
+//      form,
+//      fieldName,
+//      stringsWithMaxLength(maxLength)
+//    )
+//
+//    behave like fieldWithMaxLength(
+//      form,
+//      fieldName,
+//      maxLength = maxLength,
+//      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+//    )
+//
+//    behave like mandatoryField(
+//      form,
+//      fieldName,
+//      requiredError = FormError(fieldName, requiredKey)
+//    )
+//  }
+
   ".firstName" - {
 
     val fieldName   = "firstName"
     val requiredKey = "whatIsYourName.error.firstName.required"
+    val invalidKey  = "whatIsYourName.error.firstName.invalid"
     val lengthKey   = "whatIsYourName.error.firstName.length"
     val maxLength   = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      stringMatchingRegexAndLength(individualNameRegex, maxLength)
     )
 
-    behave like fieldWithMaxLength(
+    behave like fieldWithMaxLengthAlpha(
       form,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      lengthError = FormError(fieldName, lengthKey)
     )
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldWithNonEmptyWhitespace(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldWithInvalidData(
+      form,
+      fieldName,
+      "jfhf-\\^' `&%",
+      FormError(fieldName, invalidKey)
     )
   }
 
@@ -54,26 +122,40 @@ class WhatIsYourNameFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName   = "lastName"
     val requiredKey = "whatIsYourName.error.lastName.required"
+    val invalidKey  = "whatIsYourName.error.lastName.invalid"
     val lengthKey   = "whatIsYourName.error.lastName.length"
-    val maxLength   = 3535
+    val maxLength   = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      stringMatchingRegexAndLength(individualNameRegex, maxLength)
     )
 
-    behave like fieldWithMaxLength(
+    behave like fieldWithMaxLengthAlpha(
       form,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      lengthError = FormError(fieldName, lengthKey)
     )
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldWithNonEmptyWhitespace(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldWithInvalidData(
+      form,
+      fieldName,
+      "jfhf-\\^' `&%",
+      FormError(fieldName, invalidKey)
     )
   }
 

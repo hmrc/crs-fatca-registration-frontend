@@ -97,7 +97,7 @@ class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, whatIsYourNameRoute)
-            .withFormUrlEncodedBody(("firstName", "value 1"), ("lastName", "value 2"))
+            .withFormUrlEncodedBody(("firstName", "nameOne"), ("lastName", "nameTwo"))
 
         val result = route(application, request).value
 
