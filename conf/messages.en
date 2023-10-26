@@ -273,8 +273,8 @@ addressWithoutId.error.postcode.invalid = Postcode must only include letters a t
 
 whatIsYourName.title = What is your name?
 whatIsYourName.heading = What is your name?
-whatIsYourName.firstName = First name
-whatIsYourName.lastName = Last name
+whatIsYourName.firstName = Given name
+whatIsYourName.lastName = Family name
 whatIsYourName.checkYourAnswersLabel = Your name
 whatIsYourName.checkYourAnswersLabel.hiddenText = Change your name
 whatIsYourName.error.firstName.required = Enter your given name
