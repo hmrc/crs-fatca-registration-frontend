@@ -126,3 +126,5 @@ GET        /register/without-id/business-address                        controll
 POST       /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)
 GET        /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/problem/sign-in-problem                controllers.UnauthorisedStandardUserController.onPageLoad()
