@@ -21,13 +21,13 @@ import play.api.data.FormError
 
 class WhatIsYourNINumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey      = "whatIsYourNINumber.error.required"
-  val invalidFormatKey = "whatIsYourNINumber.error.format.invalid"
-  val invalidKey       = "whatIsYourNINumber.error.invalid"
-  val lengthKey        = "whatIsYourNINumber.error.length"
+  val requiredKey      = "indWhatIsYourNINumber.error.required"
+  val invalidFormatKey = "indWhatIsYourNINumber.error.format.invalid"
+  val invalidKey       = "indWhatIsYourNINumber.error.invalid"
+  val lengthKey        = "indWhatIsYourNINumber.error.length"
   val maxLength        = 9
 
-  val form = new WhatIsYourNINumberFormProvider()()
+  val form = new IndWhatIsYourNINumberFormProvider()()
 
   ".value" - {
 

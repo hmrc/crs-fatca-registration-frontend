@@ -16,14 +16,13 @@
 
 package forms
 
-import javax.inject.Inject
 import forms.mappings.{Mappings, StopOnFirstFail}
 import play.api.data.Form
 import utils.RegexConstants
 
-import scala.util.matching.Regex
+import javax.inject.Inject
 
-class WhatIsYourNINumberFormProvider @Inject() extends Mappings with RegexConstants {
+class IndWhatIsYourNINumberFormProvider @Inject() extends Mappings with RegexConstants {
 
   private val maxLength = 9
 
@@ -31,13 +30,13 @@ class WhatIsYourNINumberFormProvider @Inject() extends Mappings with RegexConsta
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("whatIsYourNINumber.error.required")
+      "value" -> text("indWhatIsYourNINumber.error.required")
         .transform[String](nino => removeWhitespace(nino.toUpperCase), nino => nino)
         .verifying(
           StopOnFirstFail[String](
-            regexp(ninoFormatRegex, "whatIsYourNINumber.error.format.invalid"),
-            regexp(ninoRegex, "whatIsYourNINumber.error.invalid"),
-            maxLength(maxLength, "whatIsYourNINumber.error.length")
+            regexp(ninoFormatRegex, "indWhatIsYourNINumber.error.format.invalid"),
+            regexp(ninoRegex, "indWhatIsYourNINumber.error.invalid"),
+            maxLength(maxLength, "indWhatIsYourNINumber.error.length")
           )
         )
     )
