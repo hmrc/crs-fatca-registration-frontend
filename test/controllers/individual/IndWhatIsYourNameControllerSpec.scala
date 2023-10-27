@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.individual
 
 import base.SpecBase
+import controllers.routes
 import forms.WhatIsYourNameFormProvider
 import models.{NormalMode, UserAnswers, WhatIsYourName}
 import navigation.{FakeNavigator, Navigator}
@@ -28,16 +29,16 @@ import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.WhatIsYourNameView
+import views.html.individual.IndWhatIsYourNameView
 
 import scala.concurrent.Future
 
-class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
+class IndWhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new WhatIsYourNameFormProvider()
   val form         = formProvider()
 
-  lazy val whatIsYourNameRoute = routes.WhatIsYourNameController.onPageLoad(NormalMode).url
+  lazy val whatIsYourNameRoute = controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(NormalMode).url
 
   val userAnswers = UserAnswers(
     userAnswersId,
@@ -58,7 +59,7 @@ class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, whatIsYourNameRoute)
 
-        val view = application.injector.instanceOf[WhatIsYourNameView]
+        val view = application.injector.instanceOf[IndWhatIsYourNameView]
 
         val result = route(application, request).value
 
@@ -74,7 +75,7 @@ class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, whatIsYourNameRoute)
 
-        val view = application.injector.instanceOf[WhatIsYourNameView]
+        val view = application.injector.instanceOf[IndWhatIsYourNameView]
 
         val result = route(application, request).value
 
@@ -117,7 +118,7 @@ class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[WhatIsYourNameView]
+        val view = application.injector.instanceOf[IndWhatIsYourNameView]
 
         val result = route(application, request).value
 
