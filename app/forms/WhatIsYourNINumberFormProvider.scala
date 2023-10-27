@@ -21,8 +21,6 @@ import forms.mappings.{Mappings, StopOnFirstFail}
 import play.api.data.Form
 import utils.RegexConstants
 
-import scala.util.matching.Regex
-
 class WhatIsYourNINumberFormProvider @Inject() extends Mappings with RegexConstants {
 
   private val maxLength = 9

@@ -25,19 +25,18 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.WhatIsYourNameView
-
+import views.html.individual.IndWhatIsYourNameView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class WhatIsYourNameController @Inject() (
+class IndWhatIsYourNameController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: WhatIsYourNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: WhatIsYourNameView
+  view: IndWhatIsYourNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {

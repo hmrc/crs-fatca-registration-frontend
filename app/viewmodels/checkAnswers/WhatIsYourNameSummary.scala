@@ -16,7 +16,6 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
 import models.{CheckMode, UserAnswers}
 import pages.WhatIsYourNamePage
 import play.api.i18n.Messages
@@ -37,7 +36,7 @@ object WhatIsYourNameSummary {
           key = "whatIsYourName.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.WhatIsYourNameController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("whatIsYourName.change.hidden"))
           )
         )
