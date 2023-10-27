@@ -19,7 +19,7 @@ package forms
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
-class WhatIsYourNameFormProviderSpec extends StringFieldBehaviours {
+class IndWhatIsYourNameFormProviderSpec extends StringFieldBehaviours {
 
   val form = new IndWhatIsYourNameFormProvider()()
 
