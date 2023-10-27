@@ -245,11 +245,13 @@ whatIsYourNINumber.error.length = Your National Insurance Number must be 9 chara
 
 addressWithoutId.business.title = What is the main address of your business?
 addressWithoutId.business.heading = What is the main address of your business?
+addressWithoutId.individual.title = What is your address?
+addressWithoutId.individual.heading = What is your address?
 addressWithoutId.addressLine1 = Address line 1
 addressWithoutId.addressLine2 = Address line 2 (optional)
 addressWithoutId.addressLine3 = City
 addressWithoutId.addressLine4 = Region (optional)
-addressWithoutId.postCode = Postcode (if applicable)
+addressWithoutId.postCode = Postcode (optional)
 addressWithoutId.countryCode = Country
 
 addressWithoutId.individual.checkYourAnswersLabel = Your home address

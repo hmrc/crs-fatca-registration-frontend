@@ -117,6 +117,11 @@ POST       /register/without-id/trading-name             controllers.organisatio
 GET        /register/without-id/change-trading-name      controllers.organisation.BusinessTradingNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/change-trading-name      controllers.organisation.BusinessTradingNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/without-id/address-non-uk         controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/address-non-uk         controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-address-non-uk  controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-address-non-uk  controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
+
 GET        /register/ni-number                        controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/ni-number                        controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-ni-number                  controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
