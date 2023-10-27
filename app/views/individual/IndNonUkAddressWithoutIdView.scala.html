@@ -29,11 +29,11 @@
 )
 
 
-@(form: Form[_], countries: Seq[SelectItem], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], countries: Seq[SelectItem], key: String, mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages(s"addressWithoutId.individual.title"))) {
 
-    @formHelper(action = controllers.individual.routes.IndAddressWithoutIdController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.individual.routes.IndNonUKAddressWithoutIdController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

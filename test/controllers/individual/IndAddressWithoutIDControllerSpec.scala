@@ -34,7 +34,7 @@ import views.html.individual.IndAddressWithoutIdView
 
 import scala.concurrent.Future
 
-class IndNonUKAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
+class IndAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
 
   val testCountryList: Seq[Country] = Seq(Country("valid", "FR", "France"))
   val formProvider                  = new AddressWithoutIdFormProvider()
