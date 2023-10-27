@@ -30,13 +30,13 @@ class IndWhatIsYourNINumberFormProvider @Inject() extends Mappings with RegexCon
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("whatIsYourNINumber.error.required")
+      "value" -> text("indWhatIsYourNINumber.error.required")
         .transform[String](nino => removeWhitespace(nino.toUpperCase), nino => nino)
         .verifying(
           StopOnFirstFail[String](
-            regexp(ninoFormatRegex, "whatIsYourNINumber.error.format.invalid"),
-            regexp(ninoRegex, "whatIsYourNINumber.error.invalid"),
-            maxLength(maxLength, "whatIsYourNINumber.error.length")
+            regexp(ninoFormatRegex, "indWhatIsYourNINumber.error.format.invalid"),
+            regexp(ninoRegex, "indWhatIsYourNINumber.error.invalid"),
+            maxLength(maxLength, "indWhatIsYourNINumber.error.length")
           )
         )
     )
