@@ -85,7 +85,6 @@ class IndAddressWithoutIdController @Inject() (
                     view(
                       formWithErrors,
                       countryListFactory.countrySelectList(form.data, countries),
-                      "individual",
                       mode
                     )
                   )

@@ -27,12 +27,10 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.IndAddressWithoutIdPage
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.CountryListFactory
-import views.html.individual.IndAddressWithoutIdView
-import views.html.organisation.BusinessAddressWithoutIDView
+import views.html.individual.IndNonUkAddressWithoutIdView
 
 import scala.concurrent.Future
 
@@ -68,13 +66,12 @@ class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndAddressWithoutIdView]
+        val view = application.injector.instanceOf[IndNonUkAddressWithoutIdView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form,
           countryListFactory.countrySelectList(form.data, testCountryList),
-          "individual",
           NormalMode
         )(request, messages(application)).toString
       }
@@ -93,7 +90,7 @@ class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
       running(application) {
         val request = FakeRequest(GET, LoadIndNonUkAddressWithoutIDRoute)
 
-        val view = application.injector.instanceOf[IndAddressWithoutIdView]
+        val view = application.injector.instanceOf[IndNonUkAddressWithoutIdView]
 
         val result = route(application, request).value
 
@@ -101,7 +98,6 @@ class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         contentAsString(result) mustEqual view(
           form.fill(address),
           countryListFactory.countrySelectList(form.data, testCountryList),
-          "individual",
           NormalMode
         )(request, messages(application)).toString
       }
@@ -151,7 +147,7 @@ class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[IndAddressWithoutIdView]
+        val view = application.injector.instanceOf[IndNonUkAddressWithoutIdView]
 
         val result = route(application, request).value
 
@@ -159,7 +155,6 @@ class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         contentAsString(result) mustEqual view(
           boundForm,
           countryListFactory.countrySelectList(form.data, testCountryList),
-          "individual",
           NormalMode
         )(request, messages(application)).toString
       }

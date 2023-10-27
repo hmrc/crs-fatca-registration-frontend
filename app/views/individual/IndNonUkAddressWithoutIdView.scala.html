@@ -29,7 +29,7 @@
 )
 
 
-@(form: Form[_], countries: Seq[SelectItem], key: String, mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], countries: Seq[SelectItem], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages(s"addressWithoutId.individual.title"))) {
 

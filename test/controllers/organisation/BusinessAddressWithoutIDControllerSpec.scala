@@ -27,7 +27,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.BusinessAddressWithoutIDPage
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.CountryListFactory
@@ -73,8 +72,6 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         contentAsString(result) mustEqual view(
           form,
           countryListFactory.countrySelectList(form.data, testCountryList),
-          Call(POST, SubmitBusinessAddressWithoutIDRoute),
-          "business",
           NormalMode
         )(request, messages(application)).toString
       }
@@ -101,8 +98,6 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         contentAsString(result) mustEqual view(
           form.fill(address),
           countryListFactory.countrySelectList(form.data, testCountryList),
-          Call(POST, SubmitBusinessAddressWithoutIDRoute),
-          "business",
           NormalMode
         )(request, messages(application)).toString
       }
@@ -160,8 +155,6 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         contentAsString(result) mustEqual view(
           boundForm,
           countryListFactory.countrySelectList(form.data, testCountryList),
-          Call(POST, SubmitBusinessAddressWithoutIDRoute),
-          "business",
           NormalMode
         )(request, messages(application)).toString
       }
