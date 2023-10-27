@@ -17,10 +17,10 @@
 package controllers.individual
 
 import controllers.actions._
-import forms.WhatIsYourNameFormProvider
+import forms.IndWhatIsYourNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.WhatIsYourNamePage
+import pages.IndWhatIsYourNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -34,7 +34,7 @@ class IndWhatIsYourNameController @Inject() (
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
-  formProvider: WhatIsYourNameFormProvider,
+  formProvider: IndWhatIsYourNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: IndWhatIsYourNameView
 )(implicit ec: ExecutionContext)
@@ -45,7 +45,7 @@ class IndWhatIsYourNameController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
-      val preparedForm = request.userAnswers.get(WhatIsYourNamePage) match {
+      val preparedForm = request.userAnswers.get(IndWhatIsYourNamePage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
@@ -61,9 +61,9 @@ class IndWhatIsYourNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatIsYourNamePage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndWhatIsYourNamePage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(WhatIsYourNamePage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(IndWhatIsYourNamePage, mode, updatedAnswers))
         )
   }
 

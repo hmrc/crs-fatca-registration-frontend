@@ -18,13 +18,13 @@ package controllers.individual
 
 import base.SpecBase
 import controllers.routes
-import forms.WhatIsYourNameFormProvider
-import models.{NormalMode, UserAnswers, WhatIsYourName}
+import forms.IndWhatIsYourNameFormProvider
+import models.{IndWhatIsYourName, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.WhatIsYourNamePage
+import pages.IndWhatIsYourNamePage
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class IndWhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new WhatIsYourNameFormProvider()
+  val formProvider = new IndWhatIsYourNameFormProvider()
   val form         = formProvider()
 
   lazy val whatIsYourNameRoute = controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(NormalMode).url
@@ -43,7 +43,7 @@ class IndWhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
   val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
-      WhatIsYourNamePage.toString -> Json.obj(
+      IndWhatIsYourNamePage.toString -> Json.obj(
         "firstName" -> "value 1",
         "lastName"  -> "value 2"
       )
@@ -80,7 +80,7 @@ class IndWhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(WhatIsYourName("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(IndWhatIsYourName("value 1", "value 2")), NormalMode)(request, messages(application)).toString
       }
     }
 

@@ -21,14 +21,14 @@ import play.api.data.FormError
 
 class WhatIsYourNameFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new WhatIsYourNameFormProvider()()
+  val form = new IndWhatIsYourNameFormProvider()()
 
   ".firstName" - {
 
     val fieldName   = "firstName"
-    val requiredKey = "whatIsYourName.error.firstName.required"
-    val invalidKey  = "whatIsYourName.error.firstName.invalid"
-    val lengthKey   = "whatIsYourName.error.firstName.length"
+    val requiredKey = "indWhatIsYourName.error.firstName.required"
+    val invalidKey  = "indWhatIsYourName.error.firstName.invalid"
+    val lengthKey   = "indWhatIsYourName.error.firstName.length"
     val maxLength   = 35
 
     behave like fieldThatBindsValidData(
@@ -67,9 +67,9 @@ class WhatIsYourNameFormProviderSpec extends StringFieldBehaviours {
   ".lastName" - {
 
     val fieldName   = "lastName"
-    val requiredKey = "whatIsYourName.error.lastName.required"
-    val invalidKey  = "whatIsYourName.error.lastName.invalid"
-    val lengthKey   = "whatIsYourName.error.lastName.length"
+    val requiredKey = "indWhatIsYourName.error.lastName.required"
+    val invalidKey  = "indWhatIsYourName.error.lastName.invalid"
+    val lengthKey   = "indWhatIsYourName.error.lastName.length"
     val maxLength   = 35
 
     behave like fieldThatBindsValidData(
