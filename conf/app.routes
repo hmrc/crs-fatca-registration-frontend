@@ -122,10 +122,10 @@ POST       /register/without-id/address-non-uk         controllers.individual.In
 GET        /register/without-id/change-address-non-uk  controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/change-address-non-uk  controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/ni-number                        controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/ni-number                        controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-ni-number                  controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-ni-number                  controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)
+GET        /register/ni-number                        controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/ni-number                        controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-ni-number                  controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-ni-number                  controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)

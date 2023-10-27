@@ -27,7 +27,7 @@ class WhatIsYourNINumberFormProviderSpec extends StringFieldBehaviours {
   val lengthKey        = "whatIsYourNINumber.error.length"
   val maxLength        = 9
 
-  val form = new WhatIsYourNINumberFormProvider()()
+  val form = new IndWhatIsYourNINumberFormProvider()()
 
   ".value" - {
 

@@ -16,14 +16,13 @@
 
 package forms
 
-import javax.inject.Inject
 import forms.mappings.{Mappings, StopOnFirstFail}
 import play.api.data.Form
 import utils.RegexConstants
 
-import scala.util.matching.Regex
+import javax.inject.Inject
 
-class WhatIsYourNINumberFormProvider @Inject() extends Mappings with RegexConstants {
+class IndWhatIsYourNINumberFormProvider @Inject() extends Mappings with RegexConstants {
 
   private val maxLength = 9
 
