@@ -278,3 +278,11 @@ unauthorisedStandardUser.paragraph2 = You need to find an administrator who can 
 unauthorisedStandardUser.paragraph3 = Once registered, they can give you permission to use the service to send CRS or FATCA reports using your own Government Gateway details.
 unauthorisedStandardUser.paragraph4 = Your administrator can add, delete or change access for team members in the ‘Manage account’ section within your organisation’s
 unauthorisedStandardUser.link =  business tax account (opens in new tab)
+
+pageNotFound.title = Page not found
+pageNotFound.heading = Page not found
+pageNotFound.p1 = If you typed the web address, check it is correct.
+pageNotFound.p2 = If you pasted the web address, check you copied the entire address.
+pageNotFound.link = You can email {0} if you have any questions about this service.
+
+enquiries.email = aeoi.enquiries@hmrc.gov.uk
