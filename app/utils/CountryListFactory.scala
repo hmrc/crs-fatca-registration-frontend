@@ -51,6 +51,14 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
     )
   }
 
+  lazy val countryListWithoutUKCountries: Option[Seq[Country]] = countryList.map {
+    countries =>
+      val excludedCodes = Set("GB", "UK", "GG", "JE", "IM")
+      countries.filter(
+        country => !excludedCodes.contains(country.code)
+      )
+  }
+
   def countrySelectList(value: Map[String, String], countries: Seq[Country]): Seq[SelectItem] = {
     def containsCountry(country: Country): Boolean =
       value.get("country") match {

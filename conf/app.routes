@@ -117,18 +117,30 @@ POST       /register/without-id/trading-name             controllers.organisatio
 GET        /register/without-id/change-trading-name      controllers.organisation.BusinessTradingNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/change-trading-name      controllers.organisation.BusinessTradingNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/ni-number                        controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/ni-number                        controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-ni-number                  controllers.WhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-ni-number                  controllers.WhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)
+GET        /register/without-id/address-non-uk         controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/address-non-uk         controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-address-non-uk  controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-address-non-uk  controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/ni-number                        controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/ni-number                        controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-ni-number                  controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-ni-number                  controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)
 GET        /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
 
+
 GET        /register/problem/sign-in-problem                controllers.UnauthorisedStandardUserController.onPageLoad()
 
 GET        /register/problem/page-not-found                 controllers.PageNotFoundController.onPageLoad()
 
 GET        /register/problem/information-sent               controllers.InformationSentController.onPageLoad()
+
+GET        /register/without-id/name                              controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST       /register/without-id/name                                controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.NormalMode)
+GET        /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST       /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.CheckMode)
+

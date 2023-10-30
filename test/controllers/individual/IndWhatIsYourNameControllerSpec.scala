@@ -14,44 +14,54 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.individual
 
 import base.SpecBase
-import forms.WhatIsYourNINumberFormProvider
-import models.{NormalMode, UserAnswers}
+import controllers.routes
+import forms.IndWhatIsYourNameFormProvider
+import models.{IndWhatIsYourName, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.WhatIsYourNINumberPage
+import pages.IndWhatIsYourNamePage
 import play.api.inject.bind
-import play.api.mvc.Call
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
-import views.html.WhatIsYourNINumberView
+import views.html.individual.IndWhatIsYourNameView
 
 import scala.concurrent.Future
 
-class WhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
+class IndWhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new WhatIsYourNINumberFormProvider()
+  val formProvider = new IndWhatIsYourNameFormProvider()
   val form         = formProvider()
 
-  lazy val whatIsYourNINumberRoute = routes.WhatIsYourNINumberController.onPageLoad(NormalMode).url
+  lazy val whatIsYourNameRoute = controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(NormalMode).url
 
-  "WhatIsYourNINumber Controller" - {
+  val userAnswers = UserAnswers(
+    userAnswersId,
+    Json.obj(
+      IndWhatIsYourNamePage.toString -> Json.obj(
+        "firstName" -> "value 1",
+        "lastName"  -> "value 2"
+      )
+    )
+  )
+
+  "WhatIsYourName Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, whatIsYourNINumberRoute)
+        val request = FakeRequest(GET, whatIsYourNameRoute)
+
+        val view = application.injector.instanceOf[IndWhatIsYourNameView]
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[WhatIsYourNINumberView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -60,19 +70,17 @@ class WhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(WhatIsYourNINumberPage, "answer").success.value
-
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, whatIsYourNINumberRoute)
+        val request = FakeRequest(GET, whatIsYourNameRoute)
 
-        val view = application.injector.instanceOf[WhatIsYourNINumberView]
+        val view = application.injector.instanceOf[IndWhatIsYourNameView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(IndWhatIsYourName("value 1", "value 2")), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -89,8 +97,8 @@ class WhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, whatIsYourNINumberRoute)
-            .withFormUrlEncodedBody(("value", "CC 12 34 56 C"))
+          FakeRequest(POST, whatIsYourNameRoute)
+            .withFormUrlEncodedBody(("firstName", "nameOne"), ("lastName", "nameTwo"))
 
         val result = route(application, request).value
 
@@ -105,12 +113,12 @@ class WhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, whatIsYourNINumberRoute)
-            .withFormUrlEncodedBody(("value", ""))
+          FakeRequest(POST, whatIsYourNameRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[WhatIsYourNINumberView]
+        val view = application.injector.instanceOf[IndWhatIsYourNameView]
 
         val result = route(application, request).value
 
@@ -124,7 +132,7 @@ class WhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, whatIsYourNINumberRoute)
+        val request = FakeRequest(GET, whatIsYourNameRoute)
 
         val result = route(application, request).value
 
@@ -139,8 +147,8 @@ class WhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, whatIsYourNINumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, whatIsYourNameRoute)
+            .withFormUrlEncodedBody(("firstName", "value 1"), ("lastName", "value 2"))
 
         val result = route(application, request).value
 

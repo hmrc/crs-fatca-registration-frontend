@@ -195,7 +195,6 @@ indContactName.error.lastName.length = The last name must be 35 characters or le
 indContactName.firstName.change.hidden = firstName
 indContactName.lastName.change.hidden = lastName
 
-
 indIdentityConfirmed.title = We have confirmed your identity
 indIdentityConfirmed.heading = We have confirmed your identity
 
@@ -203,6 +202,16 @@ indCouldNotConfirmIdentity.title = We could not confirm your identity
 indCouldNotConfirmIdentity.heading = We could not confirm your identity
 indCouldNotConfirmIdentity.p1 = The information you have entered does not match our records.
 indCouldNotConfirmIdentity.button = Try again
+
+indWhatIsYourNINumber.title = What is your National Insurance number?
+indWhatIsYourNINumber.heading = What is your National Insurance number?
+indWhatIsYourNINumber.checkYourAnswersLabel = Your National Insurance number
+indWhatIsYourNINumber.change.hidden = Change your National Insurance number
+indWhatIsYourNINumber.hint = It’s on your National Insurance card, benefit letter, payslip or P60.  For example, ‘QQ 12 34 56 C’.
+indWhatIsYourNINumber.error.required = Enter your National Insurance number
+indWhatIsYourNINumber.error.format.invalid = Enter your National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ123456C
+indWhatIsYourNINumber.error.invalid = Enter a real National Insurance number
+indWhatIsYourNINumber.error.length = Your National Insurance Number must be 9 characters or less
 
 businessNameWithoutID.title = What is the name of your business?
 businessNameWithoutID.heading = What is the name of your business?
@@ -233,23 +242,15 @@ businessTradingNameWithoutID.error.invalid = Trading name must only include lett
 businessTradingNameWithoutID.error.length = Trading name must be 80 characters or less
 businessTradingNameWithoutID.change.hidden = Change your business trading name
 
-whatIsYourNINumber.title = What is your National Insurance number?
-whatIsYourNINumber.heading = What is your National Insurance number?
-whatIsYourNINumber.checkYourAnswersLabel = Your National Insurance number
-whatIsYourNINumber.change.hidden = Change your National Insurance number
-whatIsYourNINumber.hint = It’s on your National Insurance card, benefit letter, payslip or P60.  For example, ‘QQ 12 34 56 C’.
-whatIsYourNINumber.error.required = Enter your National Insurance number
-whatIsYourNINumber.error.format.invalid = Enter your National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ123456C
-whatIsYourNINumber.error.invalid = Enter a real National Insurance number
-whatIsYourNINumber.error.length = Your National Insurance Number must be 9 characters or less
-
 addressWithoutId.business.title = What is the main address of your business?
 addressWithoutId.business.heading = What is the main address of your business?
+addressWithoutId.individual.title = What is your address?
+addressWithoutId.individual.heading = What is your address?
 addressWithoutId.addressLine1 = Address line 1
 addressWithoutId.addressLine2 = Address line 2 (optional)
 addressWithoutId.addressLine3 = City
 addressWithoutId.addressLine4 = Region (optional)
-addressWithoutId.postCode = Postcode (if applicable)
+addressWithoutId.postCode = Postcode (optional)
 addressWithoutId.countryCode = Country
 
 addressWithoutId.individual.checkYourAnswersLabel = Your home address
@@ -291,3 +292,17 @@ informationSent.p1 = We will contact you if we have any questions about the deta
 informationSent.link = Send a CRS or FATCA report
 
 enquiries.email = aeoi.enquiries@hmrc.gov.uk
+
+indWhatIsYourName.title = What is your name?
+indWhatIsYourName.heading = What is your name?
+indWhatIsYourName.firstName = Given name
+indWhatIsYourName.lastName = Family name
+indWhatIsYourName.checkYourAnswersLabel = Your name
+indWhatIsYourName.checkYourAnswersLabel.hiddenText = Change your name
+indWhatIsYourName.error.firstName.required = Enter your given name
+indWhatIsYourName.error.firstName.invalid = The given name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+indWhatIsYourName.error.firstName.length = The given name must be 35 characters or less
+indWhatIsYourName.error.lastName.required = Enter your family name
+indWhatIsYourName.error.lastName.invalid = The family name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+indWhatIsYourName.error.lastName.length = 	The family name must be 35 characters or less
+
