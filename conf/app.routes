@@ -130,3 +130,5 @@ POST       /register/without-id/business-address                  controllers.or
 GET        /register/problem/sign-in-problem                controllers.UnauthorisedStandardUserController.onPageLoad()
 
 GET        /register/problem/page-not-found                 controllers.PageNotFoundController.onPageLoad()
+
+GET        /register/problem/information-sent               controllers.InformationSentController.onPageLoad()

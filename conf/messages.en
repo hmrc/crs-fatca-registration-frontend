@@ -285,4 +285,9 @@ pageNotFound.p1 = If you typed the web address, check it is correct.
 pageNotFound.p2 = If you pasted the web address, check you copied the entire address.
 pageNotFound.link = You can email {0} if you have any questions about this service.
 
+informationSent.title = Information sent
+informationSent.heading = Information sent
+informationSent.p1 = We will contact you if we have any questions about the details you have provided.
+informationSent.link = Send a CRS or FATCA report
+
 enquiries.email = aeoi.enquiries@hmrc.gov.uk
