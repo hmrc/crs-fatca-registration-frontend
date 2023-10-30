@@ -35,7 +35,7 @@ class PageNotFoundController @Inject() (
 
   def onPageLoad: Action[AnyContent] = standardActionSets.identifiedUserWithEnrolmentCheck() {
     implicit request =>
-      Ok(view("testEmail"))
+      Ok(view(frontendAppConfig.emailEnquiries))
   }
 
 }
