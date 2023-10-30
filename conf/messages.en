@@ -271,13 +271,13 @@ addressWithoutId.error.postcode.required = Enter a postcode, like AA1 1AA
 addressWithoutId.error.postcode.length = Postcode must be 10 characters or less
 addressWithoutId.error.postcode.invalid = Postcode must only include letters a to z and numbers 0 to 9
 
-unauthorisedStandardUser.title = Sorry, you’re unable to use this service
-unauthorisedStandardUser.heading = Sorry, you’re unable to use this service
+unauthorisedStandardUser.title = You’re unable to use this service
+unauthorisedStandardUser.heading = You’re unable to use this service
 unauthorisedStandardUser.paragraph1 = You’ve signed in as a standard user. Only people in your organisation with an administrator role can register for the service.
 unauthorisedStandardUser.paragraph2 = You need to find an administrator who can then sign in with their Government Gateway details.
 unauthorisedStandardUser.paragraph3 = Once registered, they can give you permission to use the service to send CRS or FATCA reports using your own Government Gateway details.
 unauthorisedStandardUser.paragraph4 = Your administrator can add, delete or change access for team members in the ‘Manage account’ section within your organisation’s
-unauthorisedStandardUser.link =  business tax account (opens in new tab)
+unauthorisedStandardUser.link =  business tax account
 
 pageNotFound.title = Page not found
 pageNotFound.heading = Page not found
@@ -285,8 +285,8 @@ pageNotFound.p1 = If you typed the web address, check it is correct.
 pageNotFound.p2 = If you pasted the web address, check you copied the entire address.
 pageNotFound.link = You can email {0} if you have any questions about this service.
 
-informationSent.title = Information sent
-informationSent.heading = Information sent
+informationSent.title = You have already sent this information
+informationSent.heading = You have already sent this information
 informationSent.p1 = We will contact you if we have any questions about the details you have provided.
 informationSent.link = Send a CRS or FATCA report
 
