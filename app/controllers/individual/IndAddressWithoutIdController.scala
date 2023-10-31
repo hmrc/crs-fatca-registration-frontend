@@ -46,7 +46,7 @@ class IndAddressWithoutIdController @Inject() (
     with I18nSupport
     with Logging {
 
-  val countriesList: Option[Seq[Country]] = countryListFactory.countryListWithoutGB
+  val countriesList: Option[Seq[Country]] = countryListFactory.countryListWithUKCountries
 
   def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
