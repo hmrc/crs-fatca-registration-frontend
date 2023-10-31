@@ -187,7 +187,7 @@ trait Formatters extends Transforms {
         val postCode                        = postCodeDataTransform(data.get(key))
         val country                         = countryDataTransform(data.get(countryFieldName))
         val maxLengthPostcode               = 10
-        val countryCodesThatRequirePostcode = List("JE", "GG", "IM")
+        val countryCodesThatRequirePostcode = List("JE", "GG", "IM", "GB")
 
         (postCode, country) match {
           case (None, Some(countryCode)) if countryCodesThatRequirePostcode.contains(countryCode) => Left(Seq(FormError(key, requiredKey)))
