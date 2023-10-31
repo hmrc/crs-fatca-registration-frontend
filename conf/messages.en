@@ -270,7 +270,8 @@ addressWithoutId.error.addressLine3.invalid = City must only include letters a t
 addressWithoutId.error.addressLine4.invalid = County must only include letters a to z, numbers 0 to 9, apostrophes, commas, ampersands (&), hyphens, full stops and spaces
 addressWithoutId.error.postcode.required = Enter a postcode, like AA1 1AA
 addressWithoutId.error.postcode.length = Postcode must be 10 characters or less
-addressWithoutId.error.postcode.invalid = Postcode must only include letters a to z and numbers 0 to 9
+addressWithoutId.error.postcode.invalid = Enter a real postcode
+addressWithoutId.error.postcode.chars = Postcode must only include letters a to z and numbers 0 to 9
 
 unauthorisedStandardUser.title = You’re unable to use this service
 unauthorisedStandardUser.heading = You’re unable to use this service

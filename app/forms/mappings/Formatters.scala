@@ -175,7 +175,13 @@ trait Formatters extends Transforms {
 
     }
 
-  private[mappings] def addressPostcodeFormatter(requiredKey: String, lengthKey: String, invalidKey: String, regex: String): Formatter[Option[String]] =
+  private[mappings] def addressPostcodeFormatter(requiredKey: String,
+                                                 lengthKey: String,
+                                                 invalidKey: String,
+                                                 regex: String,
+                                                 invalidCharKey: String,
+                                                 validCharRegex: String
+  ): Formatter[Option[String]] =
     new Formatter[Option[String]] {
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
@@ -183,10 +189,11 @@ trait Formatters extends Transforms {
         val maxLengthPostcode = 10
 
         postCode match {
-          case Some(postCode) if postCode.length > maxLengthPostcode   => Left(Seq(FormError(key, lengthKey)))
-          case Some(postcode) if !stripSpaces(postcode).matches(regex) => Left(Seq(FormError(key, invalidKey)))
-          case Some(postcode)                                          => Right(Some(validPostCodeFormat(stripSpaces(postcode))))
-          case _                                                       => Left(Seq(FormError(key, requiredKey)))
+          case Some(postCode) if postCode.length > maxLengthPostcode            => Left(Seq(FormError(key, lengthKey)))
+          case Some(postCode) if !stripSpaces(postCode).matches(validCharRegex) => Left(Seq(FormError(key, invalidCharKey)))
+          case Some(postcode) if !stripSpaces(postcode).matches(regex)          => Left(Seq(FormError(key, invalidKey)))
+          case Some(postcode)                                                   => Right(Some(validPostCodeFormat(stripSpaces(postcode))))
+          case _                                                                => Left(Seq(FormError(key, requiredKey)))
         }
       }
 

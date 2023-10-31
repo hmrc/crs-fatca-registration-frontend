@@ -168,9 +168,12 @@ class AddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
 
   ".postCode" - {
 
-    val fieldName         = "postCode"
-    val requiredKey       = "addressWithoutId.error.postcode.required"
-    val lengthKey         = "addressWithoutId.error.postcode.length"
+    val fieldName      = "postCode"
+    val requiredKey    = "addressWithoutId.error.postcode.required"
+    val lengthKey      = "addressWithoutId.error.postcode.length"
+    val invalidKey     = "addressWithoutId.error.postcode.invalid"
+    val invalidCharKey = "addressWithoutId.error.postcode.chars"
+
     val postCodeMaxLength = 10
 
     behave like fieldThatBindsValidData(
@@ -190,6 +193,21 @@ class AddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldWithInvalidData(
+      form,
+      fieldName,
+      "xx9 9xx9",
+      FormError(fieldName, invalidKey)
+    )
+
+    behave like fieldWithInvalidData(
+      form,
+      fieldName,
+      "!#2",
+      FormError(fieldName, invalidCharKey),
+      Some("chars")
     )
   }
 

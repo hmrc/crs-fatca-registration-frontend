@@ -59,7 +59,9 @@ class AddressWithoutIdFormProvider @Inject() extends Mappings with RegexConstant
         "addressWithoutId.error.postcode.required",
         "addressWithoutId.error.postcode.length",
         "addressWithoutId.error.postcode.invalid",
-        regexPostcode
+        regexPostcode,
+        "addressWithoutId.error.postcode.chars",
+        postCodeAllowedChars
       ),
       "country" -> text("addressWithoutId.error.country.required")
         .verifying("addressWithoutId.error.country.required", value => countryList.exists(_.code == value))
