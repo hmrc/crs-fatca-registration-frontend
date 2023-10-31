@@ -41,7 +41,7 @@
                 field = form("firstName"),
                 label = LabelViewModel(messages("indWhatIsYourName.firstName"))
             )
-            .withWidth(ThreeQuarters).withAutocomplete("given-name")
+            .withWidth(TwoThirds).withAutocomplete("given-name")
         )
 
         @govukInput(
@@ -49,7 +49,7 @@
                 field = form("lastName"),
                 label = LabelViewModel(messages("indWhatIsYourName.lastName"))
             )
-            .withWidth(ThreeQuarters).withAutocomplete("family-name")
+            .withWidth(TwoThirds).withAutocomplete("family-name")
         )
 
         @govukButton(
