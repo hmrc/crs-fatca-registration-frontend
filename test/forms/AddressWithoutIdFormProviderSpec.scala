@@ -186,11 +186,10 @@ class AddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
       lengthError = FormError(fieldName, lengthKey)
     )
 
-    behave like fieldWithPostCodeRequired(
+    behave like mandatoryField(
       form,
       fieldName,
-      Seq("JE", "GG", "IM"),
-      invalidError = FormError(fieldName, Seq(requiredKey), Seq())
+      requiredError = FormError(fieldName, requiredKey)
     )
   }
 
