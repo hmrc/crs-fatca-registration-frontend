@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+case object RegisteredAddressInUKPage extends QuestionPage[Boolean] {
 
-  implicit lazy val arbitraryReporterType: Arbitrary[ReporterType] =
-    Arbitrary {
-      Gen.oneOf(ReporterType.values.toSeq)
-    }
+  override def path: JsPath = JsPath \ toString
 
-  implicit lazy val arbitraryIndContactName: Arbitrary[IndContactName] =
-    Arbitrary {
-      for {
-        FirstName <- arbitrary[String]
-        LastName  <- arbitrary[String]
-      } yield IndContactName(FirstName, LastName)
-    }
-
-//Line holder for template scripts
+  override def toString: String = "registeredAddressInUK"
 }
