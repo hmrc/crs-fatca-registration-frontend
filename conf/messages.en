@@ -285,3 +285,31 @@ indWhatIsYourName.error.lastName.required = Enter your family name
 indWhatIsYourName.error.lastName.invalid = The family name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 indWhatIsYourName.error.lastName.length = 	The family name must be 35 characters or less
 
+
+businessName.title = businessName
+businessName.heading = businessName
+businessName.checkYourAnswersLabel = businessName
+businessName.error.required = Enter businessName
+businessName.error.length = BusinessName must be 100 characters or less
+businessName.change.hidden = BusinessName
+
+registeredAddressInUK.title = registeredAddressInUK
+registeredAddressInUK.heading = registeredAddressInUK
+registeredAddressInUK.checkYourAnswersLabel = registeredAddressInUK
+registeredAddressInUK.error.required = Select yes if registeredAddressInUK
+registeredAddressInUK.change.hidden = RegisteredAddressInUK
+
+reporterType.title = reporterType
+reporterType.heading = reporterType
+reporterType.what will you report as? = Option 1
+reporterType.option2 = Option 2
+reporterType.checkYourAnswersLabel = reporterType
+reporterType.error.required = Select reporterType
+reporterType.change.hidden = ReporterType
+
+whatIsYourName.title = whatIsYourName
+whatIsYourName.heading = whatIsYourName
+whatIsYourName.checkYourAnswersLabel = whatIsYourName
+whatIsYourName.error.required = Enter whatIsYourName
+whatIsYourName.error.length = WhatIsYourName must be 100 characters or less
+whatIsYourName.change.hidden = WhatIsYourName

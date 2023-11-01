@@ -136,3 +136,22 @@ GET        /register/without-id/name                              controllers.in
 POST       /register/without-id/name                                controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.NormalMode)
 GET        /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.CheckMode)
 POST       /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.CheckMode)
+GET        /businessName                        controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /businessName                        controllers.organisation.BusinessNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeBusinessName                  controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeBusinessName                  controllers.organisation.BusinessNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /registeredAddressInUK                        controllers.organisation.RegisteredAddressInUKController.onPageLoad(mode: Mode = NormalMode)
+POST       /registeredAddressInUK                        controllers.organisation.RegisteredAddressInUKController.onSubmit(mode: Mode = NormalMode)
+GET        /changeRegisteredAddressInUK                  controllers.organisation.RegisteredAddressInUKController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeRegisteredAddressInUK                  controllers.organisation.RegisteredAddressInUKController.onSubmit(mode: Mode = CheckMode)
+
+GET        /reporterType                        controllers.ReporterTypeController.onPageLoad(mode: Mode = NormalMode)
+POST       /reporterType                        controllers.ReporterTypeController.onSubmit(mode: Mode = NormalMode)
+GET        /changeReporterType                  controllers.ReporterTypeController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeReporterType                  controllers.ReporterTypeController.onSubmit(mode: Mode = CheckMode)
+
+GET        /whatIsYourName                        controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /whatIsYourName                        controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeWhatIsYourName                  controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeWhatIsYourName                  controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = CheckMode)
