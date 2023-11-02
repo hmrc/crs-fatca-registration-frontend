@@ -30,9 +30,9 @@ class DataInitializeActionImpl @Inject() (implicit val executionContext: Executi
   override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] =
     request.userAnswers match {
       case None =>
-        Future.successful(Right(DataRequest(request.request, request.userId, UserAnswers(request.userId))))
+        Future.successful(Right(DataRequest(request.request, request.userId, request.affinityGroup, UserAnswers(request.userId))))
       case Some(data) =>
-        Future.successful(Right(DataRequest(request.request, request.userId, data)))
+        Future.successful(Right(DataRequest(request.request, request.userId, request.affinityGroup, data)))
     }
 
 }
