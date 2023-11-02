@@ -144,6 +144,11 @@ POST       /register/without-id/name                                controllers.
 GET        /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.CheckMode)
 POST       /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.CheckMode)
 
+GET        /register/have-utr                            controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST       /register/have-utr                            controllers.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode: models.Mode = models.NormalMode)
+GET        /register/change-have-utr                     controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST       /register/change-have-utr                     controllers.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode: models.Mode = models.CheckMode)
+
 GET        /register/without-id/address-uk         controllers.individual.IndAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/without-id/address-uk         controllers.individual.IndAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
 GET        /register/without-id/change-address-uk  controllers.individual.IndAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)

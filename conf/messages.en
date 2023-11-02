@@ -307,3 +307,12 @@ indWhatIsYourName.error.lastName.required = Enter your family name
 indWhatIsYourName.error.lastName.invalid = The family name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 indWhatIsYourName.error.lastName.length = 	The family name must be 35 characters or less
 
+doYouHaveUniqueTaxPayerReference.title = Do you have a UK Unique Taxpayer Reference (UTR)?
+doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel =  Do you have a Unique Taxpayer Reference?
+doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel.hiddenText = Change if you have a Unique Taxpayer Reference
+doYouHaveUniqueTaxPayerReference.heading = Do you have a UK Unique Taxpayer Reference (UTR)?
+doYouHaveUniqueTaxPayerReference.p1 = You can {0}.
+doYouHaveUniqueTaxPayerReference.p1.link = find a lost UTR
+doYouHaveUniqueTaxPayerReference.hint =  This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax and Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+doYouHaveUniqueTaxPayerReference.error.required = Select yes if you have a UTR
+

@@ -58,10 +58,12 @@ class Navigator @Inject() () {
           userAnswers,
           HaveTradingNamePage,
           controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(NormalMode),
-          controllers.routes.IndexController.onPageLoad // ToDo update to business address page
+          controllers.organisation.routes.BusinessAddressWithoutIDController.onPageLoad(NormalMode)
         )
-    case BusinessTradingNameWithoutIDPage => _ => controllers.routes.IndexController.onPageLoad // ToDo update to business address page
-    case _                                => _ => routes.IndexController.onPageLoad
+    case BusinessTradingNameWithoutIDPage =>
+      _ => controllers.organisation.routes.BusinessAddressWithoutIDController.onPageLoad(NormalMode)
+    case DoYouHaveUniqueTaxPayerReferencePage => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    case _                                    => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
