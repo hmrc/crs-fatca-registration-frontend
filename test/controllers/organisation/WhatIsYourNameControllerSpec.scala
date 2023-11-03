@@ -18,7 +18,7 @@ package controllers.organisation
 
 import base.SpecBase
 import forms.WhatIsYourNameFormProvider
-import models.{Name, NormalMode, UserAnswers}
+import models.{Name, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -66,7 +66,7 @@ class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(WhatIsYourNamePage, Name("firstName", "lastName")).success.value
+      val userAnswers = emptyUserAnswers.set(WhatIsYourNamePage, Name(firstName, lastName)).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -79,7 +79,7 @@ class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
         val filledForm = form.bind(validData)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(filledForm), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(filledForm, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -97,7 +97,7 @@ class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, whatIsYourNameRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("firstName", "answer"), ("lastName", "answer"))
 
         val result = route(application, request).value
 
