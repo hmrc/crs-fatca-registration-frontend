@@ -132,6 +132,13 @@ POST       /register/without-id/business-address                        controll
 GET        /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
 
+
+GET        /register/problem/sign-in-problem                controllers.UnauthorisedStandardUserController.onPageLoad()
+
+GET        /register/problem/page-not-found                 controllers.PageNotFoundController.onPageLoad()
+
+GET        /register/problem/information-sent               controllers.InformationSentController.onPageLoad()
+
 GET        /register/without-id/name                              controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.NormalMode)
 POST       /register/without-id/name                                controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.NormalMode)
 GET        /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.CheckMode)
@@ -156,3 +163,5 @@ GET        /register/your-name                        controllers.organisation.W
 POST       /register/your-name                        controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-your-name                  controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-your-name                  controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = CheckMode)
+
+

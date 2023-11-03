@@ -39,8 +39,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val signOutUrl: String                      = configuration.get[String]("urls.signOut")
   val crsFatcaFIManagementFrontendUrl: String = configuration.get[String]("urls.crsFatcaFIManagementFrontend")
 
-  private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/crs-fatca-registration-frontend"
+  private val exitSurveyBaseUrl: String   = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  val exitSurveyUrl: String               = s"$exitSurveyBaseUrl/feedback/crs-fatca-registration-frontend"
+  lazy val businessTaxAccountLink: String = configuration.get[String]("urls.btaLogin")
+  lazy val emailEnquiries: String         = configuration.get[String]("urls.emailEnquiries")
+  lazy val crsFatcaFrontendUrl: String    = configuration.get[String]("urls.crsFatcaFrontendUrl")
 
   val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
