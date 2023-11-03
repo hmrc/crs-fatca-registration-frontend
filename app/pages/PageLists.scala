@@ -16,11 +16,27 @@
 
 package pages
 
-import play.api.libs.json.JsPath
+import models.UserAnswers
 
-case object BusinessNamePage extends QuestionPage[String] {
+import scala.util.Try
 
-  override def path: JsPath = JsPath \ toString
+object PageLists {
 
-  override def toString: String = "businessName"
+  val removePage: (Try[UserAnswers], QuestionPage[_]) => Try[UserAnswers] =
+    (ua: Try[UserAnswers], page: QuestionPage[_]) => ua.flatMap(_.remove(page))
+
+  val businessWithIDPages =
+    List(BusinessNamePage)
+
+  val businessWithOutIDPages = List(
+  )
+
+  val individualWithIDPages = List(
+    WhatIsYourNamePage
+  )
+
+  val individualWithOutIDPages = List(
+  )
+
+  // TODO: add all pages necessary once created
 }
