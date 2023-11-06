@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.organisation
+package controllers.individual
 
 import base.SpecBase
 import config.FrontendAppConfig
@@ -24,17 +24,17 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.BusinessAddressWithoutIDPage
+import pages.IndAddressWithoutIdPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.CountryListFactory
-import views.html.organisation.BusinessAddressWithoutIDView
+import views.html.individual.IndAddressWithoutIdView
 
 import scala.concurrent.Future
 
-class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
+class IndAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
 
   val testCountryList: Seq[Country] = Seq(Country("valid", "GG", "Guernsey"))
   val formProvider                  = new AddressWithoutIdFormProvider()
@@ -48,8 +48,8 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
     override lazy val countryListWithoutGB: Option[Seq[Country]] = Some(testCountryList)
   }
 
-  lazy val SubmitBusinessAddressWithoutIDRoute = routes.BusinessAddressWithoutIDController.onSubmit(NormalMode).url
-  lazy val LoadBusinessAddressWithoutIDRoute   = routes.BusinessAddressWithoutIDController.onSubmit(NormalMode).url
+  lazy val SubmitIndAddressWithoutIDRoute = routes.IndAddressWithoutIdController.onSubmit(NormalMode).url
+  lazy val LoadIndAddressWithoutIDRoute   = routes.IndAddressWithoutIdController.onSubmit(NormalMode).url
 
   "BusinessAddressWithoutID Controller" - {
 
@@ -62,11 +62,11 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, LoadBusinessAddressWithoutIDRoute)
+        val request = FakeRequest(GET, LoadIndAddressWithoutIDRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[BusinessAddressWithoutIDView]
+        val view = application.injector.instanceOf[IndAddressWithoutIdView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
@@ -79,7 +79,7 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(BusinessAddressWithoutIDPage, address).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(IndAddressWithoutIdPage, address).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
@@ -88,9 +88,9 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, LoadBusinessAddressWithoutIDRoute)
+        val request = FakeRequest(GET, LoadIndAddressWithoutIDRoute)
 
-        val view = application.injector.instanceOf[BusinessAddressWithoutIDView]
+        val view = application.injector.instanceOf[IndAddressWithoutIdView]
 
         val result = route(application, request).value
 
@@ -116,7 +116,7 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
       running(application) {
         val request =
-          FakeRequest(POST, LoadBusinessAddressWithoutIDRoute)
+          FakeRequest(POST, LoadIndAddressWithoutIDRoute)
             .withFormUrlEncodedBody(("addressLine1", "value 1"),
                                     ("addressLine2", "value 2"),
                                     ("addressLine3", "value 2"),
@@ -142,12 +142,12 @@ class BusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
       running(application) {
         val request =
-          FakeRequest(POST, LoadBusinessAddressWithoutIDRoute)
+          FakeRequest(POST, LoadIndAddressWithoutIDRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[BusinessAddressWithoutIDView]
+        val view = application.injector.instanceOf[IndAddressWithoutIdView]
 
         val result = route(application, request).value
 
