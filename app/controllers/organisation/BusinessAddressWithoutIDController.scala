@@ -62,8 +62,6 @@ class BusinessAddressWithoutIDController @Inject() (
             view(
               preparedForm,
               countryListFactory.countrySelectList(form.data, countries),
-              routes.BusinessAddressWithoutIDController.onSubmit(mode),
-              "business",
               mode
             )
           )
@@ -88,8 +86,6 @@ class BusinessAddressWithoutIDController @Inject() (
                     view(
                       formWithErrors,
                       countryListFactory.countrySelectList(form.data, countries),
-                      routes.BusinessAddressWithoutIDController.onSubmit(mode),
-                      "business",
                       mode
                     )
                   )

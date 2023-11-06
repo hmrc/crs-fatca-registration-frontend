@@ -93,12 +93,13 @@ trait Mappings extends Formatters with Constraints {
   protected def validatedOptionalText(invalidKey: String, lengthKey: String, regex: String, length: Int): FieldMapping[Option[String]] =
     of(validatedOptionalTextFormatter(invalidKey, lengthKey, regex, length))
 
-  protected def optionalPostcode(requiredKey: String,
-                                 lengthKey: String,
-                                 invalidKey: String,
-                                 regex: String,
-                                 countryFieldName: String
+  protected def addressPostcode(requiredKey: String,
+                                lengthKey: String,
+                                invalidKey: String,
+                                regex: String,
+                                invalidCharKey: String,
+                                InvalidCharRegex: String
   ): FieldMapping[Option[String]] =
-    of(optionalPostcodeFormatter(requiredKey, lengthKey, invalidKey, regex, countryFieldName))
+    of(addressPostcodeFormatter(requiredKey, lengthKey, invalidKey, regex, invalidCharKey, InvalidCharRegex))
 
 }

@@ -27,12 +27,12 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CountryListFactory
-import views.html.individual.IndNonUkAddressWithoutIdView
+import views.html.individual.IndAddressWithoutIdView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndNonUKAddressWithoutIdController @Inject() (
+class IndAddressWithoutIdController @Inject() (
   override val messagesApi: MessagesApi,
   countryListFactory: CountryListFactory,
   sessionRepository: SessionRepository,
@@ -40,13 +40,13 @@ class IndNonUKAddressWithoutIdController @Inject() (
   standardActionSets: StandardActionSets,
   formProvider: AddressWithoutIdFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IndNonUkAddressWithoutIdView
+  view: IndAddressWithoutIdView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  val countriesList: Option[Seq[Country]] = countryListFactory.countryListWithoutUKCountries
+  val countriesList: Option[Seq[Country]] = countryListFactory.countryListWithUKCountries
 
   def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
