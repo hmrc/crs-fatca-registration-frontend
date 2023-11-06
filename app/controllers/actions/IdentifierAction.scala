@@ -48,20 +48,11 @@ class AuthenticatedIdentifierAction @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised().retrieve(Retrievals.internalId and Retrievals.allEnrolments and affinityGroup and credentialRole) {
-      case _ ~ enrolments ~ _ ~ _ =>
-        if (enrolments.enrolments.exists(_.key == enrolmentKey)) {
-          Future.successful(Redirect(config.crsFatcaFIManagementFrontendUrl))
-        } else {
-          Future.successful(Redirect(routes.UnauthorisedStandardUserController.onPageLoad()))
-        }
-      case _ ~ enrolments ~ _ ~ Some(Assistant) =>
-        if (enrolments.enrolments.exists(_.key == enrolmentKey)) {
-          Future.successful(Redirect(config.crsFatcaFIManagementFrontendUrl))
-        } else {
-          Future.successful(Redirect(routes.UnauthorisedStandardUserController.onPageLoad()))
-        }
+      case _ ~ enrolments ~ _ ~ Some(Assistant) if enrolments.enrolments.exists(_.key == enrolmentKey) =>
+        Future.successful(Redirect(config.crsFatcaFIManagementFrontendUrl))
+      case _ ~ _ ~ _ ~ Some(Assistant) =>
+        Future.successful(Redirect(routes.UnauthorisedStandardUserController.onPageLoad()))
       case Some(internalID) ~ enrolments ~ Some(affinityGroup) ~ _ => block(IdentifierRequest(request, internalID, affinityGroup, enrolments.enrolments))
-
       case _ => throw new UnauthorizedException("Unable to retrieve internal Id")
     } recover {
       case _: NoActiveSession =>
