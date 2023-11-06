@@ -48,7 +48,7 @@ class AuthenticatedIdentifierAction @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised().retrieve(Retrievals.internalId and Retrievals.allEnrolments and affinityGroup and credentialRole) {
-      case _ ~ enrolments ~ _ ~ Some(Assistant) if enrolments.enrolments.exists(_.key == enrolmentKey) =>
+      case _ ~ enrolments ~ _ ~ _ if (enrolments.enrolments.exists(_.key == enrolmentKey)) =>
         Future.successful(Redirect(config.crsFatcaFIManagementFrontendUrl))
       case _ ~ _ ~ _ ~ Some(Assistant) =>
         Future.successful(Redirect(routes.UnauthorisedStandardUserController.onPageLoad()))
