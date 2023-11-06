@@ -16,6 +16,7 @@
 
 package base
 
+import connectors.AddressLookupConnector
 import controllers.actions._
 import models.UserAnswers
 import org.mockito.MockitoSugar.when
@@ -32,6 +33,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import repositories.SessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait SpecBase
     extends AnyFreeSpec
@@ -46,9 +48,12 @@ trait SpecBase
 
   val userAnswersId: String = "id"
 
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+
   def onwardRoute: Call                                  = Call("GET", "/foo")
   final val mockDataRetrievalAction: DataRetrievalAction = mock[DataRetrievalAction]
   final val mockSessionRepository: SessionRepository     = mock[SessionRepository]
+  final val mockAddressLookupConnector                   = mock[AddressLookupConnector]
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 

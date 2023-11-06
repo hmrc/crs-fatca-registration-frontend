@@ -41,6 +41,9 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey, args))
 
+  protected def requiredRegexOnlyText(requiredKey: String, invalidKey: String, regex: String): FieldMapping[String] =
+    of(requiredRegexOnly(requiredKey, invalidKey, regex))
+
   protected def localDate(
     invalidKey: String,
     notRealDateKey: String,
