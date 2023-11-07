@@ -106,6 +106,23 @@ trait Formatters extends Transforms {
   private def removeNonBreakingSpaces(str: String) =
     str.replaceAll("\u00A0", " ")
 
+  protected def requiredRegexOnly(requiredKey: String, invalidKey: String, validFormatRegex: String) = new Formatter[String] {
+    private val dataFormatter: Formatter[String] = stringTrimFormatter(requiredKey)
+
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
+      dataFormatter
+        .bind(key, data)
+        .right
+        .flatMap {
+          case str if !str.matches(validFormatRegex) => Left(Seq(FormError(key, invalidKey)))
+          case str                                   => Right(str)
+        }
+
+    override def unbind(key: String, value: String): Map[String, String] =
+      Map(key -> value)
+
+  }
+
   private[mappings] def stringTrimFormatter(errorKey: String, msgArg: String = ""): Formatter[String] = new Formatter[String] {
 
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
