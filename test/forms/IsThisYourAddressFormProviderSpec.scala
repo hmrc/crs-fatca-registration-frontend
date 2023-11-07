@@ -6,7 +6,7 @@ import play.api.data.FormError
 class IsThisYourAddressFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "isThisYourAddress.error.required"
-  val invalidKey = "error.boolean"
+  val invalidKey  = "error.boolean"
 
   val form = new IsThisYourAddressFormProvider()()
 
@@ -26,4 +26,5 @@ class IsThisYourAddressFormProviderSpec extends BooleanFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
   }
+
 }

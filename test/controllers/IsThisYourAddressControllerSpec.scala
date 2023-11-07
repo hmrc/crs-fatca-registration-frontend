@@ -17,7 +17,7 @@ import scala.concurrent.Future
 class IsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new IsThisYourAddressFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val isThisYourAddressRoute = routes.IsThisYourAddressController.onPageLoad(NormalMode).url
 
@@ -130,4 +130,5 @@ class IsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
   }
+
 }
