@@ -144,6 +144,32 @@ POST       /register/without-id/name                                controllers.
 GET        /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.CheckMode)
 POST       /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.CheckMode)
 
+GET        /businessName                        controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /businessName                        controllers.organisation.BusinessNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeBusinessName                  controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeBusinessName                  controllers.organisation.BusinessNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/business-name                        controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/business-name                        controllers.organisation.BusinessNameController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-business-name                  controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-business-name                  controllers.organisation.BusinessNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/registered-address-in-uk                        controllers.organisation.RegisteredAddressInUKController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/registered-address-in-uk                        controllers.organisation.RegisteredAddressInUKController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-registered-address-in-uk                  controllers.organisation.RegisteredAddressInUKController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-registered-address-in-uk                  controllers.organisation.RegisteredAddressInUKController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/registration-type                        controllers.ReporterTypeController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/registration-type                        controllers.ReporterTypeController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-registration-type                  controllers.ReporterTypeController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-registration-type                  controllers.ReporterTypeController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/your-name                        controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/your-name                        controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = NormalMode)
+GET        /register/change-your-name                  controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/change-your-name                  controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = CheckMode)
+
+
 GET        /register/have-utr                            controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.NormalMode)
 POST       /register/have-utr                            controllers.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode: models.Mode = models.NormalMode)
 GET        /register/change-have-utr                     controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.CheckMode)
