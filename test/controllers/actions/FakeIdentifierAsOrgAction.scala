@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject() (bodyParsers: PlayBodyParsers) extends IdentifierAction {
+class FakeIdentifierAsOrgAction @Inject() (bodyParsers: PlayBodyParsers) extends IdentifierAction {
 
   val affinityGroup: AffinityGroup = AffinityGroup.Organisation
 
