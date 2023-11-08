@@ -18,7 +18,7 @@ package controllers.individual
 
 import base.SpecBase
 import controllers.routes
-import forms.IsThisYourAddressFormProvider
+import forms.IndIsThisYourAddressFormProvider
 import models.{AddressLookup, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -28,13 +28,13 @@ import pages.AddressLookupPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.IsThisYourAddressView
+import views.html.individual.IndIsThisYourAddressView
 
 import scala.concurrent.Future
 
 class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new IsThisYourAddressFormProvider()
+  val formProvider = new IndIsThisYourAddressFormProvider()
   val form         = formProvider()
 
   val addressLookup = AddressLookup(
@@ -69,7 +69,7 @@ class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IsThisYourAddressView]
+        val view = application.injector.instanceOf[IndIsThisYourAddressView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, addressLookup, NormalMode)(request, messages(application)).toString
@@ -88,7 +88,7 @@ class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, isThisYourAddressRoute)
 
-        val view = application.injector.instanceOf[IsThisYourAddressView]
+        val view = application.injector.instanceOf[IndIsThisYourAddressView]
 
         val result = route(application, request).value
 
@@ -141,7 +141,7 @@ class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[IsThisYourAddressView]
+        val view = application.injector.instanceOf[IndIsThisYourAddressView]
 
         val result = route(application, request).value
 
@@ -160,7 +160,7 @@ class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url // TODO : update this with ThereIsProblemview when created
       }
     }
 
@@ -176,7 +176,7 @@ class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url // TODO : update this with ThereIsProblemview when created
       }
     }
   }

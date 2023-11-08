@@ -17,7 +17,7 @@
 package controllers.individual
 
 import controllers.actions._
-import forms.IsThisYourAddressFormProvider
+import forms.IndIsThisYourAddressFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.{AddressLookupPage, IsThisYourAddressPage}
@@ -25,8 +25,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{IsThisYourAddressView, UnauthorisedView}
-
+import views.html.UnauthorisedView
+import views.html.individual.IndIsThisYourAddressView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,9 +35,9 @@ class IndIsThisYourAddressController @Inject() (
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
-  formProvider: IsThisYourAddressFormProvider,
+  formProvider: IndIsThisYourAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IsThisYourAddressView,
+  view: IndIsThisYourAddressView,
   errorView: UnauthorisedView // TODO : update this with ThereIsProblemview when created
 
 )(implicit ec: ExecutionContext)
