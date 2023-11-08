@@ -17,7 +17,7 @@
 package forms.mappings
 
 import java.time.LocalDate
-import play.api.data.FieldMapping
+import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import models.Enumerable
 
@@ -101,5 +101,14 @@ trait Mappings extends Formatters with Constraints {
                                 InvalidCharRegex: String
   ): FieldMapping[Option[String]] =
     of(addressPostcodeFormatter(requiredKey, lengthKey, invalidKey, regex, invalidCharKey, InvalidCharRegex))
+
+  protected def mandatoryPostcode(requiredKey: String,
+                                  lengthKey: String,
+                                  invalidKey: String,
+                                  regex: String,
+                                  invalidCharKey: String,
+                                  InvalidCharRegex: String
+  ): Mapping[String] =
+    of(mandatoryPostcodeFormatter(requiredKey, lengthKey, invalidKey, regex, invalidCharKey, InvalidCharRegex))
 
 }

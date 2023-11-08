@@ -25,14 +25,25 @@ class IndWhatIsYourPostcodeFormProviderSpec extends StringFieldBehaviours {
 
   ".postCode" - {
 
-    val fieldName   = "postCode"
-    val requiredKey = "indWhatIsYourPostcode.error.required"
-    val invalidKey  = "indWhatIsYourPostcode.error.invalid"
+    val fieldName      = "postCode"
+    val requiredKey    = "indWhatIsYourPostcode.error.required"
+    val lengthKey      = "indWhatIsYourPostcode.error.length"
+    val invalidKey     = "indWhatIsYourPostcode.error.invalid"
+    val invalidCharKey = "indWhatIsYourPostcode.error.chars"
+
+    val postCodeMaxLength = 10
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
       validPostCodes
+    )
+
+    behave like fieldWithMaxLengthAlpha(
+      form,
+      fieldName,
+      maxLength = postCodeMaxLength,
+      lengthError = FormError(fieldName, lengthKey)
     )
 
     behave like mandatoryField(
@@ -44,8 +55,16 @@ class IndWhatIsYourPostcodeFormProviderSpec extends StringFieldBehaviours {
     behave like fieldWithInvalidData(
       form,
       fieldName,
-      "456 AD4",
+      "xx9 9xx9",
       FormError(fieldName, invalidKey)
+    )
+
+    behave like fieldWithInvalidData(
+      form,
+      fieldName,
+      "!#2",
+      FormError(fieldName, invalidCharKey),
+      Some("chars")
     )
   }
 
