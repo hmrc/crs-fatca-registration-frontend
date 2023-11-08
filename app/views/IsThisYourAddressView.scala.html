@@ -33,23 +33,24 @@
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
+       <h1 class="govuk-heading-l">@messages("isThisYourAddress.heading")</h1>
+        <div class="govuk-body">
+        <p class="govuk-!-margin-bottom-0">@address.addressLine1</p>
+          <p class="govuk-!-margin-bottom-0">@address.addressLine2</p>
+          <p class="govuk-!-margin-bottom-0">@address.addressLine3</p>
+          <p class="govuk-!-margin-bottom-0">@address.addressLine4</p>
+          <p class="govuk-!-margin-bottom-0">@address.town</p>
+          <p class="govuk-!-margin-bottom-0">@address.county</p>
+          <p class="govuk-!-margin-bottom-0">@address.postcode</p>
+        </div>
 
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("isThisYourAddress.heading")).asPageHeading()
+                legend = LegendViewModel(messages("isThisYourAddress.heading")).withCssClass("govuk-visually-hidden")
             )
         )
 
-       <div class="govuk-body">
-          <p class="govuk-body">@address.addressLine1</p>
-          <p class="govuk-body">@address.addressLine2</p>
-          <p class="govuk-body">@address.addressLine3</p>
-          <p class="govuk-body">@address.addressLine4</p>
-          <p class="govuk-body">@address.town</p>
-          <p class="govuk-body">@address.county</p>
-          <p class="govuk-body">@address.postcode</p>
-        </div>
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))
