@@ -65,7 +65,13 @@ class IsThisYourAddressController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(errorView())),
+          formWithErrors =>
+            Future.successful(
+              request.userAnswers.get(AddressLookupPage) match {
+                case Some(value) => BadRequest(view(formWithErrors, value.head, mode))
+                case None        => InternalServerError(errorView())
+              }
+            ),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourAddressPage, value))
