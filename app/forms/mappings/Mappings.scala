@@ -36,6 +36,9 @@ trait Mappings extends Formatters with Constraints {
   protected def boolean(requiredKey: String = "error.required", invalidKey: String = "error.boolean", args: Seq[String] = Seq.empty): FieldMapping[Boolean] =
     of(booleanFormatter(requiredKey, invalidKey, args))
 
+  protected def validatedTextMaxLength(requiredKey: String, lengthKey: String, maxLength: Int): FieldMapping[String] =
+    of(textMaxLengthFormatter(requiredKey, lengthKey, maxLength))
+
   protected def enumerable[A](requiredKey: String = "error.required", invalidKey: String = "error.invalid", args: Seq[String] = Seq.empty)(implicit
     ev: Enumerable[A]
   ): FieldMapping[A] =

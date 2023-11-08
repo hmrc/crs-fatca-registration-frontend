@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-trait ModelGenerators {
+import javax.inject.Inject
 
-  implicit lazy val arbitraryReporterType: Arbitrary[ReporterType] =
-    Arbitrary {
-      Gen.oneOf(ReporterType.values.toSeq)
-    }
+class DoYouHaveUniqueTaxPayerReferenceFormProvider @Inject() extends Mappings {
 
-  implicit lazy val arbitraryIndContactName: Arbitrary[IndContactName] =
-    Arbitrary {
-      for {
-        FirstName <- arbitrary[String]
-        LastName  <- arbitrary[String]
-      } yield IndContactName(FirstName, LastName)
-    }
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("doYouHaveUniqueTaxPayerReference.error.required")
+    )
 
-//Line holder for template scripts
 }

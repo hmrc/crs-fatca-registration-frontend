@@ -219,6 +219,23 @@ trait Formatters extends Transforms {
 
     }
 
+  protected def textMaxLengthFormatter(requiredKey: String, lengthKey: String, maxLength: Int): Formatter[String] = new Formatter[String] {
+    private val dataFormatter: Formatter[String] = stringTrimFormatter(requiredKey)
+
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
+      dataFormatter
+        .bind(key, data)
+        .right
+        .flatMap {
+          case str if str.length > maxLength => Left(Seq(FormError(key, lengthKey)))
+          case str                           => Right(str)
+        }
+
+    override def unbind(key: String, value: String): Map[String, String] =
+      Map(key -> value)
+
+  }
+
   private[mappings] def mandatoryPostcodeFormatter(requiredKey: String,
                                                    lengthKey: String,
                                                    invalidKey: String,

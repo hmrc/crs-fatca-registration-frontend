@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package generators
+package models
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json._
 
-trait ModelGenerators {
+//strings between 1 and 35 inclusive ^[a-zA-Z &`\\-\\'^]{1,35}$
+case class Name(firstName: String, lastName: String) {
 
-  implicit lazy val arbitraryReporterType: Arbitrary[ReporterType] =
-    Arbitrary {
-      Gen.oneOf(ReporterType.values.toSeq)
-    }
+  val fullName: String = s"$firstName $lastName"
+}
 
-  implicit lazy val arbitraryIndContactName: Arbitrary[IndContactName] =
-    Arbitrary {
-      for {
-        FirstName <- arbitrary[String]
-        LastName  <- arbitrary[String]
-      } yield IndContactName(FirstName, LastName)
-    }
-
-//Line holder for template scripts
+object Name {
+  implicit val format = Json.format[Name]
 }
