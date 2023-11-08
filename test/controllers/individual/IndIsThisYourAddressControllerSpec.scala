@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.individual
 
 import base.SpecBase
+import controllers.routes
 import forms.IsThisYourAddressFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AddressLookup, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -30,9 +31,8 @@ import play.api.test.Helpers._
 import views.html.IsThisYourAddressView
 
 import scala.concurrent.Future
-import models.AddressLookup
 
-class IsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
+class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new IsThisYourAddressFormProvider()
   val form         = formProvider()
@@ -51,7 +51,7 @@ class IsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
     AddressLookup(Some("123 Main Street"), Some("Apt 4B"), Some("test 1"), Some("test 2"), "London", Some("Greater London"), "SW1A 1AA")
   )
 
-  lazy val isThisYourAddressRoute = routes.IsThisYourAddressController.onPageLoad(NormalMode).url
+  lazy val isThisYourAddressRoute = controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(NormalMode).url
 
   "IsThisYourAddress Controller" - {
 

@@ -16,7 +16,6 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
 import models.{CheckMode, UserAnswers}
 import pages.IsThisYourAddressPage
 import play.api.i18n.Messages
@@ -32,10 +31,10 @@ object IsThisYourAddressSummary {
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key = "isThisYourAddress.checkYourAnswersLabel",
+          key = "indIsThisYourAddress.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.IsThisYourAddressController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("isThisYourAddress.change.hidden"))
           )
         )

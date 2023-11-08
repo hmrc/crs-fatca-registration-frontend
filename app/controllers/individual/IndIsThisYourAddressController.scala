@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.individual
 
 import controllers.actions._
 import forms.IsThisYourAddressFormProvider
-
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.{AddressLookupPage, IsThisYourAddressPage}
@@ -29,9 +27,10 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{IsThisYourAddressView, UnauthorisedView}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IsThisYourAddressController @Inject() (
+class IndIsThisYourAddressController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,

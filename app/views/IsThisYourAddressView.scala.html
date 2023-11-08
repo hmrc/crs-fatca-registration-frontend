@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("isThisYourAddress.title"))) {
 
-    @formHelper(action = routes.IsThisYourAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.individual.routes.IndIsThisYourAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
