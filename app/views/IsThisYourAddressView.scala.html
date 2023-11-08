@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import models.AddressLookup
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -22,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], address: AddressLookup, mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("isThisYourAddress.title"))) {
 
@@ -32,19 +34,22 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-       <div class="govuk-body">
-        <p class="govuk-body">@registrationInfo.name</p>
-          @for(addressLine <- registrationInfo.address.asList){
-        <p class="govuk-body govuk-!-margin-bottom-0">@addressLine</p>
-        }
-       </div>
-
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
                 legend = LegendViewModel(messages("isThisYourAddress.heading")).asPageHeading()
             )
         )
+
+       <div class="govuk-body">
+          <p class="govuk-body">@address.addressLine1</p>
+          <p class="govuk-body">@address.addressLine2</p>
+          <p class="govuk-body">@address.addressLine3</p>
+          <p class="govuk-body">@address.addressLine4</p>
+          <p class="govuk-body">@address.town</p>
+          <p class="govuk-body">@address.county</p>
+          <p class="govuk-body">@address.postcode</p>
+        </div>
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

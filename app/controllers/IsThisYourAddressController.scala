@@ -18,15 +18,16 @@ package controllers
 
 import controllers.actions._
 import forms.IsThisYourAddressFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.IsThisYourAddressPage
+import pages.{AddressLookupPage, IsThisYourAddressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IsThisYourAddressView
+import views.html.{IsThisYourAddressView, UnauthorisedView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,7 +38,9 @@ class IsThisYourAddressController @Inject() (
   standardActionSets: StandardActionSets,
   formProvider: IsThisYourAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IsThisYourAddressView
+  view: IsThisYourAddressView,
+  errorView: UnauthorisedView // TODO : update this with ThereIsProblemview when created
+
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -51,7 +54,10 @@ class IsThisYourAddressController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      request.userAnswers.get(AddressLookupPage) match {
+        case Some(value) => Ok(view(preparedForm, value.head, mode))
+        case None        => InternalServerError(errorView())
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
@@ -59,7 +65,7 @@ class IsThisYourAddressController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(errorView())),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourAddressPage, value))
