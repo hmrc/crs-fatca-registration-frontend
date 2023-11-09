@@ -307,6 +307,17 @@ indWhatIsYourName.error.lastName.required = Enter your family name
 indWhatIsYourName.error.lastName.invalid = The family name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 indWhatIsYourName.error.lastName.length = 	The family name must be 35 characters or less
 
+indWhatIsYourPostcode.title = What is your postcode?
+indWhatIsYourPostcode.heading = What is your postcode?
+indWhatIsYourPostcode.hint = Enter your postcode to find your address automatically.
+indWhatIsYourPostcode.checkYourAnswersLabel = What is your postcode?
+indWhatIsYourPostcode.button = Find address
+indWhatIsYourPostcode.manualLink = Or enter the address manually
+indWhatIsYourPostcode.error.required = Enter a postcode, like AA1 1AA
+indWhatIsYourPostcode.error.length = Postcode must be 10 characters or less
+indWhatIsYourPostcode.error.invalid = Enter a real postcode or enter the address manually
+indWhatIsYourPostcode.error.chars = Postcode must only include letters a to z and numbers 0 to 9
+
 doYouHaveUniqueTaxPayerReference.title = Do you have a UK Unique Taxpayer Reference (UTR)?
 doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel =  Do you have a Unique Taxpayer Reference?
 doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel.hiddenText = Change if you have a Unique Taxpayer Reference

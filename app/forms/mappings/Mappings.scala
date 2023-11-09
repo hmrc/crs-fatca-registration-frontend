@@ -17,7 +17,7 @@
 package forms.mappings
 
 import java.time.LocalDate
-import play.api.data.FieldMapping
+import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import models.Enumerable
 
@@ -43,6 +43,9 @@ trait Mappings extends Formatters with Constraints {
     ev: Enumerable[A]
   ): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey, args))
+
+  protected def requiredRegexOnlyText(requiredKey: String, invalidKey: String, regex: String): FieldMapping[String] =
+    of(requiredRegexOnly(requiredKey, invalidKey, regex))
 
   protected def localDate(
     invalidKey: String,
@@ -101,5 +104,14 @@ trait Mappings extends Formatters with Constraints {
                                 InvalidCharRegex: String
   ): FieldMapping[Option[String]] =
     of(addressPostcodeFormatter(requiredKey, lengthKey, invalidKey, regex, invalidCharKey, InvalidCharRegex))
+
+  protected def mandatoryPostcode(requiredKey: String,
+                                  lengthKey: String,
+                                  invalidKey: String,
+                                  regex: String,
+                                  invalidCharKey: String,
+                                  InvalidCharRegex: String
+  ): Mapping[String] =
+    of(mandatoryPostcodeFormatter(requiredKey, lengthKey, invalidKey, regex, invalidCharKey, InvalidCharRegex))
 
 }
