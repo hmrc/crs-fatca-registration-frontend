@@ -106,6 +106,23 @@ trait Formatters extends Transforms {
   private def removeNonBreakingSpaces(str: String) =
     str.replaceAll("\u00A0", " ")
 
+  protected def requiredRegexOnly(requiredKey: String, invalidKey: String, validFormatRegex: String) = new Formatter[String] {
+    private val dataFormatter: Formatter[String] = stringTrimFormatter(requiredKey)
+
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
+      dataFormatter
+        .bind(key, data)
+        .right
+        .flatMap {
+          case str if !str.matches(validFormatRegex) => Left(Seq(FormError(key, invalidKey)))
+          case str                                   => Right(str)
+        }
+
+    override def unbind(key: String, value: String): Map[String, String] =
+      Map(key -> value)
+
+  }
+
   private[mappings] def stringTrimFormatter(errorKey: String, msgArg: String = ""): Formatter[String] = new Formatter[String] {
 
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
@@ -218,5 +235,32 @@ trait Formatters extends Transforms {
       Map(key -> value)
 
   }
+
+  private[mappings] def mandatoryPostcodeFormatter(requiredKey: String,
+                                                   lengthKey: String,
+                                                   invalidKey: String,
+                                                   regex: String,
+                                                   invalidCharKey: String,
+                                                   validCharRegex: String
+  ): Formatter[String] =
+    new Formatter[String] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
+        val postCode          = postCodeDataTransform(data.get(key))
+        val maxLengthPostcode = 10
+
+        postCode match {
+          case Some(postCode) if postCode.length > maxLengthPostcode            => Left(Seq(FormError(key, lengthKey)))
+          case Some(postCode) if !stripSpaces(postCode).matches(validCharRegex) => Left(Seq(FormError(key, invalidCharKey)))
+          case Some(postcode) if !stripSpaces(postcode).matches(regex)          => Left(Seq(FormError(key, invalidKey)))
+          case Some(postcode)                                                   => Right(validPostCodeFormat(stripSpaces(postcode)))
+          case _                                                                => Left(Seq(FormError(key, requiredKey)))
+        }
+      }
+
+      override def unbind(key: String, value: String): Map[String, String] =
+        Map(key -> value)
+
+    }
 
 }
