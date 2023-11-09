@@ -33,7 +33,6 @@ class IndWhatIsYourPostcodeFormProviderSpec extends StringFieldBehaviours {
 
     val postCodeMaxLength = 10
 
-
     behave like fieldThatBindsValidData(
       form,
       fieldName,
@@ -46,7 +45,6 @@ class IndWhatIsYourPostcodeFormProviderSpec extends StringFieldBehaviours {
       maxLength = postCodeMaxLength,
       lengthError = FormError(fieldName, lengthKey)
     )
-
 
     behave like mandatoryField(
       form,

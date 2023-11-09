@@ -364,6 +364,7 @@ reporterType.sole = Sole trader
 reporterType.individual = An individual not connected to a business
 reporterType.hint = Select one option.
 
+
 whatIsYourName.title = What is your name?
 whatIsYourName.heading = What is your name?
 whatIsYourName.firstName = First name
