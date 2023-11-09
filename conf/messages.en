@@ -383,3 +383,17 @@ dateOfBirthWithoutId.heading = What is your date of birth?
 dateOfBirthWithoutId.hint = For example, 31 3 1980.
 dateOfBirthWithoutId.checkYourAnswersLabel = Your date of birth
 dateOfBirthWithoutId.checkYourAnswersLabel.hiddenText = Change your date of birth
+
+
+whatIsYourUTR.title = What is your {0} Unique Taxpayer Reference (UTR)?
+whatIsYourUTR.heading = What is your {0} Unique Taxpayer Reference (UTR)?
+whatIsYourUTR.p1 = You can {0}.
+whatIsYourUTR.p1.link = find a lost UTR
+whatIsYourUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+whatIsYourUTR.checkYourAnswersLabel = whatIsYourUTR
+whatIsYourUTR.error.selfAssessment = Self Assessment
+whatIsYourUTR.error.corporationTax = Corporation Tax
+whatIsYourUTR.error.required = Enter your Unique Taxpayer Reference
+whatIsYourUTR.error.invalidFormat = Unique Taxpayer Reference must include 10 numbers, for example 1234567890
+whatIsYourUTR.error.invalid = Unique Taxpayer Reference must only include numbers 0 to 9
+whatIsYourUTR.change.hidden = WhatIsYourUTR
