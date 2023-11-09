@@ -44,7 +44,7 @@ class ReporterTypeController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithInitializedData() {
     implicit request =>
       val preparedForm = request.userAnswers.get(ReporterTypePage) match {
         case None        => form

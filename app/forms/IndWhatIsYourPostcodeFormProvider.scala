@@ -26,10 +26,13 @@ class IndWhatIsYourPostcodeFormProvider @Inject() extends Mappings with RegexCon
   def apply(): Form[String] =
     Form(
       "postCode" ->
-        requiredRegexOnlyText(
+        mandatoryPostcode(
           "indWhatIsYourPostcode.error.required",
+          "indWhatIsYourPostcode.error.length",
           "indWhatIsYourPostcode.error.invalid",
-          regexPostcode
+          regexPostcode,
+          "indWhatIsYourPostcode.error.chars",
+          postCodeAllowedChars
         )
     )
 
