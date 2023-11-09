@@ -390,3 +390,10 @@ whatIsYourUTR.error.required = Enter your Unique Taxpayer Reference
 whatIsYourUTR.error.invalidFormat = Unique Taxpayer Reference must include 10 numbers, for example 1234567890
 whatIsYourUTR.error.invalid = Unique Taxpayer Reference must only include numbers 0 to 9
 whatIsYourUTR.change.hidden = WhatIsYourUTR
+
+indWhereDoYouLive.title = Where do you live?
+indWhereDoYouLive.heading = Where do you live?
+indWhereDoYouLive.Wheredoyoulive = The UK, Jersey, Guernsey or the Isle of Man
+indWhereDoYouLive.Wheredoyoulive2 = Somewhere else
+indWhereDoYouLive.checkYourAnswersLabel = Where do you live?
+indWhereDoYouLive.error.required = 	Select where you live

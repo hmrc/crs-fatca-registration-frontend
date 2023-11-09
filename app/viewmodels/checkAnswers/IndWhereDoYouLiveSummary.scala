@@ -16,25 +16,33 @@
 
 package viewmodels.checkAnswers
 
+import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.IndWhatIsYourNINumberPage
+import pages.IndWhereDoYouLivePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object IndWhatIsYourNINumberSummary {
+object IndWhereDoYouLiveSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndWhatIsYourNINumberPage).map {
+    answers.get(IndWhereDoYouLivePage).map {
       answer =>
+        val value = ValueViewModel(
+          HtmlContent(
+            HtmlFormat.escape(messages(s"indWhereDoYouLive.$answer"))
+          )
+        )
+
         SummaryListRowViewModel(
-          key = "whatIsYourNINumber.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key = "indWhereDoYouLive.checkYourAnswersLabel",
+          value = value,
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatIsYourNINumber.change.hidden"))
+            ActionItemViewModel("site.change", controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("indWhereDoYouLive.change.hidden"))
           )
         )
     }

@@ -189,3 +189,9 @@ GET        /register/utr                        controllers.organisation.WhatIsY
 POST       /register/utr                        controllers.organisation.WhatIsYourUTRController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-utr                  controllers.organisation.WhatIsYourUTRController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-utr                  controllers.organisation.WhatIsYourUTRController.onSubmit(mode: Mode = CheckMode)
+
+GET        /register/without-id/where-do-you-live                    controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/where-do-you-live                       controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-where-do-you-live                  controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-where-do-you-live               controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: Mode = CheckMode)
+
