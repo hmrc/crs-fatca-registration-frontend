@@ -196,4 +196,14 @@ trait Generators extends ModelGenerators with RegexConstants {
 
     } yield s"$part.$part@$part.$part"
 
+  def validUtr: Gen[String] = for {
+    chars <- listOfN(10, Gen.oneOf(List(1, 2, 3, 4, 5, 6, 7, 8, 9)))
+  } yield chars.mkString
+
+  def stringsNotOfFixedLengthNumeric(givenLength: Int): Gen[String] = for {
+    maxLength <- givenLength + 50
+    length    <- Gen.chooseNum(1, maxLength).suchThat(_ != givenLength)
+    chars     <- listOfN(length, Gen.numChar)
+  } yield chars.mkString
+
 }

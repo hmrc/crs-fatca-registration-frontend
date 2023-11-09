@@ -377,3 +377,16 @@ whatIsYourName.error.firstName.length = The first name must be 35 characters or 
 whatIsYourName.error.lastName.required = Enter your last name
 whatIsYourName.error.lastName.invalid = The last name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 whatIsYourName.error.lastName.length = The last name must be 35 characters or less
+
+whatIsYourUTR.title = What is your {0} Unique Taxpayer Reference (UTR)?
+whatIsYourUTR.heading = What is your {0} Unique Taxpayer Reference (UTR)?
+whatIsYourUTR.p1 = You can {0}.
+whatIsYourUTR.p1.link = find a lost UTR
+whatIsYourUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+whatIsYourUTR.checkYourAnswersLabel = whatIsYourUTR
+whatIsYourUTR.error.selfAssessment = Self Assessment
+whatIsYourUTR.error.corporationTax = Corporation Tax
+whatIsYourUTR.error.required = Enter your Unique Taxpayer Reference
+whatIsYourUTR.error.invalidFormat = Unique Taxpayer Reference must include 10 numbers, for example 1234567890
+whatIsYourUTR.error.invalid = Unique Taxpayer Reference must only include numbers 0 to 9
+whatIsYourUTR.change.hidden = WhatIsYourUTR
