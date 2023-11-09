@@ -17,24 +17,25 @@
 package viewmodels.checkAnswers
 
 import models.{CheckMode, UserAnswers}
-import pages.IndWhatIsYourNINumberPage
+import pages.IsThisYourAddressPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object IndWhatIsYourNINumberSummary {
+object IsThisYourAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndWhatIsYourNINumberPage).map {
+    answers.get(IsThisYourAddressPage).map {
       answer =>
+        val value = if (answer) "site.yes" else "site.no"
+
         SummaryListRowViewModel(
-          key = "whatIsYourNINumber.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key = "indIsThisYourAddress.checkYourAnswersLabel",
+          value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatIsYourNINumber.change.hidden"))
+            ActionItemViewModel("site.change", controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("isThisYourAddress.change.hidden"))
           )
         )
     }

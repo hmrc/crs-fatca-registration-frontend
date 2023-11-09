@@ -14,63 +14,86 @@
  * limitations under the License.
  */
 
-package controllers.organisation
+package controllers.individual
 
 import base.SpecBase
-import forms.RegisteredAddressInUKFormProvider
-import models.{NormalMode, UserAnswers}
+import controllers.routes
+import forms.IndIsThisYourAddressFormProvider
+import models.{AddressLookup, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.RegisteredAddressInUKPage
+import pages.AddressLookupPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.organisation.RegisteredAddressInUKView
+import views.html.individual.IndIsThisYourAddressView
 
 import scala.concurrent.Future
 
-class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
+class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new RegisteredAddressInUKFormProvider()
+  val formProvider = new IndIsThisYourAddressFormProvider()
   val form         = formProvider()
 
-  lazy val registeredAddressInUKRoute = controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(NormalMode).url
+  val addressLookup = AddressLookup(
+    addressLine1 = Some("123 Main Street"),
+    addressLine2 = Some("Apt 4B"),
+    addressLine3 = Some("test 1"),
+    addressLine4 = Some("test 2"),
+    town = "London",
+    county = Some("Greater London"),
+    postcode = "SW1A 1AA"
+  )
 
-  "RegisteredAddressInUK Controller" - {
+  val addresses: Seq[AddressLookup] = Seq(
+    AddressLookup(Some("123 Main Street"), Some("Apt 4B"), Some("test 1"), Some("test 2"), "London", Some("Greater London"), "SW1A 1AA")
+  )
+
+  lazy val isThisYourAddressRoute = controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(NormalMode).url
+
+  "IsThisYourAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers
+        .set(AddressLookupPage, addresses)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, registeredAddressInUKRoute)
+        val request = FakeRequest(GET, isThisYourAddressRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[RegisteredAddressInUKView]
+        val view = application.injector.instanceOf[IndIsThisYourAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, addressLookup, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(RegisteredAddressInUKPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(AddressLookupPage, addresses)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, registeredAddressInUKRoute)
+        val request = FakeRequest(GET, isThisYourAddressRoute)
 
-        val view = application.injector.instanceOf[RegisteredAddressInUKView]
+        val view = application.injector.instanceOf[IndIsThisYourAddressView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, addressLookup, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -78,8 +101,13 @@ class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(AddressLookupPage, addresses)
+        .success
+        .value
+
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -87,7 +115,7 @@ class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, registeredAddressInUKRoute)
+          FakeRequest(POST, isThisYourAddressRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -99,21 +127,26 @@ class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers
+        .set(AddressLookupPage, addresses)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, registeredAddressInUKRoute)
+          FakeRequest(POST, isThisYourAddressRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[RegisteredAddressInUKView]
+        val view = application.injector.instanceOf[IndIsThisYourAddressView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, addressLookup, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -122,12 +155,12 @@ class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, registeredAddressInUKRoute)
+        val request = FakeRequest(GET, isThisYourAddressRoute)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url // TODO : update this with ThereIsProblemview when created
       }
     }
 
@@ -137,13 +170,13 @@ class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, registeredAddressInUKRoute)
+          FakeRequest(POST, isThisYourAddressRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url // TODO : update this with ThereIsProblemview when created
       }
     }
   }

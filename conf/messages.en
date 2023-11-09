@@ -364,6 +364,7 @@ reporterType.sole = Sole trader
 reporterType.individual = An individual not connected to a business
 reporterType.hint = Select one option.
 
+
 whatIsYourName.title = What is your name?
 whatIsYourName.heading = What is your name?
 whatIsYourName.firstName = First name
@@ -377,6 +378,22 @@ whatIsYourName.error.firstName.length = The first name must be 35 characters or 
 whatIsYourName.error.lastName.required = Enter your last name
 whatIsYourName.error.lastName.invalid = The last name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 whatIsYourName.error.lastName.length = The last name must be 35 characters or less
+
+isThisYourAddress.title = Is this your address?
+isThisYourAddress.heading = Is this your address?
+isThisYourAddress.checkYourAnswersLabel = isThisYourAddress
+isThisYourAddress.error.required = Select yes if this is your address
+
+indWhatIsYourPostcode.title = What is your postcode?
+indWhatIsYourPostcode.heading = What is your postcode?
+indWhatIsYourPostcode.hint = Enter your postcode to find your address automatically.
+indWhatIsYourPostcode.checkYourAnswersLabel = What is your postcode?
+indWhatIsYourPostcode.button = Find address
+indWhatIsYourPostcode.manualLink = Or enter the address manually
+indWhatIsYourPostcode.error.required = Enter your postcode
+indWhatIsYourPostcode.error.length = Your postcode must be 8 characters or less
+indWhatIsYourPostcode.error.invalid = Enter a real postcode or enter the address manually
+indWhatIsYourPostcode.error.notFound = Address not found - enter a different postcode or enter the address manually
 
 whatIsYourUTR.title = What is your {0} Unique Taxpayer Reference (UTR)?
 whatIsYourUTR.heading = What is your {0} Unique Taxpayer Reference (UTR)?
