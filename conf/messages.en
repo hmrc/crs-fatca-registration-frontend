@@ -410,7 +410,7 @@ whatIsYourUTR.change.hidden = WhatIsYourUTR
 
 indWhereDoYouLive.title = Where do you live?
 indWhereDoYouLive.heading = Where do you live?
-indWhereDoYouLive.where-do-you-live = The UK, Jersey, Guernsey or the Isle of Man
-indWhereDoYouLive.where-do-you-live-2 = Somewhere else
+indWhereDoYouLive.where-do-you-live-uk-countries = The UK, Jersey, Guernsey or the Isle of Man
+indWhereDoYouLive.where-do-you-live-non-uk-countries = Somewhere else
 indWhereDoYouLive.checkYourAnswersLabel = Where do you live?
 indWhereDoYouLive.error.required = Select where you live
