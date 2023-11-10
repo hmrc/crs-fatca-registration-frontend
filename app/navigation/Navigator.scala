@@ -63,7 +63,11 @@ class Navigator @Inject() () {
     case BusinessTradingNameWithoutIDPage =>
       _ => controllers.organisation.routes.BusinessAddressWithoutIDController.onPageLoad(NormalMode)
     case DoYouHaveUniqueTaxPayerReferencePage => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
-    case _                                    => _ => routes.IndexController.onPageLoad
+
+    case IndWhatIsYourPostcodePage =>
+      ua => addressLookupNavigation(NormalMode)(ua)
+
+    case _ => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
@@ -76,6 +80,12 @@ class Navigator @Inject() () {
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
+
+  private def addressLookupNavigation(mode: Mode)(ua: UserAnswers): Call =
+    ua.get(AddressLookupPage) match {
+      case Some(value) if value.length == 1 => controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(mode)
+      case _                                => controllers.individual.routes.IndWhatIsYourPostcodeController.onPageLoad(mode)
+    }
 
   private def yesNoPage(ua: UserAnswers, fromPage: QuestionPage[Boolean], yesCall: => Call, noCall: => Call): Call =
     ua.get(fromPage)

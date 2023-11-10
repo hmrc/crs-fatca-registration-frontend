@@ -180,6 +180,11 @@ POST       /register/without-id/address-uk         controllers.individual.IndAdd
 GET        /register/without-id/change-address-uk  controllers.individual.IndAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/change-address-uk  controllers.individual.IndAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/without-id/is-this-your-address              controllers.individual.IndIsThisYourAddressController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST       /register/without-id/is-this-your-address              controllers.individual.IndIsThisYourAddressController.onSubmit(mode: models.Mode = models.NormalMode)
+GET        /register/without-id/change-is-this-your-address       controllers.individual.IndIsThisYourAddressController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST       /register/without-id/change-is-this-your-address       controllers.individual.IndIsThisYourAddressController.onSubmit(mode: models.Mode = models.CheckMode)
+
 GET        /register/without-id/uk-postcode                         controllers.individual.IndWhatIsYourPostcodeController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/without-id/uk-postcode                         controllers.individual.IndWhatIsYourPostcodeController.onSubmit(mode: Mode = NormalMode)
 GET        /register/without-id/change-uk-postcode                  controllers.individual.IndWhatIsYourPostcodeController.onPageLoad(mode: Mode = CheckMode)
