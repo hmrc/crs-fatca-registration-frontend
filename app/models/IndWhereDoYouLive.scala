@@ -25,11 +25,11 @@ sealed trait IndWhereDoYouLive
 object IndWhereDoYouLive extends Enumerable.Implicits {
 
   case object UKJerseyGuernseyIsleOfMan extends WithName("where-do-you-live") with IndWhereDoYouLive
-  case object SomewhereElse extends WithName("where-do-you-live-2") with IndWhereDoYouLive
+  case object NonUkCountries extends WithName("where-do-you-live-2") with IndWhereDoYouLive
 
   val values: Seq[IndWhereDoYouLive] = Seq(
     UKJerseyGuernseyIsleOfMan,
-    SomewhereElse
+    NonUkCountries
   )
 
   def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
