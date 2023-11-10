@@ -29,18 +29,18 @@ import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.individual.DateOfBirthWithoutIdView
+import views.html.individual.IndDateOfBirthWithoutIdView
 
 import scala.concurrent.Future
 
-class DateOfBirthWithoutIdControllerSpec extends SpecBase with MockitoSugar {
+class IndDateOfBirthWithoutIdControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new IndDateOfBirthFormProvider()
   private def form = formProvider()
 
   private val validAnswer = LocalDate.now(ZoneOffset.UTC)
 
-  private lazy val DateOfBirthWithoutIdRoute = controllers.individual.routes.DateOfBirthWithoutIdController.onPageLoad(NormalMode).url
+  private lazy val DateOfBirthWithoutIdRoute = controllers.individual.routes.IndDateOfBirthWithoutIdController.onPageLoad(NormalMode).url
 
   override val emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
@@ -64,7 +64,7 @@ class DateOfBirthWithoutIdControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val result = route(application, getRequest).value
 
-        val view = application.injector.instanceOf[DateOfBirthWithoutIdView]
+        val view = application.injector.instanceOf[IndDateOfBirthWithoutIdView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(getRequest, messages(application)).toString
@@ -78,7 +78,7 @@ class DateOfBirthWithoutIdControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val view = application.injector.instanceOf[DateOfBirthWithoutIdView]
+        val view = application.injector.instanceOf[IndDateOfBirthWithoutIdView]
 
         val result = route(application, getRequest).value
 
@@ -117,7 +117,7 @@ class DateOfBirthWithoutIdControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[DateOfBirthWithoutIdView]
+        val view = application.injector.instanceOf[IndDateOfBirthWithoutIdView]
 
         val result = route(application, request).value
 

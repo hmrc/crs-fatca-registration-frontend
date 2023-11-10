@@ -20,14 +20,13 @@ import controllers.individual.routes
 import models.{CheckMode, UserAnswers}
 import pages.DateOfBirthWithoutIdPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 import java.time.format.DateTimeFormatter
 
-object DateOfBirthWithoutIdSummary {
+object IndDateOfBirthWithoutIdSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(DateOfBirthWithoutIdPage).map {
@@ -37,7 +36,7 @@ object DateOfBirthWithoutIdSummary {
           key = "dateOfBirthWithoutId.checkYourAnswersLabel",
           value = ValueViewModel(answer.format(dateFormatter)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.DateOfBirthWithoutIdController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.IndDateOfBirthWithoutIdController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("dateOfBirthWithoutId.change.hidden"))
           )
         )

@@ -26,18 +26,18 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.individual.DateOfBirthWithoutIdView
+import views.html.individual.IndDateOfBirthWithoutIdView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DateOfBirthWithoutIdController @Inject() (
+class IndDateOfBirthWithoutIdController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: IndDateOfBirthFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: DateOfBirthWithoutIdView
+  view: IndDateOfBirthWithoutIdView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
