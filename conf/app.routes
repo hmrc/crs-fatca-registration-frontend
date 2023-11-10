@@ -190,6 +190,11 @@ POST       /register/without-id/uk-postcode                         controllers.
 GET        /register/without-id/change-uk-postcode                  controllers.individual.IndWhatIsYourPostcodeController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/without-id/change-uk-postcode                  controllers.individual.IndWhatIsYourPostcodeController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/without-id/date-of-birth                        controllers.individual.IndDateOfBirthWithoutIdController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/date-of-birth                        controllers.individual.IndDateOfBirthWithoutIdController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-date-of-birth                  controllers.individual.IndDateOfBirthWithoutIdController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-date-of-birth                  controllers.individual.IndDateOfBirthWithoutIdController.onSubmit(mode: Mode = CheckMode)
+
 GET        /register/utr                        controllers.organisation.WhatIsYourUTRController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/utr                        controllers.organisation.WhatIsYourUTRController.onSubmit(mode: Mode = NormalMode)
 GET        /register/change-utr                  controllers.organisation.WhatIsYourUTRController.onPageLoad(mode: Mode = CheckMode)
