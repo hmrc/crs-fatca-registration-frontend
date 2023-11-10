@@ -268,7 +268,7 @@ addressWithoutId.error.addressLine1.invalid = Address line 1 must only include l
 addressWithoutId.error.addressLine2.invalid = Address line 2 must only include letters a to z, numbers 0 to 9, apostrophes, commas, ampersands (&), hyphens, full stops and spaces
 addressWithoutId.error.addressLine3.invalid = City must only include letters a to z, numbers 0 to 9, apostrophes, commas, ampersands (&), hyphens, full stops and spaces
 addressWithoutId.error.addressLine4.invalid = County must only include letters a to z, numbers 0 to 9, apostrophes, commas, ampersands (&), hyphens, full stops and spaces
-addressWithoutId.error.postcode.required = Enter a postcode, like AA1 1AA
+addressWithoutId.error.postcode.required = Enter a postcode for Jersey, Guernsey or the Isle of Man, like AA1 1AA
 addressWithoutId.error.postcode.length = Postcode must be 10 characters or less
 addressWithoutId.error.postcode.invalid = Enter a real postcode
 addressWithoutId.error.postcode.chars = Postcode must only include letters a to z and numbers 0 to 9
@@ -384,6 +384,22 @@ dateOfBirthWithoutId.hint = For example, 31 3 1980.
 dateOfBirthWithoutId.checkYourAnswersLabel = Your date of birth
 dateOfBirthWithoutId.checkYourAnswersLabel.hiddenText = Change your date of birth
 
+
+isThisYourAddress.title = Is this your address?
+isThisYourAddress.heading = Is this your address?
+isThisYourAddress.checkYourAnswersLabel = isThisYourAddress
+isThisYourAddress.error.required = Select yes if this is your address
+
+indWhatIsYourPostcode.title = What is your postcode?
+indWhatIsYourPostcode.heading = What is your postcode?
+indWhatIsYourPostcode.hint = Enter your postcode to find your address automatically.
+indWhatIsYourPostcode.checkYourAnswersLabel = What is your postcode?
+indWhatIsYourPostcode.button = Find address
+indWhatIsYourPostcode.manualLink = Or enter the address manually
+indWhatIsYourPostcode.error.required = Enter your postcode
+indWhatIsYourPostcode.error.length = Your postcode must be 8 characters or less
+indWhatIsYourPostcode.error.invalid = Enter a real postcode or enter the address manually
+indWhatIsYourPostcode.error.notFound = Address not found - enter a different postcode or enter the address manually
 
 whatIsYourUTR.title = What is your {0} Unique Taxpayer Reference (UTR)?
 whatIsYourUTR.heading = What is your {0} Unique Taxpayer Reference (UTR)?
