@@ -68,7 +68,7 @@ class IndWhatIsYourPostcodeController @Inject() (
           postCode =>
             addressLookupConnector.addressLookupByPostcode(postCode).flatMap {
               case Nil =>
-                val formError = formReturned.withError(FormError("postCode", List("indWhatIsYourPostcode.error.invalid")))
+                val formError = formReturned.withError(FormError("postCode", List("indWhatIsYourPostcode.error.notFound")))
                 Future.successful(BadRequest(view(formError, mode)))
 
               case addresses =>
