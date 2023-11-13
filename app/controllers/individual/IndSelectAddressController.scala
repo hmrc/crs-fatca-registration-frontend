@@ -29,6 +29,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IndSelectAddressView
+import play.api.Logging
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +44,8 @@ class IndSelectAddressController @Inject() (
   view: IndSelectAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   private val form = formProvider()
 
@@ -63,7 +65,9 @@ class IndSelectAddressController @Inject() (
 
             Ok(view(preparedForm, radios, mode))
 
-          case None => Redirect(controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(mode))
+          case None =>
+            logger.error("No addresses found in userAnswers.")
+            Redirect(controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(mode))
         }
     }
 

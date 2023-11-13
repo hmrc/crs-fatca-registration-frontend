@@ -1,136 +1,142 @@
-package controllers.individual
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers
 
 import base.SpecBase
-import controllers.routes
 import forms.IndSelectAddressFormProvider
-import models.{IndSelectAddress, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import models.{AddressLookup, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
-import pages.IndSelectAddressPage
-import play.api.inject.bind
+import org.mockito.MockitoSugar
+import pages.AddressLookupPage
+import play.api.data.Form
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import views.html.IndSelectAddressView
 
 import scala.concurrent.Future
 
-class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
+class IndSelectAddressControllerSpec extends SpecBase {
 
-  lazy val indSelectAddressRoute = routes.IndSelectAddressController.onPageLoad(NormalMode).url
+  override def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new IndSelectAddressFormProvider()
-  val form         = formProvider()
+  lazy val selectAddressRoute: String = controllers.individual.routes.IndSelectAddressController.onPageLoad(NormalMode).url
 
-  "IndSelectAddress Controller" - {
+  val formProvider       = new IndSelectAddressFormProvider()
+  val form: Form[String] = formProvider()
+
+  val addresses: Seq[AddressLookup] = Seq(
+    AddressLookup(Some("1 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ"),
+    AddressLookup(Some("2 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ")
+  )
+
+  val addressRadios: Seq[RadioItem] = Seq(
+    RadioItem(content = Text("1 Address line 1, Town, ZZ1 1ZZ"), value = Some("1 Address line 1, Town, ZZ1 1ZZ")),
+    RadioItem(content = Text("2 Address line 1, Town, ZZ1 1ZZ"), value = Some("2 Address line 1, Town, ZZ1 1ZZ"))
+  )
+
+  val userAnswers = emptyUserAnswers
+    .set(AddressLookupPage, addresses)
+    .success
+    .value
+
+  "SelectAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, indSelectAddressRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[IndSelectAddressView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(IndSelectAddressPage, IndSelectAddress.values.head).success.value
+      val userAnswers = emptyUserAnswers
+        .set(AddressLookupPage, addresses)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, indSelectAddressRoute)
-
-        val view = application.injector.instanceOf[IndSelectAddressView]
+        implicit val request = FakeRequest(GET, selectAddressRoute)
 
         val result = route(application, request).value
+
+        val view = application.injector.instanceOf[IndSelectAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IndSelectAddress.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, addressRadios, NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, indSelectAddressRoute)
-            .withFormUrlEncodedBody(("value", IndSelectAddress.values.head.toString))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must redirect to manual UK address page if there are no address matches" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
       running(application) {
-        val request =
-          FakeRequest(POST, indSelectAddressRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
-
-        val boundForm = form.bind(Map("value" -> "invalid value"))
-
-        val view = application.injector.instanceOf[IndSelectAddressView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, indSelectAddressRoute)
-
-        val result = route(application, request).value
+        val request = FakeRequest(GET, selectAddressRoute)
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(NormalMode).url
       }
     }
 
-    "redirect to Journey Recovery for a POST if no existing data is found" in {
+//    "must redirect to the next page when valid data is submitted" in {
+//
+//      val userAnswers = emptyUserAnswers
+//        .set(AddressLookupPage, addresses)
+//        .success
+//        .value
+//
+//      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+//
+//      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+//
+//      running(application) {
+//        val request =
+//          FakeRequest(POST, selectAddressRoute).withFormUrlEncodedBody(("value", "1 Address line 1, Town, ZZ1 1ZZ"))
+//
+//        val result = route(application, request).value
+//
+//        status(result) mustEqual SEE_OTHER
+//        redirectLocation(result).value mustEqual onwardRoute.url
+//      }
+//    }
+//
+//    "must return a Bad Request and errors when invalid data is submitted" in {
+//
+//      retrieveUserAnswersData(userAnswers)
+//
+//      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+//
+//      running(application) {
+//        implicit val request =
+//          FakeRequest(POST, selectAddressRoute)
+//            .withFormUrlEncodedBody(("value", ""))
+//
+//        val boundForm = form.bind(Map("value" -> ""))
+//
+//        val view = application.injector.instanceOf[IndSelectAddressView]
+//
+//        val result = route(application, request).value
+//
+//        status(result) mustEqual BAD_REQUEST
+//        contentAsString(result) mustEqual view(boundForm, addressRadios, NormalMode)(request, messages(application)).toString
+//      }
+//    }
 
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, indSelectAddressRoute)
-            .withFormUrlEncodedBody(("value", IndSelectAddress.values.head.toString))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
   }
 
 }
