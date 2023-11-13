@@ -17,7 +17,6 @@
 package forms
 
 import forms.behaviours.OptionFieldBehaviours
-import models.IndSelectAddress
 import play.api.data.FormError
 
 class IndSelectAddressFormProviderSpec extends OptionFieldBehaviours {
