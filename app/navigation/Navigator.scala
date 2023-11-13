@@ -84,7 +84,7 @@ class Navigator @Inject() () {
   private def addressLookupNavigation(mode: Mode)(ua: UserAnswers): Call =
     ua.get(AddressLookupPage) match {
       case Some(value) if value.length == 1 => controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(mode)
-      case _                                => controllers.individual.routes.IndWhatIsYourPostcodeController.onPageLoad(mode)
+      case _                                => controllers.individual.routes.IndSelectAddressController.onPageLoad(mode)
     }
 
   private def yesNoPage(ua: UserAnswers, fromPage: QuestionPage[Boolean], yesCall: => Call, noCall: => Call): Call =
