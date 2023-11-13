@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.individual
 
 import base.SpecBase
 import forms.IndSelectAddressFormProvider
 import models.{AddressLookup, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import pages.AddressLookupPage
 import play.api.data.Form
 import play.api.mvc.Call
@@ -33,9 +32,9 @@ import views.html.IndSelectAddressView
 
 import scala.concurrent.Future
 
-class IndSelectAddressControllerSpec extends SpecBase {
+class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  override def onwardRoute: Call = Call("GET", "/foo")
+  override def onwardRoute: Call = Call("GET", "/register-for-crs-and-fatca")
 
   lazy val selectAddressRoute: String = controllers.individual.routes.IndSelectAddressController.onPageLoad(NormalMode).url
 
@@ -85,57 +84,57 @@ class IndSelectAddressControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
       running(application) {
         val request = FakeRequest(GET, selectAddressRoute)
-        val result  = route(app, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(NormalMode).url
       }
+
     }
 
-//    "must redirect to the next page when valid data is submitted" in {
-//
-//      val userAnswers = emptyUserAnswers
-//        .set(AddressLookupPage, addresses)
-//        .success
-//        .value
-//
-//      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-//
-//      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-//
-//      running(application) {
-//        val request =
-//          FakeRequest(POST, selectAddressRoute).withFormUrlEncodedBody(("value", "1 Address line 1, Town, ZZ1 1ZZ"))
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual onwardRoute.url
-//      }
-//    }
-//
-//    "must return a Bad Request and errors when invalid data is submitted" in {
-//
-//      retrieveUserAnswersData(userAnswers)
-//
-//      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-//
-//      running(application) {
-//        implicit val request =
-//          FakeRequest(POST, selectAddressRoute)
-//            .withFormUrlEncodedBody(("value", ""))
-//
-//        val boundForm = form.bind(Map("value" -> ""))
-//
-//        val view = application.injector.instanceOf[IndSelectAddressView]
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual BAD_REQUEST
-//        contentAsString(result) mustEqual view(boundForm, addressRadios, NormalMode)(request, messages(application)).toString
-//      }
-//    }
+    "must redirect to the next page when valid data is submitted" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(AddressLookupPage, addresses)
+        .success
+        .value
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, selectAddressRoute).withFormUrlEncodedBody(("value", "1 Address line 1, Town, ZZ1 1ZZ"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted" in {
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      running(application) {
+        implicit val request =
+          FakeRequest(POST, selectAddressRoute)
+            .withFormUrlEncodedBody(("value", ""))
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[IndSelectAddressView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, addressRadios, NormalMode)(request, messages(application)).toString
+      }
+    }
 
   }
 

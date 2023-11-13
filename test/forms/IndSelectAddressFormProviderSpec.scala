@@ -29,13 +29,6 @@ class IndSelectAddressFormProviderSpec extends OptionFieldBehaviours {
     val fieldName   = "value"
     val requiredKey = "indSelectAddress.error.required"
 
-    behave like optionsField[IndSelectAddress](
-      form,
-      fieldName,
-      validValues = IndSelectAddress.values,
-      invalidError = FormError(fieldName, "error.invalid")
-    )
-
     behave like mandatoryField(
       form,
       fieldName,
