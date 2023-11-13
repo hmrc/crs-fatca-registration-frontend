@@ -414,3 +414,14 @@ whatIsYourUTR.error.required = Enter your Unique Taxpayer Reference
 whatIsYourUTR.error.invalidFormat = Unique Taxpayer Reference must include 10 numbers, for example 1234567890
 whatIsYourUTR.error.invalid = Unique Taxpayer Reference must only include numbers 0 to 9
 whatIsYourUTR.change.hidden = WhatIsYourUTR
+
+
+sessionExpired.title = For your security, we signed you out
+sessionExpired.heading = For your security, we signed you out
+sessionExpired.guidance = We did not save your answers.
+sessionExpired.link = {0}
+
+signedOut.title = For your security, we signed you out
+signedOut.heading = For your security, we signed you out
+signedOut.guidance = We did not save your answers.
+signedOut.link = Sign in again using Government Gateway
