@@ -21,10 +21,10 @@ import models.Country
 import play.api.data.FormError
 import wolfendale.scalacheck.regexp.RegexpGen
 
-class AddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
+class NonUKBusinessAddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
 
   val countries = Seq(Country("valid", "AD", "Andorra"))
-  val form      = new AddressWithoutIdFormProvider()(countries)
+  val form      = new NonUKBusinessAddressWithoutIdFormProvider()(countries)
 
   val addressLineMaxLength = 35
 
@@ -168,12 +168,9 @@ class AddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
 
   ".postCode" - {
 
-    val fieldName      = "postCode"
-    val requiredKey    = "addressWithoutId.error.postcode.required"
-    val lengthKey      = "addressWithoutId.error.postcode.length"
-    val invalidKey     = "addressWithoutId.error.postcode.invalid"
-    val invalidCharKey = "addressWithoutId.error.postcode.chars"
-
+    val fieldName         = "postCode"
+    val requiredKey       = "addressWithoutId.error.postcode.required.business"
+    val lengthKey         = "addressWithoutId.error.postcode.length"
     val postCodeMaxLength = 10
 
     behave like fieldThatBindsValidData(
@@ -189,25 +186,11 @@ class AddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
       lengthError = FormError(fieldName, lengthKey)
     )
 
-    behave like mandatoryField(
+    behave like fieldWithPostCodeRequired(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-
-    behave like fieldWithInvalidData(
-      form,
-      fieldName,
-      "xx9 9xx9",
-      FormError(fieldName, invalidKey)
-    )
-
-    behave like fieldWithInvalidData(
-      form,
-      fieldName,
-      "!#2",
-      FormError(fieldName, invalidCharKey),
-      Some("chars")
+      Seq("JE", "GG", "IM"),
+      invalidError = FormError(fieldName, Seq(requiredKey), Seq())
     )
   }
 

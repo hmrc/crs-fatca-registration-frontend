@@ -58,10 +58,10 @@ class Navigator @Inject() () {
           userAnswers,
           HaveTradingNamePage,
           controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(NormalMode),
-          controllers.organisation.routes.BusinessAddressWithoutIDController.onPageLoad(NormalMode)
+          controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
         )
     case BusinessTradingNameWithoutIDPage =>
-      _ => controllers.organisation.routes.BusinessAddressWithoutIDController.onPageLoad(NormalMode)
+      _ => controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
     case DoYouHaveUniqueTaxPayerReferencePage => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
 
     case IndWhatIsYourPostcodePage =>

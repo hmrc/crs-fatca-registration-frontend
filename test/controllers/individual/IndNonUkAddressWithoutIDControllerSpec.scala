@@ -18,13 +18,13 @@ package controllers.individual
 
 import base.SpecBase
 import config.FrontendAppConfig
-import forms.AddressWithoutIdFormProvider
+import forms.NonUKAddressWithoutIdFormProvider
 import models.{Address, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.IndAddressWithoutIdPage
+import pages.IndNonUKAddressWithoutIdPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -37,7 +37,7 @@ import scala.concurrent.Future
 class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
 
   val testCountryList: Seq[Country] = Seq(Country("valid", "FR", "France"))
-  val formProvider                  = new AddressWithoutIdFormProvider()
+  val formProvider                  = new NonUKAddressWithoutIdFormProvider()
   val form: Form[Address]           = formProvider(testCountryList)
   val address: Address              = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("valid", "FR", "France"))
 
@@ -79,7 +79,7 @@ class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndAddressWithoutIdPage, address).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(IndNonUKAddressWithoutIdPage, address).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(

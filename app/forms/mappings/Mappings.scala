@@ -114,6 +114,14 @@ trait Mappings extends Formatters with Constraints {
   ): Mapping[String] =
     of(mandatoryPostcodeFormatter(requiredKey, lengthKey, invalidKey, regex, invalidCharKey, InvalidCharRegex))
 
+  protected def optionalPostcode(requiredKey: String,
+                                 lengthKey: String,
+                                 invalidKey: String,
+                                 regex: String,
+                                 countryFieldName: String
+  ): FieldMapping[Option[String]] =
+    of(optionalPostcodeFormatter(requiredKey, lengthKey, invalidKey, regex, countryFieldName))
+
   protected def validatedUTR(requiredKey: String, invalidKey: String, invalidFormatKey: String, regex: String, msgArg: String = ""): FieldMapping[String] =
     of(validatedUtrFormatter(requiredKey, invalidKey, invalidFormatKey, regex, msgArg))
 

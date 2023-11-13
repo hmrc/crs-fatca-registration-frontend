@@ -17,30 +17,30 @@
 package controllers.individual
 
 import controllers.actions._
-import forms.AddressWithoutIdFormProvider
+import forms.UKAddressWithoutIdFormProvider
 import models.{Country, Mode}
 import navigation.Navigator
-import pages.IndAddressWithoutIdPage
+import pages.IndUKAddressWithoutIdPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CountryListFactory
-import views.html.individual.IndAddressWithoutIdView
+import views.html.individual.IndUKAddressWithoutIdView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndAddressWithoutIdController @Inject() (
+class IndUKAddressWithoutIdController @Inject() (
   override val messagesApi: MessagesApi,
   countryListFactory: CountryListFactory,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
-  formProvider: AddressWithoutIdFormProvider,
+  formProvider: UKAddressWithoutIdFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IndAddressWithoutIdView
+  view: IndUKAddressWithoutIdView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -53,7 +53,7 @@ class IndAddressWithoutIdController @Inject() (
       countriesList match {
         case Some(countries) =>
           val form = formProvider(countries)
-          val preparedForm = request.userAnswers.get(IndAddressWithoutIdPage) match {
+          val preparedForm = request.userAnswers.get(IndUKAddressWithoutIdPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
@@ -91,9 +91,9 @@ class IndAddressWithoutIdController @Inject() (
                 ),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndAddressWithoutIdPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndUKAddressWithoutIdPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(IndAddressWithoutIdPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(IndUKAddressWithoutIdPage, mode, updatedAnswers))
             )
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")

@@ -16,16 +16,15 @@
 
 package forms
 
-import models.Address
 import forms.mappings.Mappings
-import models.Country
+import models.{Address, Country}
 import play.api.data.Form
 import play.api.data.Forms._
 import utils.RegexConstants
 
 import javax.inject.Inject
 
-class AddressWithoutIdFormProvider @Inject() extends Mappings with RegexConstants {
+class UKAddressWithoutIdFormProvider @Inject() extends Mappings with RegexConstants {
 
   val addressLineLength = 35
 

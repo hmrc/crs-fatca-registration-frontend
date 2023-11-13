@@ -17,30 +17,30 @@
 package controllers.organisation
 
 import controllers.actions._
-import forms.AddressWithoutIdFormProvider
+import forms.NonUKBusinessAddressWithoutIdFormProvider
 import models.{Country, Mode}
 import navigation.Navigator
-import pages.BusinessAddressWithoutIDPage
+import pages.NonUKBusinessAddressWithoutIDPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CountryListFactory
-import views.html.organisation.BusinessAddressWithoutIDView
+import views.html.organisation.NonUKBusinessAddressWithoutIDView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessAddressWithoutIDController @Inject() (
+class NonUKBusinessAddressWithoutIDController @Inject() (
   override val messagesApi: MessagesApi,
   countryListFactory: CountryListFactory,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
-  formProvider: AddressWithoutIdFormProvider,
+  formProvider: NonUKBusinessAddressWithoutIdFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: BusinessAddressWithoutIDView
+  view: NonUKBusinessAddressWithoutIDView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -53,7 +53,7 @@ class BusinessAddressWithoutIDController @Inject() (
       countriesList match {
         case Some(countries) =>
           val form = formProvider(countries)
-          val preparedForm = request.userAnswers.get(BusinessAddressWithoutIDPage) match {
+          val preparedForm = request.userAnswers.get(NonUKBusinessAddressWithoutIDPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
@@ -92,9 +92,9 @@ class BusinessAddressWithoutIDController @Inject() (
                 ),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessAddressWithoutIDPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(NonUKBusinessAddressWithoutIDPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(BusinessAddressWithoutIDPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(NonUKBusinessAddressWithoutIDPage, mode, updatedAnswers))
             )
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")

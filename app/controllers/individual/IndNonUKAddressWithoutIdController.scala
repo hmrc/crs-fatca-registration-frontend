@@ -17,10 +17,10 @@
 package controllers.individual
 
 import controllers.actions._
-import forms.AddressWithoutIdFormProvider
+import forms.NonUKAddressWithoutIdFormProvider
 import models.{Country, Mode}
 import navigation.Navigator
-import pages.IndAddressWithoutIdPage
+import pages.IndNonUKAddressWithoutIdPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -38,7 +38,7 @@ class IndNonUKAddressWithoutIdController @Inject() (
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
-  formProvider: AddressWithoutIdFormProvider,
+  formProvider: NonUKAddressWithoutIdFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: IndNonUkAddressWithoutIdView
 )(implicit ec: ExecutionContext)
@@ -53,7 +53,7 @@ class IndNonUKAddressWithoutIdController @Inject() (
       countriesList match {
         case Some(countries) =>
           val form = formProvider(countries)
-          val preparedForm = request.userAnswers.get(IndAddressWithoutIdPage) match {
+          val preparedForm = request.userAnswers.get(IndNonUKAddressWithoutIdPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
@@ -91,9 +91,9 @@ class IndNonUKAddressWithoutIdController @Inject() (
                 ),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndAddressWithoutIdPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(IndNonUKAddressWithoutIdPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(IndAddressWithoutIdPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(IndNonUKAddressWithoutIdPage, mode, updatedAnswers))
             )
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")
