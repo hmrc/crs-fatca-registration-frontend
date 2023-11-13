@@ -20,12 +20,14 @@ import base.SpecBase
 import controllers.organisation.routes._
 import controllers.individual.routes._
 import controllers.routes
+import models.ReporterType.Individual
 import pages._
 import models._
+import org.scalatest.prop.TableDrivenPropertyChecks
 
 import java.time.LocalDate
 
-class NavigatorSpec extends SpecBase {
+class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks {
 
   val navigator = new Navigator
 
@@ -39,9 +41,133 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad
       }
 
+      "must go from ReporterTypePage to IndDoYouHaveNINumberPage for Individual reporter" in {
+
+        val userAnswers = emptyUserAnswers.set(ReporterTypePage, Individual).success.value
+        navigator.nextPage(ReporterTypePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
+      }
+
+      val nonIndividualReporterTypes = TableDrivenPropertyChecks.Table(
+        "nonIndividualReporterTypes",
+        ReporterType.values.filter(_ != ReporterType.Individual): _*
+      )
+
+      forAll(nonIndividualReporterTypes) {
+        reporterType =>
+          s"must go from ReporterTypePage to RegisteredAddressInUKPage for $reporterType reporter" in {
+
+            val userAnswers = emptyUserAnswers.set(ReporterTypePage, reporterType).success.value
+            navigator.nextPage(ReporterTypePage, NormalMode, userAnswers) mustBe RegisteredAddressInUKController.onPageLoad(NormalMode)
+          }
+      }
+
+      "must go from ReporterTypePage to JourneyRecoveryPage when reporterType is not answered" in {
+
+        navigator.nextPage(ReporterTypePage, NormalMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from RegisteredAddressInUKPage to WhatIsYourUTRPage when user answers yes" in {
+        val userAnswers = emptyUserAnswers.set(RegisteredAddressInUKPage, true).success.value
+        navigator.nextPage(RegisteredAddressInUKPage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from RegisteredAddressInUKPage to DoYouHaveUniqueTaxPayerReferencePage when user answers no" in {
+
+        val userAnswers = emptyUserAnswers.set(RegisteredAddressInUKPage, false).success.value
+        navigator.nextPage(
+          RegisteredAddressInUKPage,
+          NormalMode,
+          userAnswers
+        ) mustBe controllers.routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(NormalMode)
+      }
+
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to WhatIsYourUTRPage when user has a UTR" in {
+        val userAnswers = emptyUserAnswers.set(DoYouHaveUniqueTaxPayerReferencePage, true).success.value
+        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
+          .onPageLoad(NormalMode)
+      }
+
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for Individual reporter with no UTR" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(ReporterTypePage, ReporterType.Individual)
+          .success
+          .value
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
+
+        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
+      }
+
+      forAll(nonIndividualReporterTypes) {
+        reporterType =>
+          s"must go from DoYouHaveUniqueTaxPayerReferencePage to BusinessNameWithoutIDPage for $reporterType reporter with no UTR" in {
+
+            val userAnswers = emptyUserAnswers
+              .set(ReporterTypePage, reporterType)
+              .success
+              .value
+              .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+              .success
+              .value
+
+            navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe BusinessNameWithoutIDController.onPageLoad(NormalMode)
+          }
+      }
+
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to JourneyRecoveryPage when DoYouHaveUniqueTaxPayerReference and ReporterType are not answered" in {
+        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to JourneyRecoveryPage when ReporterType is not answered" in {
+
+        val userAnswers = emptyUserAnswers.set(DoYouHaveUniqueTaxPayerReferencePage, false).success.value
+
+        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      forAll(nonIndividualReporterTypes) {
+        reporterType =>
+          s"must go from DoYouHaveUniqueTaxPayerReferencePage to JourneyRecoveryPage when only reporterType is answered as $reporterType" in {
+
+            val userAnswers = emptyUserAnswers.set(ReporterTypePage, reporterType).success.value
+
+            navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+          }
+      }
+
+      "must go from BusinessNameWithoutIDPage to HaveTradingNamePage" in {
+
+        navigator.nextPage(BusinessNameWithoutIDPage, NormalMode, emptyUserAnswers) mustBe HaveTradingNameController.onPageLoad(NormalMode)
+      }
+
+      "must go from HaveTradingNamePage to BusinessTradingNameWithoutIDPage when user answers yes" in {
+
+        val userAnswers = emptyUserAnswers.set(HaveTradingNamePage, true).success.value
+        navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe BusinessTradingNameWithoutIDController.onPageLoad(NormalMode)
+      }
+
+      "must go from HaveTradingNamePage to BusinessAddressWithoutIDPage when user answers yes" in {
+
+        val userAnswers = emptyUserAnswers.set(HaveTradingNamePage, false).success.value
+        navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe BusinessAddressWithoutIDController.onPageLoad(NormalMode)
+      }
+
+      "must gro from BusinessTradingNameWithoutIDPage to BusinessAddressWithoutIDPage" in {
+
+        navigator.nextPage(BusinessTradingNameWithoutIDPage, NormalMode, emptyUserAnswers) mustBe BusinessAddressWithoutIDController.onPageLoad(NormalMode)
+      }
+
       "must go from YourContactDetailsPage to ContactNamePage" in {
 
         navigator.nextPage(YourContactDetailsPage, NormalMode, UserAnswers("id")) mustBe ContactNameController.onPageLoad(NormalMode)
+      }
+
+      "must go from ContactNamePage to ContactEmailPage" in {
+
+        navigator.nextPage(ContactNamePage, NormalMode, emptyUserAnswers) mustBe ContactEmailController.onPageLoad(NormalMode)
       }
 
       "must go from ContactEmailPage to ContactHavePhonePage when user answers yes" in {
@@ -56,16 +182,38 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(ContactHavePhonePage, NormalMode, userAnswers) mustBe ContactPhoneController.onPageLoad(NormalMode)
       }
 
+      "must go from ContactHavePhonePage to CheckYourAnswersPage when user answers no" in {
+
+        val userAnswers = emptyUserAnswers.set(ContactHavePhonePage, false).success.value
+        navigator.nextPage(ContactHavePhonePage, NormalMode, userAnswers) mustBe controllers.routes.CheckYourAnswersController.onPageLoad
+      }
+
+      "must go from ContactPhonePage to HaveSecondContactPage" in {
+
+        navigator.nextPage(ContactPhonePage, NormalMode, emptyUserAnswers) mustBe HaveSecondContactController.onPageLoad(NormalMode)
+      }
+
       "must go from SecondContactNamePage to SecondContactEmailPage" in {
 
         val userAnswers = emptyUserAnswers.set(SecondContactNamePage, "value").success.value
         navigator.nextPage(SecondContactNamePage, NormalMode, userAnswers) mustBe SecondContactEmailController.onPageLoad(NormalMode)
       }
 
+      "must go from SecondContactEmailPage to SecondContactHavePhonePage" in {
+
+        navigator.nextPage(SecondContactEmailPage, NormalMode, emptyUserAnswers) mustBe SecondContactHavePhoneController.onPageLoad(NormalMode)
+      }
+
       "must go from SecondContactHavePhonePage to SecondContactPhonePage when user answers yes" in {
 
         val userAnswers = emptyUserAnswers.set(SecondContactHavePhonePage, true).success.value
         navigator.nextPage(SecondContactHavePhonePage, NormalMode, userAnswers) mustBe SecondContactPhoneController.onPageLoad(NormalMode)
+      }
+
+      "must go from SecondContactHavePhonePage to CheckYourAnswersPage when user answers no" in {
+
+        val userAnswers = emptyUserAnswers.set(SecondContactHavePhonePage, false).success.value
+        navigator.nextPage(SecondContactHavePhonePage, NormalMode, userAnswers) mustBe controllers.routes.CheckYourAnswersController.onPageLoad
       }
 
       "must go from SecondContactPhonePage to CheckYourAnswersPage" in {
@@ -90,12 +238,6 @@ class NavigatorSpec extends SpecBase {
 
         val userAnswers = emptyUserAnswers.set(IndDateOfBirthPage, LocalDate.now()).success.value
         navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
-      }
-
-      "must go from HaveTradingNamePage to BusinessTradingNameWithoutIDPage when user answers yes" in {
-
-        val userAnswers = emptyUserAnswers.set(HaveTradingNamePage, true).success.value
-        navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe BusinessTradingNameWithoutIDController.onPageLoad(NormalMode)
       }
     }
 
