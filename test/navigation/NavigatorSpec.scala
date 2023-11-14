@@ -66,10 +66,10 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks {
         navigator.nextPage(ReporterTypePage, NormalMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from RegisteredAddressInUKPage to JourneyRecoveryPage when user answers yes" in {
-        // TODO: Change to register/utr (DAC6-2909)
+      "must go from RegisteredAddressInUKPage to WhatIsYourUTRPage when user answers yes" in {
         val userAnswers = emptyUserAnswers.set(RegisteredAddressInUKPage, true).success.value
-        navigator.nextPage(RegisteredAddressInUKPage, NormalMode, userAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+        navigator.nextPage(RegisteredAddressInUKPage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
+          .onPageLoad(NormalMode)
       }
 
       "must go from RegisteredAddressInUKPage to DoYouHaveUniqueTaxPayerReferencePage when user answers no" in {
@@ -82,10 +82,10 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks {
         ) mustBe controllers.routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(NormalMode)
       }
 
-      "must go from DoYouHaveUniqueTaxPayerReferencePage to JourneyRecoveryPage when user has a UTR" in {
-        // TODO: Change to register/utr (DAC6-2909)
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to WhatIsYourUTRPage when user has a UTR" in {
         val userAnswers = emptyUserAnswers.set(DoYouHaveUniqueTaxPayerReferencePage, true).success.value
-        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
+          .onPageLoad(NormalMode)
       }
 
       "must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for Individual reporter with no UTR" in {
