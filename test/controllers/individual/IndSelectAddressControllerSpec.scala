@@ -28,7 +28,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import views.html.IndSelectAddressView
+import views.html.individual.IndSelectAddressView
 
 import scala.concurrent.Future
 

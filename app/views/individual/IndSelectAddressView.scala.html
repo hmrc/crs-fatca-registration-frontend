@@ -28,7 +28,7 @@ appConfig: FrontendAppConfig
 
 @(form: Form[_], radios: Seq[RadioItem], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("selectAddress.title"))) {
+@layout(pageTitle = title(form, messages("indSelectAddress.title"))) {
 
 @formHelper(action = controllers.individual.routes.IndSelectAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -36,18 +36,15 @@ appConfig: FrontendAppConfig
            @govukErrorSummary(ErrorSummaryViewModel(form))
        }
 
+       <h1 class="govuk-heading-l">@messages("indSelectAddress.heading")</h1>
+       <p class="govuk-body">@Html(messages("indSelectAddress.p1" , link(controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(mode).url, "indSelectAddress.p2")))</p>
+
        @govukRadios(
          RadiosViewModel.apply(
-            field = form("value"),
-            legend = LegendViewModel(messages("indSelectAddress.heading")).asPageHeading(),
+            field = form("select-address"),
+            legend = LegendViewModel(messages("indSelectAddress.heading")).withCssClass("govuk-visually-hidden"),
             items = radios
-            ).withHint(
-            HintViewModel(
-                HtmlContent(Html(messages(
-                     "indSelectAddress.hint.part1",
-                      link(controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(mode).url, "indSelectAddress.hint.part2", Some("manualAddress"))
-             )))
-            ).withAttribute("id" -> "select-address-hint")
+            )
         )
       )
 

@@ -420,5 +420,5 @@ indSelectAddress.heading = What is your address?
 indSelectAddress.checkYourAnswersLabel = Your home address
 indSelectAddress.checkYourAnswersLabel.hiddenText = Change your home address
 indSelectAddress.error.required = Select your address or enter it manually
-indSelectAddress.hint.part1 = Select from the list or {0}
-indSelectAddress.hint.part2 = enter your address manually
+indSelectAddress.p1 = Select from the list or {0}.
+indSelectAddress.p2 = enter your address manually

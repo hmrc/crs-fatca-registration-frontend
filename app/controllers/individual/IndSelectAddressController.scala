@@ -28,8 +28,8 @@ import repositories.SessionRepository
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndSelectAddressView
 import play.api.Logging
+import views.html.individual.IndSelectAddressView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
