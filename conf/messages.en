@@ -422,3 +422,58 @@ indSelectAddress.checkYourAnswersLabel.hiddenText = Change your home address
 indSelectAddress.error.required = Select your address or enter it manually
 indSelectAddress.p1 = Select from the list or {0}.
 indSelectAddress.p2 = enter your address manually
+
+isThisYourBusiness.title = Is this your business?
+isThisYourBusiness.heading = Is this your business?
+isThisYourBusiness.checkYourAnswersLabel = isThisYourBusiness
+isThisYourBusiness.error.required = Select yes if this is your business
+
+businessNotIdentified.title = The details you entered did not match our records
+businessNotIdentified.heading = The details you entered did not match our records
+businessNotIdentified.p1 = To help us find your business, check if you have entered the correct business name and Unique Taxpayer Reference (UTR).
+businessNotIdentified.subheading1 = Try entering your UTR again
+businessNotIdentified.p2 = If entering your UTR again does not work, you can
+businessNotIdentified.p2.link = find a lost UTR number (opens in new tab)
+businessNotIdentified.subheading2 = Try entering your business name again
+businessNotIdentified.p3 = Check if your business name uses:
+businessNotIdentified.bullet1 = capital letters
+businessNotIdentified.bullet2 = spaces
+businessNotIdentified.bullet3 = limited or LTD
+businessNotIdentified.p4 = If we still cannot identify your business, or you do not know your exact business name, you can
+businessNotIdentified.p4.link = contact HMRC (opens in new tab)
+businessNotIdentified.subheading3 = Email HMRC if you still need help
+businessNotIdentified.p5 = You can email
+businessNotIdentified.p5b = if we still cannot find your business.
+businessNotIdentified.button = Try again
+
+businessAlreadyRegistered.title = Your organisation is already registered to use this service
+businessAlreadyRegistered.heading = Your organisation is already registered to use this service
+businessAlreadyRegistered.withoutID.information = You can access the service using the Government Gateway details that were used to register for CRS and FATCA.
+businessAlreadyRegistered.withoutID.GGLink = Sign in using Government Gateway
+businessAlreadyRegistered.withID.information = You will need to contact your administrator to give you access via the ‘Manage account’ settings within their business tax account.
+businessAlreadyRegistered.help = You can email {0} if you’re having problems accessing the service.
+
+individualAlreadyRegistered.title = You are already registered to use this service
+individualAlreadyRegistered.heading = You are already registered to use this service
+individualAlreadyRegistered.p1 = You can access the service using the same Government Gateway account that you used to register for CRS and FATCA.
+individualAlreadyRegistered.link = Sign in using Government Gateway
+individualAlreadyRegistered.p2 = You can email {0} if you’re having problems accessing the service.
+
+differentBusiness.title = You’re unable to use this service with this Government Gateway user ID
+differentBusiness.heading = You’re unable to use this service with this Government Gateway user ID
+differentBusiness.p1 = You have signed in with a Government Gateway user ID that is linked to the following business details:
+differentBusiness.p2 = If you want to register a different organisation for CRS and FATCA, you must {0}.
+differentBusiness.p3 = You have signed in with a Government Gateway user ID that is linked to different business details.
+differentBusiness.link = sign in with the Government Gateway user ID for the organisation you wish to register
+
+unableToChangeBusiness.title = You’re unable to change your business details
+unableToChangeBusiness.heading = You’re unable to change your business details
+unableToChangeBusiness.p1 = You have signed in with a Government Gateway user ID that is linked to the following business details:
+unableToChangeBusiness.p2 = If you want to register a different organisation for CRS and FATCA, you must {0}.
+unableToChangeBusiness.p3 = You have signed in with a Government Gateway user ID that is linked to different business details.
+unableToChangeBusiness.link = sign in with the Government Gateway user ID for the organisation you wish to register
+
+thereIsAProblem.title = Sorry, there is a problem with the service
+thereIsAProblem.heading = Sorry, there is a problem with the service
+thereIsAProblem.paragraph.1 = Try again later.
+thereIsAProblem.paragraph.2.a = You can email {0} if you need to contact someone about your CRS or FATCA reporting.

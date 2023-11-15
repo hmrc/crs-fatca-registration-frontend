@@ -206,4 +206,10 @@ trait Generators extends ModelGenerators with RegexConstants {
     chars     <- listOfN(length, Gen.numChar)
   } yield chars.mkString
 
+  val safeIDRegex              = "^[0-9A-Za-z]{1,15}"
+  def validSafeID: Gen[String] = RegexpGen.from(safeIDRegex)
+
+  val subscriptionIDRegex              = "^[X][A-Z][0-9]{13}"
+  def validSubscriptionID: Gen[String] = RegexpGen.from(subscriptionIDRegex)
+
 }

@@ -18,6 +18,7 @@ package config
 
 import com.google.inject.AbstractModule
 import controllers.actions._
+import models.{UUIDGen, UUIDGenImpl}
 
 import java.time.{Clock, ZoneOffset}
 
@@ -32,6 +33,8 @@ class Module extends AbstractModule {
     bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
 
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
+    bind(classOf[CtUtrRetrievalAction]).to(classOf[CtUtrRetrievalActionImpl]).asEagerSingleton()
+    bind(classOf[UUIDGen]).to(classOf[UUIDGenImpl])
   }
 
 }

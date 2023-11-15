@@ -32,7 +32,7 @@ class CheckEnrolledToServiceAction @Inject() (config: FrontendAppConfig)(implici
 
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] =
     if (request.enrolments.exists(_.key == config.enrolmentKey)) {
-      logger.info(s"User is enrolled to the MDR service")
+      logger.info(s"User is enrolled to the CRS-FATCA service")
       successful(Some(Redirect(config.crsFatcaFIManagementFrontendUrl)))
     } else {
       successful(None)

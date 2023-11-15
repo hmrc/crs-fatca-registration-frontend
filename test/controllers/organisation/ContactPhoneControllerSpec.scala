@@ -29,6 +29,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.organisation.ContactPhoneView
 
 import scala.concurrent.Future
@@ -88,13 +89,14 @@ class ContactPhoneControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the CheckYourAnswers page when valid data is submitted and affinityGroup is Individual" in {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      retrieveUserAnswersData(emptyUserAnswers)
 
       val application = new GuiceApplicationBuilder()
         .overrides(
           bind[DataRequiredAction].to[DataRequiredActionImpl],
           bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          bind[IdentifierAction].to[FakeIdentifierAsIndividualAction],
-          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(Option(emptyUserAnswers)))
+          bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, AffinityGroup.Individual)),
+          bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
         )
         .build()
 
@@ -113,13 +115,14 @@ class ContactPhoneControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted and affinityGroup is Organisation" in {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      retrieveUserAnswersData(emptyUserAnswers)
 
       val application = new GuiceApplicationBuilder()
         .overrides(
           bind[DataRequiredAction].to[DataRequiredActionImpl],
           bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          bind[IdentifierAction].to[FakeIdentifierAsOrgAction],
-          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(Option(emptyUserAnswers)))
+          bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, AffinityGroup.Organisation)),
+          bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
         )
         .build()
 
@@ -138,13 +141,14 @@ class ContactPhoneControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted and affinityGroup is Agent" in {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      retrieveUserAnswersData(emptyUserAnswers)
 
       val application = new GuiceApplicationBuilder()
         .overrides(
           bind[DataRequiredAction].to[DataRequiredActionImpl],
           bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          bind[IdentifierAction].to[FakeIdentifierAsAgentAction],
-          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(Option(emptyUserAnswers)))
+          bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, AffinityGroup.Agent)),
+          bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
         )
         .build()
 

@@ -42,11 +42,24 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val crsFatcaFIManagementFrontendUrl: String = configuration.get[String]("urls.crsFatcaFIManagementFrontend")
   lazy val lostUTRUrl: String                 = configuration.get[String]("urls.lostUTR")
 
-  private val exitSurveyBaseUrl: String   = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  val exitSurveyUrl: String               = s"$exitSurveyBaseUrl/feedback/crs-fatca-registration-frontend"
-  lazy val businessTaxAccountLink: String = configuration.get[String]("urls.btaLogin")
-  lazy val emailEnquiries: String         = configuration.get[String]("urls.emailEnquiries")
-  lazy val crsFatcaFrontendUrl: String    = configuration.get[String]("urls.crsFatcaFrontendUrl")
+  lazy val businessMatchingUrl: String =
+    s"${configuration.get[Service]("microservice.services.business-matching").baseUrl}${configuration.get[String]("microservice.services.business-matching.startUrl")}"
+
+  lazy val enrolmentStoreProxyUrl: String =
+    s"${configuration.get[Service]("microservice.services.enrolment-store-proxy").baseUrl}${configuration.get[String]("microservice.services.enrolment-store-proxy.startUrl")}"
+
+  val taxEnrolmentsUrl1: String = s"${configuration.get[Service]("microservice.services.tax-enrolments").baseUrl}${configuration
+      .get[String]("microservice.services.tax-enrolments.url1")}"
+
+  val taxEnrolmentsUrl2: String = s"${configuration.get[String]("microservice.services.tax-enrolments.url2")}"
+
+  private val exitSurveyBaseUrl: String        = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  val exitSurveyUrl: String                    = s"$exitSurveyBaseUrl/feedback/crs-fatca-registration-frontend"
+  lazy val businessTaxAccountLink: String      = configuration.get[String]("urls.btaLogin")
+  lazy val corporationTaxEnquiriesLink: String = configuration.get[String]("urls.corporationTaxEnquiries")
+  lazy val selfAssessmentEnquiriesLink: String = configuration.get[String]("urls.selfAssessmentEnquiries")
+  lazy val emailEnquiries: String              = configuration.get[String]("urls.emailEnquiries")
+  lazy val crsFatcaFrontendUrl: String         = configuration.get[String]("urls.crsFatcaFrontendUrl")
 
   val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
@@ -57,7 +70,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val timeout: Int                 = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int               = configuration.get[Int]("timeout-dialog.countdown")
-  val enrolmentKey: String         = configuration.get[String](s"keys.enrolmentKey.crsFatca")
+  val enrolmentKey: String         = configuration.get[String]("keys.enrolmentKey.crsFatca")
+  val ctEnrolmentKey: String       = configuration.get[String]("keys.enrolmentKey.ct")
   lazy val countryCodeJson: String = configuration.get[String]("json.countries")
 
   val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
