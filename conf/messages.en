@@ -414,3 +414,11 @@ whatIsYourUTR.error.required = Enter your Unique Taxpayer Reference
 whatIsYourUTR.error.invalidFormat = Unique Taxpayer Reference must include 10 numbers, for example 1234567890
 whatIsYourUTR.error.invalid = Unique Taxpayer Reference must only include numbers 0 to 9
 whatIsYourUTR.change.hidden = WhatIsYourUTR
+
+indSelectAddress.title = What is your address?
+indSelectAddress.heading = What is your address?
+indSelectAddress.checkYourAnswersLabel = Your home address
+indSelectAddress.checkYourAnswersLabel.hiddenText = Change your home address
+indSelectAddress.error.required = Select your address or enter it manually
+indSelectAddress.p1 = Select from the list or {0}.
+indSelectAddress.p2 = enter your address manually
