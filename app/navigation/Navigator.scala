@@ -16,19 +16,22 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
 import controllers.routes
 import models.ReporterType.{Individual, Sole}
 import pages._
 import models._
 import play.api.Logging
+import play.api.libs.json.Reads
+import play.api.mvc.Call
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() () extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case ReporterTypePage => whatAreYouReportingAs(NormalMode)
+    case IsThisYourBusinessPage => isThisYourBusiness(NormalMode)
+    case ReporterTypePage       => whatAreYouReportingAs(NormalMode)
     case RegisteredAddressInUKPage =>
       userAnswers =>
         yesNoPage(
@@ -118,6 +121,19 @@ class Navigator @Inject() () extends Logging {
       checkRouteMap(page)(userAnswers)
   }
 
+  def checkNextPageForValueThenRoute[A](mode: Mode, ua: UserAnswers, page: QuestionPage[A], call: Call)(implicit rds: Reads[A]): Call =
+    if (
+      mode.equals(CheckMode) && ua
+        .get(page)
+        .fold(false)(
+          _ => true
+        )
+    ) {
+      routes.CheckYourAnswersController.onPageLoad
+    } else {
+      call
+    }
+
   private def addressLookupNavigation(mode: Mode)(ua: UserAnswers): Call =
     ua.get(AddressLookupPage) match {
       case Some(value) if value.length == 1 => controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(mode)
@@ -159,6 +175,21 @@ class Navigator @Inject() () extends Logging {
       case _ =>
         logger.warn("ReporterType answer not found when routing from ReporterTypePage")
         controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def isThisYourBusiness(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(IsThisYourBusinessPage), ua.get(ReporterTypePage), ua.get(AutoMatchedUTRPage).isDefined) match {
+      case (Some(true), Some(Sole), _) =>
+        checkNextPageForValueThenRoute(
+          mode,
+          ua,
+          IndContactEmailPage,
+          controllers.individual.routes.IndContactEmailController.onPageLoad(mode)
+        )
+      case (Some(true), _, _) =>
+        checkNextPageForValueThenRoute(mode, ua, ContactNamePage, routes.YourContactDetailsController.onPageLoad())
+      case (Some(false), _, true) => controllers.organisation.routes.DifferentBusinessController.onPageLoad()
+      case _                      => controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad()
     }
 
   private def isSoleProprietor(mode: Mode)(ua: UserAnswers): Call =
