@@ -49,8 +49,8 @@ class NonUKBusinessAddressWithoutIdFormProvider @Inject() extends Mappings with 
         apiAddressRegex,
         addressLineLength
       ),
-      "addressLine4" -> validatedOptionalText("addressWithoutId.error.addressLine4.invalid",
-                                              "addressWithoutId.error.addressLine4.length",
+      "addressLine4" -> validatedOptionalText("addressWithoutId.error.addressLine4.region.invalid",
+                                              "addressWithoutId.error.addressLine4.region.length",
                                               apiAddressRegex,
                                               addressLineLength
       ),

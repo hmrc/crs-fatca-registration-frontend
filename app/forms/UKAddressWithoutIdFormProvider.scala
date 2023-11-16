@@ -49,8 +49,8 @@ class UKAddressWithoutIdFormProvider @Inject() extends Mappings with RegexConsta
         apiAddressRegex,
         addressLineLength
       ),
-      "addressLine4" -> validatedOptionalText("addressWithoutId.error.addressLine4.invalid",
-                                              "addressWithoutId.error.addressLine4.length",
+      "addressLine4" -> validatedOptionalText("addressWithoutId.error.addressLine4.county.invalid",
+                                              "addressWithoutId.error.addressLine4.county.length",
                                               apiAddressRegex,
                                               addressLineLength
       ),
