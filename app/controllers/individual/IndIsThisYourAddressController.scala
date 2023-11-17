@@ -25,8 +25,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.UnauthorisedView
+import views.html.ThereIsAProblemView
 import views.html.individual.IndIsThisYourAddressView
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,8 +39,7 @@ class IndIsThisYourAddressController @Inject() (
   formProvider: IndIsThisYourAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: IndIsThisYourAddressView,
-  errorView: UnauthorisedView // TODO : update this with ThereIsProblemview when created
-
+  errorView: ThereIsAProblemView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
