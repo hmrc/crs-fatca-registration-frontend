@@ -16,7 +16,9 @@ GET         /there-is-a-problem                          controllers.JourneyReco
 
 GET         /register/check-your-answers                 controllers.CheckYourAnswersController.onPageLoad
 
-GET         /register/problem/signed-out                          controllers.SessionExpiredController.onPageLoad()
+GET         /register/problem/signed-out                 controllers.SessionExpiredController.onPageLoad()
+
+GET         /register/problem/some-information-is-missing   controllers.InformationMissingController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey

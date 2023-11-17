@@ -1,0 +1,17 @@
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("informationMissing.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("informationMissing.heading")</h1>
+
+    <p class="govuk-body">@messages("informationMissing.p1")</p>
+
+     @govukButton(
+     ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
+     )
+}
