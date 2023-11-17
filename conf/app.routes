@@ -26,6 +26,9 @@ GET         /account/signed-out                          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad
 
+GET        /register/problem/organisation-without-utr-pre-registered        controllers.PreRegisteredController.onPageLoad(withId: Boolean = false)
+GET        /register/problem/organisation-with-utr-pre-registered           controllers.PreRegisteredController.onPageLoad(withId: Boolean = true)
+
 GET        /register/your-contact-details                controllers.YourContactDetailsController.onPageLoad()
 POST       /register/your-contact-details                controllers.YourContactDetailsController.onSubmit()
 
