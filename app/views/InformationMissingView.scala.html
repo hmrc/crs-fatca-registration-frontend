@@ -23,9 +23,11 @@
 
 @layout(pageTitle = titleNoForm(messages("informationMissing.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("informationMissing.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("informationMissing.heading")</h1>
 
     <p class="govuk-body">@messages("informationMissing.p1")</p>
+
+    <div class = "govuk-!-padding-top-5"></div>
 
      @govukButton(
      ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
