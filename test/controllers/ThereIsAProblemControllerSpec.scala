@@ -19,9 +19,9 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.ThereIsAproblemView
+import views.html.ThereIsAProblemView
 
-class ThereIsAproblemControllerSpec extends SpecBase {
+class ThereIsAProblemControllerSpec extends SpecBase {
 
   "ThereIsAproblem Controller" - {
 
@@ -34,7 +34,7 @@ class ThereIsAproblemControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ThereIsAproblemView]
+        val view = application.injector.instanceOf[ThereIsAProblemView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
