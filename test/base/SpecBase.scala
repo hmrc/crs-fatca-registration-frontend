@@ -18,7 +18,8 @@ package base
 
 import connectors.AddressLookupConnector
 import controllers.actions._
-import models.UserAnswers
+import helpers.JsonFixtures.UserAnswersId
+import models.{UUIDGen, UUIDGenImpl, UserAnswers}
 import org.mockito.MockitoSugar.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -30,10 +31,15 @@ import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.Call
+import play.api.libs.json.Json
+import play.api.mvc.{Call, PlayBodyParsers}
 import play.api.test.FakeRequest
 import repositories.SessionRepository
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
+
+import java.time.format.DateTimeFormatter
+import java.time.{Clock, Instant, ZoneId}
 
 trait SpecBase
     extends AnyFreeSpec
@@ -50,28 +56,44 @@ trait SpecBase
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  def onwardRoute: Call                                  = Call("GET", "/foo")
-  final val mockDataRetrievalAction: DataRetrievalAction = mock[DataRetrievalAction]
-  final val mockSessionRepository: SessionRepository     = mock[SessionRepository]
-  final val mockAddressLookupConnector                   = mock[AddressLookupConnector]
+  implicit val uuidGenerator: UUIDGen = new UUIDGenImpl
 
-  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
+  private val UtcZoneId          = "UTC"
+  implicit val fixedClock: Clock = Clock.fixed(Instant.parse("2021-11-14T14:23:34.312535Z"), ZoneId.of(UtcZoneId))
+
+  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+  def onwardRoute: Call                                    = Call("GET", "/foo")
+  final val mockDataRetrievalAction: DataRetrievalAction   = mock[DataRetrievalAction]
+  final val mockSessionRepository: SessionRepository       = mock[SessionRepository]
+  final val mockAddressLookupConnector                     = mock[AddressLookupConnector]
+  final val mockCtUtrRetrievalAction: CtUtrRetrievalAction = mock[CtUtrRetrievalAction]
+
+  def emptyUserAnswers: UserAnswers = UserAnswers(UserAnswersId, Json.obj(), Instant.now(fixedClock))
 
   protected def retrieveNoData(): Unit =
-    when(mockDataRetrievalAction).thenReturn(new FakeDataRetrievalAction(None))
+    when(mockDataRetrievalAction.apply()).thenReturn(new FakeDataRetrievalAction(None))
 
   protected def retrieveUserAnswersData(userAnswers: UserAnswers): Unit =
-    when(mockDataRetrievalAction).thenReturn(new FakeDataRetrievalAction(Some(userAnswers)))
+    when(mockDataRetrievalAction.apply()).thenReturn(new FakeDataRetrievalAction(Some(userAnswers)))
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  def injectedParsers: PlayBodyParsers = app.injector.instanceOf[PlayBodyParsers]
+
+  protected def applicationBuilder(
+    userAnswers: Option[UserAnswers] = None,
+    affinityGroup: AffinityGroup = AffinityGroup.Organisation
+  ): GuiceApplicationBuilder = {
+    when(mockDataRetrievalAction.apply()).thenReturn(new FakeDataRetrievalAction(userAnswers))
+
     new GuiceApplicationBuilder()
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
-        bind[IdentifierAction].to[FakeIdentifierAsOrgAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, affinityGroup)),
+        bind[DataRetrievalAction].toInstance(mockDataRetrievalAction),
         bind[SessionRepository].toInstance(mockSessionRepository)
       )
+  }
 
 }
