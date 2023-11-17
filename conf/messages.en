@@ -427,11 +427,6 @@ signedOut.heading = For your security, we signed you out
 signedOut.guidance = We did not save your answers.
 signedOut.link = Sign in again using Government Gateway
 
-thereIsAProblem.title = Sorry, there is a problem with the service
-thereIsAProblem.heading = Sorry, there is a problem with the service
-thereIsAProblem.paragraph.1 = Try again later.
-thereIsAProblem.paragraph.2.a = You can email {0} if you need to contact someone about your MDR reporting.
-
 informationMissing.title = Some information is missing
 informationMissing.heading = Some information is missing
 informationMissing.p1 = You must provide this information to register.
