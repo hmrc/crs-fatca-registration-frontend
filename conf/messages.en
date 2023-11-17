@@ -443,4 +443,8 @@ preRegistered.help = You can email {0} if you’re having problems accessing the
 preRegistered.help.linkLocation = mailto:aeoi.enquiries@hmrc.gov.uk
 preRegistered.withID.information = You will need to contact your administrator to give you access via the ‘Manage account’ settings within their business tax account.
 
-
+individualAlreadyRegistered.title = You are already registered to use this service
+individualAlreadyRegistered.heading = You are already registered to use this service
+individualAlreadyRegistered.p1 = You can access the service using the Government Gateway details that were used to register for CRS and FATCA.
+individualAlreadyRegistered.link = Sign in using Government Gateway
+individualAlreadyRegistered.p2 = You can email {0} if you’re having problems accessing the service.
