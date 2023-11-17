@@ -10,7 +10,9 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "play-frontend-hmrc"             % "7.11.0-play-28",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping"  % "1.13.0-play-28",
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"     % bootstrapVersion,
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"             % hmrcMongoVersion
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"             % hmrcMongoVersion,
+    "uk.gov.hmrc"       %% "domain"                         % "8.3.0-play-28",
+    "org.typelevel"     %% "cats-core"                      % "2.1.1"
   )
 
   val test = Seq(
@@ -23,7 +25,8 @@ object AppDependencies {
     "org.scalacheck"          %% "scalacheck"              % "1.15.4",
     "org.pegdown"             %  "pegdown"                 % "1.6.0",
     "org.jsoup"               %  "jsoup"                   % "1.14.3",
-    "wolfendale"             %% "scalacheck-gen-regexp"    % "0.1.2",
+    "wolfendale"             %%  "scalacheck-gen-regexp"   % "0.1.2",
+    "com.github.tomakehurst"  %  "wiremock-jre8"           % "2.26.0",
     "com.vladsch.flexmark"    %  "flexmark-all"            % "0.62.2"
   ).map(_ % "test, it")
 

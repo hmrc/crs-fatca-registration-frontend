@@ -17,17 +17,21 @@
 package navigation
 
 import base.SpecBase
-import controllers.organisation.routes._
 import controllers.individual.routes._
+import controllers.organisation.routes._
 import controllers.routes
-import models.ReporterType.Individual
-import pages._
+import generators.{Generators, UserAnswersGenerator}
+import helpers.JsonFixtures.utr
+import models.ReporterType.{Individual, LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models._
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import pages._
 
 import java.time.LocalDate
 
-class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks {
+class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generators with UserAnswersGenerator {
 
   val navigator = new Navigator
 
@@ -66,10 +70,10 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks {
         navigator.nextPage(ReporterTypePage, NormalMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
       }
 
-      "must go from RegisteredAddressInUKPage to JourneyRecoveryPage when user answers yes" in {
-        // TODO: Change to register/utr (DAC6-2909)
+      "must go from RegisteredAddressInUKPage to WhatIsYourUTRPage when user answers yes" in {
         val userAnswers = emptyUserAnswers.set(RegisteredAddressInUKPage, true).success.value
-        navigator.nextPage(RegisteredAddressInUKPage, NormalMode, userAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+        navigator.nextPage(RegisteredAddressInUKPage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
+          .onPageLoad(NormalMode)
       }
 
       "must go from RegisteredAddressInUKPage to DoYouHaveUniqueTaxPayerReferencePage when user answers no" in {
@@ -82,10 +86,10 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks {
         ) mustBe controllers.routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(NormalMode)
       }
 
-      "must go from DoYouHaveUniqueTaxPayerReferencePage to JourneyRecoveryPage when user has a UTR" in {
-        // TODO: Change to register/utr (DAC6-2909)
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to WhatIsYourUTRPage when user has a UTR" in {
         val userAnswers = emptyUserAnswers.set(DoYouHaveUniqueTaxPayerReferencePage, true).success.value
-        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
+          .onPageLoad(NormalMode)
       }
 
       "must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for Individual reporter with no UTR" in {
@@ -238,6 +242,142 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks {
 
         val userAnswers = emptyUserAnswers.set(IndDateOfBirthPage, LocalDate.now()).success.value
         navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
+      }
+
+      "must go from IsThisYourBusinessPage" - {
+
+        val nonOrgReporters = Table(
+          "nonOrgReporter",
+          Seq(Sole, Individual): _*
+        )
+
+        "to IndContactEmailPage when Yes is selected for Sole reporter type" in {
+          ScalaCheckPropertyChecks.forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(ReporterTypePage, Sole)
+                  .success
+                  .value
+                  .set(IsThisYourBusinessPage, true)
+                  .success
+                  .value
+
+              navigator
+                .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+                .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+          }
+        }
+
+        forAll(nonOrgReporters) {
+          nonOrgReporter =>
+            s"to DifferentBusinessPage when No is selected for an auto-matched $nonOrgReporter reporter type" in {
+              ScalaCheckPropertyChecks.forAll(arbitrary[UserAnswers]) {
+                answers =>
+                  val updatedAnswers =
+                    answers
+                      .set(ReporterTypePage, nonOrgReporter)
+                      .success
+                      .value
+                      .set(IsThisYourBusinessPage, false)
+                      .success
+                      .value
+                      .set(AutoMatchedUTRPage, utr)
+                      .success
+                      .value
+
+                  navigator
+                    .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+                    .mustBe(controllers.organisation.routes.DifferentBusinessController.onPageLoad())
+              }
+            }
+        }
+
+        val orgReporters = Table(
+          "orgReporters",
+          Seq(LimitedCompany, Partnership, LimitedPartnership, UnincorporatedAssociation): _*
+        )
+
+        forAll(orgReporters) {
+          orgReporter =>
+            s"to YourContactDetailsPage when Yes is selected for $orgReporter reporter type" in {
+              ScalaCheckPropertyChecks.forAll(arbitrary[UserAnswers]) {
+                answers =>
+                  val updatedAnswers =
+                    answers
+                      .set(ReporterTypePage, orgReporter)
+                      .success
+                      .value
+                      .set(IsThisYourBusinessPage, true)
+                      .success
+                      .value
+
+                  navigator
+                    .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+                    .mustBe(routes.YourContactDetailsController.onPageLoad())
+              }
+            }
+        }
+
+        forAll(orgReporters) {
+          orgReporter =>
+            s"to DifferentBusinessPage when Yes is selected for an auto-matched $orgReporter reporter type" in {
+              ScalaCheckPropertyChecks.forAll(arbitrary[UserAnswers]) {
+                answers =>
+                  val updatedAnswers =
+                    answers
+                      .set(ReporterTypePage, orgReporter)
+                      .success
+                      .value
+                      .set(IsThisYourBusinessPage, false)
+                      .success
+                      .value
+                      .set(AutoMatchedUTRPage, utr)
+                      .success
+                      .value
+
+                  navigator
+                    .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+                    .mustBe(controllers.organisation.routes.DifferentBusinessController.onPageLoad())
+              }
+            }
+        }
+
+        "to YourContactDetailsPage when there is no ReporterType and Yes is selected" in {
+          ScalaCheckPropertyChecks.forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .remove(ReporterTypePage)
+                  .success
+                  .value
+                  .set(IsThisYourBusinessPage, true)
+                  .success
+                  .value
+
+              navigator
+                .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+                .mustBe(routes.YourContactDetailsController.onPageLoad())
+          }
+        }
+
+        "to BusinessNotIdentifiedPage when No is selected" in {
+          ScalaCheckPropertyChecks.forAll(arbitrary[UserAnswers]) {
+            answers =>
+              val updatedAnswers =
+                answers
+                  .set(ReporterTypePage, LimitedCompany)
+                  .success
+                  .value
+                  .set(IsThisYourBusinessPage, false)
+                  .success
+                  .value
+
+              navigator
+                .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+                .mustBe(controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad())
+          }
+        }
       }
     }
 

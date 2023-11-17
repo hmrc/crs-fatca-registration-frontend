@@ -16,24 +16,29 @@
 
 package controllers.actions
 
-import javax.inject.Inject
+import models.UniqueTaxpayerReference
 import models.requests.IdentifierRequest
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.AffinityGroup
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAsOrgAction @Inject() (bodyParsers: PlayBodyParsers) extends IdentifierAction {
+class FakeCtUtrRetrievalActionProvider(
+  utr: Option[UniqueTaxpayerReference] = None
+) extends CtUtrRetrievalAction {
 
-  val affinityGroup: AffinityGroup = AffinityGroup.Organisation
+  def apply(): ActionFunction[IdentifierRequest, IdentifierRequest] =
+    new FakeCtUtrRetrievalAction(utr)
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, "id", affinityGroup))
+}
 
-  override def parser: BodyParser[AnyContent] =
-    bodyParsers.default
+class FakeCtUtrRetrievalAction(
+  utr: Option[UniqueTaxpayerReference] = None
+) extends ActionFunction[IdentifierRequest, IdentifierRequest] {
 
-  override protected def executionContext: ExecutionContext =
+  override def invokeBlock[A](request: IdentifierRequest[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
+    block(request.copy(utr = utr))
+
+  implicit override protected val executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
 
 }

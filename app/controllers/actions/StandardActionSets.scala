@@ -27,25 +27,28 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
                                     initializeData: DataInitializeAction,
+                                    retrieveCtUTR: CtUtrRetrievalAction,
                                     checkEnrolment: CheckEnrolledToServiceAction,
                                     dependantAnswer: DependantAnswerProvider
 ) {
 
+  def identifiedUserWithEnrolmentCheckAndCtUtrRetrieval(): ActionBuilder[IdentifierRequest, AnyContent] =
+    identify() andThen checkEnrolment andThen retrieveCtUTR()
+
   def identifiedWithoutEnrolmentCheck(): ActionBuilder[DataRequest, AnyContent] =
-    identify andThen getData andThen requireData
+    identify() andThen getData() andThen requireData
 
   def identifiedWithoutEnrolmentCheckInitialisedData(): ActionBuilder[DataRequest, AnyContent] =
-    identify andThen getData andThen initializeData
+    identify() andThen getData() andThen initializeData
 
   def identifiedUserWithEnrolmentCheck(): ActionBuilder[IdentifierRequest, AnyContent] =
-    identify andThen checkEnrolment
+    identify() andThen checkEnrolment
 
   def identifiedUserWithInitializedData(): ActionBuilder[DataRequest, AnyContent] =
-    identifiedUserWithEnrolmentCheck() andThen getData andThen initializeData
+    identifiedUserWithEnrolmentCheck() andThen getData() andThen initializeData
 
-  // ToDo Update with enrolment check when implemented
   def identifiedUserWithData(): ActionBuilder[DataRequest, AnyContent] =
-    identifiedUserWithEnrolmentCheck() andThen getData andThen requireData
+    identifiedUserWithEnrolmentCheck() andThen getData() andThen requireData
 
   def identifiedUserWithDependantAnswer[T](answer: Gettable[T])(implicit reads: Reads[T]): ActionBuilder[DataRequest, AnyContent] =
     identifiedUserWithData() andThen dependantAnswer(answer)

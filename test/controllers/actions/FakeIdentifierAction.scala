@@ -23,9 +23,10 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAsAgentAction @Inject() (bodyParsers: PlayBodyParsers) extends IdentifierAction {
-
-  val affinityGroup: AffinityGroup = AffinityGroup.Agent
+class FakeIdentifierAction @Inject() (bodyParsers: PlayBodyParsers, affinityGroup: AffinityGroup)
+    extends IdentifierAction
+    with ActionBuilder[IdentifierRequest, AnyContent]
+    with ActionFunction[Request, IdentifierRequest] {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
     block(IdentifierRequest(request, "id", affinityGroup))
@@ -35,5 +36,7 @@ class FakeIdentifierAsAgentAction @Inject() (bodyParsers: PlayBodyParsers) exten
 
   override protected def executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
+
+  override def apply(): ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest] = this
 
 }
