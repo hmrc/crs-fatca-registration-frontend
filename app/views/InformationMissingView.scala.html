@@ -19,7 +19,7 @@
         govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(continueUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("informationMissing.title"))) {
 
@@ -30,6 +30,6 @@
     <div class = "govuk-!-padding-top-5"></div>
 
      @govukButton(
-     ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
+       ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit").asLink(continueUrl)
      )
 }
