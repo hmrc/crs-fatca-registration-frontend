@@ -200,3 +200,18 @@ POST       /register/utr                        controllers.organisation.WhatIsY
 GET        /register/change-utr                  controllers.organisation.WhatIsYourUTRController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-utr                  controllers.organisation.WhatIsYourUTRController.onSubmit(mode: Mode = CheckMode)
 
+GET        /register/without-id/select-address                       controllers.individual.IndSelectAddressController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST       /register/without-id/select-address                      controllers.individual.IndSelectAddressController.onSubmit(mode: models.Mode = models.NormalMode)
+GET        /register/without-id/change-select-address                 controllers.individual.IndSelectAddressController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST       /register/without-id/change-select-address                 controllers.individual.IndSelectAddressController.onSubmit(mode: models.Mode = models.CheckMode)
+
+GET        /register/is-this-your-business                            controllers.organisation.IsThisYourBusinessController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST       /register/is-this-your-business                            controllers.organisation.IsThisYourBusinessController.onSubmit(mode: models.Mode = models.NormalMode)
+GET        /register/change-is-this-your-business                     controllers.organisation.IsThisYourBusinessController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST       /register/change-is-this-your-business                     controllers.organisation.IsThisYourBusinessController.onSubmit(mode: models.Mode = models.CheckMode)
+
+GET        /register/business-not-identified                          controllers.organisation.BusinessNotIdentifiedController.onPageLoad()
+
+GET        /register/problem/different-business                       controllers.organisation.DifferentBusinessController.onPageLoad()
+
+GET        /register/problem/unable-to-change-business                controllers.organisation.UnableToChangeBusinessController.onPageLoad()

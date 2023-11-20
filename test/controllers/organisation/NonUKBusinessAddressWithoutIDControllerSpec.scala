@@ -160,4 +160,5 @@ class NonUKBusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoS
       }
     }
   }
+
 }
