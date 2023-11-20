@@ -141,8 +141,8 @@ class NonUKBusinessAddressWithoutIdFormProviderSpec extends StringFieldBehaviour
   ".addressLine4" - {
 
     val fieldName  = "addressLine4"
-    val invalidKey = "addressWithoutId.error.addressLine4.invalid"
-    val lengthKey  = "addressWithoutId.error.addressLine4.length"
+    val invalidKey = "addressWithoutId.error.addressLine4.region.invalid"
+    val lengthKey  = "addressWithoutId.error.addressLine4.region.length"
 
     behave like fieldThatBindsValidDataWithoutInvalidError(
       form,
