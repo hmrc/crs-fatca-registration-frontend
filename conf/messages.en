@@ -492,7 +492,7 @@ businessAlreadyRegistered.help = You can email {0} if you’re having problems a
 
 individualAlreadyRegistered.title = You are already registered to use this service
 individualAlreadyRegistered.heading = You are already registered to use this service
-individualAlreadyRegistered.p1 = You can access the service using the same Government Gateway account that you used to register for CRS and FATCA.
+individualAlreadyRegistered.p1 = You can access the service using the same Government Gateway details that you used to register for CRS and FATCA.
 individualAlreadyRegistered.link = Sign in using Government Gateway
 individualAlreadyRegistered.p2 = You can email {0} if you’re having problems accessing the service.
 
