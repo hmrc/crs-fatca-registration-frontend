@@ -14,22 +14,22 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
-
 @this(
-layout: templates.Layout,
-govukButton: GovukButton,
-link: components.Link,
-appConfig: FrontendAppConfig
+        layout: templates.Layout,
+        govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(continueUrl: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("thereIsAProblem.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("informationMissing.title"))) {
 
-<h1 class="govuk-heading-l">@messages("thereIsAProblem.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("informationMissing.heading")</h1>
 
-<p class="govuk-body">@messages("thereIsAProblem.paragraph.1")</p>
+    <p class="govuk-body">@messages("informationMissing.p1")</p>
 
-<p class="govuk-body">@Html(messages("thereIsAProblem.paragraph.2.a" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.email", openInNewWindow = true)))</p>
+    <div class = "govuk-!-padding-top-5"></div>
+
+     @govukButton(
+       ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit").asLink(continueUrl)
+     )
 }

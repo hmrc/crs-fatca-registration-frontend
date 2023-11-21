@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.FrontendAppConfig
+package controllers
 
-@this(
-layout: templates.Layout,
-govukButton: GovukButton,
-link: components.Link,
-appConfig: FrontendAppConfig
-)
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.ThereIsAProblemView
 
-@()(implicit request: Request[_], messages: Messages)
+import javax.inject.Inject
 
-@layout(pageTitle = titleNoForm(messages("thereIsAProblem.title")), showBackLink = false) {
+class ThereIsAProblemController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
+  view: ThereIsAProblemView
+) extends FrontendBaseController
+    with I18nSupport {
 
-<h1 class="govuk-heading-l">@messages("thereIsAProblem.heading")</h1>
+  def onPageLoad(): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(view())
+  }
 
-<p class="govuk-body">@messages("thereIsAProblem.paragraph.1")</p>
-
-<p class="govuk-body">@Html(messages("thereIsAProblem.paragraph.2.a" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.email", openInNewWindow = true)))</p>
 }

@@ -10,15 +10,26 @@ GET         /language/:lang                              controllers.LanguageSwi
 
 GET         /refresh-session                             controllers.KeepAliveController.keepAlive
 
+GET         /register/problem/there-is-a-problem                  controllers.ThereIsAProblemController.onPageLoad()
+
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET         /register/check-your-answers                 controllers.CheckYourAnswersController.onPageLoad
+
+GET         /register/problem/signed-out                 controllers.SessionExpiredController.onPageLoad()
+
+GET         /register/problem/some-information-is-missing   controllers.InformationMissingController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad
+
+GET        /register/problem/organisation-without-utr-pre-registered        controllers.PreRegisteredController.onPageLoad(withId: Boolean = false)
+GET        /register/problem/organisation-with-utr-pre-registered           controllers.PreRegisteredController.onPageLoad(withId: Boolean = true)
+
+GET        /register/problem/individual-pre-registered                                  controllers.individual.IndividualAlreadyRegisteredController.onPageLoad()
 
 GET        /register/your-contact-details                controllers.YourContactDetailsController.onPageLoad()
 POST       /register/your-contact-details                controllers.YourContactDetailsController.onSubmit()

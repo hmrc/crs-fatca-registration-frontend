@@ -415,6 +415,36 @@ whatIsYourUTR.error.invalidFormat = Unique Taxpayer Reference must include 10 nu
 whatIsYourUTR.error.invalid = Unique Taxpayer Reference must only include numbers 0 to 9
 whatIsYourUTR.change.hidden = WhatIsYourUTR
 
+
+
+sessionExpired.title = For your security, we signed you out
+sessionExpired.heading = For your security, we signed you out
+sessionExpired.guidance = We did not save your answers.
+sessionExpired.link = {0}
+
+signedOut.title = For your security, we signed you out
+signedOut.heading = For your security, we signed you out
+signedOut.guidance = We did not save your answers.
+signedOut.link = Sign in again using Government Gateway
+
+informationMissing.title = Some information is missing
+informationMissing.heading = Some information is missing
+informationMissing.p1 = You must provide this information to register.
+
+preRegistered.title = Your organisation is already registered to use this service
+preRegistered.heading = Your organisation is already registered to use this service
+preRegistered.withOutID.information = You can access the service using the Government Gateway details that were used to register for CRS and FATCA.
+preRegistered.withOutID.GGLink = Sign in using Government Gateway
+preRegistered.help = You can email {0} if you’re having problems accessing the service.
+preRegistered.help.linkLocation = mailto:aeoi.enquiries@hmrc.gov.uk
+preRegistered.withID.information = You will need to contact your administrator to give you access via the ‘Manage account’ settings within their business tax account.
+
+individualAlreadyRegistered.title = You are already registered to use this service
+individualAlreadyRegistered.heading = You are already registered to use this service
+individualAlreadyRegistered.p1 = You can access the service using the Government Gateway details that were used to register for CRS and FATCA.
+individualAlreadyRegistered.link = Sign in using Government Gateway
+individualAlreadyRegistered.p2 = You can email {0} if you’re having problems accessing the service.
+
 indSelectAddress.title = What is your address?
 indSelectAddress.heading = What is your address?
 indSelectAddress.checkYourAnswersLabel = Your home address
@@ -477,3 +507,4 @@ thereIsAProblem.title = Sorry, there is a problem with the service
 thereIsAProblem.heading = Sorry, there is a problem with the service
 thereIsAProblem.paragraph.1 = Try again later.
 thereIsAProblem.paragraph.2.a = You can email {0} if you need to contact someone about your CRS or FATCA reporting.
+

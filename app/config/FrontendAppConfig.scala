@@ -28,6 +28,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
 
+  val timeoutSeconds: Int   = configuration.get[Int]("session.timeoutSeconds")
+  val countdownSeconds: Int = configuration.get[Int]("session.countdownSeconds")
+
   private val contactHost                  = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "crs-fatca-registration-frontend"
 

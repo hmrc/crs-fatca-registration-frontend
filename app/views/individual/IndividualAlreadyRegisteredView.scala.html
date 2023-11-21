@@ -17,22 +17,22 @@
 @import config.FrontendAppConfig
 
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton,
-        link: components.Link,
-        appConfig: FrontendAppConfig
+layout: templates.Layout,
+govukButton: GovukButton,
+link: components.Link,
+appConfig: FrontendAppConfig
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("individualAlreadyRegistered.title")), showBackLink = false) {
 
-    <h1 class="govuk-heading-l">@messages("individualAlreadyRegistered.heading")</h1>
+<h1 class="govuk-heading-l">@messages("individualAlreadyRegistered.heading")</h1>
 
-    <p class="govuk-body">@messages("individualAlreadyRegistered.p1")</p>
+<p class="govuk-body">@messages("individualAlreadyRegistered.p1")</p>
 
-    <p class="govuk-body">@link(appConfig.loginUrl, "individualAlreadyRegistered.link", openInNewWindow = true)</p>
+<p class="govuk-body">@link(appConfig.loginUrl, "individualAlreadyRegistered.link", openInNewWindow = true)</p>
 
-    <p class="govuk-body">@Html(messages("individualAlreadyRegistered.p2" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.emailAddress", openInNewWindow = true)))</p>
+<p class="govuk-body">@Html(messages("individualAlreadyRegistered.p2" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.email", openInNewWindow = true)))</p>
 
 }
