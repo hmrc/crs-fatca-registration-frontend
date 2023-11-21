@@ -27,10 +27,10 @@ case object IsThisYourBusinessPage extends QuestionPage[Boolean] {
     List(
       IndWhatIsYourPostcodePage,
       IndSelectAddressPage,
-      IndAddressWithoutIdPage,
+      IndUKAddressWithoutIdPage,
       IndSelectedAddressLookupPage,
       AddressLookupPage,
-      BusinessAddressWithoutIDPage
+      NonUKBusinessAddressWithoutIDPage
     )
 
   override def path: JsPath = JsPath \ toString

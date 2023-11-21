@@ -50,11 +50,11 @@ class Navigator @Inject() () extends Logging {
           userAnswers,
           HaveTradingNamePage,
           controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(NormalMode),
-          controllers.organisation.routes.BusinessAddressWithoutIDController.onPageLoad(NormalMode)
+          controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
         )
     case BusinessTradingNameWithoutIDPage =>
-      _ => controllers.organisation.routes.BusinessAddressWithoutIDController.onPageLoad(NormalMode)
-    case BusinessAddressWithoutIDPage => businessAddressWithoutIdRouting(NormalMode)
+      _ => controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
+    case NonUKBusinessAddressWithoutIDPage => businessAddressWithoutIdRouting(NormalMode)
     // org first contact details pages
     case YourContactDetailsPage => _ => controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode)
     case ContactNamePage        => _ => controllers.organisation.routes.ContactEmailController.onPageLoad(NormalMode)

@@ -76,7 +76,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .set(ContactEmailPage, TestEmail)
         .success
         .value
-        .set(BusinessAddressWithoutIDPage, address)
+        .set(NonUKBusinessAddressWithoutIDPage, address)
         .success
         .value
         .set(RegistrationInfoPage, IndRegistrationInfo(safeId))
@@ -110,7 +110,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .set(ContactEmailPage, TestEmail)
         .success
         .value
-        .set(BusinessAddressWithoutIDPage, address)
+        .set(NonUKBusinessAddressWithoutIDPage, address)
         .success
         .value
         .set(RegistrationInfoPage, IndRegistrationInfo(safeId))
@@ -146,7 +146,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .set(ContactEmailPage, TestEmail)
         .success
         .value
-        .set(BusinessAddressWithoutIDPage, address)
+        .set(NonUKBusinessAddressWithoutIDPage, address)
         .success
         .value
         .set(RegistrationInfoPage, IndRegistrationInfo(safeId))

@@ -16,20 +16,12 @@
 
 package pages
 
-import models.UserAnswers
+import models.Address
 import play.api.libs.json.JsPath
 
-import scala.util.Try
-
-case object IndSelectAddressPage extends QuestionPage[String] {
+case object NonUKBusinessAddressWithoutIDPage extends QuestionPage[Address] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "selectAddress"
-
-  override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
-    value.fold(Try(userAnswers))(
-      _ => userAnswers.remove(IndUKAddressWithoutIdPage)
-    )
-
+  override def toString: String = "NonUKBusinessAddressWithoutID"
 }

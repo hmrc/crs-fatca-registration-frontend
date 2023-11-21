@@ -138,10 +138,10 @@ POST       /register/ni-number                        controllers.individual.Ind
 GET        /register/change-ni-number                  controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /register/change-ni-number                  controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/business-address                        controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/business-address                  controllers.organisation.BusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
+GET        /register/without-id/business-address                        controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/business-address                        controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/business-address                  controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/business-address                  controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
 
 
 GET        /register/problem/sign-in-problem                controllers.UnauthorisedStandardUserController.onPageLoad()
@@ -186,10 +186,10 @@ POST       /register/have-utr                            controllers.DoYouHaveUn
 GET        /register/change-have-utr                     controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.CheckMode)
 POST       /register/change-have-utr                     controllers.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode: models.Mode = models.CheckMode)
 
-GET        /register/without-id/address-uk         controllers.individual.IndAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/address-uk         controllers.individual.IndAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-address-uk  controllers.individual.IndAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-address-uk  controllers.individual.IndAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
+GET        /register/without-id/address-uk         controllers.individual.IndUKAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
+POST       /register/without-id/address-uk         controllers.individual.IndUKAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
+GET        /register/without-id/change-address-uk  controllers.individual.IndUKAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-address-uk  controllers.individual.IndUKAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
 
 GET        /register/without-id/is-this-your-address              controllers.individual.IndIsThisYourAddressController.onPageLoad(mode: models.Mode = models.NormalMode)
 POST       /register/without-id/is-this-your-address              controllers.individual.IndIsThisYourAddressController.onSubmit(mode: models.Mode = models.NormalMode)

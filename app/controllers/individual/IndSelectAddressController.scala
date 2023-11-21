@@ -67,7 +67,7 @@ class IndSelectAddressController @Inject() (
 
           case None =>
             logger.error("No addresses found in userAnswers.")
-            Redirect(controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(mode))
+            Redirect(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(mode))
         }
     }
 
@@ -95,7 +95,7 @@ class IndSelectAddressController @Inject() (
                 }
               )
 
-          case None => Future.successful(Redirect(controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(mode)))
+          case None => Future.successful(Redirect(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(mode)))
         }
     }
 

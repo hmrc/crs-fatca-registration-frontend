@@ -37,7 +37,7 @@ appConfig: FrontendAppConfig
        }
 
        <h1 class="govuk-heading-l">@messages("indSelectAddress.heading")</h1>
-       <p class="govuk-body">@Html(messages("indSelectAddress.p1" , link(controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(mode).url, "indSelectAddress.p2")))</p>
+       <p class="govuk-body">@Html(messages("indSelectAddress.p1" , link(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(mode).url, "indSelectAddress.p2")))</p>
 
        @govukRadios(
          RadiosViewModel.apply(

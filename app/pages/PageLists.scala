@@ -41,7 +41,8 @@ object PageLists {
 
   val individualAndWithoutIdPages = List(
     WhatIsYourNamePage,
-    IndAddressWithoutIdPage,
+    IndUKAddressWithoutIdPage,
+    IndNonUKAddressWithoutIdPage,
     IndContactEmailPage,
     IndContactHavePhonePage,
     IndContactNamePage,
@@ -50,7 +51,7 @@ object PageLists {
     IndDoYouHaveNINumberPage,
     IndWhatIsYourNamePage,
     IndWhatIsYourNINumberPage,
-    BusinessAddressWithoutIDPage,
+    NonUKBusinessAddressWithoutIDPage,
     BusinessNameWithoutIDPage,
     BusinessTradingNameWithoutIDPage
   )

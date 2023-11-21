@@ -88,7 +88,7 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(NormalMode).url
+          controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode).url
       }
 
     }

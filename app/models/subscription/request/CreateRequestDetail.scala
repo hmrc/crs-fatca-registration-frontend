@@ -18,7 +18,7 @@ package models.subscription.request
 
 import models.matching.SafeId
 import models.{IdentifierType, UserAnswers}
-import pages.{BusinessAddressWithoutIDPage, BusinessTradingNameWithoutIDPage, IndAddressWithoutIdPage}
+import pages.{BusinessTradingNameWithoutIDPage, IndUKAddressWithoutIdPage, NonUKBusinessAddressWithoutIDPage}
 import play.api.libs.json.{Json, OFormat}
 import utils.UserAnswersHelper
 
@@ -55,7 +55,7 @@ object CreateRequestDetail extends UserAnswersHelper {
   }.flatten
 
   private def isGBUser(userAnswers: UserAnswers): Boolean =
-    if (userAnswers.get(BusinessAddressWithoutIDPage).exists(_.isOtherCountry) || userAnswers.get(IndAddressWithoutIdPage).exists(_.isOtherCountry)) {
+    if (userAnswers.get(NonUKBusinessAddressWithoutIDPage).exists(_.isOtherCountry) || userAnswers.get(IndUKAddressWithoutIdPage).exists(_.isOtherCountry)) {
       false
     } else {
       true

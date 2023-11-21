@@ -33,7 +33,7 @@
 
 @layout(pageTitle = title(form, messages(s"addressWithoutId.individual.title"))) {
 
-    @formHelper(action = controllers.individual.routes.IndAddressWithoutIdController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.individual.routes.IndUKAddressWithoutIdController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -76,7 +76,7 @@
         @govukInput(
             InputViewModel(
                 field = form("addressLine4"),
-                label = LabelViewModel(messages("addressWithoutId.addressLine4"))
+                label = LabelViewModel(messages("addressWithoutId.addressLine4.county"))
             )
                     .withAutocomplete("address-level1")
                     .withWidth(TwoThirds)
@@ -85,7 +85,7 @@
         @govukInput(
             InputViewModel(
                 field = form("postCode"),
-                label = LabelViewModel(messages("addressWithoutId.postCode"))
+                label = LabelViewModel(messages("addressWithoutId.postCode.mandatory"))
             )
                     .withAutocomplete("postal-code")
                     .withWidth(Fixed10)

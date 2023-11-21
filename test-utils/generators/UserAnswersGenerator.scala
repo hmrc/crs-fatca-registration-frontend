@@ -35,7 +35,7 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       arbitrary[(IndWhatIsYourPostcodePage.type, JsValue)] ::
       arbitrary[(ContactNamePage.type, JsValue)] ::
       arbitrary[(WhatIsYourNamePage.type, JsValue)] ::
-      arbitrary[(BusinessAddressWithoutIDPage.type, JsValue)] ::
+      arbitrary[(NonUKBusinessAddressWithoutIDPage.type, JsValue)] ::
       arbitrary[(DateOfBirthWithoutIdPage.type, JsValue)] ::
       arbitrary[(WhatIsYourNamePage.type, JsValue)] ::
       arbitrary[(IndWhatIsYourNINumberPage.type, JsValue)] ::

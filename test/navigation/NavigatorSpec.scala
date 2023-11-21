@@ -156,12 +156,12 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       "must go from HaveTradingNamePage to BusinessAddressWithoutIDPage when user answers yes" in {
 
         val userAnswers = emptyUserAnswers.set(HaveTradingNamePage, false).success.value
-        navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe BusinessAddressWithoutIDController.onPageLoad(NormalMode)
+        navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
       }
 
       "must gro from BusinessTradingNameWithoutIDPage to BusinessAddressWithoutIDPage" in {
 
-        navigator.nextPage(BusinessTradingNameWithoutIDPage, NormalMode, emptyUserAnswers) mustBe BusinessAddressWithoutIDController.onPageLoad(NormalMode)
+        navigator.nextPage(BusinessTradingNameWithoutIDPage, NormalMode, emptyUserAnswers) mustBe NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
       }
 
       "must go from YourContactDetailsPage to ContactNamePage" in {

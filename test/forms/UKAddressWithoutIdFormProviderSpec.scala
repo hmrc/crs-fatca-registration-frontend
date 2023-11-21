@@ -21,10 +21,10 @@ import models.Country
 import play.api.data.FormError
 import wolfendale.scalacheck.regexp.RegexpGen
 
-class AddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
+class UKAddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
 
   val countries = Seq(Country("valid", "AD", "Andorra"))
-  val form      = new AddressWithoutIdFormProvider()(countries)
+  val form      = new UKAddressWithoutIdFormProvider()(countries)
 
   val addressLineMaxLength = 35
 
@@ -141,8 +141,8 @@ class AddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
   ".addressLine4" - {
 
     val fieldName  = "addressLine4"
-    val invalidKey = "addressWithoutId.error.addressLine4.invalid"
-    val lengthKey  = "addressWithoutId.error.addressLine4.length"
+    val invalidKey = "addressWithoutId.error.addressLine4.county.invalid"
+    val lengthKey  = "addressWithoutId.error.addressLine4.county.length"
 
     behave like fieldThatBindsValidDataWithoutInvalidError(
       form,

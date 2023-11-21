@@ -263,6 +263,39 @@ trait Formatters extends Transforms {
 
     }
 
+  private[mappings] def optionalPostcodeFormatter(requiredKey: String,
+                                                  lengthKey: String,
+                                                  invalidKey: String,
+                                                  regex: String,
+                                                  countryFieldName: String
+  ): Formatter[Option[String]] =
+    new Formatter[Option[String]] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
+        val postCode                        = postCodeDataTransform(data.get(key))
+        val country                         = countryDataTransform(data.get(countryFieldName))
+        val maxLengthPostcode               = 10
+        val countryCodesThatRequirePostcode = List("JE", "GG", "IM")
+
+        (postCode, country) match {
+          case (None, Some(countryCode)) if countryCodesThatRequirePostcode.contains(countryCode) => Left(Seq(FormError(key, requiredKey)))
+
+          case (Some(postCode), _) if postCode.length > maxLengthPostcode => Left(Seq(FormError(key, lengthKey)))
+
+          case (Some(postcode), Some(countryCode)) if countryCodesThatRequirePostcode.contains(countryCode) && !stripSpaces(postcode).matches(regex) =>
+            Left(Seq(FormError(key, invalidKey)))
+
+          case (Some(postcode), _) => Right(Some(postcode))
+
+          case _ => Right(None)
+        }
+      }
+
+      override def unbind(key: String, value: Option[String]): Map[String, String] =
+        Map(key -> value.getOrElse(""))
+
+    }
+
   protected def validatedUtrFormatter(requiredKey: String,
                                       invalidKey: String,
                                       invalidFormatKey: String,

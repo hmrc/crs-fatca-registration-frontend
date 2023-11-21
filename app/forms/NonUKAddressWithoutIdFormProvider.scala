@@ -25,7 +25,7 @@ import utils.RegexConstants
 
 import javax.inject.Inject
 
-class AddressWithoutIdFormProvider @Inject() extends Mappings with RegexConstants {
+class NonUKAddressWithoutIdFormProvider @Inject() extends Mappings with RegexConstants {
 
   val addressLineLength = 35
 
@@ -50,18 +50,17 @@ class AddressWithoutIdFormProvider @Inject() extends Mappings with RegexConstant
         apiAddressRegex,
         addressLineLength
       ),
-      "addressLine4" -> validatedOptionalText("addressWithoutId.error.addressLine4.invalid",
-                                              "addressWithoutId.error.addressLine4.length",
+      "addressLine4" -> validatedOptionalText("addressWithoutId.error.addressLine4.region.invalid",
+                                              "addressWithoutId.error.addressLine4.region.length",
                                               apiAddressRegex,
                                               addressLineLength
       ),
-      "postCode" -> addressPostcode(
+      "postCode" -> optionalPostcode(
         "addressWithoutId.error.postcode.required",
         "addressWithoutId.error.postcode.length",
         "addressWithoutId.error.postcode.invalid",
         regexPostcode,
-        "addressWithoutId.error.postcode.chars",
-        postCodeAllowedChars
+        "country"
       ),
       "country" -> text("addressWithoutId.error.country.required")
         .verifying("addressWithoutId.error.country.required", value => countryList.exists(_.code == value))

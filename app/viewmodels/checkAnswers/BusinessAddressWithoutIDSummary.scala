@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.organisation.routes
 import models.{Address, CheckMode, UserAnswers}
-import pages.BusinessAddressWithoutIDPage
+import pages.NonUKBusinessAddressWithoutIDPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryListRow, Value}
@@ -28,13 +28,13 @@ import viewmodels.implicits._
 object BusinessAddressWithoutIDSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(BusinessAddressWithoutIDPage).map {
+    answers.get(NonUKBusinessAddressWithoutIDPage).map {
       answer =>
         SummaryListRowViewModel(
           key = "businessWithoutIDAddress.checkYourAnswersLabel",
           value = formatAddress(answer),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.BusinessAddressWithoutIDController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("businessWithoutIDAddress.change.hidden"))
           )
         )

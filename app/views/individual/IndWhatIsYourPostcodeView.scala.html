@@ -45,7 +45,7 @@
             .withHint(HintViewModel(Text(messages("indWhatIsYourPostcode.hint"))))
         )
 
-        <p class="govuk-body">@link(controllers.individual.routes.IndAddressWithoutIdController.onPageLoad(mode).url, "indWhatIsYourPostcode.manualLink" , id = Some("manualAddressLink"))</p>
+        <p class="govuk-body">@link(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(mode).url, "indWhatIsYourPostcode.manualLink" , id = Some("manualAddressLink"))</p>
 
         @govukButton(
             ButtonViewModel(messages("indWhatIsYourPostcode.button"))

@@ -76,7 +76,7 @@
         @govukInput(
             InputViewModel(
                 field = form("addressLine4"),
-                label = LabelViewModel(messages("addressWithoutId.addressLine4"))
+                label = LabelViewModel(messages("addressWithoutId.addressLine4.region"))
             )
                     .withAutocomplete("address-level1")
                     .withWidth(TwoThirds)
@@ -85,7 +85,7 @@
         @govukInput(
             InputViewModel(
                 field = form("postCode"),
-                label = LabelViewModel(messages("addressWithoutId.postCode"))
+                label = LabelViewModel(messages("addressWithoutId.postCode.optional"))
             )
                     .withAutocomplete("postal-code")
                     .withWidth(Fixed10)

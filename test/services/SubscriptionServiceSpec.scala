@@ -73,7 +73,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
         .set(IndContactHavePhonePage, false)
         .success
         .value
-        .set(IndAddressWithoutIdPage, address)
+        .set(IndUKAddressWithoutIdPage, address)
         .success
         .value
 
@@ -108,7 +108,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
         .set(ContactHavePhonePage, false)
         .success
         .value
-        .set(IndAddressWithoutIdPage, address)
+        .set(IndUKAddressWithoutIdPage, address)
         .success
         .value
         .set(HaveSecondContactPage, true)
