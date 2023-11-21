@@ -18,7 +18,7 @@ package navigation
 
 import controllers.routes
 import models.ReporterType.{Individual, Sole}
-import pages._
+import pages.{DoYouHaveNINPage, DoYouLiveInTheUKPage, NonUkNamePage, WhatIsYourNationalInsuranceNumberPage, _}
 import models._
 import play.api.Logging
 import play.api.libs.json.Reads
@@ -196,6 +196,29 @@ class Navigator @Inject() () extends Logging {
     ua.get(ReporterTypePage) match {
       case Some(Sole) => controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode)
       case _          => controllers.organisation.routes.BusinessNameController.onPageLoad(mode)
+    }
+
+  private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Option[Call] =
+    ua.get(ReporterTypePage) map {
+      case Individual => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
+      case _ => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
+    }
+
+  private def doYouHaveNINORoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
+    ua.get(IndDoYouHaveNINumberPage) map {
+      case true =>
+        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNINumberPage,
+          controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode))
+//      case false =>
+//        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNamePage, controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode))
+    }
+
+  private def whatIsYourDateOfBirthRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
+    ua.get(IndDoYouHaveNINumberPage) map {
+      case true =>
+        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
+//      case false =>
+//        checkNextPageForValueThenRoute(mode, ua, IndDoYouLiveInTheUKPage, routes.DoYouLiveInTheUKController.onPageLoad(mode)).get
     }
 
 }
