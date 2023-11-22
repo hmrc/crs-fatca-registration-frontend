@@ -95,9 +95,8 @@ class Navigator @Inject() () extends Logging {
     case IndDateOfBirthPage      => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
 
     case IndDoYouHaveNINumberPage  => doYouHaveNINORoutes(NormalMode)
-    case IndWhatIsYourNINumberPage => _ => Some(controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(NormalMode)).get
-    case WhatIsYourNamePage        => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)).get
-    case IndWhatIsYourNamePage     => _ => Some(controllers.individual.routes.IndDateOfBirthWithoutIdController.onPageLoad(NormalMode)).get
+    case IndWhatIsYourNINumberPage => _ => Some(controllers.individual.routes.IndContactNameController.onPageLoad(NormalMode)).get
+    case IndContactNamePage        => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)).get
     case IndDateOfBirthPage        => whatIsYourDateOfBirthRoutes()
     case DateOfBirthWithoutIdPage  => whatIsYourDateOfBirthRoutes()
     case IndWhatIsYourPostcodePage =>
@@ -119,9 +118,8 @@ class Navigator @Inject() () extends Logging {
     case DoYouHaveUniqueTaxPayerReferencePage => doYouHaveUniqueTaxPayerReference(CheckMode)
     case WhatIsYourUTRPage                    => isSoleProprietor(CheckMode)
     case IndDoYouHaveNINumberPage             => doYouHaveNINORoutes(CheckMode)
-    case IndWhatIsYourNINumberPage            => _ => Some(controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(CheckMode)).get
-    case WhatIsYourNamePage                   => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(CheckMode)).get
-    case IndWhatIsYourNamePage                => _ => Some(controllers.individual.routes.IndDateOfBirthWithoutIdController.onPageLoad(CheckMode)).get
+    case IndWhatIsYourNINumberPage            => _ => Some(controllers.individual.routes.IndContactNameController.onPageLoad(CheckMode)).get
+    case IndContactNamePage                   => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)).get
     case IndDateOfBirthPage                   => whatIsYourDateOfBirthRoutes()
     case DateOfBirthWithoutIdPage             => whatIsYourDateOfBirthRoutes()
     case _                                    => _ => routes.CheckYourAnswersController.onPageLoad

@@ -76,17 +76,17 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .set(IndWhatIsYourNINumberPage, "AA000000A")
           .success
           .value
-        navigator.nextPage(IndWhatIsYourNINumberPage, NormalMode, userAnswers) mustBe IndWhatIsYourNameController.onPageLoad(NormalMode)
+        navigator.nextPage(IndWhatIsYourNINumberPage, NormalMode, userAnswers) mustBe IndContactNameController.onPageLoad(NormalMode)
       }
 
-      "must go from WhatIsYourNamePage to IndDateOfBirthPage" in {
+      "must go from IndContactNamePage to IndDateOfBirthPage" in {
 
         val userAnswers = emptyUserAnswers
           .set(IndWhatIsYourNINumberPage, "AA000000A")
           .success
           .value
 
-        navigator.nextPage(WhatIsYourNamePage, NormalMode, userAnswers) mustBe IndDateOfBirthController.onPageLoad(NormalMode)
+        navigator.nextPage(IndContactNamePage, NormalMode, userAnswers) mustBe IndDateOfBirthController.onPageLoad(NormalMode)
       }
 
       "must go from DateOfBirthWithoutIdPage to IndIdentityConfirmedPage if Nino" in {
@@ -96,7 +96,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .success
           .value
 
-        navigator.nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
+        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
       }
 
       "must go from DateOfBirthWithoutIdPage to IndIdentityConfirmedPage if no Nino" in {
