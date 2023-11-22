@@ -16,7 +16,6 @@
 
 package navigation
 
-import controllers.individual.routes.IndContactNameController
 import controllers.routes
 import models.ReporterType.{Individual, Sole}
 import pages._
@@ -90,18 +89,43 @@ class Navigator @Inject() () extends Logging {
         )
     case SecondContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad
 
+    // individual
+    case IndDoYouHaveNINumberPage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          IndDoYouHaveNINumberPage,
+          controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(NormalMode),
+          controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(NormalMode)
+        )
+    case IndWhatIsYourNINumberPage => _ => controllers.individual.routes.IndContactNameController.onPageLoad(NormalMode)
+    case IndContactNamePage        => _ => controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)
+    case IndWhatIsYourNamePage     => _ => controllers.individual.routes.IndDateOfBirthWithoutIdController.onPageLoad(NormalMode)
+    case DateOfBirthWithoutIdPage  => whatIsYourDateOfBirthRoutes(NormalMode)
+    case IndWhereDoYouLivePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          IndWhereDoYouLivePage,
+          controllers.individual.routes.IndWhatIsYourPostcodeController.onPageLoad(NormalMode),
+          controllers.individual.routes.IndNonUKAddressWithoutIdController.onPageLoad(NormalMode)
+        )
+    case IndUKAddressWithoutIdPage    => _ => controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+    case IndNonUKAddressWithoutIdPage => _ => controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+    case IndWhatIsYourPostcodePage    => addressLookupNavigation(NormalMode)
+    case IsThisYourAddressPage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          IsThisYourAddressPage,
+          controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode),
+          controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode)
+        )
+    case IndSelectAddressPage    => _ => controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
     case IndContactEmailPage     => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
     case IndContactHavePhonePage => _ => controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode)
     case IndContactPhonePage     => _ => controllers.routes.CheckYourAnswersController.onPageLoad
     case IndDateOfBirthPage      => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
-
-    case IndDoYouHaveNINumberPage  => doYouHaveNINORoutes(NormalMode)
-    case IndWhatIsYourNINumberPage => _ => Some(controllers.individual.routes.IndContactNameController.onPageLoad(NormalMode)).get
-    case IndContactNamePage        => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)).get
-    case IndDateOfBirthPage        => whatIsYourDateOfBirthRoutes()
-    case DateOfBirthWithoutIdPage  => whatIsYourDateOfBirthRoutes()
-    case IndWhatIsYourPostcodePage =>
-      ua => addressLookupNavigation(NormalMode)(ua)
 
     case _ => _ => routes.IndexController.onPageLoad
   }
@@ -120,9 +144,9 @@ class Navigator @Inject() () extends Logging {
     case WhatIsYourUTRPage                    => isSoleProprietor(CheckMode)
     case IndDoYouHaveNINumberPage             => doYouHaveNINORoutes(CheckMode)
     case IndWhatIsYourNINumberPage            => _ => Some(controllers.individual.routes.IndContactNameController.onPageLoad(CheckMode)).get
-    case IndContactNamePage                   => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)).get
-    case IndDateOfBirthPage                   => whatIsYourDateOfBirthRoutes()
-    case DateOfBirthWithoutIdPage             => whatIsYourDateOfBirthRoutes()
+    case IndContactNamePage                   => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(CheckMode)).get
+    case IndDateOfBirthPage                   => whatIsYourDateOfBirthRoutes(CheckMode)
+    case DateOfBirthWithoutIdPage             => whatIsYourDateOfBirthRoutes(CheckMode)
     case _                                    => _ => routes.CheckYourAnswersController.onPageLoad
   }
 
@@ -185,7 +209,7 @@ class Navigator @Inject() () extends Logging {
       case Some(Sole) | Some(Individual) => controllers.individual.routes.IndContactEmailController.onPageLoad(mode)
       case Some(_)                       => controllers.routes.YourContactDetailsController.onPageLoad()
       case _ =>
-        logger.warn("ReporterType answer not found when routing from ReporterTypePage")
+        logger.warn("ReporterType answer not found when routing from NonUKBusinessAddressWithoutIDPage")
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -216,14 +240,25 @@ class Navigator @Inject() () extends Logging {
         checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNINumberPage, controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode))
       case Some(false) =>
         checkNextPageForValueThenRoute(mode, ua, IndContactNamePage, controllers.individual.routes.IndContactNameController.onPageLoad(mode))
+      case _ =>
+        logger.warn("NI Number answer not found when routing from IndDoYouHaveNINumberPage")
+        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def whatIsYourDateOfBirthRoutes()(ua: UserAnswers): Call =
+  private def whatIsYourDateOfBirthRoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
       case Some(true) =>
-        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad
+        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
       case Some(false) =>
-        controllers.routes.JourneyRecoveryController.onPageLoad() // TODO : needs to be replaced with DoYouLiveInTheUKPage
+        checkNextPageForValueThenRoute(
+          mode,
+          ua,
+          IndWhereDoYouLivePage,
+          controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(mode)
+        )
+      case _ =>
+        logger.warn("NI Number answer not found when routing from DateOfBirthPage")
+        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
 }

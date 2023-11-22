@@ -226,3 +226,8 @@ GET        /register/business-not-identified                          controller
 GET        /register/problem/different-business                       controllers.organisation.DifferentBusinessController.onPageLoad()
 
 GET        /register/problem/unable-to-change-business                controllers.organisation.UnableToChangeBusinessController.onPageLoad()
+
+GET        /register/without-id/where-do-you-live                     controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST       /register/without-id/where-do-you-live                     controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: models.Mode = models.NormalMode)
+GET        /register/without-id/change-where-do-you-live              controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST       /register/without-id/change-where-do-you-live              controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: models.Mode = models.CheckMode)

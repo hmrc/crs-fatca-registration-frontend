@@ -19,11 +19,12 @@ package controllers.individual
 import base.SpecBase
 import forms.IndSelectAddressFormProvider
 import models.{AddressLookup, NormalMode}
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.any
 import pages.AddressLookupPage
 import play.api.data.Form
-import play.api.mvc.Call
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
@@ -33,8 +34,6 @@ import views.html.individual.IndSelectAddressView
 import scala.concurrent.Future
 
 class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
-
-  override def onwardRoute: Call = Call("GET", "/register-for-crs-and-fatca")
 
   lazy val selectAddressRoute: String = controllers.individual.routes.IndSelectAddressController.onPageLoad(NormalMode).url
 
@@ -65,7 +64,9 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
         .success
         .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+        .build()
 
       running(application) {
         implicit val request = FakeRequest(GET, selectAddressRoute)
@@ -81,7 +82,9 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to manual UK address page if there are no address matches" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+        .build()
       running(application) {
         val request = FakeRequest(GET, selectAddressRoute)
         val result  = route(application, request).value
@@ -102,7 +105,9 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+        .build()
 
       running(application) {
         val request =
@@ -117,7 +122,9 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+        .build()
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       running(application) {
