@@ -16,6 +16,7 @@
 
 package navigation
 
+import controllers.individual.routes.IndContactNameController
 import controllers.routes
 import models.ReporterType.{Individual, Sole}
 import pages._
@@ -93,6 +94,12 @@ class Navigator @Inject() () extends Logging {
     case IndContactHavePhonePage => _ => controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode)
     case IndContactPhonePage     => _ => controllers.routes.CheckYourAnswersController.onPageLoad
     case IndDateOfBirthPage      => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
+
+    case IndDoYouHaveNINumberPage  => doYouHaveNINORoutes(NormalMode)
+    case IndWhatIsYourNINumberPage => _ => Some(controllers.individual.routes.IndContactNameController.onPageLoad(NormalMode)).get
+    case IndContactNamePage        => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)).get
+    case IndDateOfBirthPage        => whatIsYourDateOfBirthRoutes()
+    case DateOfBirthWithoutIdPage  => whatIsYourDateOfBirthRoutes()
     case IndWhatIsYourPostcodePage =>
       ua => addressLookupNavigation(NormalMode)(ua)
 
@@ -111,6 +118,11 @@ class Navigator @Inject() () extends Logging {
         )
     case DoYouHaveUniqueTaxPayerReferencePage => doYouHaveUniqueTaxPayerReference(CheckMode)
     case WhatIsYourUTRPage                    => isSoleProprietor(CheckMode)
+    case IndDoYouHaveNINumberPage             => doYouHaveNINORoutes(CheckMode)
+    case IndWhatIsYourNINumberPage            => _ => Some(controllers.individual.routes.IndContactNameController.onPageLoad(CheckMode)).get
+    case IndContactNamePage                   => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)).get
+    case IndDateOfBirthPage                   => whatIsYourDateOfBirthRoutes()
+    case DateOfBirthWithoutIdPage             => whatIsYourDateOfBirthRoutes()
     case _                                    => _ => routes.CheckYourAnswersController.onPageLoad
   }
 
@@ -196,6 +208,22 @@ class Navigator @Inject() () extends Logging {
     ua.get(ReporterTypePage) match {
       case Some(Sole) => controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode)
       case _          => controllers.organisation.routes.BusinessNameController.onPageLoad(mode)
+    }
+
+  private def doYouHaveNINORoutes(mode: Mode)(ua: UserAnswers): Call =
+    ua.get(IndDoYouHaveNINumberPage) match {
+      case Some(true) =>
+        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNINumberPage, controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode))
+      case Some(false) =>
+        checkNextPageForValueThenRoute(mode, ua, IndContactNamePage, controllers.individual.routes.IndContactNameController.onPageLoad(mode))
+    }
+
+  private def whatIsYourDateOfBirthRoutes()(ua: UserAnswers): Call =
+    ua.get(IndDoYouHaveNINumberPage) match {
+      case Some(true) =>
+        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad
+      case Some(false) =>
+        controllers.routes.JourneyRecoveryController.onPageLoad() // TODO : needs to be replaced with DoYouLiveInTheUKPage
     }
 
 }

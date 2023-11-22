@@ -51,6 +51,65 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(ReporterTypePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
       }
 
+      "must go from DoYouHaveNINumberPage to WhatIsYourNINumberPage for Individual reporter if have Nino" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
+        navigator.nextPage(IndDoYouHaveNINumberPage, NormalMode, userAnswers) mustBe IndWhatIsYourNINumberController.onPageLoad(NormalMode)
+      }
+
+      "must go from DoYouHaveNINumberPage to IndContactNamePage for Individual reporter if no Nino" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(IndDoYouHaveNINumberPage, false)
+          .success
+          .value
+        navigator.nextPage(IndDoYouHaveNINumberPage, NormalMode, userAnswers) mustBe IndContactNameController.onPageLoad(NormalMode)
+
+      }
+
+      "must go from whatIsNINumberPage to WhatIsYourNamePage if have Nino" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(IndWhatIsYourNINumberPage, "AA000000A")
+          .success
+          .value
+        navigator.nextPage(IndWhatIsYourNINumberPage, NormalMode, userAnswers) mustBe IndContactNameController.onPageLoad(NormalMode)
+      }
+
+      "must go from IndContactNamePage to IndDateOfBirthPage" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(IndWhatIsYourNINumberPage, "AA000000A")
+          .success
+          .value
+
+        navigator.nextPage(IndContactNamePage, NormalMode, userAnswers) mustBe IndDateOfBirthController.onPageLoad(NormalMode)
+      }
+
+      "must go from IndDateOfBirthPage to IndIdentityConfirmedPage if Nino" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
+
+        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
+      }
+
+      "must go from IndDateOfBirthPage to JourneyRecoveryPage if no Nino" in { // TODO : replace it with  DoYouLiveInTheUKPage when created
+
+        val userAnswers = emptyUserAnswers
+          .set(IndDoYouHaveNINumberPage, false)
+          .success
+          .value
+
+        navigator.nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers) mustBe
+          routes.JourneyRecoveryController.onPageLoad() // TODO : replace it with  DoYouLiveInTheUKPage when created
+      }
+
       val nonIndividualReporterTypes = TableDrivenPropertyChecks.Table(
         "nonIndividualReporterTypes",
         ReporterType.values.filter(_ != ReporterType.Individual): _*
