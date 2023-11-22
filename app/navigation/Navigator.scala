@@ -18,7 +18,7 @@ package navigation
 
 import controllers.routes
 import models.ReporterType.{Individual, Sole}
-import pages.{DoYouHaveNINPage, DoYouLiveInTheUKPage, NonUkNamePage, WhatIsYourNationalInsuranceNumberPage, _}
+import pages._
 import models._
 import play.api.Logging
 import play.api.libs.json.Reads
@@ -93,6 +93,13 @@ class Navigator @Inject() () extends Logging {
     case IndContactHavePhonePage => _ => controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode)
     case IndContactPhonePage     => _ => controllers.routes.CheckYourAnswersController.onPageLoad
     case IndDateOfBirthPage      => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
+
+    case IndDoYouHaveNINumberPage  => doYouHaveNINORoutes(NormalMode)
+    case IndWhatIsYourNINumberPage => _ => Some(controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(NormalMode)).get
+    case WhatIsYourNamePage        => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)).get
+    case IndWhatIsYourNamePage     => _ => Some(controllers.individual.routes.IndDateOfBirthWithoutIdController.onPageLoad(NormalMode)).get
+    case IndDateOfBirthPage        => whatIsYourDateOfBirthRoutes()
+    case DateOfBirthWithoutIdPage  => whatIsYourDateOfBirthRoutes()
     case IndWhatIsYourPostcodePage =>
       ua => addressLookupNavigation(NormalMode)(ua)
 
@@ -111,6 +118,12 @@ class Navigator @Inject() () extends Logging {
         )
     case DoYouHaveUniqueTaxPayerReferencePage => doYouHaveUniqueTaxPayerReference(CheckMode)
     case WhatIsYourUTRPage                    => isSoleProprietor(CheckMode)
+    case IndDoYouHaveNINumberPage             => doYouHaveNINORoutes(CheckMode)
+    case IndWhatIsYourNINumberPage            => _ => Some(controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(CheckMode)).get
+    case WhatIsYourNamePage                   => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(CheckMode)).get
+    case IndWhatIsYourNamePage                => _ => Some(controllers.individual.routes.IndDateOfBirthWithoutIdController.onPageLoad(CheckMode)).get
+    case IndDateOfBirthPage                   => whatIsYourDateOfBirthRoutes()
+    case DateOfBirthWithoutIdPage             => whatIsYourDateOfBirthRoutes()
     case _                                    => _ => routes.CheckYourAnswersController.onPageLoad
   }
 
@@ -198,27 +211,20 @@ class Navigator @Inject() () extends Logging {
       case _          => controllers.organisation.routes.BusinessNameController.onPageLoad(mode)
     }
 
-  private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Option[Call] =
-    ua.get(ReporterTypePage) map {
-      case Individual => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case _ => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
+  private def doYouHaveNINORoutes(mode: Mode)(ua: UserAnswers): Call =
+    ua.get(IndDoYouHaveNINumberPage) match {
+      case Some(true) =>
+        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNINumberPage, controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode))
+      case Some(false) =>
+        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNamePage, controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode))
     }
 
-  private def doYouHaveNINORoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
-    ua.get(IndDoYouHaveNINumberPage) map {
-      case true =>
-        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNINumberPage,
-          controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode))
-//      case false =>
-//        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNamePage, controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode))
-    }
-
-  private def whatIsYourDateOfBirthRoutes(mode: Mode)(ua: UserAnswers): Option[Call] =
-    ua.get(IndDoYouHaveNINumberPage) map {
-      case true =>
-        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
-//      case false =>
-//        checkNextPageForValueThenRoute(mode, ua, IndDoYouLiveInTheUKPage, routes.DoYouLiveInTheUKController.onPageLoad(mode)).get
+  private def whatIsYourDateOfBirthRoutes()(ua: UserAnswers): Call =
+    ua.get(IndDoYouHaveNINumberPage) match {
+      case Some(true) =>
+        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad
+      case Some(false) =>
+        controllers.routes.JourneyRecoveryController.onPageLoad() // TODO : needs to be replaced with DoYouLiveInTheUKPage
     }
 
 }
