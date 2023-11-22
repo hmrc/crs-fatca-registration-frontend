@@ -16,6 +16,7 @@
 
 package navigation
 
+import controllers.individual.routes.IndContactNameController
 import controllers.routes
 import models.ReporterType.{Individual, Sole}
 import pages._
@@ -214,7 +215,7 @@ class Navigator @Inject() () extends Logging {
       case Some(true) =>
         checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNINumberPage, controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode))
       case Some(false) =>
-        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNamePage, controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode))
+        checkNextPageForValueThenRoute(mode, ua, IndContactNamePage, controllers.individual.routes.IndContactNameController.onPageLoad(mode))
     }
 
   private def whatIsYourDateOfBirthRoutes()(ua: UserAnswers): Call =
