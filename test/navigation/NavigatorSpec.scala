@@ -21,7 +21,7 @@ import controllers.individual.routes._
 import controllers.organisation.routes._
 import controllers.routes
 import generators.{Generators, UserAnswersGenerator}
-import helpers.JsonFixtures.utr
+import helpers.JsonFixtures._
 import models.ReporterType.{Individual, LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models._
 import org.scalacheck.Arbitrary.arbitrary
@@ -29,7 +29,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 
-import java.time.LocalDate
+import java.time.{Clock, LocalDate}
 
 class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generators with UserAnswersGenerator {
 
@@ -60,13 +60,13 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(IndDoYouHaveNINumberPage, NormalMode, userAnswers) mustBe IndWhatIsYourNINumberController.onPageLoad(NormalMode)
       }
 
-      "must go from DoYouHaveNINumberPage to IndContactNamePage for Individual reporter if no Nino" in {
+      "must go from IndDoYouHaveNINumberPage to IndContactNamePage for Individual reporter if no Nino" in {
 
         val userAnswers = emptyUserAnswers
           .set(IndDoYouHaveNINumberPage, false)
           .success
           .value
-        navigator.nextPage(IndDoYouHaveNINumberPage, NormalMode, userAnswers) mustBe IndContactNameController.onPageLoad(NormalMode)
+        navigator.nextPage(IndDoYouHaveNINumberPage, NormalMode, userAnswers) mustBe IndWhatIsYourNameController.onPageLoad(NormalMode)
 
       }
 
@@ -82,7 +82,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       "must go from IndContactNamePage to IndDateOfBirthPage" in {
 
         val userAnswers = emptyUserAnswers
-          .set(IndWhatIsYourNINumberPage, "AA000000A")
+          .set(IndContactNamePage, IndContactName(FirstName, LastName))
           .success
           .value
 
@@ -99,15 +99,14 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
       }
 
-      "must go from IndDateOfBirthPage to JourneyRecoveryPage if no Nino" in { // TODO : replace it with  DoYouLiveInTheUKPage when created
+      "must go from IndDateOfBirthPage to IndWhereDoYouLivePage if no Nino" in {
 
         val userAnswers = emptyUserAnswers
           .set(IndDoYouHaveNINumberPage, false)
           .success
           .value
 
-        navigator.nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers) mustBe
-          routes.JourneyRecoveryController.onPageLoad() // TODO : replace it with  DoYouLiveInTheUKPage when created
+        navigator.nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers) mustBe IndWhereDoYouLiveController.onPageLoad(NormalMode)
       }
 
       val nonIndividualReporterTypes = TableDrivenPropertyChecks.Table(
@@ -437,6 +436,163 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
                 .mustBe(controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad())
           }
         }
+      }
+
+      "must go from IndDoYouHaveNINumberPage to IndWhatIsYourNamePage when user answers No" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndDoYouHaveNINumberPage, false)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndDoYouHaveNINumberPage, NormalMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(NormalMode))
+      }
+
+      "must go from IndDoYouHaveNINumberPage to IndWhatIsYourNINumberPage when user answers Yes" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndDoYouHaveNINumberPage, NormalMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(NormalMode))
+      }
+
+      "must go from IndWhatIsYourNamePage to IndDateOfBirthWithoutIdPage" in {
+        navigator
+          .nextPage(IndWhatIsYourNamePage, NormalMode, emptyUserAnswers)
+          .mustBe(controllers.individual.routes.IndDateOfBirthWithoutIdController.onPageLoad(NormalMode))
+      }
+
+      "must go from DateOfBirthWithoutIdPage to IndWhereDoYouLivePage for user without Id" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndDoYouHaveNINumberPage, false)
+          .success
+          .value
+          .set(DateOfBirthWithoutIdPage, LocalDate.now(Clock.systemUTC()))
+          .success
+          .value
+
+        navigator
+          .nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(NormalMode))
+      }
+
+      "must go from DateOfBirthWithoutIdPage to IndIdentityConfirmedPage for user with Id" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
+          .set(DateOfBirthWithoutIdPage, LocalDate.now(Clock.systemUTC()))
+          .success
+          .value
+
+        navigator
+          .nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndIdentityConfirmedController.onPageLoad())
+      }
+
+      "must go from DateOfBirthWithoutIdPage to JourneyRecoveryPage when NI Number answer not found" in {
+        val userAnswers = emptyUserAnswers
+          .set(DateOfBirthWithoutIdPage, LocalDate.now(Clock.systemUTC()))
+          .success
+          .value
+
+        navigator
+          .nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers)
+          .mustBe(routes.JourneyRecoveryController.onPageLoad())
+      }
+
+      "must go from IndWhereDoYouLivePage to IndWhatIsYourPostcodePage when user answers Yes" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndWhereDoYouLivePage, true)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndWhereDoYouLivePage, NormalMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndWhatIsYourPostcodeController.onPageLoad(NormalMode))
+      }
+
+      "must go from IndWhereDoYouLivePage to IndNonUKAddressWithoutIdPage when user answers No" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndWhereDoYouLivePage, false)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndWhereDoYouLivePage, NormalMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndNonUKAddressWithoutIdController.onPageLoad(NormalMode))
+      }
+
+      "must go from IndNonUKAddressWithoutIdPage to IndContactEmailPage" in {
+        navigator
+          .nextPage(IndNonUKAddressWithoutIdPage, NormalMode, emptyUserAnswers)
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+      }
+
+      "must go from IndWhatIsYourPostcodePage to IndIsThisYourAddressPage when there is only one matching address" in {
+        ScalaCheckPropertyChecks.forAll(arbitrary[models.AddressLookup]) {
+          addressLookup =>
+            val userAnswers = emptyUserAnswers
+              .set(AddressLookupPage, Seq(addressLookup))
+              .success
+              .value
+
+            navigator
+              .nextPage(IndWhatIsYourPostcodePage, NormalMode, userAnswers)
+              .mustBe(controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from IndWhatIsYourPostcodePage to IndSelectAddressPage when there is more than one matching address" in {
+        ScalaCheckPropertyChecks.forAll(arbitrary[models.AddressLookup]) {
+          addressLookup =>
+            val userAnswers = emptyUserAnswers
+              .set(AddressLookupPage, Seq(addressLookup, addressLookup))
+              .success
+              .value
+
+            navigator
+              .nextPage(IndWhatIsYourPostcodePage, NormalMode, userAnswers)
+              .mustBe(controllers.individual.routes.IndSelectAddressController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from IsThisYourAddressPage to IndContactEmailPage when user answers Yes" in {
+        val userAnswers = emptyUserAnswers
+          .set(IsThisYourAddressPage, true)
+          .success
+          .value
+
+        navigator
+          .nextPage(IsThisYourAddressPage, NormalMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+      }
+
+      "must go from IsThisYourAddressPage to IndUKAddressWithoutIdPage when user answers No" in {
+        val userAnswers = emptyUserAnswers
+          .set(IsThisYourAddressPage, false)
+          .success
+          .value
+
+        navigator
+          .nextPage(IsThisYourAddressPage, NormalMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode))
+      }
+
+      "must go from IndSelectAddressPage to IndContactEmailPage" in {
+        navigator
+          .nextPage(IndSelectAddressPage, NormalMode, emptyUserAnswers)
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+      }
+
+      "must go from IndContactHavePhonePage to IndContactPhonePage" in {
+        navigator
+          .nextPage(IndContactHavePhonePage, NormalMode, emptyUserAnswers)
+          .mustBe(controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode))
       }
     }
 

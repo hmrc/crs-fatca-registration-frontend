@@ -150,6 +150,19 @@ trait ModelGenerators {
       } yield Address(addressLine1, addressLine2, addressLine3, addressLine4, postCode, country)
     }
 
+  implicit lazy val arbitraryAddressLookup: Arbitrary[models.AddressLookup] =
+    Arbitrary {
+      for {
+        addressLine1 <- arbitrary[Option[String]]
+        addressLine2 <- arbitrary[Option[String]]
+        addressLine3 <- arbitrary[Option[String]]
+        addressLine4 <- arbitrary[Option[String]]
+        postCode     <- arbitrary[String]
+        town         <- arbitrary[String]
+        county       <- arbitrary[Option[String]]
+      } yield AddressLookup(addressLine1, addressLine2, addressLine3, addressLine4, town, county, postCode)
+    }
+
   implicit lazy val arbitraryName: Arbitrary[models.Name] =
     Arbitrary {
       for {
