@@ -589,10 +589,26 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
       }
 
-      "must go from IndContactHavePhonePage to IndContactPhonePage" in {
+      "must go from IndContactHavePhonePage to IndContactPhonePage when user answers Yes" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndContactHavePhonePage, true)
+          .success
+          .value
+
         navigator
-          .nextPage(IndContactHavePhonePage, NormalMode, emptyUserAnswers)
+          .nextPage(IndContactHavePhonePage, NormalMode, userAnswers)
           .mustBe(controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode))
+      }
+
+      "must go from IndContactHavePhonePage to CheckYourAnswersPage when user answers No" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndContactHavePhonePage, false)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndContactHavePhonePage, NormalMode, userAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad)
       }
     }
 

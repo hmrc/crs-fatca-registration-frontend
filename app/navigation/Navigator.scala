@@ -121,11 +121,18 @@ class Navigator @Inject() () extends Logging {
           controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode),
           controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode)
         )
-    case IndSelectAddressPage    => _ => controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
-    case IndContactEmailPage     => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
-    case IndContactHavePhonePage => _ => controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode)
-    case IndContactPhonePage     => _ => controllers.routes.CheckYourAnswersController.onPageLoad
-    case IndDateOfBirthPage      => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
+    case IndSelectAddressPage => _ => controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+    case IndContactEmailPage  => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
+    case IndContactHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          IndContactHavePhonePage,
+          controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode),
+          controllers.routes.CheckYourAnswersController.onPageLoad
+        )
+    case IndContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad
+    case IndDateOfBirthPage  => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
 
     case _ => _ => routes.IndexController.onPageLoad
   }
