@@ -16,28 +16,32 @@
 
 package controllers.individual
 
-import base.SpecBase
+import base.{ControllerMockFixtures, SpecBase}
+import controllers.routes
+import org.mockito.ArgumentMatchers.any
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.individual.IndCouldNotConfirmIdentityView
+import org.mockito.Mockito.when
+import scala.concurrent.Future
 
-class IndCouldNotConfirmIdentityControllerSpec extends SpecBase {
+class IndCouldNotConfirmIdentityControllerSpec extends SpecBase with ControllerMockFixtures {
 
   "IndCouldNotConfirmIdentity Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       running(application) {
-        val request = FakeRequest(GET, controllers.individual.routes.IndCouldNotConfirmIdentityController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.individual.routes.IndCouldNotConfirmIdentityController.onPageLoad("identity").url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[IndCouldNotConfirmIdentityView]
-
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        val continueUrl: String = routes.IndexController.onPageLoad.url
+        contentAsString(result) mustEqual view(continueUrl, "identity")(request, messages(application)).toString
       }
     }
   }

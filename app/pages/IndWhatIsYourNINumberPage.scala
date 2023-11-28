@@ -17,8 +17,9 @@
 package pages
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.domain.Nino
 
-case object IndWhatIsYourNINumberPage extends QuestionPage[String] {
+case object IndWhatIsYourNINumberPage extends QuestionPage[Nino] {
 
   override def path: JsPath = JsPath \ toString
 

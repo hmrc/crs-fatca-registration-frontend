@@ -19,7 +19,7 @@
         govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(continueUrl: String, affinity: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("indCouldNotConfirmIdentity.title"))) {
 
@@ -27,9 +27,8 @@
 
     <p class="govuk-body">@messages("indCouldNotConfirmIdentity.p1")</p>
 
-    <!-- ToDo update asLink with href when available -->
     @govukButton(
-        ButtonViewModel(messages("indCouldNotConfirmIdentity.button")).asLink("#")
+        ButtonViewModel(messages("indCouldNotConfirmIdentity.button")).withAttribute("id" -> "submit").asLink(continueUrl))
     )
 
 }

@@ -20,14 +20,14 @@ import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
-import models.IndWhatIsYourName
+import models.{IndWhatIsYourName, Name}
 import utils.RegexConstants
 
 class IndWhatIsYourNameFormProvider @Inject() extends Mappings with RegexConstants {
 
   private val maxLength = 35
 
-  def apply(): Form[IndWhatIsYourName] = Form(
+  def apply(): Form[Name] = Form(
     mapping(
       "firstName" -> validatedText(
         "indWhatIsYourName.error.firstName.required",
@@ -43,7 +43,7 @@ class IndWhatIsYourNameFormProvider @Inject() extends Mappings with RegexConstan
         individualNameRegex,
         maxLength
       )
-    )(IndWhatIsYourName.apply)(IndWhatIsYourName.unapply)
+    )(Name.apply)(Name.unapply)
   )
 
 }

@@ -16,16 +16,17 @@
 
 package controllers
 
-import models.error.ApiError.ServiceUnavailableError
+import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.SafeId
 import models.requests.DataRequest
 import models.{SubscriptionID, UserAnswers}
-import pages.SubscriptionIDPage
+import pages.{RegistrationInfoPage, SubscriptionIDPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.TaxEnrolmentService
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ThereIsAProblemView
@@ -50,6 +51,20 @@ class ControllerHelper @Inject() (
     taxEnrolmentService.checkAndCreateEnrolment(safeId, userAnswers, subscriptionId) flatMap {
       case Right(_) =>
         Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())) // TODO DAC6-2756 and DAC6-2858
+      case Left(EnrolmentExistsError(groupIds)) if request.affinityGroup == AffinityGroup.Individual =>
+        logger.info(s"ControllerHelper: EnrolmentExistsError for the the groupIds $groupIds")
+        Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad()))
+      case Left(EnrolmentExistsError(groupIds)) =>
+        logger.info(s"ControllerHelper: EnrolmentExistsError for the the groupIds $groupIds")
+        if (request.userAnswers.get(RegistrationInfoPage).isDefined) {
+          Future.successful(Redirect(routes.PreRegisteredController.onPageLoad(true)))
+        } else {
+          Future.successful(Redirect(routes.PreRegisteredController.onPageLoad(false)))
+        }
+      case Left(MandatoryInformationMissingError(_)) =>
+        logger.warn(s"ControllerHelper: Mandatory information is missing")
+        Future.successful(Redirect(routes.InformationMissingController.onPageLoad()))
+
       case Left(error) =>
         logger.warn(s"Error received from API: $error")
         error match {

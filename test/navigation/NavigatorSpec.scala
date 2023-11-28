@@ -28,6 +28,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
+import uk.gov.hmrc.domain.Nino
 
 import java.time.{Clock, LocalDate}
 
@@ -73,7 +74,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       "must go from whatIsNINumberPage to WhatIsYourNamePage if have Nino" in {
 
         val userAnswers = emptyUserAnswers
-          .set(IndWhatIsYourNINumberPage, "AA000000A")
+          .set(IndWhatIsYourNINumberPage, Nino("CC123456C"))
           .success
           .value
         navigator.nextPage(IndWhatIsYourNINumberPage, NormalMode, userAnswers) mustBe IndContactNameController.onPageLoad(NormalMode)

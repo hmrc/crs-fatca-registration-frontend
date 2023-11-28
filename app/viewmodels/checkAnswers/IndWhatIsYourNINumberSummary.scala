@@ -31,7 +31,7 @@ object IndWhatIsYourNINumberSummary {
       answer =>
         SummaryListRowViewModel(
           key = "whatIsYourNINumber.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value = ValueViewModel(HtmlFormat.escape(answer.nino).toString),
           actions = Seq(
             ActionItemViewModel("site.change", controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("whatIsYourNINumber.change.hidden"))
