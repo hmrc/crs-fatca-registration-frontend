@@ -125,7 +125,7 @@ class Navigator @Inject() () extends Logging {
     case IndContactEmailPage     => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
     case IndContactHavePhonePage => _ => controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode)
     case IndContactPhonePage     => _ => controllers.routes.CheckYourAnswersController.onPageLoad
-    case IndDateOfBirthPage      => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
+    case IndDateOfBirthPage      => whatIsYourDateOfBirthRoutes(NormalMode)
 
     case _ => _ => routes.IndexController.onPageLoad
   }
@@ -248,7 +248,7 @@ class Navigator @Inject() () extends Logging {
   private def whatIsYourDateOfBirthRoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
       case Some(true) =>
-        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
+        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
       case Some(false) =>
         checkNextPageForValueThenRoute(
           mode,

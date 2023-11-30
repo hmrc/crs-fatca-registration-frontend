@@ -122,7 +122,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       retrieveUserAnswersData(validUserAnswers)
-      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad().url)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
       val view    = app.injector.instanceOf[IndIdentityConfirmedView]
       val result  = route(app, request).value
 
@@ -141,7 +141,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       retrieveUserAnswersData(validUserAnswers)
-      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad().url)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
       val result = route(app, request).value
 
@@ -159,7 +159,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       retrieveUserAnswersData(validUserAnswers)
-      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad().url)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
       val result = route(app, request).value
 
@@ -175,7 +175,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
         .thenReturn(Future.successful(Left(NotFoundError)))
 
       retrieveUserAnswersData(validUserAnswers)
-      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad().url)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
       val result = route(app, request).value
 
@@ -190,7 +190,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
         .thenReturn(Future.successful(Left(ServiceUnavailableError)))
 
       retrieveUserAnswersData(validUserAnswers)
-      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad().url)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
       val result = route(app, request).value
 
@@ -203,7 +203,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
     "return return Internal Server Error for a GET when there is no data" in {
 
       retrieveUserAnswersData(emptyUserAnswers)
-      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad().url)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
       val result = route(app, request).value
 
