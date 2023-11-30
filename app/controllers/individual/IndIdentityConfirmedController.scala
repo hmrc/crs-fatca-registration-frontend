@@ -25,6 +25,7 @@ import models.register.request.RegisterWithID
 import models.requests.DataRequest
 import navigation.Navigator
 import pages._
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -53,7 +54,8 @@ class IndIdentityConfirmedController @Inject() (
   errorView: ThereIsAProblemView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   implicit private val uuidGenerator: UUIDGen = uuidGen
   implicit private val implicitClock: Clock   = clock
@@ -77,18 +79,32 @@ class IndIdentityConfirmedController @Inject() (
                 case Left(NotFoundError) =>
                   Future.successful(Redirect(routes.IndCouldNotConfirmIdentityController.onPageLoad("identity")))
                 case _ =>
+                  logger.error("Exception here 12345")
                   Future.successful(InternalServerError(errorView()))
               }
           case _ =>
+            logger.error("Exception here 123456")
             Future.successful(InternalServerError(errorView()))
         }
     }
 
   private def buildRegisterWithID()(implicit request: DataRequest[AnyContent]): Option[RegisterWithID] =
     for {
-      nino <- request.userAnswers.get(IndWhatIsYourNINumberPage)
-      name <- request.userAnswers.get(IndWhatIsYourNamePage)
-      dob  <- request.userAnswers.get(IndDateOfBirthPage)
+      nino <- {
+        logger.error("here 111")
+        logger.error(request.userAnswers.get(IndWhatIsYourNINumberPage).get.nino)
+        request.userAnswers.get(IndWhatIsYourNINumberPage)
+      }
+      name <- {
+        logger.error("here 222")
+        logger.error(request.userAnswers.get(IndContactNamePage).get.fullName)
+        request.userAnswers.get(IndContactNamePage)
+      }
+      dob <- {
+        logger.error("here 333")
+        logger.error(request.userAnswers.get(IndDateOfBirthPage).get.getYear.toString)
+        request.userAnswers.get(IndDateOfBirthPage)
+      }
     } yield RegisterWithID(name, Some(dob), IdentifierType.NINO, nino.nino)
 
 }
