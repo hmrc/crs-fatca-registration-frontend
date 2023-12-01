@@ -35,14 +35,17 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-heading-l">@messages("indWhatIsYourPostcode.heading")</h1>
+        <p class="govuk-body">@Html(messages("indWhatIsYourPostcode.p1"))</p>
+
+
         @govukInput(
             InputViewModel(
                 field = form("postCode"),
-                label = LabelViewModel(messages("indWhatIsYourPostcode.heading")).asPageHeading()
+                label = LabelViewModel(messages("indWhatIsYourPostcode.heading")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Fixed10)
             .withAutocomplete("postal-code")
-            .withHint(HintViewModel(Text(messages("indWhatIsYourPostcode.hint"))))
         )
 
         <p class="govuk-body">@link(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(mode).url, "indWhatIsYourPostcode.manualLink" , id = Some("manualAddressLink"))</p>
