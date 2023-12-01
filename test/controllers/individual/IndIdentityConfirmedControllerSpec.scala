@@ -15,39 +15,6 @@
  */
 
 package controllers.individual
-//
-//import base.SpecBase
-//import models.NormalMode
-//import play.api.test.FakeRequest
-//import play.api.test.Helpers._
-//import views.html.individual.IndIdentityConfirmedView
-//
-//class IndIdentityConfirmedControllerSpec extends SpecBase {
-//
-//  val continueUrl = routes.IndContactEmailController.onPageLoad(NormalMode).url
-//
-//  "IndIdentityConfirmed Controller" - {
-//
-//    "must return OK and the correct view for a GET" in {
-//
-//      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-//
-//      running(application) {
-//        val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad().url)
-//
-//        val result = route(application, request).value
-//
-//        val view = application.injector.instanceOf[IndIdentityConfirmedView]
-//
-//        status(result) mustEqual OK
-//        contentAsString(result) mustEqual view(NormalMode, continueUrl)(request, messages(application)).toString
-//      }
-//    }
-//  }
-//
-//
-//
-//}
 
 import base.{ControllerMockFixtures, SpecBase}
 import controllers.routes
