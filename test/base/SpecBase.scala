@@ -83,7 +83,7 @@ trait SpecBase
 
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = None,
-    affinityGroup: AffinityGroup = AffinityGroup.Organisation
+    affinityGroup: AffinityGroup = AffinityGroup.Individual
   ): GuiceApplicationBuilder = {
     when(mockDataRetrievalAction.apply()).thenReturn(new FakeDataRetrievalAction(userAnswers))
 

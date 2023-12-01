@@ -56,7 +56,7 @@ import models.matching.{IndRegistrationInfo, SafeId}
 import models.{Name, NormalMode, SubscriptionID, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.reset
-import pages.{IndDateOfBirthPage, IndWhatIsYourNINumberPage, WhatIsYourNamePage}
+import pages.{IndContactNamePage, IndDateOfBirthPage, IndWhatIsYourNINumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -64,26 +64,26 @@ import services.{BusinessMatchingWithIdService, SubscriptionService, TaxEnrolmen
 import uk.gov.hmrc.domain.Nino
 import views.html.ThereIsAProblemView
 import org.mockito.Mockito.when
+import play.api.inject.guice.GuiceApplicationBuilder
 import views.html.individual.IndIdentityConfirmedView
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
 class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFixtures {
-
   private val SafeIdValue = "XE0000123456789"
   val safeId: SafeId      = SafeId(SafeIdValue)
+  val registrationInfo    = IndRegistrationInfo(safeId)
   val TestNiNumber        = "CC123456C"
   val FirstName           = "Fred"
   val LastName            = "Flintstone"
-  val registrationInfo    = IndRegistrationInfo(safeId)
   val name: Name          = Name(FirstName, LastName)
 
   val validUserAnswers: UserAnswers = emptyUserAnswers
     .set(IndWhatIsYourNINumberPage, Nino(TestNiNumber))
     .success
     .value
-    .set(WhatIsYourNamePage, name)
+    .set(IndContactNamePage, name)
     .success
     .value
     .set(IndDateOfBirthPage, LocalDate.now())
@@ -104,11 +104,11 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       .build()
 
   override def beforeEach(): Unit = {
-    Seq(mockMatchingService, mockSubscriptionService, mockTaxEnrolmentService).foreach(reset(_))
+    reset(mockMatchingService, mockSubscriptionService, mockTaxEnrolmentService)
     super.beforeEach
   }
 
-  "IndIdentityConfirmed Controller" - {
+  "WeHaveConfirmedYourIdentity Controller" - {
 
     "return OK and the correct view for a GET when there is a match" in {
 
@@ -123,8 +123,8 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
 
       retrieveUserAnswersData(validUserAnswers)
       val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
-      val view    = app.injector.instanceOf[IndIdentityConfirmedView]
-      val result  = route(app, request).value
+      val view    = mockedApp.injector.instanceOf[IndIdentityConfirmedView]
+      val result  = route(mockedApp, request).value
 
       status(result) mustEqual OK
       contentAsString(result) mustEqual view(NormalMode, onwardRoute.url)(request, messages).toString()
@@ -139,14 +139,14 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
       retrieveUserAnswersData(validUserAnswers)
       val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
-      val result = route(app, request).value
+      val result = route(mockedApp, request).value
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url // TODO : Replace with RegistationConfirmed controller
+
     }
 
     "render technical difficulties page when there is an existing subscription and fails to create an enrolment" in {
@@ -161,9 +161,9 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       retrieveUserAnswersData(validUserAnswers)
       val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
-      val result = route(app, request).value
+      val result = route(mockedApp, request).value
 
-      val view = app.injector.instanceOf[ThereIsAProblemView]
+      val view = mockedApp.injector.instanceOf[ThereIsAProblemView]
 
       status(result) mustEqual INTERNAL_SERVER_ERROR
       contentAsString(result) mustEqual view()(request, messages).toString
@@ -177,7 +177,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       retrieveUserAnswersData(validUserAnswers)
       val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
-      val result = route(app, request).value
+      val result = route(mockedApp, request).value
 
       status(result) mustEqual SEE_OTHER
 
@@ -190,14 +190,16 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
         .thenReturn(Future.successful(Left(ServiceUnavailableError)))
 
       retrieveUserAnswersData(validUserAnswers)
+
       val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
-      val result = route(app, request).value
+      val result = route(mockedApp, request).value
 
-      val view = app.injector.instanceOf[ThereIsAProblemView]
+      val view = mockedApp.injector.instanceOf[ThereIsAProblemView]
 
       status(result) mustEqual INTERNAL_SERVER_ERROR
       contentAsString(result) mustEqual view()(request, messages).toString
+
     }
 
     "return return Internal Server Error for a GET when there is no data" in {
@@ -205,13 +207,14 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       retrieveUserAnswersData(emptyUserAnswers)
       val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
-      val result = route(app, request).value
+      val result = route(mockedApp, request).value
 
-      val view = app.injector.instanceOf[ThereIsAProblemView]
+      val view = mockedApp.injector.instanceOf[ThereIsAProblemView]
 
       status(result) mustEqual INTERNAL_SERVER_ERROR
       contentAsString(result) mustEqual view()(request, messages).toString
     }
+
   }
 
 }

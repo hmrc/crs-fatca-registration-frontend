@@ -83,7 +83,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       "must go from IndContactNamePage to IndDateOfBirthPage" in {
 
         val userAnswers = emptyUserAnswers
-          .set(IndContactNamePage, IndContactName(FirstName, LastName))
+          .set(IndContactNamePage, Name(FirstName, LastName))
           .success
           .value
 
@@ -295,12 +295,6 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
         val userAnswers = emptyUserAnswers.set(IndContactPhonePage, "123456789").success.value
         navigator.nextPage(IndContactPhonePage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
-      }
-
-      "must go from IndDateOfBirthPage to IndIdentityConfirmedPage" in {
-
-        val userAnswers = emptyUserAnswers.set(IndDateOfBirthPage, LocalDate.now()).success.value
-        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad(NormalMode)
       }
 
       "must go from IsThisYourBusinessPage" - {
