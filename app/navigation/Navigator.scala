@@ -121,8 +121,11 @@ class Navigator @Inject() () extends Logging {
           controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode),
           controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode)
         )
+
     case IndSelectAddressPage => _ => controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
     case IndContactEmailPage  => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
+    case IndContactPhonePage  => _ => controllers.routes.CheckYourAnswersController.onPageLoad
+    case IndDateOfBirthPage   => whatIsYourDateOfBirthRoutes(NormalMode)
     case IndContactHavePhonePage =>
       userAnswers =>
         yesNoPage(
@@ -131,8 +134,6 @@ class Navigator @Inject() () extends Logging {
           controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode),
           controllers.routes.CheckYourAnswersController.onPageLoad
         )
-    case IndContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad
-    case IndDateOfBirthPage  => _ => controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
 
     case _ => _ => routes.IndexController.onPageLoad
   }
@@ -255,7 +256,7 @@ class Navigator @Inject() () extends Logging {
   private def whatIsYourDateOfBirthRoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
       case Some(true) =>
-        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad()
+        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
       case Some(false) =>
         checkNextPageForValueThenRoute(
           mode,

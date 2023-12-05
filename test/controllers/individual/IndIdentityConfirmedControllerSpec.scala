@@ -16,33 +16,172 @@
 
 package controllers.individual
 
-import base.SpecBase
-import models.NormalMode
+import base.{ControllerMockFixtures, SpecBase}
+import controllers.routes
+import models.error.ApiError.{BadRequestError, NotFoundError, ServiceUnavailableError}
+import models.matching.{IndRegistrationInfo, SafeId}
+import models.{Name, NormalMode, SubscriptionID, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.reset
+import pages.{IndContactNamePage, IndDateOfBirthPage, IndWhatIsYourNINumberPage}
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.{BusinessMatchingWithIdService, SubscriptionService, TaxEnrolmentService}
+import uk.gov.hmrc.domain.Nino
+import views.html.ThereIsAProblemView
+import org.mockito.Mockito.when
+import play.api.inject.guice.GuiceApplicationBuilder
 import views.html.individual.IndIdentityConfirmedView
 
-class IndIdentityConfirmedControllerSpec extends SpecBase {
+import java.time.LocalDate
+import scala.concurrent.Future
 
-  val continueUrl = routes.IndContactEmailController.onPageLoad(NormalMode).url
+class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFixtures {
+  private val SafeIdValue = "XE0000123456789"
+  val safeId: SafeId      = SafeId(SafeIdValue)
+  val registrationInfo    = IndRegistrationInfo(safeId)
+  val TestNiNumber        = "CC123456C"
+  val FirstName           = "Fred"
+  val LastName            = "Flintstone"
+  val name: Name          = Name(FirstName, LastName)
 
-  "IndIdentityConfirmed Controller" - {
+  val validUserAnswers: UserAnswers = emptyUserAnswers
+    .set(IndWhatIsYourNINumberPage, Nino(TestNiNumber))
+    .success
+    .value
+    .set(IndContactNamePage, name)
+    .success
+    .value
+    .set(IndDateOfBirthPage, LocalDate.now())
+    .success
+    .value
 
-    "must return OK and the correct view for a GET" in {
+  val mockMatchingService: BusinessMatchingWithIdService = mock[BusinessMatchingWithIdService]
+  val mockSubscriptionService: SubscriptionService       = mock[SubscriptionService]
+  val mockTaxEnrolmentService: TaxEnrolmentService       = mock[TaxEnrolmentService]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+  private val mockedApp =
+    guiceApplicationBuilder()
+      .overrides(
+        bind[BusinessMatchingWithIdService].toInstance(mockMatchingService),
+        bind[SubscriptionService].toInstance(mockSubscriptionService),
+        bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentService)
+      )
+      .build()
 
-      running(application) {
-        val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad().url)
+  override def beforeEach(): Unit = {
+    reset(mockMatchingService, mockSubscriptionService, mockTaxEnrolmentService)
+    super.beforeEach
+  }
 
-        val result = route(application, request).value
+  "WeHaveConfirmedYourIdentity Controller" - {
 
-        val view = application.injector.instanceOf[IndIdentityConfirmedView]
+    "return OK and the correct view for a GET when there is a match" in {
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(NormalMode, continueUrl)(request, messages(application)).toString
-      }
+      when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
+        .thenReturn(Future.successful(Right(registrationInfo)))
+
+      when(mockSubscriptionService.getDisplaySubscriptionId(any())(any(), any())).thenReturn(Future.successful(None))
+
+      when(mockSubscriptionService.getDisplaySubscriptionId(any())(any(), any())).thenReturn(Future.successful(None))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      retrieveUserAnswersData(validUserAnswers)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
+      val view    = mockedApp.injector.instanceOf[IndIdentityConfirmedView]
+      val result  = route(mockedApp, request).value
+
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual view(NormalMode, onwardRoute.url)(request, messages).toString()
+
     }
+
+    "must redirect to 'confirmation' page when there is an existing subscription" in {
+
+      when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
+        .thenReturn(Future.successful(Right(registrationInfo)))
+      when(mockSubscriptionService.getDisplaySubscriptionId(any())(any(), any())).thenReturn(Future.successful(Some(SubscriptionID("id"))))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      retrieveUserAnswersData(validUserAnswers)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
+
+      val result = route(mockedApp, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url // TODO : Replace with RegistationConfirmed controller
+
+    }
+
+    "render technical difficulties page when there is an existing subscription and fails to create an enrolment" in {
+
+      when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
+        .thenReturn(Future.successful(Right(registrationInfo)))
+      when(mockSubscriptionService.getDisplaySubscriptionId(any())(any(), any())).thenReturn(Future.successful(Some(SubscriptionID("id"))))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      retrieveUserAnswersData(validUserAnswers)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
+
+      val result = route(mockedApp, request).value
+
+      val view = mockedApp.injector.instanceOf[ThereIsAProblemView]
+
+      status(result) mustEqual INTERNAL_SERVER_ERROR
+      contentAsString(result) mustEqual view()(request, messages).toString
+    }
+
+    "return redirect for a GET when there is no match" in {
+
+      when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
+        .thenReturn(Future.successful(Left(NotFoundError)))
+
+      retrieveUserAnswersData(validUserAnswers)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
+
+      val result = route(mockedApp, request).value
+
+      status(result) mustEqual SEE_OTHER
+
+      redirectLocation(result).value mustEqual controllers.individual.routes.IndCouldNotConfirmIdentityController.onPageLoad("identity").url
+    }
+
+    "return return Internal Server Error for a GET when an error other than NotFoundError is returned" in {
+
+      when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
+        .thenReturn(Future.successful(Left(ServiceUnavailableError)))
+
+      retrieveUserAnswersData(validUserAnswers)
+
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
+
+      val result = route(mockedApp, request).value
+
+      val view = mockedApp.injector.instanceOf[ThereIsAProblemView]
+
+      status(result) mustEqual INTERNAL_SERVER_ERROR
+      contentAsString(result) mustEqual view()(request, messages).toString
+
+    }
+
+    "return return Internal Server Error for a GET when there is no data" in {
+
+      retrieveUserAnswersData(emptyUserAnswers)
+      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
+
+      val result = route(mockedApp, request).value
+
+      val view = mockedApp.injector.instanceOf[ThereIsAProblemView]
+
+      status(result) mustEqual INTERNAL_SERVER_ERROR
+      contentAsString(result) mustEqual view()(request, messages).toString
+    }
+
   }
 
 }

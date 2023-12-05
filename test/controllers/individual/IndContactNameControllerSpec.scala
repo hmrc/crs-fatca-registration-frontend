@@ -18,7 +18,7 @@ package controllers.individual
 
 import base.SpecBase
 import forms.IndContactNameFormProvider
-import models.{IndContactName, NormalMode, UserAnswers}
+import models.{IndContactName, Name, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -37,14 +37,24 @@ class IndContactNameControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new IndContactNameFormProvider()
   val form         = formProvider()
 
+  val FirstName = "Fred"
+  val LastName  = "Flintstone"
+
+  val name: Name = Name(FirstName, LastName)
+
+  val validData = Map(
+    "firstName" -> name.firstName,
+    "lastName"  -> name.lastName
+  )
+
   lazy val indContactNameRoute = controllers.individual.routes.IndContactNameController.onPageLoad(NormalMode).url
 
   val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       IndContactNamePage.toString -> Json.obj(
-        "firstName" -> "value 1",
-        "lastName"  -> "value 2"
+        "firstName" -> "Fred",
+        "lastName"  -> "Flintstone"
       )
     )
   )
@@ -76,10 +86,10 @@ class IndContactNameControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[IndContactNameView]
 
-        val result = route(application, request).value
-
+        val result     = route(application, request).value
+        val filledForm = form.bind(validData)
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IndContactName("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(filledForm, NormalMode)(request, messages(application)).toString
       }
     }
 

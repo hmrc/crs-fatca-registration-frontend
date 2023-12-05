@@ -70,7 +70,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .set(IndDoYouHaveNINumberPage, false)
         .success
         .value
-        .set(IndContactNamePage, individualContactName)
+        .set(IndContactNamePage, name)
         .success
         .value
         .set(ContactEmailPage, TestEmail)
@@ -104,7 +104,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .set(IndDoYouHaveNINumberPage, false)
         .success
         .value
-        .set(IndContactNamePage, individualContactName)
+        .set(IndContactNamePage, name)
         .success
         .value
         .set(ContactEmailPage, TestEmail)
@@ -140,7 +140,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .set(IndDoYouHaveNINumberPage, false)
         .success
         .value
-        .set(IndContactNamePage, individualContactName)
+        .set(IndContactNamePage, name)
         .success
         .value
         .set(ContactEmailPage, TestEmail)

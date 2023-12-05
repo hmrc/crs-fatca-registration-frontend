@@ -73,7 +73,7 @@ object SubscriptionInfo {
 
   private def getNinoIfProvided(userAnswers: UserAnswers): Option[String] =
     userAnswers.get(IndWhatIsYourNINumberPage) match {
-      case Some(nino) => Some(nino)
+      case Some(nino) => Some(nino.nino)
       case _          => None
     }
 

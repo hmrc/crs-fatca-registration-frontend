@@ -28,6 +28,7 @@ import pages.IndWhatIsYourNINumberPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.domain.Nino
 import views.html.individual.IndWhatIsYourNINumberView
 
 import scala.concurrent.Future
@@ -36,6 +37,7 @@ class IndWhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new IndWhatIsYourNINumberFormProvider()
   val form         = formProvider()
+  val validAnswer  = Nino("CC123456C")
 
   lazy val whatIsYourNINumberRoute = controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(NormalMode).url
 
@@ -59,7 +61,8 @@ class IndWhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndWhatIsYourNINumberPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(IndWhatIsYourNINumberPage, validAnswer).success.value
+      val filledForm  = form.bind(Map("value" -> validAnswer.nino))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -71,7 +74,7 @@ class IndWhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(filledForm, NormalMode)(request, messages(application)).toString
       }
     }
 

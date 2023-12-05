@@ -39,6 +39,12 @@ object PageLists {
     SecondContactPhonePage
   )
 
+  val individualWithIDPages = List(
+    IndWhatIsYourNINumberPage,
+    IndWhatIsYourNamePage,
+    IndDateOfBirthPage
+  )
+
   val individualAndWithoutIdPages = List(
     WhatIsYourNamePage,
     IndUKAddressWithoutIdPage,

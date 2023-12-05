@@ -28,6 +28,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
+import uk.gov.hmrc.domain.Nino
 
 import java.time.{Clock, LocalDate}
 
@@ -73,7 +74,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       "must go from whatIsNINumberPage to WhatIsYourNamePage if have Nino" in {
 
         val userAnswers = emptyUserAnswers
-          .set(IndWhatIsYourNINumberPage, "AA000000A")
+          .set(IndWhatIsYourNINumberPage, Nino("CC123456C"))
           .success
           .value
         navigator.nextPage(IndWhatIsYourNINumberPage, NormalMode, userAnswers) mustBe IndContactNameController.onPageLoad(NormalMode)
@@ -82,7 +83,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       "must go from IndContactNamePage to IndDateOfBirthPage" in {
 
         val userAnswers = emptyUserAnswers
-          .set(IndContactNamePage, IndContactName(FirstName, LastName))
+          .set(IndContactNamePage, Name(FirstName, LastName))
           .success
           .value
 
@@ -96,7 +97,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .success
           .value
 
-        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
+        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad(NormalMode)
       }
 
       "must go from IndDateOfBirthPage to IndWhereDoYouLivePage if no Nino" in {
@@ -296,12 +297,6 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(IndContactPhonePage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
       }
 
-      "must go from IndDateOfBirthPage to IndIdentityConfirmedPage" in {
-
-        val userAnswers = emptyUserAnswers.set(IndDateOfBirthPage, LocalDate.now()).success.value
-        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad
-      }
-
       "must go from IsThisYourBusinessPage" - {
 
         val nonOrgReporters = Table(
@@ -491,7 +486,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
         navigator
           .nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers)
-          .mustBe(controllers.individual.routes.IndIdentityConfirmedController.onPageLoad())
+          .mustBe(controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode))
       }
 
       "must go from DateOfBirthWithoutIdPage to JourneyRecoveryPage when NI Number answer not found" in {

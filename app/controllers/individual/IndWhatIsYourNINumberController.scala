@@ -24,6 +24,7 @@ import pages.IndWhatIsYourNINumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.individual.IndWhatIsYourNINumberView
 
@@ -47,8 +48,8 @@ class IndWhatIsYourNINumberController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
       val preparedForm = request.userAnswers.get(IndWhatIsYourNINumberPage) match {
-        case None        => form
-        case Some(value) => form.fill(value)
+        case None       => form
+        case Some(nino) => form.fill(nino.nino)
       }
 
       Ok(view(preparedForm, mode))
@@ -62,7 +63,7 @@ class IndWhatIsYourNINumberController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndWhatIsYourNINumberPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndWhatIsYourNINumberPage, Nino(value)))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndWhatIsYourNINumberPage, mode, updatedAnswers))
         )
