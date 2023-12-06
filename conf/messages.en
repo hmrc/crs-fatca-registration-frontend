@@ -349,9 +349,13 @@ businessName.checkYourAnswersLabel = businessName
 businessName.error.required.llp = Enter the registered name of your business
 businessName.error.required.partner = Enter the partnership name
 businessName.error.required.unincorporated = Enter the name of your organisation
-businessName.error.length.llp = Registered name of your business must be 105 characters or less
+businessName.error.length.llp = Business name must be 105 characters or less
 businessName.error.length.partner = Partnership name must be 105 characters or less
 businessName.error.length.unincorporated = Organisation name must be 105 characters of less
+businessName.error.invalid.llp = Business name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+businessName.error.invalid.partner = Partnership name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+businessName.error.invalid.unincorporated = Organisation name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+
 
 registeredAddressInUK.title = Is your registered address in the UK?
 registeredAddressInUK.heading = Is your registered address in the UK?
@@ -359,39 +363,23 @@ registeredAddressInUK.checkYourAnswersLabel = Is your registered address in the 
 registeredAddressInUK.checkYourAnswersLabel.hiddenText =  Change whether your registered address is in the UK
 registeredAddressInUK.error.required = Select yes if your registered address is in the UK
 
-reporterType.title = What will you report as?
-reporterType.heading = What will you report as?
-reporterType.checkYourAnswersLabel = What will you report as?
-reporterType.checkYourAnswersLabel.hiddenText = Change what will you report as
-reporterType.error.required = Select what you will report as
+reporterType.title = What are you registering as?
+reporterType.heading = What are you registering as?
+reporterType.checkYourAnswersLabel = What are you registering as?
+reporterType.checkYourAnswersLabel.hiddenText = Change what will you register as
+reporterType.error.required = Select what you are registering as
 reporterType.limited = Limited company
 reporterType.partnership = Partnership
 reporterType.limitedPartnership = Limited partnership or limited liability partnership
 reporterType.unincorporatedAssociation = Unincorporated association or trust
 reporterType.sole = Sole trader
 reporterType.individual = An individual not connected to a business
-reporterType.hint = Select one option.
-
-whatIsYourName.title = What is your name?
-whatIsYourName.heading = What is your name?
-whatIsYourName.firstName = First name
-whatIsYourName.lastName = Last name
-whatIsYourName.p1 = This is so we can match your details such as UTR, name and date of birth to our records.
-whatIsYourName.checkYourAnswersLabel = Your name
-whatIsYourName.checkYourAnswersLabel.hiddenText = Change your name
-whatIsYourName.error.firstName.required = Enter your first name
-whatIsYourName.error.firstName.invalid = The first name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
-whatIsYourName.error.firstName.length = The first name must be 35 characters or less
-whatIsYourName.error.lastName.required = Enter your last name
-whatIsYourName.error.lastName.invalid = The last name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
-whatIsYourName.error.lastName.length = The last name must be 35 characters or less
 
 dateOfBirthWithoutId.title = What is your date of birth?
 dateOfBirthWithoutId.heading = What is your date of birth?
 dateOfBirthWithoutId.hint = For example, 31 3 1980.
 dateOfBirthWithoutId.checkYourAnswersLabel = Your date of birth
 dateOfBirthWithoutId.checkYourAnswersLabel.hiddenText = Change your date of birth
-
 
 isThisYourAddress.title = Is this your address?
 isThisYourAddress.heading = Is this your address?
