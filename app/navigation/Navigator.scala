@@ -238,7 +238,7 @@ class Navigator @Inject() () extends Logging {
 
   private def isSoleProprietor(mode: Mode)(ua: UserAnswers): Call =
     ua.get(ReporterTypePage) match {
-      case Some(Sole) => controllers.individual.routes.IndContactNameController.onPageLoad(mode)
+      case Some(Sole) => controllers.organisation.routes.WhatIsYourNameController.onPageLoad(mode)
       case _          => controllers.organisation.routes.BusinessNameController.onPageLoad(mode)
     }
 
