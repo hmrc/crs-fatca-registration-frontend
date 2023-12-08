@@ -16,6 +16,8 @@ GET         /there-is-a-problem                          controllers.JourneyReco
 
 GET         /register/check-your-answers                 controllers.CheckYourAnswersController.onPageLoad
 
+GET         /register/sole-trader-not-identified               controllers.SoleTraderNotIdentifiedController.onPageLoad
+
 GET         /register/problem/signed-out                 controllers.SessionExpiredController.onPageLoad()
 
 GET         /register/problem/some-information-is-missing   controllers.InformationMissingController.onPageLoad()
