@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions._
 import models.ReporterType.{LimitedCompany, UnincorporatedAssociation}
 import pages.ReporterTypePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,18 +35,20 @@ class BusinessNotIdentifiedController @Inject() (
   appConfig: FrontendAppConfig,
   view: BusinessNotIdentifiedView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
-      val startUrl = controllers.routes.IndexController.onPageLoad.url
+      val startUrl     = controllers.routes.IndexController.onPageLoad.url
+      val reporterType = request.userAnswers.get(ReporterTypePage)
 
       val contactLink: String = request.userAnswers.get(ReporterTypePage) match {
         case Some(LimitedCompany) | Some(UnincorporatedAssociation) => appConfig.corporationTaxEnquiriesLink
         case _                                                      => appConfig.selfAssessmentEnquiriesLink
       }
 
-      Ok(view(contactLink, startUrl))
+      Ok(view(contactLink, reporterType, startUrl))
   }
 
 }
