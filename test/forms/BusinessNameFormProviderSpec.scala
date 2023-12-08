@@ -24,7 +24,7 @@ class BusinessNameFormProviderSpec extends StringFieldBehaviours {
   val selectedReporterType = "llp"
   val requiredKey          = "businessName.error.required.llp"
   val lengthKey            = "businessName.error.length.llp"
-  val invalidKey           = "businessName.error.invalid"
+  val invalidKey           = "businessName.error.invalid.llp"
   val maxLength            = 105
 
   val form = new BusinessNameFormProvider()(selectedReporterType)
@@ -36,7 +36,14 @@ class BusinessNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      stringMatchingRegexAndLength(orgNameRegex, maxLength)
+    )
+
+    behave like fieldWithInvalidData(
+      form,
+      fieldName,
+      invalidString = "@@",
+      error = FormError(fieldName, invalidKey)
     )
 
     behave like fieldWithMaxLengthAlpha(

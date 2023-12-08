@@ -18,7 +18,7 @@ package controllers.individual
 
 import base.SpecBase
 import forms.IndContactNameFormProvider
-import models.{IndContactName, Name, NormalMode, UserAnswers}
+import models.{Name, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

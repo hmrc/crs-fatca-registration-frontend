@@ -238,7 +238,7 @@ class Navigator @Inject() () extends Logging {
 
   private def isSoleProprietor(mode: Mode)(ua: UserAnswers): Call =
     ua.get(ReporterTypePage) match {
-      case Some(Sole) => controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode)
+      case Some(Sole) => controllers.organisation.routes.WhatIsYourNameController.onPageLoad(mode)
       case _          => controllers.organisation.routes.BusinessNameController.onPageLoad(mode)
     }
 
@@ -247,7 +247,7 @@ class Navigator @Inject() () extends Logging {
       case Some(true) =>
         checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNINumberPage, controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode))
       case Some(false) =>
-        checkNextPageForValueThenRoute(mode, ua, IndContactNamePage, controllers.individual.routes.IndContactNameController.onPageLoad(mode))
+        checkNextPageForValueThenRoute(mode, ua, IndContactNamePage, controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode))
       case _ =>
         logger.warn("NI Number answer not found when routing from IndDoYouHaveNINumberPage")
         controllers.routes.JourneyRecoveryController.onPageLoad()

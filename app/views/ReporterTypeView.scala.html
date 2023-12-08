@@ -38,7 +38,7 @@
                 field  = form("value"),
                 legend = LegendViewModel(messages("reporterType.heading")).asPageHeading(),
                 items  = ReporterType.options
-            ).withHint(HintViewModel(Text(messages("reporterType.hint"))))
+            )
         )
 
         @govukButton(

@@ -22,7 +22,7 @@ import models.error.ApiError.{BadRequestError, NotFoundError, ServiceUnavailable
 import models.matching.{IndRegistrationInfo, SafeId}
 import models.{Name, NormalMode, SubscriptionID, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.reset
+import org.mockito.Mockito.{reset, when}
 import pages.{IndContactNamePage, IndDateOfBirthPage, IndWhatIsYourNINumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -30,8 +30,6 @@ import play.api.test.Helpers._
 import services.{BusinessMatchingWithIdService, SubscriptionService, TaxEnrolmentService}
 import uk.gov.hmrc.domain.Nino
 import views.html.ThereIsAProblemView
-import org.mockito.Mockito.when
-import play.api.inject.guice.GuiceApplicationBuilder
 import views.html.individual.IndIdentityConfirmedView
 
 import java.time.LocalDate
