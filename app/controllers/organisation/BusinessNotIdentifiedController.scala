@@ -18,12 +18,13 @@ package controllers.organisation
 
 import config.FrontendAppConfig
 import controllers.actions._
-import models.ReporterType.{LimitedCompany, UnincorporatedAssociation}
+import models.ReporterType.{LimitedCompany, Sole, UnincorporatedAssociation}
 import pages.ReporterTypePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.SoleTraderNotIdentifiedView
 import views.html.organisation.BusinessNotIdentifiedView
 
 import javax.inject.Inject
@@ -33,7 +34,8 @@ class BusinessNotIdentifiedController @Inject() (
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
   appConfig: FrontendAppConfig,
-  view: BusinessNotIdentifiedView
+  view: BusinessNotIdentifiedView,
+  viewSoleTrader: SoleTraderNotIdentifiedView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -48,7 +50,11 @@ class BusinessNotIdentifiedController @Inject() (
         case _                                                      => appConfig.selfAssessmentEnquiriesLink
       }
 
-      Ok(view(contactLink, reporterType, startUrl))
+      if (reporterType == Some(Sole)) {
+        Ok(viewSoleTrader(startUrl))
+      } else {
+        Ok(view(contactLink, reporterType, startUrl))
+      }
   }
 
 }
