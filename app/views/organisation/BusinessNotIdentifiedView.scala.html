@@ -34,7 +34,7 @@
 
     <h2 class="govuk-heading-m">@messages("businessNotIdentified.subheading1")</h2>
 
-    <p class="govuk-body">@messages("businessNotIdentified.p2") @link(appConfig.lostUTRUrl, "businessNotIdentified.p2.link", openInNewWindow = true).</p>
+    <p class="govuk-body">@messages("businessNotIdentified.p2") @link(appConfig.lostUTRUrl, "businessNotIdentified.p2.link").</p>
 
     <h2 class="govuk-heading-m">@messages("businessNotIdentified.subheading2")</h2>
 
@@ -54,7 +54,7 @@
     </ul>
 
     @if(reporterType == Some(ReporterType.LimitedCompany)) {
-       <p class="govuk-body">@messages("businessNotIdentified.limitedCompany.p4") @link(contactLink, "businessNotIdentified.limitedCompany.p4.link").</p>
+       <p class="govuk-body">@messages("businessNotIdentified.limitedCompany.p4") @link(contactLink, "businessNotIdentified.limitedCompany.p4.link", openInNewWindow = true).</p>
      } else if (reporterType != Some(ReporterType.UnincorporatedAssociation)) {
        <p class="govuk-body">@messages("businessNotIdentified.partnership.p4") @link(contactLink, "businessNotIdentified.partnership.p4.link", openInNewWindow = true).</p>
      }
