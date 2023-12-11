@@ -54,7 +54,7 @@
     </ul>
 
     @if(reporterType == Some(ReporterType.LimitedCompany)) {
-       <p class="govuk-body">@messages("businessNotIdentified.limitedCompany.p4") @link(contactLink, "businessNotIdentified.limitedCompany.p4.link", openInNewWindow = true).</p>
+       <p class="govuk-body">@messages("businessNotIdentified.limitedCompany.p4") @link(contactLink, "businessNotIdentified.limitedCompany.p4.link").</p>
      } else if (reporterType != Some(ReporterType.UnincorporatedAssociation)) {
        <p class="govuk-body">@messages("businessNotIdentified.partnership.p4") @link(contactLink, "businessNotIdentified.partnership.p4.link", openInNewWindow = true).</p>
      }
