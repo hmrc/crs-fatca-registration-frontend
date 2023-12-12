@@ -45,14 +45,9 @@ class BusinessNotIdentifiedController @Inject() (
       val startUrl     = controllers.routes.IndexController.onPageLoad.url
       val reporterType = request.userAnswers.get(ReporterTypePage)
 
-      val contactLink: String = reporterType match {
-        case Some(LimitedCompany) | Some(UnincorporatedAssociation) => appConfig.findCompanyName
-        case _                                                      => appConfig.selfAssessmentEnquiriesLink
-      }
-
       reporterType match {
         case Some(Sole) => Ok(viewSoleTrader(startUrl))
-        case _          => Ok(view(contactLink, reporterType, startUrl))
+        case _          => Ok(view(appConfig.findCompanyName, reporterType, startUrl))
       }
   }
 
