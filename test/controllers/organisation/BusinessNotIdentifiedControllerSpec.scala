@@ -17,18 +17,19 @@
 package controllers.organisation
 
 import base.SpecBase
-import models.ReporterType.{LimitedCompany, LimitedPartnership}
+import models.ReporterType.{LimitedCompany, Sole}
 import pages.ReporterTypePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import views.html.SoleTraderNotIdentifiedView
 import views.html.organisation.BusinessNotIdentifiedView
 
 class BusinessNotIdentifiedControllerSpec extends SpecBase {
+  val startUrl = controllers.routes.IndexController.onPageLoad.url
 
   "NoRecordsMatched Controller" - {
 
-    lazy val corporationTaxEnquiriesLink: String = "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries"
-    lazy val selfAssessmentEnquiriesLink: String = "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment"
+    lazy val findCompanyName: String = "https://find-and-update.company-information.service.gov.uk/"
 
     "return OK and the correct view for a GET with link for corporation tax enquiries" in {
 
@@ -44,7 +45,8 @@ class BusinessNotIdentifiedControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
-          corporationTaxEnquiriesLink,
+          findCompanyName,
+          Some(LimitedCompany),
           controllers.routes.IndexController.onPageLoad.url
         )(request, messages(application)).toString
 
@@ -53,7 +55,7 @@ class BusinessNotIdentifiedControllerSpec extends SpecBase {
 
     "return OK and the correct view for a GET when a Sole Trader" in {
 
-      val userAnswers = emptyUserAnswers.set(ReporterTypePage, LimitedPartnership).success.value
+      val userAnswers = emptyUserAnswers.set(ReporterTypePage, Sole).success.value
       val application = applicationBuilder(Option(userAnswers)).build()
 
       running(application) {
@@ -61,12 +63,11 @@ class BusinessNotIdentifiedControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[BusinessNotIdentifiedView]
+        val view = application.injector.instanceOf[SoleTraderNotIdentifiedView]
 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(
-          selfAssessmentEnquiriesLink,
           controllers.routes.IndexController.onPageLoad.url
         )(request, messages(application)).toString
 

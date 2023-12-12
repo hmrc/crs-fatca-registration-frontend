@@ -44,6 +44,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val signOutUrl: String                      = configuration.get[String]("urls.signOut")
   val crsFatcaFIManagementFrontendUrl: String = configuration.get[String]("urls.crsFatcaFIManagementFrontend")
   lazy val lostUTRUrl: String                 = configuration.get[String]("urls.lostUTR")
+  lazy val findCompanyName: String            = configuration.get[String]("urls.findCompanyName")
 
   lazy val businessMatchingUrl: String =
     s"${configuration.get[Service]("microservice.services.business-matching").baseUrl}${configuration.get[String]("microservice.services.business-matching.startUrl")}"

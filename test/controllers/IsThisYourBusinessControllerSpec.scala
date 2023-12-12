@@ -364,6 +364,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures {
       status(result) mustEqual INTERNAL_SERVER_ERROR
       contentAsString(result) mustEqual view()(request, messages).toString
     }
+
   }
 
 }
