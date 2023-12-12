@@ -46,7 +46,7 @@ class BusinessNotIdentifiedController @Inject() (
       val reporterType = request.userAnswers.get(ReporterTypePage)
 
       val contactLink: String = reporterType match {
-        case Some(LimitedCompany) | Some(UnincorporatedAssociation) => appConfig.corporationTaxEnquiriesLink
+        case Some(LimitedCompany) | Some(UnincorporatedAssociation) => appConfig.findCompanyName
         case _                                                      => appConfig.selfAssessmentEnquiriesLink
       }
 
