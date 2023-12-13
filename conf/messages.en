@@ -524,7 +524,7 @@ thereIsAProblem.heading = Sorry, there is a problem with the service
 thereIsAProblem.paragraph.1 = Try again later.
 thereIsAProblem.paragraph.2.a = You can email {0} if you need to contact someone about your CRS or FATCA reporting.
 
-indWhereDoYouLive.title = Do you live in the United Kingdom?
-indWhereDoYouLive.heading = Do you live in the United Kingdom?
-indWhereDoYouLive.checkYourAnswersLabel = Do you live in the United Kingdom?
-indWhereDoYouLive.error.required = Select yes if you live in the UK
+indWhereDoYouLive.title = Do you live in the UK, Jersey, Guernsey or the Isle of Man?
+indWhereDoYouLive.heading = Do you live in the UK, Jersey, Guernsey or the Isle of Man?
+indWhereDoYouLive.checkYourAnswersLabel = Do you live in the UK, Jersey, Guernsey or the Isle of Man?
+indWhereDoYouLive.error.required = 	Select yes if you live in the UK, Jersey, Guernsey or the Isle of Man
