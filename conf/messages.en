@@ -316,7 +316,7 @@ indWhatIsYourName.error.lastName.length = 	The family name must be 35 characters
 
 indWhatIsYourPostcode.title = What is your postcode?
 indWhatIsYourPostcode.heading = What is your postcode?
-indWhatIsYourPostcode.hint = Enter your postcode to find your address automatically.
+indWhatIsYourPostcode.p1 = Enter your postcode to find your address automatically.
 indWhatIsYourPostcode.checkYourAnswersLabel = What is your postcode?
 indWhatIsYourPostcode.button = Find address
 indWhatIsYourPostcode.manualLink = Or enter the address manually
