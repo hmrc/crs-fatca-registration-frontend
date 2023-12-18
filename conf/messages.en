@@ -67,20 +67,20 @@ yourContactDetails.p2 = You can change your CRS and FATCA contact names and deta
 contactName.title = What is the name of the person or team we should contact?
 contactName.heading = What is the name of the person or team we should contact?
 contactName.hint = For example, '‘Ashley Smith’' or '‘Tax team’'.
-contactName.checkYourAnswersLabel = Contact name
+contactName.checkYourAnswersLabel = First contact name
 contactName.error.required = Enter a name for the first contact
 contactName.error.length = The name must be 35 characters or less
 contactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
-contactName.change.hidden = Change your contact name
+contactName.change.hidden = Change first contact name
 
 contactEmail.title = What is the email address for the first contact?
 contactEmail.heading = What is the email address for {0}?
-contactEmail.checkYourAnswersLabel = firstContactEmail
+contactEmail.checkYourAnswersLabel = First contact email address
 contactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
 contactEmail.error.required = Enter an email address for the first contact
 contactEmail.error.length = The email address must be 132 characters or less
 contactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
-contactEmail.change.hidden = Change your email address
+contactEmail.change.hidden = Change first contact email address
 
 contactHavePhone.title = Can we contact your first contact by telephone?
 contactHavePhone.heading = Can we contact {0} by telephone?
@@ -89,14 +89,14 @@ contactHavePhone.checkYourAnswersLabel = Can we contact {0} by telephone?
 contactHavePhone.error.required = Select yes if they can be contacted by telephone
 contactHavePhone.change.hidden = Change can we contact {0} by telephone?
 
-contactPhone.checkYourAnswersLabel = Telephone number
+contactPhone.checkYourAnswersLabel = First contact telephone number
 contactPhone.title = What is the telephone number for the first contact?
 contactPhone.heading = What is the telephone number for {0}?
 contactPhone.hint = For international numbers, include the country code.
 contactPhone.error.required = Enter a telephone number for the first contact
 contactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 contactPhone.error.length = The telephone number must be 24 characters or less
-contactPhone.change.hidden = Change telephone number
+contactPhone.change.hidden = Change first contact telephone number
 
 secondContactEmail.title = What is the email address for the second contact?
 secondContactEmail.heading = What is the email address for {0}?
@@ -111,7 +111,7 @@ haveSecondContact.title = Is there someone else we can contact if your first con
 haveSecondContact.heading = Is there someone else we can contact if {0} is not available?
 haveSecondContact.p1 = This can be a team mailbox or another contact.
 haveSecondContact.checkYourAnswersLabel = Do you have a second contact?
-haveSecondContact.checkYourAnswersLabel.hiddenText = Change if you have a second contact
+haveSecondContact.change.hidden = Change if you have a second contact
 haveSecondContact.error.required = Select yes if there is someone else we can contact
 
 secondContactName.title = What is the name of the person or team we should contact?
@@ -126,9 +126,7 @@ secondContactName.change.hidden = Change second contact name
 secondContactHavePhone.title = Can we contact your second contact by telephone?
 secondContactHavePhone.heading = Can we contact {0} by telephone?
 secondContactHavePhone.p1 = We will call if we have any questions about your reports.
-secondContactHavePhone.checkYourAnswersLabel = secondContactHavePhone
 secondContactHavePhone.error.required = Select yes if they can be contacted by telephone
-secondContactHavePhone.change.hidden = SecondContactHavePhone
 
 secondContactPhone.title = What is the telephone number for the second contact?
 secondContactPhone.heading = What is the telephone number for {0}?
@@ -142,11 +140,11 @@ secondContactPhone.change.hidden = Change second contact telephone number
 indContactEmail.title = What is your email address?
 indContactEmail.heading = What is your email address?
 indContactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
-indContactEmail.checkYourAnswersLabel = indContactEmail
+indContactEmail.checkYourAnswersLabel = Email address
 indContactEmail.error.required = Enter your email address
 indContactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
 indContactEmail.error.length = The email address must be 132 characters or less
-indContactEmail.change.hidden = IndContactEmail
+indContactEmail.change.hidden = Change email address
 
 indContactHavePhone.title = Can we contact you by telephone?
 indContactHavePhone.heading = Can we contact you by telephone?
@@ -158,11 +156,11 @@ indContactHavePhone.change.hidden = Change can we contact you by telephone?
 indContactPhone.title = What is your telephone number?
 indContactPhone.heading = What is your telephone number?
 indContactPhone.hint = For international numbers, include the country code.
-indContactPhone.checkYourAnswersLabel = Your contact telephone number
+indContactPhone.checkYourAnswersLabel = Telephone number
 indContactPhone.error.required = Enter your telephone number
 indContactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 indContactPhone.error.length = The telephone number must be 24 characters or less
-indContactPhone.change.hidden = Change your contact telephone number
+indContactPhone.change.hidden = Change telephone number
 
 indDateOfBirth.title = What is your date of birth?
 indDateOfBirth.heading = What is your date of birth?
@@ -185,15 +183,14 @@ indContactName.title = What is your name?
 indContactName.heading = What is your name?
 indContactName.firstName = First name
 indContactName.lastName = Last name
-indContactName.checkYourAnswersLabel = IndContactName
+indContactName.checkYourAnswersLabel = Your name
 indContactName.error.firstName.required = Enter your first name
 indContactName.error.lastName.required = Enter your last name
 indContactName.error.firstName.invalid = The first name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 indContactName.error.lastName.invalid = The last name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 indContactName.error.firstName.length = The first name must be 35 characters or less
 indContactName.error.lastName.length = The last name must be 35 characters or less
-indContactName.firstName.change.hidden = firstName
-indContactName.lastName.change.hidden = lastName
+indContactName.change.hidden = Change your name
 
 indIdentityConfirmed.title = We have confirmed your identity
 indIdentityConfirmed.heading = We have confirmed your identity
@@ -215,32 +212,33 @@ indWhatIsYourNINumber.error.length = Your National Insurance Number must be 9 ch
 
 businessNameWithoutID.title = What is the name of your business?
 businessNameWithoutID.heading = What is the name of your business?
-businessNameWithoutID.checkYourAnswersLabel = businessNameWithoutID
 businessNameWithoutID.error.required = Enter the name of your business
 businessNameWithoutID.error.invalid = Business name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 businessNameWithoutID.error.length = Business name must be 105 characters or less
-businessNameWithoutID.change.hidden = BusinessNameWithoutID
+businessNameWithoutID.checkYourAnswersLabel = Business name
+businessNameWithoutID.change.hidden = Change business name
+
+businessWithIDName.checkYourAnswersLabel = Your business
+businessWithIDName.change.hidden = Change your business
 
 indDoYouHaveNINumber.title = Do you have a National Insurance number?
 indDoYouHaveNINumber.heading = Do you have a National Insurance number?
 indDoYouHaveNINumber.hint = You can find your National Insurance number on your payslip, P60 or letters about tax, pensions and benefits.
 indDoYouHaveNINumber.checkYourAnswersLabel = Do you have a National Insurance number?
-indDoYouHaveNINumber.checkYourAnswersLabel.hiddenText = Change if you have a National Insurance number
+indDoYouHaveNINumber.change.hidden = Change if you have a National Insurance number
 indDoYouHaveNINumber.error.required = Select yes if you have a National Insurance number
 
 haveTradingName.title = Does your business trade under a different name?
 haveTradingName.heading = Does your business trade under a different name?
-haveTradingName.checkYourAnswersLabel = haveTradingName
 haveTradingName.error.required = Select yes if your business trades under a different name
-haveTradingName.change.hidden = HaveTradingName
 
 businessTradingNameWithoutID.title = What is the trading name of your business?
 businessTradingNameWithoutID.heading = What is the trading name of your business?
-businessTradingNameWithoutID.checkYourAnswersLabel = Your business trading name
+businessTradingNameWithoutID.checkYourAnswersLabel = Trading name
 businessTradingNameWithoutID.error.required = Enter the trading name of your business
 businessTradingNameWithoutID.error.invalid = Trading name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 businessTradingNameWithoutID.error.length = Trading name must be 80 characters or less
-businessTradingNameWithoutID.change.hidden = Change your business trading name
+businessTradingNameWithoutID.change.hidden = Change trading name
 
 addressWithoutId.business.title = What is the main address of your business?
 addressWithoutId.business.heading = What is the main address of your business?
@@ -256,11 +254,12 @@ addressWithoutId.postCode.mandatory = Postcode
 addressWithoutId.postCode.ifApplicable = Postcode (if applicable)
 addressWithoutId.countryCode = Country
 
-
 addressWithoutId.individual.checkYourAnswersLabel = Your home address
-addressWithoutId.individual.checkYourAnswersLabel.hiddenText = Change your home address
+addressWithoutId.individual.change.hidden = Change your home address
+
 addressWithoutId.business.checkYourAnswersLabel = Main business address
-addressWithoutId.business.checkYourAnswersLabel.hiddenText = Change main business address
+addressWithoutId.business.change.hidden = Change main business address
+
 addressWithoutId.error.addressLine1.required = Enter address line 1
 addressWithoutId.error.addressLine3.required = Enter city
 addressWithoutId.error.country.required = Select country
@@ -306,7 +305,7 @@ indWhatIsYourName.heading = What is your name?
 indWhatIsYourName.firstName = Given name
 indWhatIsYourName.lastName = Family name
 indWhatIsYourName.checkYourAnswersLabel = Your name
-indWhatIsYourName.checkYourAnswersLabel.hiddenText = Change your name
+indWhatIsYourName.change.hidden = Change your name
 indWhatIsYourName.error.firstName.required = Enter your given name
 indWhatIsYourName.error.firstName.invalid = The given name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 indWhatIsYourName.error.firstName.length = The given name must be 35 characters or less
@@ -327,12 +326,12 @@ indWhatIsYourPostcode.error.chars = Postcode must only include letters a to z an
 indWhatIsYourPostcode.error.notFound = Postcode not found — enter a different postcode or enter the address manually
 
 doYouHaveUniqueTaxPayerReference.title = Do you have a UK Unique Taxpayer Reference (UTR)?
-doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel =  Do you have a Unique Taxpayer Reference?
-doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel.hiddenText = Change if you have a Unique Taxpayer Reference
+doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel = Do you have a UK Unique Taxpayer Reference?
+doYouHaveUniqueTaxPayerReference.change.hidden = Change if you have a UK Unique Taxpayer Reference
 doYouHaveUniqueTaxPayerReference.heading = Do you have a UK Unique Taxpayer Reference (UTR)?
 doYouHaveUniqueTaxPayerReference.p1 = You can {0}.
 doYouHaveUniqueTaxPayerReference.p1.link = find a lost UTR
-doYouHaveUniqueTaxPayerReference.hint =  This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax and Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+doYouHaveUniqueTaxPayerReference.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax and Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
 doYouHaveUniqueTaxPayerReference.error.required = Select yes if you have a UTR
 
 
@@ -345,7 +344,6 @@ businessName.heading.unincorporated = What is the name of your organisation?
 businessName.hint.llp = This is the registered name on your incorporation certificate. Enter the name in full as it appears on the certificate.
 businessName.hint.partner = This is the name that you registered with HMRC.
 businessName.hint.unincorporated = This is the name on your governing document.
-businessName.checkYourAnswersLabel = businessName
 businessName.error.required.llp = Enter the registered name of your business
 businessName.error.required.partner = Enter the partnership name
 businessName.error.required.unincorporated = Enter the name of your organisation
@@ -359,14 +357,14 @@ businessName.error.invalid.unincorporated = Organisation name must only include 
 
 registeredAddressInUK.title = Is your registered address in the UK?
 registeredAddressInUK.heading = Is your registered address in the UK?
-registeredAddressInUK.checkYourAnswersLabel = Is your registered address in the UK?
-registeredAddressInUK.checkYourAnswersLabel.hiddenText =  Change whether your registered address is in the UK
+registeredAddressInUK.checkYourAnswersLabel = Is your registered business address in the UK?
+registeredAddressInUK.change.hidden = Change whether your registered address is in the UK
 registeredAddressInUK.error.required = Select yes if your registered address is in the UK
 
 reporterType.title = What are you registering as?
 reporterType.heading = What are you registering as?
 reporterType.checkYourAnswersLabel = What are you registering as?
-reporterType.checkYourAnswersLabel.hiddenText = Change what will you register as
+reporterType.change.hidden = Change what you are registering as
 reporterType.error.required = Select what you are registering as
 reporterType.limited = Limited company
 reporterType.partnership = Partnership
@@ -381,7 +379,7 @@ whatIsYourName.firstName = First name
 whatIsYourName.lastName = Last name
 whatIsYourName.p1 = This is so we can match your details such as UTR, name and date of birth to our records.
 whatIsYourName.checkYourAnswersLabel = Your name
-whatIsYourName.checkYourAnswersLabel.hiddenText = Change your name
+whatIsYourName.change.hidden = Change your name
 whatIsYourName.error.firstName.required = Enter your first name
 whatIsYourName.error.firstName.invalid = The first name must only include letters a to z, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 whatIsYourName.error.firstName.length = The first name must be 35 characters or less
@@ -393,11 +391,10 @@ dateOfBirthWithoutId.title = What is your date of birth?
 dateOfBirthWithoutId.heading = What is your date of birth?
 dateOfBirthWithoutId.hint = For example, 31 3 1980.
 dateOfBirthWithoutId.checkYourAnswersLabel = Your date of birth
-dateOfBirthWithoutId.checkYourAnswersLabel.hiddenText = Change your date of birth
+dateOfBirthWithoutId.change.hidden = Change your date of birth
 
 isThisYourAddress.title = Is this your address?
 isThisYourAddress.heading = Is this your address?
-isThisYourAddress.checkYourAnswersLabel = isThisYourAddress
 isThisYourAddress.error.required = Select yes if this is your address
 
 whatIsYourUTR.title = What is your {0} Unique Taxpayer Reference (UTR)?
@@ -446,7 +443,7 @@ individualAlreadyRegistered.p2 = You can email {0} if you’re having problems a
 indSelectAddress.title = What is your address?
 indSelectAddress.heading = What is your address?
 indSelectAddress.checkYourAnswersLabel = Your home address
-indSelectAddress.checkYourAnswersLabel.hiddenText = Change your home address
+indSelectAddress.change.hidden = Change your home address
 indSelectAddress.error.required = Select your address or enter it manually
 indSelectAddress.p1 = Select from the list or {0}.
 indSelectAddress.p2 = enter your address manually
@@ -517,3 +514,14 @@ indWhereDoYouLive.title = Do you live in the UK, Jersey, Guernsey or the Isle of
 indWhereDoYouLive.heading = Do you live in the UK, Jersey, Guernsey or the Isle of Man?
 indWhereDoYouLive.checkYourAnswersLabel = Do you live in the UK, Jersey, Guernsey or the Isle of Man?
 indWhereDoYouLive.error.required = 	Select yes if you live in the UK, Jersey, Guernsey or the Isle of Man
+
+checkYourAnswers.title = Check your answers before you register for CRS and FATCA
+checkYourAnswers.heading = Check your answers before you register for CRS and FATCA
+checkYourAnswers.individualDetails.h2 = Your details
+checkYourAnswers.businessDetails.h2 = Business details
+checkYourAnswers.firstContact.h2 = First contact
+checkYourAnswers.secondContact.h2 = Second contact
+checkYourAnswers.contactDetails.h2 = Contact details
+checkYourAnswers.information.h2 = Now send your registration for CRS and FATCA
+checkYourAnswers.information.p = By sending these details, you are confirming that the information is correct and complete to the best of your knowledge.
+checkYourAnswers.button = Confirm and send

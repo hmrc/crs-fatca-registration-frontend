@@ -22,20 +22,20 @@ import pages.IndContactPhonePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object IndContactPhoneSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndContactPhonePage).map {
+    answers.get(IndContactPhonePage).orElse(Option("Not provided")).map {
       answer =>
         SummaryListRowViewModel(
           key = "indContactPhone.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.IndContactPhoneController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("indContactPhone.change.hidden"))
+            changeAction("indContactPhone", routes.IndContactHavePhoneController.onPageLoad(CheckMode).url)
           )
         )
     }

@@ -23,6 +23,7 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -41,8 +42,7 @@ object ReporterTypeSummary {
           key = "reporterType.checkYourAnswersLabel",
           value = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ReporterTypeController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("reporterType.change.hidden"))
+            changeAction("reporterType", routes.ReporterTypeController.onPageLoad(CheckMode).url)
           )
         )
     }

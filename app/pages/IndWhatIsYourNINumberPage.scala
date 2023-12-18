@@ -23,5 +23,5 @@ case object IndWhatIsYourNINumberPage extends QuestionPage[Nino] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "whatIsYourNINumber"
+  override def toString: String = "indWhatIsYourNINumber"
 }

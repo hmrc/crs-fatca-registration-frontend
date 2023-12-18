@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.RegisteredAddressInUKPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -35,8 +36,10 @@ object RegisteredAddressInUKSummary {
           key = "registeredAddressInUK.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.RegisteredAddressInUKController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("registeredAddressInUK.change.hidden"))
+            changeAction(
+              "registeredAddressInUK",
+              routes.RegisteredAddressInUKController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

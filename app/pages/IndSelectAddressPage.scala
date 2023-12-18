@@ -25,7 +25,7 @@ case object IndSelectAddressPage extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "selectAddress"
+  override def toString: String = "indSelectAddress"
 
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
     value.fold(Try(userAnswers))(

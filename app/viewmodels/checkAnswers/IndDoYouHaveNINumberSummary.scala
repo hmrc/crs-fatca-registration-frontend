@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.IndDoYouHaveNINumberPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -35,8 +36,7 @@ object IndDoYouHaveNINumberSummary {
           key = "indDoYouHaveNINumber.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("indDoYouHaveNINumber.change.hidden"))
+            changeAction("indDoYouHaveNINumber", routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode).url)
           )
         )
     }

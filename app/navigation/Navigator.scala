@@ -42,6 +42,10 @@ class Navigator @Inject() () extends Logging {
         )
     case DoYouHaveUniqueTaxPayerReferencePage => doYouHaveUniqueTaxPayerReference(NormalMode)
     case WhatIsYourUTRPage                    => isSoleProprietor(NormalMode)
+    case WhatIsYourNamePage =>
+      _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(NormalMode)
+    case BusinessNamePage =>
+      _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(NormalMode)
     // business without ID pages
     case BusinessNameWithoutIDPage => _ => controllers.organisation.routes.HaveTradingNameController.onPageLoad(NormalMode)
     case HaveTradingNamePage =>
@@ -102,6 +106,7 @@ class Navigator @Inject() () extends Logging {
     case IndContactNamePage        => _ => controllers.individual.routes.IndDateOfBirthController.onPageLoad(NormalMode)
     case IndWhatIsYourNamePage     => _ => controllers.individual.routes.IndDateOfBirthWithoutIdController.onPageLoad(NormalMode)
     case DateOfBirthWithoutIdPage  => whatIsYourDateOfBirthRoutes(NormalMode)
+    case RegistrationInfoPage      => _ => controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
     case IndWhereDoYouLivePage =>
       userAnswers =>
         yesNoPage(
@@ -200,6 +205,7 @@ class Navigator @Inject() () extends Logging {
     (ua.get(DoYouHaveUniqueTaxPayerReferencePage), ua.get(ReporterTypePage)) match {
       case (Some(true), _)                 => controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(mode)
       case (Some(false), Some(Individual)) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
+      case (Some(false), Some(Sole))       => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
       case (Some(false), Some(_))          => controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(mode)
       case (None, Some(_)) =>
         logger.warn("DoYouHaveUniqueTaxPayerReference answer not found when routing from DoYouHaveUniqueTaxPayerReferencePage")

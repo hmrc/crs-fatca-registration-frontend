@@ -17,11 +17,11 @@
 package viewmodels.checkAnswers
 
 import controllers.organisation.routes
-import models.{Address, CheckMode, UserAnswers}
+import models.{CheckMode, UserAnswers}
 import pages.NonUKBusinessAddressWithoutIDPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryListRow, Value}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.{changeAction, formatAddress}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -31,29 +31,15 @@ object BusinessAddressWithoutIDSummary {
     answers.get(NonUKBusinessAddressWithoutIDPage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "businessWithoutIDAddress.checkYourAnswersLabel",
+          key = s"$NonUKBusinessAddressWithoutIDPage.business.checkYourAnswersLabel",
           value = formatAddress(answer),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("businessWithoutIDAddress.change.hidden"))
+            changeAction(
+              NonUKBusinessAddressWithoutIDPage.toString,
+              routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode).url
+            )
           )
         )
     }
-
-  def formatAddress(answer: Address): Value =
-    Value(HtmlContent(s"""
-          ${answer.addressLine1}<br>
-          ${answer.addressLine2.fold("")(
-        address => s"$address<br>"
-      )}
-          ${answer.addressLine3}<br>
-          ${answer.addressLine4.fold("")(
-        address => s"$address<br>"
-      )}
-          ${answer.postCode.fold("")(
-        postcode => s"$postcode<br>"
-      )}
-          ${answer.country.description}
-       """))
 
 }

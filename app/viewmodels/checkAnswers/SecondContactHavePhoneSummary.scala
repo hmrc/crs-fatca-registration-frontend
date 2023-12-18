@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.SecondContactHavePhonePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -35,8 +36,10 @@ object SecondContactHavePhoneSummary {
           key = "secondContactHavePhone.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.SecondContactHavePhoneController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("secondContactHavePhone.change.hidden"))
+            changeAction(
+              "secondContactHavePhone",
+              routes.SecondContactHavePhoneController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

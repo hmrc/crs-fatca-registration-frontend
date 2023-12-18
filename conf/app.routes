@@ -14,7 +14,8 @@ GET         /register/problem/there-is-a-problem                  controllers.Th
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /register/check-your-answers                 controllers.CheckYourAnswersController.onPageLoad
+GET         /register/check-your-answers                      controllers.CheckYourAnswersController.onPageLoad()
+POST        /register/check-your-answers                      controllers.CheckYourAnswersController.onSubmit()
 
 GET         /register/sole-trader-not-identified               controllers.SoleTraderNotIdentifiedController.onPageLoad
 

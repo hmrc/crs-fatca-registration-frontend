@@ -16,28 +16,36 @@
 
 package viewmodels.checkAnswers
 
-import controllers.organisation.routes
 import models.{CheckMode, UserAnswers}
-import pages.BusinessNamePage
+import pages.IndWhereDoYouLivePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.{changeAction, formatAddress}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object BusinessNameSummary {
+object IndividualAddressWithoutIdSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(BusinessNamePage).map {
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    val address = if (answers.get(IndWhereDoYouLivePage).getOrElse(false)) {
+      answers.get(pages.IndUKAddressWithoutIdPage)
+    } else {
+      answers.get(pages.IndNonUKAddressWithoutIdPage)
+    }
+
+    address.map {
       answer =>
         SummaryListRowViewModel(
-          key = "businessName.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key = "addressWithoutId.individual.checkYourAnswersLabel",
+          value = formatAddress(answer),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.BusinessNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("businessName.change.hidden"))
+            changeAction(
+              "addressWithoutId",
+              controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(CheckMode).url
+            )
           )
         )
     }
+  }
 
 }

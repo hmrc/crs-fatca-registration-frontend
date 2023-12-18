@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package viewmodels
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.json.{__, OWrites}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 
-import scala.util.Try
+final case class Section(sectionName: String, rows: Seq[SummaryListRow])
 
-case object HaveTradingNamePage extends QuestionPage[Boolean] {
+object Section {
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "haveTradingName"
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(false) => userAnswers.remove(BusinessTradingNameWithoutIDPage)
-      case _           => super.cleanup(value, userAnswers)
-    }
+  implicit val sectionWrites: OWrites[Section] =
+    (
+      (__ \ "sectionName").write[String] and
+        (__ \ "rows").write[Seq[SummaryListRow]]
+    )(unlift(Section.unapply))
 
 }

@@ -20,10 +20,11 @@ import models.{CheckMode, UserAnswers}
 import pages.IsThisYourAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object IsThisYourAddressSummary {
+object IndIsThisYourAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IsThisYourAddressPage).map {
@@ -34,8 +35,10 @@ object IsThisYourAddressSummary {
           key = "indIsThisYourAddress.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("isThisYourAddress.change.hidden"))
+            changeAction(
+              "isThisYourAddress",
+              controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

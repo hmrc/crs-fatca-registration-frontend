@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.HaveTradingNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -35,8 +36,7 @@ object HaveTradingNameSummary {
           key = "haveTradingName.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.HaveTradingNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("haveTradingName.change.hidden"))
+            changeAction("haveTradingName", routes.HaveTradingNameController.onPageLoad(CheckMode).url)
           )
         )
     }

@@ -16,44 +16,681 @@
 
 package controllers
 
-import base.SpecBase
+import base.{ControllerMockFixtures, SpecBase}
+import connectors.AddressLookupConnector
+import helpers.JsonFixtures._
+import models.enrolment.GroupIds
+import models.error.ApiError._
+import models.matching.IndRegistrationInfo
+import models.{Address, Country, SubscriptionID, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.MockitoSugar.{reset, when}
+import org.scalatest.BeforeAndAfterEach
+import pages._
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import viewmodels.govuk.SummaryListFluency
-import views.html.CheckYourAnswersView
+import services.{BusinessMatchingWithoutIdService, SubscriptionService, TaxEnrolmentService}
+import uk.gov.hmrc.auth.core.AffinityGroup
+import views.html.ThereIsAProblemView
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
+import scala.concurrent.Future
 
-  "Check Your Answers Controller" - {
+class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach {
 
-    "must return OK and the correct view for a GET" in {
+  final val mockRegistrationService: BusinessMatchingWithoutIdService = mock[BusinessMatchingWithoutIdService]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+  lazy val loadRoute: String   = routes.CheckYourAnswersController.onPageLoad().url
+  lazy val submitRoute: String = routes.CheckYourAnswersController.onSubmit().url
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad.url)
+  // first contact
+  val firstContactName    = "first-contact-name"
+  val firstContactEmail   = "first-contact-email"
+  val isFirstContactPhone = true
+  val firstContactPhone   = "+44 0000 000 0000"
 
-        val result = route(application, request).value
+  // second contact
+  val isSecondContact                               = true
+  val secondContactName                             = "second-contact-name"
+  val secondContactEmail                            = "second-contact-email"
+  val isSecondContactPhone                          = true
+  val secondContactPhone                            = "+44 0808 157 0193"
+  val mockSubscriptionService: SubscriptionService  = mock[SubscriptionService]
+  val mockTaxEnrolmentsService: TaxEnrolmentService = mock[TaxEnrolmentService]
 
-        val view = application.injector.instanceOf[CheckYourAnswersView]
-        val list = SummaryListViewModel(Seq.empty)
+  override def beforeEach(): Unit = {
+    reset(mockSubscriptionService, mockRegistrationService, mockTaxEnrolmentsService)
+    super.beforeEach()
+  }
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list)(request, messages(application)).toString
+  val address: Address = Address("line 1", Some("line 2"), "line 3", Some("line 4"), Some(""), Country.GB)
+
+  "CheckYourAnswers Controller" - {
+
+    "onPageLoad" - {
+
+      "must return OK and the correct view for a GET when first Contact has a phone number" in {
+        val userAnswers: UserAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .success
+          .value
+          .set(ContactNamePage, firstContactName)
+          .success
+          .value
+          .set(ContactEmailPage, firstContactEmail)
+          .success
+          .value
+          .set(ContactPhonePage, firstContactPhone)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result).contains(firstContactName) mustBe true
+          contentAsString(result).contains(firstContactEmail) mustBe true
+          contentAsString(result).contains(firstContactPhone) mustBe true
+        }
       }
+
+      "must redirect to Information sent when UserAnswers is empty" in {
+        val application = applicationBuilder(userAnswers = Option(emptyUserAnswers))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
+        }
+      }
+
+      "must return OK and the correct view for a GET when first contact does not have a phone number" in {
+        val userAnswers: UserAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .success
+          .value
+          .set(ContactNamePage, firstContactName)
+          .success
+          .value
+          .set(ContactEmailPage, firstContactEmail)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result).contains(firstContactName) mustBe true
+          contentAsString(result).contains(firstContactEmail) mustBe true
+          contentAsString(result).contains(firstContactPhone) mustBe false
+        }
+      }
+
+      "must return OK and the correct view for a GET when there is no second contact" in {
+        val userAnswers: UserAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .success
+          .value
+          .set(ContactNamePage, firstContactName)
+          .success
+          .value
+          .set(ContactEmailPage, firstContactEmail)
+          .success
+          .value
+          .set(ContactPhonePage, firstContactPhone)
+          .success
+          .value
+          .set(HaveSecondContactPage, !isSecondContact)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result).contains(firstContactName) mustBe true
+          contentAsString(result).contains(firstContactEmail) mustBe true
+          contentAsString(result).contains(secondContactName) mustBe false
+        }
+      }
+
+      "must return OK and the correct view for a GET when the second contact has a phone number" in {
+        val userAnswers: UserAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .success
+          .value
+          .set(ContactEmailPage, TestEmail)
+          .success
+          .value
+          .set(ContactNamePage, name.fullName)
+          .success
+          .value
+          .set(ContactHavePhonePage, false)
+          .success
+          .value
+          .set(HaveSecondContactPage, true)
+          .success
+          .value
+          .set(SecondContactNamePage, secondContactName)
+          .success
+          .value
+          .set(SecondContactEmailPage, secondContactEmail)
+          .success
+          .value
+          .set(SecondContactHavePhonePage, true)
+          .success
+          .value
+          .set(SecondContactPhonePage, secondContactPhone)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result).contains(name.fullName) mustBe true
+          contentAsString(result).contains(TestEmail) mustBe true
+          contentAsString(result).contains(secondContactName) mustBe true
+          contentAsString(result).contains(secondContactEmail) mustBe true
+          contentAsString(result).contains(secondContactPhone) mustBe true
+        }
+      }
+
+      "must return OK and the correct view for a GET when the second contact has no phone number" in {
+        val userAnswers: UserAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .success
+          .value
+          .set(ContactNamePage, firstContactName)
+          .success
+          .value
+          .set(ContactEmailPage, firstContactEmail)
+          .success
+          .value
+          .set(ContactPhonePage, firstContactPhone)
+          .success
+          .value
+          .set(HaveSecondContactPage, isSecondContact)
+          .success
+          .value
+          .set(SecondContactNamePage, secondContactName)
+          .success
+          .value
+          .set(SecondContactEmailPage, secondContactEmail)
+          .success
+          .value
+          .set(SecondContactHavePhonePage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result).contains(firstContactName)
+          contentAsString(result).contains(firstContactEmail)
+          contentAsString(result).mustNot(contain(secondContactName))
+
+          contentAsString(result).contains(firstContactName) mustBe true
+          contentAsString(result).contains(firstContactEmail) mustBe true
+          contentAsString(result).contains(firstContactPhone) mustBe true
+          contentAsString(result).contains(secondContactName) mustBe true
+          contentAsString(result).contains(secondContactEmail) mustBe true
+          contentAsString(result).contains(secondContactPhone) mustBe false
+        }
+      }
+
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+    "onSubmit" - {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      "must redirect to RegistrationConfirmationPage for Individual with Id" in {
+        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(NO_CONTENT)))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad.url)
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
 
-        val result = route(application, request).value
+        val application = applicationBuilder(Option(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to RegistrationConfirmationPage for Business with Id" in {
+        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(NO_CONTENT)))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Organisation)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must return ThereIsAProblemPage for Business with Id when tax enrolment fails" in {
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(UnableToCreateEnrolmentError)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any())).thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+          status(result) mustEqual INTERNAL_SERVER_ERROR
+        }
+      }
+
+      "must redirect to RegistrationConfirmationPage for Individual without Id" in {
+        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(NO_CONTENT)))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
+          .set(IndDoYouHaveNINumberPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(Option(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to RegistrationConfirmationPage for Business without Id" in {
+
+        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(NO_CONTENT)))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
+          .set(IndDoYouHaveNINumberPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(Option(userAnswers), AffinityGroup.Organisation)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to MissingInformationPage when information is missing" in {
+
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Left(MandatoryInformationMissingError())))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application = applicationBuilder(Option(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.InformationMissingController.onPageLoad().url
+        }
+      }
+
+      "must redirect to IndividualAlreadyRegisteredPage when there is EnrolmentExistsError and Affinity Group is Individual" in {
+
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(EnrolmentExistsError(GroupIds(Seq(UserAnswersId), Seq.empty)))))
+
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
+
+        val application = applicationBuilder(Option(userAnswers), AffinityGroup.Individual)
+          .overrides(
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
+            bind[Navigator].toInstance(fakeNavigator),
+            bind[AddressLookupConnector].toInstance(mockAddressLookupConnector)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url
+        }
+      }
+
+      "must redirect to BusinessAlreadyRegisteredPage when there is EnrolmentExistsError" in {
+
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(EnrolmentExistsError(GroupIds(Seq(UserAnswersId), Seq.empty)))))
+
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
+
+        val application = applicationBuilder(Option(userAnswers), AffinityGroup.Organisation)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.routes.PreRegisteredController.onPageLoad(withId = false).url
+        }
+      }
+
+      "must redirect to BusinessAlreadyRegisteredPage when EnrolmentExistsError occurs in registration with Id" in {
+
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(EnrolmentExistsError(GroupIds(Seq(UserAnswersId), Seq.empty)))))
+
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .success
+          .value
+          .set(RegistrationInfoPage, IndRegistrationInfo(safeId))
+          .success
+          .value
+
+        val application = applicationBuilder(Option(userAnswers), AffinityGroup.Organisation)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.routes.PreRegisteredController.onPageLoad(withId = true).url
+        }
+      }
+
+      "must return ThereIsAProblemPage when subscription creation fails with UnableToCreateEMTPSubscriptionError" in {
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(UnableToCreateEMTPSubscriptionError)))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
+
+        val application = applicationBuilder(Option(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[ThereIsAProblemView]
+
+          status(result) mustEqual INTERNAL_SERVER_ERROR
+          contentAsString(result) mustEqual view()(request, messages).toString
+        }
+      }
+
+      "must return ThereIsAProblemPage when subscription creation fails with ServiceUnavailableError" in {
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(ServiceUnavailableError)))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val userAnswers = emptyUserAnswers
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
+          .set(IndDoYouHaveNINumberPage, true)
+          .success
+          .value
+
+        val application = applicationBuilder(Option(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[ThereIsAProblemView]
+
+          status(result) mustEqual SERVICE_UNAVAILABLE
+          contentAsString(result) mustEqual view()(request, messages).toString
+        }
+      }
+
+      "must redirect to InformationMissingPage if both individual and organisation are not present" in {
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(UnableToCreateEMTPSubscriptionError)))
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.successful(true))
+        when(mockRegistrationService.registerWithoutId()(any(), any())).thenReturn(Future.successful(Left(MandatoryInformationMissingError())))
+
+        val application = applicationBuilder(Option(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual controllers.routes.InformationMissingController.onPageLoad().url
+        }
       }
     }
   }

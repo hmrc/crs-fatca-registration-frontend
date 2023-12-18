@@ -17,12 +17,12 @@
 package viewmodels.checkAnswers
 
 import java.time.format.DateTimeFormatter
-
 import controllers.individual.routes
 import models.{CheckMode, UserAnswers}
 import pages.IndDateOfBirthPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -37,8 +37,7 @@ object IndDateOfBirthSummary {
           key = "indDateOfBirth.checkYourAnswersLabel",
           value = ValueViewModel(answer.format(dateFormatter)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.IndDateOfBirthController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("indDateOfBirth.change.hidden"))
+            changeAction("indDateOfBirth", routes.IndDateOfBirthController.onPageLoad(CheckMode).url)
           )
         )
     }

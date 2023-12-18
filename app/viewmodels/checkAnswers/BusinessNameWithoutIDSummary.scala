@@ -22,6 +22,7 @@ import pages.BusinessNameWithoutIDPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -34,8 +35,10 @@ object BusinessNameWithoutIDSummary {
           key = "businessNameWithoutID.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.BusinessNameWithoutIDController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("businessNameWithoutID.change.hidden"))
+            changeAction(
+              "businessNameWithoutID",
+              routes.BusinessNameWithoutIDController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

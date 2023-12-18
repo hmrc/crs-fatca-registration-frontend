@@ -22,6 +22,7 @@ import pages.ContactEmailPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -34,8 +35,7 @@ object ContactEmailSummary {
           key = "contactEmail.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ContactEmailController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("contactEmail.change.hidden"))
+            changeAction("contactEmail", routes.ContactEmailController.onPageLoad(CheckMode).url)
           )
         )
     }

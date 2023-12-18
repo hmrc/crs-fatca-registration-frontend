@@ -16,30 +16,29 @@
 
 package viewmodels.checkAnswers
 
+import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.IndWhatIsYourNamePage
+import pages.DoYouHaveUniqueTaxPayerReferencePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object IndWhatIsYourNameSummary {
+object DoYouHaveUniqueTaxPayerReferenceSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndWhatIsYourNamePage).map {
+    answers.get(DoYouHaveUniqueTaxPayerReferencePage).map {
       answer =>
-        val value = HtmlFormat.escape(answer.firstName).toString + " " + HtmlFormat.escape(answer.lastName).toString
+        val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key = "indWhatIsYourName.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlContent(value)),
+          key = s"$DoYouHaveUniqueTaxPayerReferencePage.checkYourAnswersLabel",
+          value = ValueViewModel(value),
           actions = Seq(
             changeAction(
-              "indWhatIsYourName",
-              controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(CheckMode).url
+              DoYouHaveUniqueTaxPayerReferencePage.toString,
+              routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode).url
             )
           )
         )
