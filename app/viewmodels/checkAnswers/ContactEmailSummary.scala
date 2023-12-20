@@ -32,10 +32,10 @@ object ContactEmailSummary {
     answers.get(ContactEmailPage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "contactEmail.checkYourAnswersLabel",
+          key = s"$ContactEmailPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            changeAction("contactEmail", routes.ContactEmailController.onPageLoad(CheckMode).url)
+            changeAction(ContactEmailPage.toString, routes.ContactEmailController.onPageLoad(CheckMode).url)
           )
         )
     }

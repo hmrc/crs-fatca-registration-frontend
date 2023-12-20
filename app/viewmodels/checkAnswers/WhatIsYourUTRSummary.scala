@@ -32,11 +32,11 @@ object WhatIsYourUTRSummary {
     answers.get(WhatIsYourUTRPage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "whatIsYourUTR.checkYourAnswersLabel",
+          key = s"$WhatIsYourUTRPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer.uniqueTaxPayerReference).toString),
           actions = Seq(
             changeAction(
-              "whatIsYourUTR",
+              WhatIsYourUTRPage.toString,
               routes.WhatIsYourUTRController.onPageLoad(CheckMode).url
             )
           )

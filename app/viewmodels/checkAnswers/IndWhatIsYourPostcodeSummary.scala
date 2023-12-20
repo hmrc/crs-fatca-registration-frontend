@@ -32,11 +32,11 @@ object IndWhatIsYourPostcodeSummary {
     answers.get(IndWhatIsYourPostcodePage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "indWhatIsYourPostcode.checkYourAnswersLabel",
+          key = s"$IndWhatIsYourPostcodePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             changeAction(
-              "indWhatIsYourPostcode",
+              IndWhatIsYourPostcodePage.toString,
               routes.IndWhatIsYourPostcodeController.onPageLoad(CheckMode).url
             )
           )

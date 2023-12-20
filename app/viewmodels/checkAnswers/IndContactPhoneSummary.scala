@@ -29,13 +29,13 @@ import viewmodels.implicits._
 object IndContactPhoneSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndContactPhonePage).orElse(Option("Not provided")).map {
+    answers.get(IndContactPhonePage).orElse(Some("Not provided")).map {
       answer =>
         SummaryListRowViewModel(
-          key = "indContactPhone.checkYourAnswersLabel",
+          key = s"$IndContactPhonePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            changeAction("indContactPhone", routes.IndContactHavePhoneController.onPageLoad(CheckMode).url)
+            changeAction(IndContactPhonePage.toString, routes.IndContactHavePhoneController.onPageLoad(CheckMode).url)
           )
         )
     }

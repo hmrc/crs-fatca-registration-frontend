@@ -32,11 +32,11 @@ object BusinessTradingNameWithoutIDSummary {
     answers.get(BusinessTradingNameWithoutIDPage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "businessTradingNameWithoutID.checkYourAnswersLabel",
+          key = s"$BusinessTradingNameWithoutIDPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             changeAction(
-              "businessTradingNameWithoutID",
+              BusinessTradingNameWithoutIDPage.toString,
               routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode).url
             )
           )

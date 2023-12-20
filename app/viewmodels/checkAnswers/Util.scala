@@ -35,6 +35,8 @@ object Util {
       href = href
     )
 
+  def yesOrNo(answer: Boolean): String = if (answer) "site.yes" else "site.no"
+
   def formatAddress(answer: Address): Value =
     Value(HtmlContent(s"""
         ${answer.addressLine1}<br>

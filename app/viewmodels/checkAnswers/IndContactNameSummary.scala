@@ -35,10 +35,10 @@ object IndContactNameSummary {
         val value = HtmlFormat.escape(answer.firstName).toString + " " + HtmlFormat.escape(answer.lastName).toString
 
         SummaryListRowViewModel(
-          key = "indContactName.checkYourAnswersLabel",
+          key = s"$IndContactNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            changeAction("indContactName", routes.IndContactNameController.onPageLoad(CheckMode).url)
+            changeAction(IndContactNamePage.toString, routes.IndContactNameController.onPageLoad(CheckMode).url)
           )
         )
     }

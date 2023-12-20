@@ -31,14 +31,14 @@ object SecondContactPhoneSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(pages.SecondContactHavePhonePage).flatMap {
       _ =>
-        answers.get(SecondContactPhonePage).orElse(Option("Not provided")).map {
+        answers.get(SecondContactPhonePage).orElse(Some("Not provided")).map {
           answer =>
             SummaryListRowViewModel(
-              key = "secondContactPhone.checkYourAnswersLabel",
+              key = s"$SecondContactPhonePage.checkYourAnswersLabel",
               value = ValueViewModel(HtmlFormat.escape(answer).toString),
               actions = Seq(
                 changeAction(
-                  "secondContactPhone",
+                  SecondContactPhonePage.toString,
                   routes.SecondContactHavePhoneController.onPageLoad(CheckMode).url
                 )
               )

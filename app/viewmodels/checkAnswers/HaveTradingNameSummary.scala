@@ -21,7 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.HaveTradingNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.Util.changeAction
+import viewmodels.checkAnswers.Util.{changeAction, yesOrNo}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -30,13 +30,11 @@ object HaveTradingNameSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(HaveTradingNamePage).map {
       answer =>
-        val value = if (answer) "site.yes" else "site.no"
-
         SummaryListRowViewModel(
-          key = "haveTradingName.checkYourAnswersLabel",
-          value = ValueViewModel(value),
+          key = s"$HaveTradingNamePage.checkYourAnswersLabel",
+          value = ValueViewModel(yesOrNo(answer)),
           actions = Seq(
-            changeAction("haveTradingName", routes.HaveTradingNameController.onPageLoad(CheckMode).url)
+            changeAction(HaveTradingNamePage.toString, routes.HaveTradingNameController.onPageLoad(CheckMode).url)
           )
         )
     }

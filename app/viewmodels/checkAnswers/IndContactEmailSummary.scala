@@ -32,10 +32,10 @@ object IndContactEmailSummary {
     answers.get(IndContactEmailPage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "indContactEmail.checkYourAnswersLabel",
+          key = s"$IndContactEmailPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            changeAction("indContactEmail", routes.IndContactEmailController.onPageLoad(CheckMode).url)
+            changeAction(IndContactEmailPage.toString, routes.IndContactEmailController.onPageLoad(CheckMode).url)
           )
         )
     }

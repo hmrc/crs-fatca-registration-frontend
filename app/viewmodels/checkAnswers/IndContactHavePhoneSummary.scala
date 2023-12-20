@@ -20,10 +20,8 @@ import controllers.individual.routes
 import models.{CheckMode, UserAnswers}
 import pages.IndContactHavePhonePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.Util.changeAction
+import viewmodels.checkAnswers.Util.{changeAction, yesOrNo}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -32,17 +30,11 @@ object IndContactHavePhoneSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndContactHavePhonePage).map {
       answer =>
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"indContactHavePhone.$answer"))
-          )
-        )
-
         SummaryListRowViewModel(
-          key = "indContactHavePhone.checkYourAnswersLabel",
-          value = value,
+          key = s"$IndContactHavePhonePage.checkYourAnswersLabel",
+          value = ValueViewModel(yesOrNo(answer)),
           actions = Seq(
-            changeAction("indContactHavePhone", routes.IndContactHavePhoneController.onPageLoad(CheckMode).url)
+            changeAction(IndContactHavePhonePage.toString, routes.IndContactHavePhoneController.onPageLoad(CheckMode).url)
           )
         )
     }

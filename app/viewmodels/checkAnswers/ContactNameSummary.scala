@@ -32,10 +32,10 @@ object ContactNameSummary {
     answers.get(ContactNamePage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "contactName.checkYourAnswersLabel",
+          key = s"$ContactNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            changeAction("contactName", routes.ContactNameController.onPageLoad(CheckMode).url)
+            changeAction(ContactNamePage.toString, routes.ContactNameController.onPageLoad(CheckMode).url)
           )
         )
     }

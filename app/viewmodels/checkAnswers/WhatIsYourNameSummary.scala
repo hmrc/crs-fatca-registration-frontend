@@ -32,11 +32,11 @@ object WhatIsYourNameSummary {
     answers.get(WhatIsYourNamePage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "whatIsYourName.checkYourAnswersLabel",
+          key = s"$WhatIsYourNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer.toString).toString),
           actions = Seq(
             changeAction(
-              "whatIsYourName",
+              WhatIsYourNamePage.toString,
               routes.WhatIsYourNameController.onPageLoad(CheckMode).url
             )
           )

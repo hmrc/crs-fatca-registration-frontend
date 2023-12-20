@@ -21,7 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.HaveSecondContactPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.Util.changeAction
+import viewmodels.checkAnswers.Util.{changeAction, yesOrNo}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -30,13 +30,11 @@ object HaveSecondContactSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(HaveSecondContactPage).map {
       answer =>
-        val value = if (answer) "site.yes" else "site.no"
-
         SummaryListRowViewModel(
-          key = "haveSecondContact.checkYourAnswersLabel",
-          value = ValueViewModel(value),
+          key = s"$HaveSecondContactPage.checkYourAnswersLabel",
+          value = ValueViewModel(yesOrNo(answer)),
           actions = Seq(
-            changeAction("haveSecondContact", routes.HaveSecondContactController.onPageLoad(CheckMode).url)
+            changeAction(HaveSecondContactPage.toString, routes.HaveSecondContactController.onPageLoad(CheckMode).url)
           )
         )
     }

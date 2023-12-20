@@ -34,15 +34,15 @@ object ReporterTypeSummary {
       answer =>
         val value = ValueViewModel(
           HtmlContent(
-            HtmlFormat.escape(messages(s"reporterType.$answer"))
+            HtmlFormat.escape(messages(s"$ReporterTypePage.$answer"))
           )
         )
 
         SummaryListRowViewModel(
-          key = "reporterType.checkYourAnswersLabel",
+          key = s"$ReporterTypePage.checkYourAnswersLabel",
           value = value,
           actions = Seq(
-            changeAction("reporterType", routes.ReporterTypeController.onPageLoad(CheckMode).url)
+            changeAction(ReporterTypePage.toString, routes.ReporterTypeController.onPageLoad(CheckMode).url)
           )
         )
     }

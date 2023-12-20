@@ -32,11 +32,11 @@ object SecondContactEmailSummary {
     answers.get(SecondContactEmailPage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "secondContactEmail.checkYourAnswersLabel",
+          key = s"$SecondContactEmailPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             changeAction(
-              "secondContactEmail",
+              SecondContactEmailPage.toString,
               routes.SecondContactEmailController.onPageLoad(CheckMode).url
             )
           )

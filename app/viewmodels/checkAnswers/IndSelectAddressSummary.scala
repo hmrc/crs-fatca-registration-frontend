@@ -38,11 +38,11 @@ object IndSelectAddressSummary {
         )
 
         SummaryListRowViewModel(
-          key = "indSelectAddress.checkYourAnswersLabel",
+          key = s"$IndSelectAddressPage.checkYourAnswersLabel",
           value = value,
           actions = Seq(
             changeAction(
-              "indSelectAddress",
+              IndSelectAddressPage.toString,
               controllers.individual.routes.IndSelectAddressController.onPageLoad(CheckMode).url
             )
           )

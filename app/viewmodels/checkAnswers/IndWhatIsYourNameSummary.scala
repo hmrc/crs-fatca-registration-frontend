@@ -34,11 +34,11 @@ object IndWhatIsYourNameSummary {
         val value = HtmlFormat.escape(answer.firstName).toString + " " + HtmlFormat.escape(answer.lastName).toString
 
         SummaryListRowViewModel(
-          key = "indWhatIsYourName.checkYourAnswersLabel",
+          key = s"$IndWhatIsYourNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             changeAction(
-              "indWhatIsYourName",
+              IndWhatIsYourNamePage.toString,
               controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(CheckMode).url
             )
           )

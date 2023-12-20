@@ -32,11 +32,11 @@ object SecondContactNameSummary {
     answers.get(SecondContactNamePage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "secondContactName.checkYourAnswersLabel",
+          key = s"$SecondContactNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             changeAction(
-              "secondContactName",
+              SecondContactNamePage.toString,
               routes.SecondContactNameController.onPageLoad(CheckMode).url
             )
           )

@@ -34,10 +34,10 @@ object IndDateOfBirthWithoutIdSummary {
       answer =>
         val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
         SummaryListRowViewModel(
-          key = "dateOfBirthWithoutId.checkYourAnswersLabel",
+          key = s"$DateOfBirthWithoutIdPage.checkYourAnswersLabel",
           value = ValueViewModel(answer.format(dateFormatter)),
           actions = Seq(
-            changeAction("dateOfBirthWithoutId", routes.IndDateOfBirthWithoutIdController.onPageLoad(CheckMode).url)
+            changeAction(DateOfBirthWithoutIdPage.toString, routes.IndDateOfBirthWithoutIdController.onPageLoad(CheckMode).url)
           )
         )
     }
