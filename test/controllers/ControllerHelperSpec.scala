@@ -55,15 +55,9 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
   val subscriptionId: SubscriptionID = SubscriptionID("ABC123")
 
   val userAnswers: UserAnswers = emptyUserAnswers
-    .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-    .success
-    .value
-    .set(ContactNamePage, "")
-    .success
-    .value
-    .set(ContactEmailPage, TestEmail)
-    .success
-    .value
+    .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+    .withPage(ContactNamePage, "")
+    .withPage(ContactEmailPage, TestEmail)
 
   "ControllerHelper" - {
     "updateSubscriptionIdAndCreateEnrolment update the subscription ID in user answers and create an enrolment" in {
@@ -104,9 +98,7 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       val affinityGroup: AffinityGroup = AffinityGroup.Organisation
       val addressResponse              = AddressResponse("line1", None, None, None, None, "UK")
       val userAnswers2 = userAnswers
-        .set(RegistrationInfoPage, OrgRegistrationInfo(safeId, name = "", address = addressResponse))
-        .success
-        .value
+        .withPage(RegistrationInfoPage, OrgRegistrationInfo(safeId, name = "", address = addressResponse))
       val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers2)
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))

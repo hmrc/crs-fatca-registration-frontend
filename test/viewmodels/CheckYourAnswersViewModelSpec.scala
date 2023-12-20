@@ -44,48 +44,20 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
     "must return required rows for 'business-with-id' flow" in {
       val userAnswers = emptyUserAnswers
-        .set(ReporterTypePage, ReporterType.LimitedCompany)
-        .success
-        .value
-        .set(RegisteredAddressInUKPage, true)
-        .success
-        .value
-        .set(WhatIsYourUTRPage, utr)
-        .success
-        .value
-        .set(BusinessNamePage, OrgName)
-        .success
-        .value
-        .set(RegistrationInfoPage, orgRegistrationInfo)
-        .success
-        .value
-        .set(IsThisYourBusinessPage, true)
-        .success
-        .value
-        .set(ContactNamePage, name.fullName)
-        .success
-        .value
-        .set(ContactEmailPage, TestEmail)
-        .success
-        .value
-        .set(ContactHavePhonePage, false)
-        .success
-        .value
-        .set(HaveSecondContactPage, true)
-        .success
-        .value
-        .set(SecondContactNamePage, TestPhoneNumber)
-        .success
-        .value
-        .set(SecondContactEmailPage, TestEmail)
-        .success
-        .value
-        .set(SecondContactHavePhonePage, true)
-        .success
-        .value
-        .set(SecondContactPhonePage, TestMobilePhoneNumber)
-        .success
-        .value
+        .withPage(ReporterTypePage, ReporterType.LimitedCompany)
+        .withPage(RegisteredAddressInUKPage, true)
+        .withPage(WhatIsYourUTRPage, utr)
+        .withPage(BusinessNamePage, OrgName)
+        .withPage(RegistrationInfoPage, orgRegistrationInfo)
+        .withPage(IsThisYourBusinessPage, true)
+        .withPage(ContactNamePage, name.fullName)
+        .withPage(ContactEmailPage, TestEmail)
+        .withPage(ContactHavePhonePage, false)
+        .withPage(HaveSecondContactPage, true)
+        .withPage(SecondContactNamePage, TestPhoneNumber)
+        .withPage(SecondContactEmailPage, TestEmail)
+        .withPage(SecondContactHavePhonePage, true)
+        .withPage(SecondContactPhonePage, TestMobilePhoneNumber)
 
       val result: Seq[Section] = CheckYourAnswersViewModel.buildPages(userAnswers, countryListFactory, isBusiness = true)
 
@@ -103,39 +75,17 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
     "must return required rows for 'business-without-id' flow" in {
       val businessAddress = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
       val userAnswers = emptyUserAnswers
-        .set(ReporterTypePage, ReporterType.LimitedCompany)
-        .success
-        .value
-        .set(RegisteredAddressInUKPage, false)
-        .success
-        .value
-        .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-        .success
-        .value
-        .set(BusinessNameWithoutIDPage, OrgName)
-        .success
-        .value
-        .set(HaveTradingNamePage, true)
-        .success
-        .value
-        .set(BusinessTradingNameWithoutIDPage, OrgName)
-        .success
-        .value
-        .set(NonUKBusinessAddressWithoutIDPage, businessAddress)
-        .success
-        .value
-        .set(ContactNamePage, name.fullName)
-        .success
-        .value
-        .set(ContactEmailPage, TestEmail)
-        .success
-        .value
-        .set(ContactHavePhonePage, false)
-        .success
-        .value
-        .set(HaveSecondContactPage, false)
-        .success
-        .value
+        .withPage(ReporterTypePage, ReporterType.LimitedCompany)
+        .withPage(RegisteredAddressInUKPage, false)
+        .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+        .withPage(BusinessNameWithoutIDPage, OrgName)
+        .withPage(HaveTradingNamePage, true)
+        .withPage(BusinessTradingNameWithoutIDPage, OrgName)
+        .withPage(NonUKBusinessAddressWithoutIDPage, businessAddress)
+        .withPage(ContactNamePage, name.fullName)
+        .withPage(ContactEmailPage, TestEmail)
+        .withPage(ContactHavePhonePage, false)
+        .withPage(HaveSecondContactPage, false)
 
       val result: Seq[Section] = CheckYourAnswersViewModel.buildPages(userAnswers, countryListFactory, isBusiness = true)
 
@@ -152,27 +102,13 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
     "must return required rows for 'individual-with-id' flow" in {
       val userAnswers = emptyUserAnswers
-        .set(ReporterTypePage, ReporterType.Individual)
-        .success
-        .value
-        .set(IndDoYouHaveNINumberPage, true)
-        .success
-        .value
-        .set(IndWhatIsYourNINumberPage, Nino(TestNiNumber))
-        .success
-        .value
-        .set(WhatIsYourNamePage, name)
-        .success
-        .value
-        .set(IndDateOfBirthPage, LocalDate.now())
-        .success
-        .value
-        .set(IndContactEmailPage, TestEmail)
-        .success
-        .value
-        .set(IndContactHavePhonePage, false)
-        .success
-        .value
+        .withPage(ReporterTypePage, ReporterType.Individual)
+        .withPage(IndDoYouHaveNINumberPage, true)
+        .withPage(IndWhatIsYourNINumberPage, Nino(TestNiNumber))
+        .withPage(WhatIsYourNamePage, name)
+        .withPage(IndDateOfBirthPage, LocalDate.now())
+        .withPage(IndContactEmailPage, TestEmail)
+        .withPage(IndContactHavePhonePage, false)
 
       val result: Seq[Section] = CheckYourAnswersViewModel.buildPages(userAnswers, countryListFactory, isBusiness = false)
 
@@ -189,30 +125,14 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
     "must return required rows for 'individual-without-id' flow" in {
       val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
       val userAnswers = emptyUserAnswers
-        .set(ReporterTypePage, ReporterType.Individual)
-        .success
-        .value
-        .set(IndDoYouHaveNINumberPage, false)
-        .success
-        .value
-        .set(IndWhatIsYourNamePage, name)
-        .success
-        .value
-        .set(IndDateOfBirthPage, LocalDate.now())
-        .success
-        .value
-        .set(IndWhereDoYouLivePage, false)
-        .success
-        .value
-        .set(IndNonUKAddressWithoutIdPage, address)
-        .success
-        .value
-        .set(IndContactEmailPage, TestEmail)
-        .success
-        .value
-        .set(IndContactHavePhonePage, false)
-        .success
-        .value
+        .withPage(ReporterTypePage, ReporterType.Individual)
+        .withPage(IndDoYouHaveNINumberPage, false)
+        .withPage(IndWhatIsYourNamePage, name)
+        .withPage(IndDateOfBirthPage, LocalDate.now())
+        .withPage(IndWhereDoYouLivePage, false)
+        .withPage(IndNonUKAddressWithoutIdPage, address)
+        .withPage(IndContactEmailPage, TestEmail)
+        .withPage(IndContactHavePhonePage, false)
 
       val result: Seq[Section] = CheckYourAnswersViewModel.buildPages(userAnswers, countryListFactory, isBusiness = false)
 

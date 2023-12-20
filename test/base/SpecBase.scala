@@ -27,11 +27,12 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.{BeforeAndAfterEach, OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import pages.QuestionPage
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Call, PlayBodyParsers}
 import play.api.test.FakeRequest
 import repositories.SessionRepository
@@ -94,6 +95,13 @@ trait SpecBase
         bind[DataRetrievalAction].toInstance(mockDataRetrievalAction),
         bind[SessionRepository].toInstance(mockSessionRepository)
       )
+  }
+
+  implicit class UserAnswersExtension(userAnswers: UserAnswers) {
+
+    def withPage[T](page: QuestionPage[T], value: T)(implicit writes: Writes[T]): UserAnswers =
+      userAnswers.set(page, value).success.value
+
   }
 
 }
