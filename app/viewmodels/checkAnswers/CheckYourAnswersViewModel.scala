@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import models.{ReporterType, UserAnswers}
 import models.subscription.request.ContactInformation.isRegisteringAsBusiness
-import pages.ReporterTypePage
+import pages.{AutoMatchedUTRPage, ReporterTypePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -33,11 +33,13 @@ object CheckYourAnswersViewModel {
 
     val isBusiness = isRegisteringAsBusiness(userAnswers)
     val helper     = new CheckYourAnswersHelper(userAnswers, countryListFactory = countryFactory)
-    val (contact, header) = userAnswers.get(ReporterTypePage) match {
-      case Some(ReporterType.Individual) => ("contactDetails", "individualDetails")
-      case Some(ReporterType.Sole)       => ("contactDetails", "businessDetails")
-      case Some(_)                       => ("firstContact", "businessDetails")
-      case None                          => throw new Exception("ReporterType must not be empty at check your answers page")
+    val (contact, header) = (userAnswers.get(ReporterTypePage), userAnswers.get(AutoMatchedUTRPage)) match {
+      case (Some(ReporterType.Individual), _) => ("contactDetails", "individualDetails")
+      case (Some(ReporterType.Sole), _)       => ("contactDetails", "businessDetails")
+      case (Some(_), _)                       => ("firstContact", "businessDetails")
+      case (None, Some(_))                    => ("firstContact", "businessDetails")
+      case (None, None) =>
+        throw new Exception("ReporterType and AutoMatchedUTR must not both be empty at check your answers page")
     }
 
     val regDetails     = messages(s"checkYourAnswers.$header.h2")

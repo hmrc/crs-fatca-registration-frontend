@@ -21,6 +21,7 @@ import helpers.JsonFixtures._
 import models.matching.OrgRegistrationInfo
 import models.register.response.details.AddressResponse
 import models.{Address, Country, ReporterType}
+import models.UniqueTaxpayerReference.format
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages._
@@ -97,6 +98,33 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
 
           result.size mustBe 3
           result.head.rows.size mustBe 6
+          result.head.sectionName mustBe "Business details"
+
+          result(1).sectionName mustBe "First contact"
+          result(1).rows.size mustBe 3
+
+          result(2).sectionName mustBe "Second contact"
+          result(2).rows.size mustBe 1
+        }
+
+        s"must return required rows for auto-matched business with $affinityGroup affinity group" in {
+          val addressResponse = AddressResponse("address line 1", None, None, None, None, Address.GBCountryCode)
+          val userAnswers = emptyUserAnswers
+            .withPage(AutoMatchedUTRPage, utr)
+            .withPage(WhatIsYourUTRPage, utr)
+            .withPage(RegisteredAddressInUKPage, false)
+            .withPage(RegistrationInfoPage, OrgRegistrationInfo(safeId, OrgName, addressResponse))
+            .withPage(IsThisYourBusinessPage, true)
+            .withPage(ContactNamePage, name.fullName)
+            .withPage(ContactEmailPage, TestEmail)
+            .withPage(ContactHavePhonePage, false)
+            .withPage(HaveSecondContactPage, false)
+
+          val result: Seq[Section] = CheckYourAnswersViewModel
+            .buildPages(userAnswers, countryListFactory, affinityGroup)
+
+          result.size mustBe 3
+          result.head.rows.size mustBe 1
           result.head.sectionName mustBe "Business details"
 
           result(1).sectionName mustBe "First contact"
