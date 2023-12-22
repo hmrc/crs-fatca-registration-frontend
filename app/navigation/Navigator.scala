@@ -69,7 +69,7 @@ class Navigator @Inject() () extends Logging {
           userAnswers,
           ContactHavePhonePage,
           controllers.organisation.routes.ContactPhoneController.onPageLoad(NormalMode),
-          controllers.routes.CheckYourAnswersController.onPageLoad
+          controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode)
         )
     case ContactPhonePage => _ => controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode)
     // org second contact details pages

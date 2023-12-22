@@ -22,16 +22,18 @@ import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ContactNamePage, HaveSecondContactPage}
+import pages.ContactNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.organisation.HaveSecondContactView
 
 import scala.concurrent.Future
 
-class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar {
+class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with TableDrivenPropertyChecks {
 
   lazy val haveSecondContactRoute = controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode).url
 
@@ -42,43 +44,38 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar {
 
   "HaveSecondContact Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    forAll(Table("nonIndividualAffinityGroup", Seq(AffinityGroup.Organisation, AffinityGroup.Agent): _*)) {
+      affinityGroup =>
+        s"must return OK and the correct view for a GET when affinity group is $affinityGroup" in {
 
-      val application = applicationBuilder(userAnswers = Some(UserAnswers(userAnswersId).set(ContactNamePage, contactName).success.value)).build()
+          val userAnswers = emptyUserAnswers.withPage(ContactNamePage, contactName)
+          val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup).build()
 
-      running(application) {
-        val request = FakeRequest(GET, haveSecondContactRoute)
+          running(application) {
+            val request = FakeRequest(GET, haveSecondContactRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[HaveSecondContactView]
+            val view = application.injector.instanceOf[HaveSecondContactView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, contactName, NormalMode)(request, messages(application)).toString
-      }
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, contactName, NormalMode)(request, messages(application)).toString
+          }
+        }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must redirect to CheckYourAnswersPage for a GET when affinity group is Individual" in {
 
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(HaveSecondContactPage, true)
-        .success
-        .value
-        .set(ContactNamePage, contactName)
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val userAnswers = emptyUserAnswers.withPage(ContactNamePage, contactName)
+      val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Individual).build()
 
       running(application) {
         val request = FakeRequest(GET, haveSecondContactRoute)
 
-        val view = application.injector.instanceOf[HaveSecondContactView]
-
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), contactName, NormalMode)(request, messages(application)).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 

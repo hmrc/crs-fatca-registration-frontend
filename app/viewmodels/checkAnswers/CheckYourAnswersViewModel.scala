@@ -16,29 +16,42 @@
 
 package viewmodels.checkAnswers
 
-import models.UserAnswers
+import models.{ReporterType, UserAnswers}
+import models.subscription.request.ContactInformation.isRegisteringAsBusiness
+import pages.ReporterTypePage
 import play.api.i18n.Messages
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import utils.{CheckYourAnswersHelper, CountryListFactory}
 import viewmodels.Section
 
 object CheckYourAnswersViewModel {
 
-  def buildPages(userAnswers: UserAnswers, countryFactory: CountryListFactory, isBusiness: Boolean)(implicit
+  def buildPages(userAnswers: UserAnswers, countryFactory: CountryListFactory, affinityGroup: AffinityGroup)(implicit
     messages: Messages
   ): Seq[Section] = {
 
-    val helper            = new CheckYourAnswersHelper(userAnswers, countryListFactory = countryFactory)
-    val (contact, header) = if (isBusiness) ("firstContact", "businessDetails") else ("contactDetails", "individualDetails")
+    val isBusiness = isRegisteringAsBusiness(userAnswers)
+    val helper     = new CheckYourAnswersHelper(userAnswers, countryListFactory = countryFactory)
+    val (contact, header) = userAnswers.get(ReporterTypePage) match {
+      case Some(ReporterType.Individual) => ("contactDetails", "individualDetails")
+      case Some(ReporterType.Sole)       => ("contactDetails", "businessDetails")
+      case Some(_)                       => ("firstContact", "businessDetails")
+      case None                          => throw new Exception("ReporterType must not be empty at check your answers page")
+    }
 
     val regDetails     = messages(s"checkYourAnswers.$header.h2")
     val contactHeading = messages(s"checkYourAnswers.$contact.h2")
-    val secContact     = if (isBusiness) Seq(Section(messages("checkYourAnswers.secondContact.h2"), buildSecondContact(helper))) else Nil
+    val secondContact = if (isBusiness && affinityGroup != AffinityGroup.Individual) {
+      Seq(Section(messages("checkYourAnswers.secondContact.h2"), buildSecondContact(helper)))
+    } else {
+      Nil
+    }
 
     Seq(
       Section(regDetails, buildDetails(userAnswers, helper, isBusiness)),
       Section(contactHeading, buildFirstContact(helper, isBusiness))
-    ) ++: secContact
+    ) ++: secondContact
   }
 
   private def buildDetails(userAnswers: UserAnswers, helper: CheckYourAnswersHelper, isBusiness: Boolean): Seq[SummaryListRow] =

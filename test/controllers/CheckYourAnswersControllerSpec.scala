@@ -22,11 +22,12 @@ import helpers.JsonFixtures._
 import models.enrolment.GroupIds
 import models.error.ApiError._
 import models.matching.IndRegistrationInfo
-import models.{Address, Country, SubscriptionID, UserAnswers}
+import models.{Address, Country, ReporterType, SubscriptionID, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{reset, when}
 import org.scalatest.BeforeAndAfterEach
+import org.scalatest.prop.TableDrivenPropertyChecks
 import pages._
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -37,7 +38,7 @@ import views.html.ThereIsAProblemView
 
 import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach {
+class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach with TableDrivenPropertyChecks {
 
   final val mockRegistrationService: BusinessMatchingWithoutIdService = mock[BusinessMatchingWithoutIdService]
 
@@ -45,16 +46,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
   lazy val submitRoute: String = routes.CheckYourAnswersController.onSubmit().url
 
   // first contact
-  val firstContactName    = "first-contact-name"
-  val firstContactEmail   = "first-contact-email"
-  val isFirstContactPhone = true
-  val firstContactPhone   = "+44 0000 000 0000"
+  val firstContactName  = "first-contact-name"
+  val firstContactEmail = "first-contact-email"
+  val firstContactPhone = "+44 0000 000 0000"
 
-  // second contact
-  val isSecondContact                               = true
   val secondContactName                             = "second-contact-name"
   val secondContactEmail                            = "second-contact-email"
-  val isSecondContactPhone                          = true
   val secondContactPhone                            = "+44 0808 157 0193"
   val mockSubscriptionService: SubscriptionService  = mock[SubscriptionService]
   val mockTaxEnrolmentsService: TaxEnrolmentService = mock[TaxEnrolmentService]
@@ -69,215 +66,237 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
   "CheckYourAnswers Controller" - {
 
     "onPageLoad" - {
+      "when affinity group is Individual" - {
+        "must return OK and the correct view for a GET when contact has a phone number" in {
+          val userAnswers: UserAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, ReporterType.Individual)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+            .withPage(ContactNamePage, firstContactName)
+            .withPage(ContactEmailPage, firstContactEmail)
+            .withPage(ContactHavePhonePage, true)
+            .withPage(ContactPhonePage, firstContactPhone)
 
-      "must return OK and the correct view for a GET when first Contact has a phone number" in {
-        val userAnswers: UserAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
-          .set(ContactNamePage, firstContactName)
-          .success
-          .value
-          .set(ContactEmailPage, firstContactEmail)
-          .success
-          .value
-          .set(ContactPhonePage, firstContactPhone)
-          .success
-          .value
+          val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Individual)
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SubscriptionService].toInstance(mockSubscriptionService),
+              bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+              bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+            )
+            .build()
 
-        val application = applicationBuilder(userAnswers = Option(userAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SubscriptionService].toInstance(mockSubscriptionService),
-            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
-          )
-          .build()
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
-        running(application) {
-          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
 
-          val result = route(application, request).value
+            status(result) mustEqual OK
+            contentAsString(result).contains(firstContactName) mustBe true
+            contentAsString(result).contains(firstContactEmail) mustBe false
+            contentAsString(result).contains(firstContactPhone) mustBe false
+          }
+        }
 
-          status(result) mustEqual OK
-          contentAsString(result).contains(firstContactName) mustBe true
-          contentAsString(result).contains(firstContactEmail) mustBe true
-          contentAsString(result).contains(firstContactPhone) mustBe true
+        "must redirect to Information sent when UserAnswers is empty" in {
+          val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), AffinityGroup.Individual)
+            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
+          }
+        }
+
+        "must return OK and the correct view for a GET when contact does not have a phone number" in {
+          val userAnswers: UserAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, ReporterType.Individual)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+            .withPage(ContactNamePage, firstContactName)
+            .withPage(ContactEmailPage, firstContactEmail)
+            .withPage(ContactHavePhonePage, false)
+
+          val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Individual)
+            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual OK
+            contentAsString(result).contains(firstContactName) mustBe true
+            contentAsString(result).contains(firstContactEmail) mustBe false
+            contentAsString(result).contains(firstContactPhone) mustBe false
+          }
         }
       }
 
-      "must redirect to Information sent when UserAnswers is empty" in {
-        val application = applicationBuilder(userAnswers = Option(emptyUserAnswers))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-          .build()
+      "when affinity group is not individual" - {
+        forAll(Table("nonIndividualAffinityGroup", Seq(AffinityGroup.Organisation, AffinityGroup.Agent): _*)) {
+          affinityGroup =>
+            s"must return OK and the correct view for a GET when first Contact has a phone number and affinity group $affinityGroup" in {
+              val userAnswers: UserAnswers = emptyUserAnswers
+                .withPage(ReporterTypePage, ReporterType.LimitedCompany)
+                .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+                .withPage(ContactNamePage, firstContactName)
+                .withPage(ContactEmailPage, firstContactEmail)
+                .withPage(ContactPhonePage, firstContactPhone)
 
-        running(application) {
-          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+              val application = applicationBuilder(userAnswers = Option(userAnswers), affinityGroup)
+                .overrides(
+                  bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+                  bind[SubscriptionService].toInstance(mockSubscriptionService),
+                  bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+                  bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+                )
+                .build()
 
-          val result = route(application, request).value
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
-        }
-      }
+                val result = route(application, request).value
 
-      "must return OK and the correct view for a GET when first contact does not have a phone number" in {
-        val userAnswers: UserAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
-          .set(ContactNamePage, firstContactName)
-          .success
-          .value
-          .set(ContactEmailPage, firstContactEmail)
-          .success
-          .value
+                status(result) mustEqual OK
+                contentAsString(result).contains(firstContactName) mustBe true
+                contentAsString(result).contains(firstContactEmail) mustBe true
+                contentAsString(result).contains(firstContactPhone) mustBe true
+              }
+            }
 
-        val application = applicationBuilder(userAnswers = Option(userAnswers))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-          .build()
+            s"must redirect to Information sent when UserAnswers is empty and affinity group $affinityGroup" in {
+              val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), affinityGroup)
+                .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+                .build()
 
-        running(application) {
-          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
-          val result = route(application, request).value
+                val result = route(application, request).value
 
-          status(result) mustEqual OK
-          contentAsString(result).contains(firstContactName) mustBe true
-          contentAsString(result).contains(firstContactEmail) mustBe true
-          contentAsString(result).contains(firstContactPhone) mustBe false
-        }
-      }
+                status(result) mustEqual SEE_OTHER
+                redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
+              }
+            }
 
-      "must return OK and the correct view for a GET when there is no second contact" in {
-        val userAnswers: UserAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
-          .set(ContactNamePage, firstContactName)
-          .success
-          .value
-          .set(ContactEmailPage, firstContactEmail)
-          .success
-          .value
-          .set(ContactPhonePage, firstContactPhone)
-          .success
-          .value
-          .set(HaveSecondContactPage, !isSecondContact)
-          .success
-          .value
+            s"must return OK and the correct view for a GET when first contact does not have a phone number and affinity group $affinityGroup" in {
+              val userAnswers: UserAnswers = emptyUserAnswers
+                .withPage(ReporterTypePage, ReporterType.LimitedCompany)
+                .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+                .withPage(ContactNamePage, firstContactName)
+                .withPage(ContactEmailPage, firstContactEmail)
 
-        val application = applicationBuilder(userAnswers = Option(userAnswers))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-          .build()
+              val application = applicationBuilder(userAnswers = Option(userAnswers), affinityGroup)
+                .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+                .build()
 
-        running(application) {
-          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
-          val result = route(application, request).value
+                val result = route(application, request).value
 
-          status(result) mustEqual OK
-          contentAsString(result).contains(firstContactName) mustBe true
-          contentAsString(result).contains(firstContactEmail) mustBe true
-          contentAsString(result).contains(secondContactName) mustBe false
-        }
-      }
+                status(result) mustEqual OK
+                contentAsString(result).contains(firstContactName) mustBe true
+                contentAsString(result).contains(firstContactEmail) mustBe true
+                contentAsString(result).contains(firstContactPhone) mustBe false
+              }
+            }
 
-      "must return OK and the correct view for a GET when the second contact has a phone number" in {
-        val userAnswers: UserAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
-          .set(ContactEmailPage, TestEmail)
-          .success
-          .value
-          .set(ContactNamePage, name.fullName)
-          .success
-          .value
-          .set(ContactHavePhonePage, false)
-          .success
-          .value
-          .set(HaveSecondContactPage, true)
-          .success
-          .value
-          .set(SecondContactNamePage, secondContactName)
-          .success
-          .value
-          .set(SecondContactEmailPage, secondContactEmail)
-          .success
-          .value
-          .set(SecondContactHavePhonePage, true)
-          .success
-          .value
-          .set(SecondContactPhonePage, secondContactPhone)
-          .success
-          .value
+            s"must return OK and the correct view for a GET when there is no second contact and affinity group $affinityGroup" in {
+              val userAnswers: UserAnswers = emptyUserAnswers
+                .withPage(ReporterTypePage, ReporterType.LimitedCompany)
+                .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+                .withPage(ContactNamePage, firstContactName)
+                .withPage(ContactEmailPage, firstContactEmail)
+                .withPage(ContactPhonePage, firstContactPhone)
+                .withPage(HaveSecondContactPage, false)
 
-        val application = applicationBuilder(userAnswers = Option(userAnswers))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-          .build()
+              val application = applicationBuilder(userAnswers = Option(userAnswers), affinityGroup)
+                .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+                .build()
 
-        running(application) {
-          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
-          val result = route(application, request).value
+                val result = route(application, request).value
 
-          status(result) mustEqual OK
-          contentAsString(result).contains(name.fullName) mustBe true
-          contentAsString(result).contains(TestEmail) mustBe true
-          contentAsString(result).contains(secondContactName) mustBe true
-          contentAsString(result).contains(secondContactEmail) mustBe true
-          contentAsString(result).contains(secondContactPhone) mustBe true
-        }
-      }
+                status(result) mustEqual OK
+                contentAsString(result).contains(firstContactName) mustBe true
+                contentAsString(result).contains(firstContactEmail) mustBe true
+                contentAsString(result).contains(secondContactName) mustBe false
+              }
+            }
 
-      "must return OK and the correct view for a GET when the second contact has no phone number" in {
-        val userAnswers: UserAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
-          .set(ContactNamePage, firstContactName)
-          .success
-          .value
-          .set(ContactEmailPage, firstContactEmail)
-          .success
-          .value
-          .set(ContactPhonePage, firstContactPhone)
-          .success
-          .value
-          .set(HaveSecondContactPage, isSecondContact)
-          .success
-          .value
-          .set(SecondContactNamePage, secondContactName)
-          .success
-          .value
-          .set(SecondContactEmailPage, secondContactEmail)
-          .success
-          .value
-          .set(SecondContactHavePhonePage, false)
-          .success
-          .value
+            s"must return OK and the correct view for a GET when the second contact has a phone number and affinity group $affinityGroup" in {
+              val userAnswers: UserAnswers = emptyUserAnswers
+                .withPage(ReporterTypePage, ReporterType.LimitedCompany)
+                .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+                .withPage(ContactEmailPage, TestEmail)
+                .withPage(ContactNamePage, name.fullName)
+                .withPage(ContactHavePhonePage, false)
+                .withPage(HaveSecondContactPage, true)
+                .withPage(SecondContactNamePage, secondContactName)
+                .withPage(SecondContactEmailPage, secondContactEmail)
+                .withPage(SecondContactHavePhonePage, true)
+                .withPage(SecondContactPhonePage, secondContactPhone)
 
-        val application = applicationBuilder(userAnswers = Option(userAnswers))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-          .build()
+              val application = applicationBuilder(userAnswers = Option(userAnswers), affinityGroup)
+                .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+                .build()
 
-        running(application) {
-          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
-          val result = route(application, request).value
+                val result = route(application, request).value
 
-          status(result) mustEqual OK
-          contentAsString(result).contains(firstContactName)
-          contentAsString(result).contains(firstContactEmail)
-          contentAsString(result).mustNot(contain(secondContactName))
+                status(result) mustEqual OK
+                contentAsString(result).contains(name.fullName) mustBe true
+                contentAsString(result).contains(TestEmail) mustBe true
+                contentAsString(result).contains(secondContactName) mustBe true
+                contentAsString(result).contains(secondContactEmail) mustBe true
+                contentAsString(result).contains(secondContactPhone) mustBe true
+              }
+            }
 
-          contentAsString(result).contains(firstContactName) mustBe true
-          contentAsString(result).contains(firstContactEmail) mustBe true
-          contentAsString(result).contains(firstContactPhone) mustBe true
-          contentAsString(result).contains(secondContactName) mustBe true
-          contentAsString(result).contains(secondContactEmail) mustBe true
-          contentAsString(result).contains(secondContactPhone) mustBe false
+            s"must return OK and the correct view for a GET when the second contact has no phone number and affinity group $affinityGroup" in {
+              val userAnswers: UserAnswers = emptyUserAnswers
+                .withPage(ReporterTypePage, ReporterType.LimitedCompany)
+                .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+                .withPage(ContactNamePage, firstContactName)
+                .withPage(ContactEmailPage, firstContactEmail)
+                .withPage(ContactPhonePage, firstContactPhone)
+                .withPage(HaveSecondContactPage, true)
+                .withPage(SecondContactNamePage, secondContactName)
+                .withPage(SecondContactEmailPage, secondContactEmail)
+                .withPage(SecondContactHavePhonePage, false)
+
+              val application = applicationBuilder(userAnswers = Option(userAnswers), affinityGroup)
+                .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+                .build()
+
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+                val result = route(application, request).value
+
+                status(result) mustEqual OK
+                contentAsString(result).contains(firstContactName)
+                contentAsString(result).contains(firstContactEmail)
+                contentAsString(result).mustNot(contain(secondContactName))
+
+                contentAsString(result).contains(firstContactName) mustBe true
+                contentAsString(result).contains(firstContactEmail) mustBe true
+                contentAsString(result).contains(firstContactPhone) mustBe true
+                contentAsString(result).contains(secondContactName) mustBe true
+                contentAsString(result).contains(secondContactEmail) mustBe true
+                contentAsString(result).contains(secondContactPhone) mustBe false
+              }
+            }
         }
       }
 
@@ -295,12 +314,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, true)
-          .success
-          .value
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .withPage(IndDoYouHaveNINumberPage, true)
 
         val application = applicationBuilder(Option(userAnswers))
           .overrides(
@@ -330,10 +345,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           .thenReturn(Future.successful(Right(safeId)))
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-        val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
+        val userAnswers = emptyUserAnswers.withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
 
         val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Organisation)
           .overrides(
@@ -361,10 +373,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           .thenReturn(Future.successful(Left(UnableToCreateEnrolmentError)))
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any())).thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
-        val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
+        val userAnswers = emptyUserAnswers.withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
 
         val application = applicationBuilder(userAnswers = Option(userAnswers))
           .overrides(
@@ -393,12 +402,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, false)
-          .success
-          .value
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .withPage(IndDoYouHaveNINumberPage, false)
 
         val application = applicationBuilder(Option(userAnswers))
           .overrides(
@@ -431,12 +436,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, false)
-          .success
-          .value
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .withPage(IndDoYouHaveNINumberPage, false)
 
         val application = applicationBuilder(Option(userAnswers), AffinityGroup.Organisation)
           .overrides(
@@ -494,12 +495,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           .thenReturn(Future.successful(Left(EnrolmentExistsError(GroupIds(Seq(UserAnswersId), Seq.empty)))))
 
         val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, true)
-          .success
-          .value
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .withPage(IndDoYouHaveNINumberPage, true)
 
         val application = applicationBuilder(Option(userAnswers), AffinityGroup.Individual)
           .overrides(
@@ -532,12 +529,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           .thenReturn(Future.successful(Left(EnrolmentExistsError(GroupIds(Seq(UserAnswersId), Seq.empty)))))
 
         val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, true)
-          .success
-          .value
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .withPage(IndDoYouHaveNINumberPage, true)
 
         val application = applicationBuilder(Option(userAnswers), AffinityGroup.Organisation)
           .overrides(
@@ -567,12 +560,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           .thenReturn(Future.successful(Left(EnrolmentExistsError(GroupIds(Seq(UserAnswersId), Seq.empty)))))
 
         val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
-          .set(RegistrationInfoPage, IndRegistrationInfo(safeId))
-          .success
-          .value
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+          .withPage(RegistrationInfoPage, IndRegistrationInfo(safeId))
 
         val application = applicationBuilder(Option(userAnswers), AffinityGroup.Organisation)
           .overrides(
@@ -601,12 +590,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, true)
-          .success
-          .value
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .withPage(IndDoYouHaveNINumberPage, true)
 
         val application = applicationBuilder(Option(userAnswers))
           .overrides(
@@ -638,12 +623,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val userAnswers = emptyUserAnswers
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, true)
-          .success
-          .value
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .withPage(IndDoYouHaveNINumberPage, true)
 
         val application = applicationBuilder(Option(userAnswers))
           .overrides(
