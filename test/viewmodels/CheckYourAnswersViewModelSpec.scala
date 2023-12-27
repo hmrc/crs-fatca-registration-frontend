@@ -108,12 +108,11 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
         }
 
         s"must return required rows for auto-matched business with $affinityGroup affinity group" in {
-          val addressResponse = AddressResponse("address line 1", None, None, None, None, Address.GBCountryCode)
           val userAnswers = emptyUserAnswers
             .withPage(AutoMatchedUTRPage, utr)
             .withPage(WhatIsYourUTRPage, utr)
             .withPage(RegisteredAddressInUKPage, false)
-            .withPage(RegistrationInfoPage, OrgRegistrationInfo(safeId, OrgName, addressResponse))
+            .withPage(RegistrationInfoPage, orgRegistrationInfo)
             .withPage(IsThisYourBusinessPage, true)
             .withPage(ContactNamePage, name.fullName)
             .withPage(ContactEmailPage, TestEmail)
@@ -230,6 +229,55 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
 
       result.head.sectionName mustBe "Your details"
       result.head.rows.size mustBe 5
+
+      result(1).sectionName mustBe "Contact details"
+      result(1).rows.size mustBe 2
+    }
+
+    "must return required rows for 'sole-trader-with-id'" in {
+      val userAnswers = emptyUserAnswers
+        .withPage(ReporterTypePage, ReporterType.Sole)
+        .withPage(IndWhereDoYouLivePage, true)
+        .withPage(WhatIsYourUTRPage, utr)
+        .withPage(WhatIsYourNamePage, name)
+        .withPage(IsThisYourBusinessPage, true)
+        .withPage(RegistrationInfoPage, orgRegistrationInfo)
+        .withPage(IndContactEmailPage, TestEmail)
+        .withPage(IndContactHavePhonePage, false)
+
+      val result: Seq[Section] = CheckYourAnswersViewModel
+        .buildPages(userAnswers, countryListFactory, AffinityGroup.Individual)
+
+      result.size mustBe 2
+
+      result.head.sectionName mustBe "Business details"
+      result.head.rows.size mustBe 1
+
+      result(1).sectionName mustBe "Contact details"
+      result(1).rows.size mustBe 2
+    }
+
+    "must return required rows for 'sole-without-id'" in {
+      val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val userAnswers = emptyUserAnswers
+        .withPage(ReporterTypePage, ReporterType.Sole)
+        .withPage(IndWhereDoYouLivePage, false)
+        .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+        .withPage(IndDoYouHaveNINumberPage, true)
+        .withPage(IndWhatIsYourNINumberPage, Nino(TestNiNumber))
+        .withPage(IndWhatIsYourNamePage, name)
+        .withPage(IndDateOfBirthPage, LocalDate.now())
+        .withPage(IndNonUKAddressWithoutIdPage, address)
+        .withPage(IndContactEmailPage, TestEmail)
+        .withPage(IndContactHavePhonePage, false)
+
+      val result: Seq[Section] = CheckYourAnswersViewModel
+        .buildPages(userAnswers, countryListFactory, AffinityGroup.Individual)
+
+      result.size mustBe 2
+
+      result.head.sectionName mustBe "Your details"
+      result.head.rows.size mustBe 7
 
       result(1).sectionName mustBe "Contact details"
       result(1).rows.size mustBe 2
