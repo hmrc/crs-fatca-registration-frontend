@@ -40,7 +40,7 @@ object IndividualAddressWithoutIdSummary {
           value = formatAddress(answer),
           actions = Seq(
             changeAction(
-              "addressWithoutId",
+              "addressWithoutId.individual",
               controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(CheckMode).url
             )
           )

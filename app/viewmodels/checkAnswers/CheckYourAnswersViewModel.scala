@@ -35,7 +35,7 @@ object CheckYourAnswersViewModel {
     val helper     = new CheckYourAnswersHelper(userAnswers, countryListFactory = countryFactory)
     val (contact, header) = (userAnswers.get(ReporterTypePage), userAnswers.get(AutoMatchedUTRPage)) match {
       case (Some(ReporterType.Individual), _) => ("contactDetails", "individualDetails")
-      case (Some(ReporterType.Sole), _)       => ("contactDetails", "businessDetails")
+      case (Some(ReporterType.Sole), _)       => ("contactDetails", "individualDetails")
       case (Some(_), _)                       => ("firstContact", "businessDetails")
       case (None, Some(_))                    => ("firstContact", "businessDetails")
       case (None, None) =>
@@ -74,7 +74,7 @@ object CheckYourAnswersViewModel {
         helper.whatIsYourDateOfBirth,
         helper.dateOfBirthWithoutId,
         helper.businessWithoutIDName,
-        helper.whatIsTradingName,
+        if (isBusiness) helper.whatIsTradingName else None,
         if (isBusiness) helper.businessAddressWithoutID else helper.individualAddressWithoutID,
         helper.selectAddress
       ).flatten

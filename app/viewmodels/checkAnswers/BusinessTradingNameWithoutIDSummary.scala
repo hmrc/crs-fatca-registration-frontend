@@ -29,7 +29,7 @@ import viewmodels.implicits._
 object BusinessTradingNameWithoutIDSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(BusinessTradingNameWithoutIDPage).map {
+    answers.get(BusinessTradingNameWithoutIDPage).orElse(Some("Not provided")).map {
       answer =>
         SummaryListRowViewModel(
           key = s"$BusinessTradingNameWithoutIDPage.checkYourAnswersLabel",

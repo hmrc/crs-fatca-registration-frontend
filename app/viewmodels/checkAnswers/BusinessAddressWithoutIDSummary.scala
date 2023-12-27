@@ -35,7 +35,7 @@ object BusinessAddressWithoutIDSummary {
           value = formatAddress(answer),
           actions = Seq(
             changeAction(
-              NonUKBusinessAddressWithoutIDPage.toString,
+              s"$NonUKBusinessAddressWithoutIDPage.business",
               routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode).url
             )
           )
