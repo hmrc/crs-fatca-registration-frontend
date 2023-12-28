@@ -21,6 +21,7 @@ import pages.IndWhatIsYourNINumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -30,11 +31,13 @@ object IndWhatIsYourNINumberSummary {
     answers.get(IndWhatIsYourNINumberPage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "whatIsYourNINumber.checkYourAnswersLabel",
+          key = s"$IndWhatIsYourNINumberPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer.nino).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatIsYourNINumber.change.hidden"))
+            changeAction(
+              IndWhatIsYourNINumberPage.toString,
+              controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

@@ -22,6 +22,7 @@ import pages.WhatIsYourUTRPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -31,11 +32,13 @@ object WhatIsYourUTRSummary {
     answers.get(WhatIsYourUTRPage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "whatIsYourUTR.checkYourAnswersLabel",
+          key = s"$WhatIsYourUTRPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer.uniqueTaxPayerReference).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.WhatIsYourUTRController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatIsYourUTR.change.hidden"))
+            changeAction(
+              WhatIsYourUTRPage.toString,
+              routes.WhatIsYourUTRController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

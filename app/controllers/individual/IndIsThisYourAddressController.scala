@@ -61,16 +61,24 @@ class IndIsThisYourAddressController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
     implicit request =>
+      val maybeAddresses = request.userAnswers.get(AddressLookupPage)
       form
         .bindFromRequest()
         .fold(
-          formWithErrors =>
+          formWithErrors => {
+            val error = InternalServerError(errorView())
             Future.successful(
-              request.userAnswers.get(AddressLookupPage) match {
-                case Some(value) => BadRequest(view(formWithErrors, value.head, mode))
-                case None        => InternalServerError(errorView())
+              maybeAddresses match {
+                case Some(addresses) =>
+                  addresses.headOption
+                    .map(
+                      address => BadRequest(view(formWithErrors, address, mode))
+                    )
+                    .getOrElse(error)
+                case None => error
               }
-            ),
+            )
+          },
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourAddressPage, value))

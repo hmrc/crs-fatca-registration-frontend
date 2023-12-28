@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -37,11 +38,13 @@ object IndSelectAddressSummary {
         )
 
         SummaryListRowViewModel(
-          key = "indSelectAddress.checkYourAnswersLabel",
+          key = s"$IndSelectAddressPage.checkYourAnswersLabel",
           value = value,
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.individual.routes.IndSelectAddressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("indSelectAddress.change.hidden"))
+            changeAction(
+              IndSelectAddressPage.toString,
+              controllers.individual.routes.IndSelectAddressController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

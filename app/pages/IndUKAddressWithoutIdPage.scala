@@ -23,5 +23,5 @@ case object IndUKAddressWithoutIdPage extends QuestionPage[Address] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "IndUKAddressWithoutId"
+  override def toString: String = "addressWithoutId"
 }

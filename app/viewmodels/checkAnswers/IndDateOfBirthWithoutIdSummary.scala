@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.DateOfBirthWithoutIdPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -33,11 +34,10 @@ object IndDateOfBirthWithoutIdSummary {
       answer =>
         val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
         SummaryListRowViewModel(
-          key = "dateOfBirthWithoutId.checkYourAnswersLabel",
+          key = s"$DateOfBirthWithoutIdPage.checkYourAnswersLabel",
           value = ValueViewModel(answer.format(dateFormatter)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.IndDateOfBirthWithoutIdController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("dateOfBirthWithoutId.change.hidden"))
+            changeAction(DateOfBirthWithoutIdPage.toString, routes.IndDateOfBirthWithoutIdController.onPageLoad(CheckMode).url)
           )
         )
     }

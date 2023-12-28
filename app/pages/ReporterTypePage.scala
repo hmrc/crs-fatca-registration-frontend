@@ -24,7 +24,6 @@ import scala.util.Try
 
 case object ReporterTypePage extends QuestionPage[ReporterType] {
 
-//TODO: add all pages necessary once created
   private val soleTraderCleanup = List(
     ContactNamePage,
     ContactEmailPage,

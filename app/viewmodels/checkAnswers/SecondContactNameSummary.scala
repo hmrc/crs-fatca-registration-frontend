@@ -22,6 +22,7 @@ import pages.SecondContactNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -31,11 +32,13 @@ object SecondContactNameSummary {
     answers.get(SecondContactNamePage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "secondContactName.checkYourAnswersLabel",
+          key = s"$SecondContactNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.SecondContactNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("secondContactName.change.hidden"))
+            changeAction(
+              SecondContactNamePage.toString,
+              routes.SecondContactNameController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

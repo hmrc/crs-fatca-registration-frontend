@@ -16,26 +16,28 @@
 
 package viewmodels.checkAnswers
 
+import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.IsThisYourAddressPage
+import pages.DoYouHaveUniqueTaxPayerReferencePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.{changeAction, yesOrNo}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object IsThisYourAddressSummary {
+object DoYouHaveUniqueTaxPayerReferenceSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IsThisYourAddressPage).map {
+    answers.get(DoYouHaveUniqueTaxPayerReferencePage).map {
       answer =>
-        val value = if (answer) "site.yes" else "site.no"
-
         SummaryListRowViewModel(
-          key = "indIsThisYourAddress.checkYourAnswersLabel",
-          value = ValueViewModel(value),
+          key = s"$DoYouHaveUniqueTaxPayerReferencePage.checkYourAnswersLabel",
+          value = ValueViewModel(yesOrNo(answer)),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("isThisYourAddress.change.hidden"))
+            changeAction(
+              DoYouHaveUniqueTaxPayerReferencePage.toString,
+              routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

@@ -22,6 +22,7 @@ import pages.WhatIsYourNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -31,11 +32,13 @@ object WhatIsYourNameSummary {
     answers.get(WhatIsYourNamePage).map {
       answer =>
         SummaryListRowViewModel(
-          key = "whatIsYourName.checkYourAnswersLabel",
+          key = s"$WhatIsYourNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer.toString).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.WhatIsYourNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatIsYourName.change.hidden"))
+            changeAction(
+              WhatIsYourNamePage.toString,
+              routes.WhatIsYourNameController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

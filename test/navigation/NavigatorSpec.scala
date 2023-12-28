@@ -110,12 +110,12 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(DateOfBirthWithoutIdPage, NormalMode, userAnswers) mustBe IndWhereDoYouLiveController.onPageLoad(NormalMode)
       }
 
-      val nonIndividualReporterTypes = TableDrivenPropertyChecks.Table(
-        "nonIndividualReporterTypes",
-        ReporterType.values.filter(_ != ReporterType.Individual): _*
+      val organisationReporterTypes = TableDrivenPropertyChecks.Table(
+        "orgReporterTypes",
+        ReporterType.orgReporterTypes: _*
       )
 
-      forAll(nonIndividualReporterTypes) {
+      forAll(organisationReporterTypes) {
         reporterType =>
           s"must go from ReporterTypePage to RegisteredAddressInUKPage for $reporterType reporter" in {
 
@@ -145,26 +145,31 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         ) mustBe controllers.routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(NormalMode)
       }
 
-      "must go from DoYouHaveUniqueTaxPayerReferencePage to WhatIsYourUTRPage when user has a UTR" in {
-        val userAnswers = emptyUserAnswers.set(DoYouHaveUniqueTaxPayerReferencePage, true).success.value
-        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
-          .onPageLoad(NormalMode)
+      forAll(Table("reporterType", ReporterType.values: _*)) {
+        reporterType =>
+          s"must go from DoYouHaveUniqueTaxPayerReferencePage to WhatIsYourUTRPage for $reporterType reporter having a UTR" in {
+            val userAnswers = emptyUserAnswers
+              .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+              .withPage(ReporterTypePage, reporterType)
+
+            navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
+              .onPageLoad(NormalMode)
+          }
       }
 
-      "must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for Individual reporter with no UTR" in {
+      forAll(Table("nonOrgReporterTypes", ReporterType.nonOrgReporterTypes: _*)) {
+        reporterType =>
+          s"must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for $reporterType reporter with no UTR" in {
 
-        val userAnswers = emptyUserAnswers
-          .set(ReporterTypePage, ReporterType.Individual)
-          .success
-          .value
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
+            val userAnswers = emptyUserAnswers
+              .withPage(ReporterTypePage, reporterType)
+              .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
 
-        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
+            navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
+          }
       }
 
-      forAll(nonIndividualReporterTypes) {
+      forAll(organisationReporterTypes) {
         reporterType =>
           s"must go from DoYouHaveUniqueTaxPayerReferencePage to BusinessNameWithoutIDPage for $reporterType reporter with no UTR" in {
 
@@ -191,7 +196,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
       }
 
-      forAll(nonIndividualReporterTypes) {
+      forAll(organisationReporterTypes) {
         reporterType =>
           s"must go from DoYouHaveUniqueTaxPayerReferencePage to JourneyRecoveryPage when only reporterType is answered as $reporterType" in {
 
@@ -245,10 +250,10 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(ContactHavePhonePage, NormalMode, userAnswers) mustBe ContactPhoneController.onPageLoad(NormalMode)
       }
 
-      "must go from ContactHavePhonePage to CheckYourAnswersPage when user answers no" in {
+      "must go from ContactHavePhonePage to HaveSecondContactPage when user answers no" in {
 
         val userAnswers = emptyUserAnswers.set(ContactHavePhonePage, false).success.value
-        navigator.nextPage(ContactHavePhonePage, NormalMode, userAnswers) mustBe controllers.routes.CheckYourAnswersController.onPageLoad
+        navigator.nextPage(ContactHavePhonePage, NormalMode, userAnswers) mustBe HaveSecondContactController.onPageLoad(NormalMode)
       }
 
       "must go from ContactPhonePage to HaveSecondContactPage" in {

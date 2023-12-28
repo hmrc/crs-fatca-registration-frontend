@@ -16,11 +16,21 @@
 
 package pages
 
+import models.UserAnswers
+import pages.PageLists.individualAndWithoutIdPages
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object RegisteredAddressInUKPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "registeredAddressInUK"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = value match {
+    case Some(true) => individualAndWithoutIdPages.foldLeft(Try(userAnswers))(PageLists.removePage)
+    case _          => super.cleanup(value, userAnswers)
+  }
+
 }

@@ -36,10 +36,12 @@ case class Address(
     Some(country.description)
   ).flatten
 
-  val isGB: Boolean           = this.country.code == "GB"
-  val isOtherCountry: Boolean = this.country.code != "GB"
+  val isGB: Boolean           = this.country.code == Address.GBCountryCode
+  val isOtherCountry: Boolean = this.country.code != Address.GBCountryCode
 }
 
 object Address {
-  implicit val format = Json.format[Address]
+  val GBCountryCode = "GB"
+
+  implicit val format: OFormat[Address] = Json.format[Address]
 }

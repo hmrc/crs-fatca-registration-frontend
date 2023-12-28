@@ -22,20 +22,23 @@ import pages.BusinessTradingNameWithoutIDPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object BusinessTradingNameWithoutIDSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(BusinessTradingNameWithoutIDPage).map {
+    answers.get(BusinessTradingNameWithoutIDPage).orElse(Some("Not provided")).map {
       answer =>
         SummaryListRowViewModel(
-          key = "businessTradingNameWithoutID.checkYourAnswersLabel",
+          key = s"$BusinessTradingNameWithoutIDPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("businessTradingNameWithoutID.change.hidden"))
+            changeAction(
+              BusinessTradingNameWithoutIDPage.toString,
+              routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

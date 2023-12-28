@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -30,14 +31,16 @@ object IndWhatIsYourNameSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndWhatIsYourNamePage).map {
       answer =>
-        val value = HtmlFormat.escape(answer.firstName).toString + "<br/>" + HtmlFormat.escape(answer.lastName).toString
+        val value = HtmlFormat.escape(answer.firstName).toString + " " + HtmlFormat.escape(answer.lastName).toString
 
         SummaryListRowViewModel(
-          key = "indWhatIsYourName.checkYourAnswersLabel",
+          key = s"$IndWhatIsYourNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("indWhatIsYourName.change.hidden"))
+            changeAction(
+              IndWhatIsYourNamePage.toString,
+              controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

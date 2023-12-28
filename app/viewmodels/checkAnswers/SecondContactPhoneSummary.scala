@@ -22,22 +22,28 @@ import pages.SecondContactPhonePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object SecondContactPhoneSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SecondContactPhonePage).map {
-      answer =>
-        SummaryListRowViewModel(
-          key = "secondContactPhone.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.SecondContactPhoneController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("secondContactPhone.change.hidden"))
-          )
-        )
+    answers.get(pages.SecondContactHavePhonePage).flatMap {
+      _ =>
+        answers.get(SecondContactPhonePage).orElse(Some("Not provided")).map {
+          answer =>
+            SummaryListRowViewModel(
+              key = s"$SecondContactPhonePage.checkYourAnswersLabel",
+              value = ValueViewModel(HtmlFormat.escape(answer).toString),
+              actions = Seq(
+                changeAction(
+                  SecondContactPhonePage.toString,
+                  routes.SecondContactHavePhoneController.onPageLoad(CheckMode).url
+                )
+              )
+            )
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -33,16 +34,15 @@ object ReporterTypeSummary {
       answer =>
         val value = ValueViewModel(
           HtmlContent(
-            HtmlFormat.escape(messages(s"reporterType.$answer"))
+            HtmlFormat.escape(messages(s"$ReporterTypePage.$answer"))
           )
         )
 
         SummaryListRowViewModel(
-          key = "reporterType.checkYourAnswersLabel",
+          key = s"$ReporterTypePage.checkYourAnswersLabel",
           value = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ReporterTypeController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("reporterType.change.hidden"))
+            changeAction(ReporterTypePage.toString, routes.ReporterTypeController.onPageLoad(CheckMode).url)
           )
         )
     }

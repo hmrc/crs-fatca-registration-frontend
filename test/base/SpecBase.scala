@@ -31,9 +31,10 @@ import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Call, PlayBodyParsers}
 import play.api.test.FakeRequest
+import queries.Settable
 import repositories.SessionRepository
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
@@ -94,6 +95,13 @@ trait SpecBase
         bind[DataRetrievalAction].toInstance(mockDataRetrievalAction),
         bind[SessionRepository].toInstance(mockSessionRepository)
       )
+  }
+
+  implicit class UserAnswersExtension(userAnswers: UserAnswers) {
+
+    def withPage[T](page: Settable[T], value: T)(implicit writes: Writes[T]): UserAnswers =
+      userAnswers.set(page, value).success.value
+
   }
 
 }
