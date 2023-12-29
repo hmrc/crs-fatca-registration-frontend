@@ -23,7 +23,7 @@ import models.register.response.details.AddressResponse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import pages.{AutoMatchedUTRPage, IsThisYourBusinessPage, RegistrationInfoPage}
+import pages.{AutoMatchedUTRPage, IndSelectAddressPage, IsThisYourBusinessPage, RegistrationInfoPage}
 import play.api.test.Helpers
 import uk.gov.hmrc.govukfrontend.views.Aliases.Actions
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -80,6 +80,24 @@ class CheckYourAnswersHelperSpec extends SpecBase with GuiceOneAppPerSuite {
       val service = new CheckYourAnswersHelper(emptyUserAnswers, mockCountryListFactory)(Helpers.stubMessages())
 
       service.businessConfirmation mustBe None
+    }
+
+    "selectAddress must properly format selected address" in {
+      val addressAsString = Seq(
+        Some(addressResponse.addressLine1),
+        addressResponse.addressLine2,
+        addressResponse.addressLine3,
+        addressResponse.addressLine4,
+        addressResponse.postalCode,
+        Some(addressResponse.countryCode)
+      ).flatten.mkString(", ")
+      val userAnswers = emptyUserAnswers.withPage(IndSelectAddressPage, addressAsString)
+
+      val service = new CheckYourAnswersHelper(userAnswers, mockCountryListFactory)(Helpers.stubMessages())
+
+      val summaryRow = service.selectAddress.value
+      summaryRow.key mustBe Key(Text(s"$IndSelectAddressPage.checkYourAnswersLabel"))
+      summaryRow.value.content mustBe HtmlContent(s"${addressAsString.replace(",", "<br>")}")
     }
   }
 

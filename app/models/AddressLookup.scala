@@ -43,6 +43,13 @@ case class AddressLookup(addressLine1: Option[String],
       safePostcode = Option(postcode)
     } yield Address(line1, line2, line3, line4, safePostcode, Country.GB)
 
+  def format: String = {
+    val lines = Seq(addressLine1, addressLine2, addressLine3, addressLine4).flatten.mkString(", ")
+    s"$lines, $town, ${county.fold("")(
+        county => s"$county, "
+      )}$postcode"
+  }
+
 }
 
 object LookupAddressByPostcode {

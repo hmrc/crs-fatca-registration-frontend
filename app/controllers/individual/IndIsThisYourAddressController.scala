@@ -20,7 +20,8 @@ import controllers.actions._
 import forms.IndIsThisYourAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.{AddressLookupPage, IsThisYourAddressPage}
+import pages.{AddressLookupPage, IndSelectAddressPage, IsThisYourAddressPage}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -42,7 +43,8 @@ class IndIsThisYourAddressController @Inject() (
   errorView: ThereIsAProblemView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val form = formProvider()
 
@@ -62,28 +64,32 @@ class IndIsThisYourAddressController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
     implicit request =>
       val maybeAddresses = request.userAnswers.get(AddressLookupPage)
+      val error          = InternalServerError(errorView())
+
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
-            val error = InternalServerError(errorView())
+          formWithErrors =>
             Future.successful(
               maybeAddresses match {
-                case Some(addresses) =>
-                  addresses.headOption
-                    .map(
-                      address => BadRequest(view(formWithErrors, address, mode))
-                    )
-                    .getOrElse(error)
-                case None => error
+                case Some(address :: _) => BadRequest(view(formWithErrors, address, mode))
+                case None =>
+                  logger.error("No selected address was found")
+                  error
               }
-            )
-          },
+            ),
           value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourAddressPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IsThisYourAddressPage, mode, updatedAnswers))
+            maybeAddresses match {
+              case Some(address :: _) =>
+                for {
+                  updatedAnswers         <- Future.fromTry(request.userAnswers.set(IsThisYourAddressPage, value))
+                  userAnswersWithAddress <- Future.fromTry(updatedAnswers.set(IndSelectAddressPage, address.format))
+                  _                      <- sessionRepository.set(userAnswersWithAddress)
+                } yield Redirect(navigator.nextPage(IsThisYourAddressPage, mode, userAnswersWithAddress))
+              case None =>
+                logger.error("No selected address was found")
+                Future.successful(error)
+            }
         )
   }
 

@@ -60,7 +60,7 @@ class IndSelectAddressController @Inject() (
             }
 
             val radios: Seq[RadioItem] = addresses.map(
-              address => RadioItem(content = Text(s"${formatAddress(address)}"), value = Some(s"${formatAddress(address)}"))
+              address => RadioItem(content = Text(s"${address.format}"), value = Some(s"${address.format}"))
             )
 
             Ok(view(preparedForm, radios, mode))
@@ -77,7 +77,7 @@ class IndSelectAddressController @Inject() (
         request.userAnswers.get(AddressLookupPage) match {
           case Some(addresses) =>
             val radios: Seq[RadioItem] = addresses.map(
-              address => RadioItem(content = Text(s"${formatAddress(address)}"), value = Some(s"${formatAddress(address)}"))
+              address => RadioItem(content = Text(s"${address.format}"), value = Some(s"${address.format}"))
             )
 
             form
@@ -85,7 +85,7 @@ class IndSelectAddressController @Inject() (
               .fold(
                 formWithErrors => Future.successful(BadRequest(view(formWithErrors, radios, mode))),
                 value => {
-                  val addressToStore: AddressLookup = addresses.find(formatAddress(_) == value).getOrElse(throw new Exception("Cannot get address"))
+                  val addressToStore: AddressLookup = addresses.find(_.format == value).getOrElse(throw new Exception("Cannot get address"))
 
                   for {
                     updatedAnswers                    <- Future.fromTry(request.userAnswers.set(IndSelectAddressPage, value))
@@ -98,14 +98,5 @@ class IndSelectAddressController @Inject() (
           case None => Future.successful(Redirect(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(mode)))
         }
     }
-
-  private def formatAddress(address: AddressLookup): String = {
-    val lines = Seq(address.addressLine1, address.addressLine2, address.addressLine3, address.addressLine4).flatten.mkString(", ")
-    val county = address.county.fold("")(
-      county => s"$county, "
-    )
-
-    s"$lines, ${address.town}, $county${address.postcode}"
-  }
 
 }
