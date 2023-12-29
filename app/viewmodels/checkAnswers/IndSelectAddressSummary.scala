@@ -19,7 +19,6 @@ package viewmodels.checkAnswers
 import models.{CheckMode, UserAnswers}
 import pages.IndSelectAddressPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.Util.changeAction
@@ -31,15 +30,9 @@ object IndSelectAddressSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndSelectAddressPage).map {
       answer =>
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"indSelectAddress.$answer"))
-          )
-        )
-
         SummaryListRowViewModel(
           key = s"$IndSelectAddressPage.checkYourAnswersLabel",
-          value = value,
+          value = ValueViewModel(HtmlContent(s"${answer.replace(",", "<br>")}")),
           actions = Seq(
             changeAction(
               IndSelectAddressPage.toString,
