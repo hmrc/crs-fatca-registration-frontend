@@ -1,7 +1,7 @@
 
 # crs-fatca-registration-frontend
 
-This is a placeholder README.md for a new repository
+This service allows a user to register for the CRS/FATCA service
 
 ### Running the service
 
