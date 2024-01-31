@@ -20,6 +20,7 @@ import controllers.routes
 import models.ReporterType.{Individual, Sole}
 import pages._
 import models._
+import pages.changeContactDetails.{IndividualEmailPage, IndividualHavePhonePage, IndividualPhonePage}
 import play.api.Logging
 import play.api.libs.json.Reads
 import play.api.mvc.Call
@@ -30,8 +31,11 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject() () extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case IsThisYourBusinessPage => isThisYourBusiness(NormalMode)
-    case ReporterTypePage       => whatAreYouReportingAs(NormalMode)
+    case IndividualEmailPage     => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(NormalMode)
+    case IndividualHavePhonePage => _ => controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(NormalMode)
+    case IndividualPhonePage     => _ => controllers.changeContactDetails.routes.IndividualChangeContactDetailsController.onPageLoad()
+    case IsThisYourBusinessPage  => isThisYourBusiness(NormalMode)
+    case ReporterTypePage        => whatAreYouReportingAs(NormalMode)
     case RegisteredAddressInUKPage =>
       userAnswers =>
         yesNoPage(
