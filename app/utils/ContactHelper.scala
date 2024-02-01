@@ -17,6 +17,7 @@
 package utils
 
 import models.UserAnswers
+import pages.changeContactDetails.OrganisationContactNamePage
 import pages.{ContactNamePage, SecondContactNamePage}
 import play.api.i18n.Messages
 
@@ -35,5 +36,8 @@ trait ContactHelper {
       .fold(messages("default.secondContact.name"))(
         contactName => contactName
       )
+
+  def getContactName(ua: UserAnswers)(implicit messages: Messages): String =
+    ua.get(OrganisationContactNamePage).getOrElse(messages("default.firstContact.name"))
 
 }
