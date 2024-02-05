@@ -22,9 +22,9 @@ import utils.RegexConstants
 
 class OrganisationContactNameFormProviderSpec extends StringFieldBehaviours with RegexConstants {
 
-  val requiredKey = "organisationName.error.required"
-  val lengthKey   = "organisationName.error.length"
-  val invalidKey  = "organisationName.error.invalid"
+  val requiredKey = "organisationContactName.error.required"
+  val lengthKey   = "organisationContactName.error.length"
+  val invalidKey  = "organisationContactName.error.invalid"
   val maxLength   = 35
 
   val form = new OrganisationContactNameFormProvider()()
