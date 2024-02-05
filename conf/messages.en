@@ -580,3 +580,42 @@ organisationPhone.checkYourAnswersLabel = What is the telephone number for the f
 organisationPhone.error.required = Enter a telephone number for the first contact
 organisationPhone.error.length = The telephone number must be 24 characters or less
 organisationPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
+
+organisationHaveSecondContact.title = Is there someone else we can contact if your first contact is not available?
+organisationHaveSecondContact.heading = Is there someone else we can contact if {0} is not available?
+organisationHaveSecondContact.p1 = This can be a team mailbox or another contact.
+organisationHaveSecondContact.checkYourAnswersLabel = Do you have a second contact?
+organisationHaveSecondContact.change.hidden = Change if you have a second contact
+organisationHaveSecondContact.error.required = Select yes if there is someone else we can contact
+
+organisationSecondContactEmail.title = What is the email address for the second contact?
+organisationSecondContactEmail.heading = What is the email address for {0}?
+organisationSecondContactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+organisationSecondContactEmail.checkYourAnswersLabel = Second contact email address
+organisationSecondContactEmail.error.required = Enter an email address for the second contact
+organisationSecondContactEmail.error.length = The email address must be 132 characters or less
+organisationSecondContactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
+organisationSecondContactEmail.change.hidden = Change second contact email address
+
+organisationSecondContactName.title = What is the name of the person or team we should contact?
+organisationSecondContactName.heading = What is the name of the person or team we should contact?
+organisationSecondContactName.hint = For example, ‘Ashley Smith’ or ‘Tax team’.
+organisationSecondContactName.checkYourAnswersLabel = Second contact name
+organisationSecondContactName.error.required = Enter a name for the second contact
+organisationSecondContactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+organisationSecondContactName.error.length = The name must be 35 characters or less
+organisationSecondContactName.change.hidden = Change second contact name
+
+organisationSecondContactHavePhone.title = Can we contact your second contact by telephone?
+organisationSecondContactHavePhone.heading = Can we contact {0} by telephone?
+organisationSecondContactHavePhone.p1 = We will call if we have any questions about your reports.
+organisationSecondContactHavePhone.error.required = Select yes if they can be contacted by telephone
+
+organisationSecondContactPhone.title = What is the telephone number for the second contact?
+organisationSecondContactPhone.heading = What is the telephone number for {0}?
+organisationSecondContactPhone.hint = For international numbers, include the country code.
+organisationSecondContactPhone.checkYourAnswersLabel = Second contact telephone number
+organisationSecondContactPhone.error.required = Enter a telephone number for the second contact
+organisationSecondContactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
+organisationSecondContactPhone.error.length = The telephone number must be 24 characters or less
+organisationSecondContactPhone.change.hidden = Change second contact telephone number

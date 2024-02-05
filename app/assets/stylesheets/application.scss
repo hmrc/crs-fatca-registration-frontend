@@ -33,6 +33,6 @@ body:not(.js-enabled) .js-enabled {
 // important to do this on the wrapper rather than the input itself otherwise the down-arrow will be floating by itself
 @media (min-width: 40.0625em){
   .autocomplete__wrapper {
-    width: 62%!important;
+    width: 66.66%!important;
   }
 }
