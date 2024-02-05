@@ -16,7 +16,6 @@
 
 package forms.changeContactDetails
 
-import forms.ContactNameFormProvider
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 import utils.RegexConstants

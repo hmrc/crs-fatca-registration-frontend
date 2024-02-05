@@ -575,6 +575,7 @@ organisationHavePhone.error.required = Select yes if they can be contacted by te
 
 organisationPhone.title = What is the telephone number for the first contact?
 organisationPhone.heading = What is the telephone number for {0}?
+organisationPhone.hint = For international numbers, include the country code.
 organisationPhone.checkYourAnswersLabel = What is the telephone number for the first contact?
 organisationPhone.error.required = Enter a telephone number for the first contact
 organisationPhone.error.length = The telephone number must be 24 characters or less

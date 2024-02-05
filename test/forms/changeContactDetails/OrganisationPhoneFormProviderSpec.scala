@@ -23,7 +23,7 @@ class OrganisationPhoneFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "organisationPhone.error.required"
   val lengthKey   = "organisationPhone.error.length"
-  val maxLength   = 15
+  val maxLength   = 24
 
   val form = new OrganisationPhoneFormProvider()()
 

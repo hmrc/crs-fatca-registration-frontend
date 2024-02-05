@@ -44,11 +44,10 @@ class Navigator @Inject() () extends Logging {
     case IndividualPhonePage         => _ => controllers.changeContactDetails.routes.IndividualChangeContactDetailsController.onPageLoad()
     case OrganisationContactNamePage => _ => controllers.changeContactDetails.routes.OrganisationEmailController.onPageLoad(NormalMode)
     case OrganisationEmailPage       => _ => controllers.changeContactDetails.routes.OrganisationHavePhoneController.onPageLoad(NormalMode)
-    case OrganisationHavePhonePage => _ => controllers.changeContactDetails.routes.OrganisationPhoneController.onPageLoad(NormalMode)
-    // TODO: Add this when next page in journey is added
-    case OrganisationPhonePage  => _ => ???
-    case IsThisYourBusinessPage => isThisYourBusiness(NormalMode)
-    case ReporterTypePage       => whatAreYouReportingAs(NormalMode)
+    case OrganisationHavePhonePage   => _ => controllers.changeContactDetails.routes.OrganisationPhoneController.onPageLoad(NormalMode)
+    case OrganisationPhonePage       => _ => controllers.routes.IndexController.onPageLoad // TODO: Add this when next page in journey is added
+    case IsThisYourBusinessPage      => isThisYourBusiness(NormalMode)
+    case ReporterTypePage            => whatAreYouReportingAs(NormalMode)
     case RegisteredAddressInUKPage =>
       userAnswers =>
         yesNoPage(

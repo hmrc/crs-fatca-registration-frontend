@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class OrganisationPhoneFormProvider @Inject() extends Mappings with RegexConstants {
 
-  private val maxLength = 15
+  private val maxLength = 24
 
   def apply(): Form[String] =
     Form(
