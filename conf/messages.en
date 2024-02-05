@@ -551,6 +551,36 @@ individualPhone.error.required = Enter your telephone number
 individualPhone.error.length = The telephone number must be 24 characters or less
 individualPhone.error.invalid =  The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 
+organisationContactName.title = What is the name of the person or team we should contact?
+organisationContactName.heading = What is the name of the person or team we should contact?
+organisationContactName.hint = For example, ‘Ashley Smith’ or ‘Tax team’.
+organisationContactName.checkYourAnswersLabel = What is the name of the person or team we should contact?
+organisationContactName.error.required = Enter a name for the first contact
+organisationContactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
+organisationContactName.error.length = The name must be 35 characters or less
+
+organisationEmail.heading = What is the email address for {0}?
+organisationEmail.title = What is the email address for the first contact?
+organisationEmail.checkYourAnswersLabel = What is the email address for the first contact?
+organisationEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+organisationEmail.error.required =  Enter an email address for the first contact
+organisationEmail.error.length = The email address must be 132 characters or less
+organisationEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
+
+organisationHavePhone.title = Can we contact your first contact by telephone?
+organisationHavePhone.heading = Can we contact {0} by telephone?
+organisationHavePhone.p1 = We will call if we have any questions about your reports.
+organisationHavePhone.checkYourAnswersLabel = Can we contact your first contact by telephone?
+organisationHavePhone.error.required = Select yes if they can be contacted by telephone
+
+organisationPhone.title = What is the telephone number for the first contact?
+organisationPhone.heading = What is the telephone number for {0}?
+organisationPhone.hint = For international numbers, include the country code.
+organisationPhone.checkYourAnswersLabel = What is the telephone number for the first contact?
+organisationPhone.error.required = Enter a telephone number for the first contact
+organisationPhone.error.length = The telephone number must be 24 characters or less
+organisationPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
+
 organisationHaveSecondContact.title = Is there someone else we can contact if your first contact is not available?
 organisationHaveSecondContact.heading = Is there someone else we can contact if {0} is not available?
 organisationHaveSecondContact.p1 = This can be a team mailbox or another contact.

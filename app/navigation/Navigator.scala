@@ -20,7 +20,15 @@ import controllers.routes
 import models.ReporterType.{Individual, Sole}
 import pages._
 import models._
-import pages.changeContactDetails.{IndividualEmailPage, IndividualHavePhonePage, IndividualPhonePage}
+import pages.changeContactDetails.{
+  IndividualEmailPage,
+  IndividualHavePhonePage,
+  IndividualPhonePage,
+  OrganisationContactNamePage,
+  OrganisationEmailPage,
+  OrganisationHavePhonePage,
+  OrganisationPhonePage
+}
 import play.api.Logging
 import play.api.libs.json.Reads
 import play.api.mvc.Call
@@ -31,11 +39,15 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject() () extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case IndividualEmailPage     => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(NormalMode)
-    case IndividualHavePhonePage => _ => controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(NormalMode)
-    case IndividualPhonePage     => _ => controllers.changeContactDetails.routes.IndividualChangeContactDetailsController.onPageLoad()
-    case IsThisYourBusinessPage  => isThisYourBusiness(NormalMode)
-    case ReporterTypePage        => whatAreYouReportingAs(NormalMode)
+    case IndividualEmailPage         => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(NormalMode)
+    case IndividualHavePhonePage     => _ => controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(NormalMode)
+    case IndividualPhonePage         => _ => controllers.changeContactDetails.routes.IndividualChangeContactDetailsController.onPageLoad()
+    case OrganisationContactNamePage => _ => controllers.changeContactDetails.routes.OrganisationEmailController.onPageLoad(NormalMode)
+    case OrganisationEmailPage       => _ => controllers.changeContactDetails.routes.OrganisationHavePhoneController.onPageLoad(NormalMode)
+    case OrganisationHavePhonePage   => _ => controllers.changeContactDetails.routes.OrganisationPhoneController.onPageLoad(NormalMode)
+    case OrganisationPhonePage       => _ => controllers.routes.IndexController.onPageLoad // TODO: Add this when next page in journey is added
+    case IsThisYourBusinessPage      => isThisYourBusiness(NormalMode)
+    case ReporterTypePage            => whatAreYouReportingAs(NormalMode)
     case RegisteredAddressInUKPage =>
       userAnswers =>
         yesNoPage(

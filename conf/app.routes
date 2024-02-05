@@ -247,6 +247,26 @@ POST       /change-contact/individual/phone                        controllers.c
 GET        /change-contact/individual/change-phone                  controllers.changeContactDetails.IndividualPhoneController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-contact/individual/change-phone                  controllers.changeContactDetails.IndividualPhoneController.onSubmit(mode: Mode = CheckMode)
 
+GET        /change-contact/organisation/contact-name                        controllers.changeContactDetails.OrganisationContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /change-contact/organisation/contact-name                        controllers.changeContactDetails.OrganisationContactNameController.onSubmit(mode: Mode = NormalMode)
+GET        /change-contact/organisation/change-contact-name                  controllers.changeContactDetails.OrganisationContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-contact/organisation/change-contact-name                  controllers.changeContactDetails.OrganisationContactNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /change-contact/organisation/email                        controllers.changeContactDetails.OrganisationEmailController.onPageLoad(mode: Mode = NormalMode)
+POST       /change-contact/organisation/email                        controllers.changeContactDetails.OrganisationEmailController.onSubmit(mode: Mode = NormalMode)
+GET        /change-contact/organisation/change-email                  controllers.changeContactDetails.OrganisationEmailController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-contact/organisation/change-email                  controllers.changeContactDetails.OrganisationEmailController.onSubmit(mode: Mode = CheckMode)
+
+GET        /change-contact/organisation/have-phone                        controllers.changeContactDetails.OrganisationHavePhoneController.onPageLoad(mode: Mode = NormalMode)
+POST       /change-contact/organisation/have-phone                        controllers.changeContactDetails.OrganisationHavePhoneController.onSubmit(mode: Mode = NormalMode)
+GET        /change-contact/organisation/change-have-phone                  controllers.changeContactDetails.OrganisationHavePhoneController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-contact/organisation/change-have-phone                  controllers.changeContactDetails.OrganisationHavePhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET        /change-contact/organisation/phone                        controllers.changeContactDetails.OrganisationPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST       /change-contact/organisation/phone                        controllers.changeContactDetails.OrganisationPhoneController.onSubmit(mode: Mode = NormalMode)
+GET        /change-contact/organisation/change-phone                  controllers.changeContactDetails.OrganisationPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-contact/organisation/change-phone                  controllers.changeContactDetails.OrganisationPhoneController.onSubmit(mode: Mode = CheckMode)
+
 GET         /change-contact/organisation/have-second-contact                    controllers.changeContactDetails.OrganisationHaveSecondContactController.onPageLoad(mode: Mode = NormalMode)
 POST        /change-contact/organisation/have-second-contact                    controllers.changeContactDetails.OrganisationHaveSecondContactController.onSubmit(mode: Mode = NormalMode)
 GET         /change-contact/organisation/change-have-second-contact             controllers.changeContactDetails.OrganisationHaveSecondContactController.onPageLoad(mode: Mode = CheckMode)
