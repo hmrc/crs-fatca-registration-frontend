@@ -43,7 +43,8 @@
                 field = form("value"),
                     label = LabelViewModel(messages("indContactEmail.heading")).withCssClass( "govuk-visually-hidden")
             )
-            .withWidth(Full)
+            .withWidth(Fixed20)
+            .asEmail()
         )
 
         @govukButton(
