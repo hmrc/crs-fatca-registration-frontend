@@ -144,8 +144,8 @@ POST       /register/change-ni-number                  controllers.individual.In
 
 GET        /register/without-id/business-address                        controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/without-id/business-address                        controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/business-address                  controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/business-address                  controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
+GET        /register/without-id/change-business-address                 controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
+POST       /register/without-id/change-business-address                 controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
 
 
 GET        /register/problem/sign-in-problem                controllers.UnauthorisedStandardUserController.onPageLoad()

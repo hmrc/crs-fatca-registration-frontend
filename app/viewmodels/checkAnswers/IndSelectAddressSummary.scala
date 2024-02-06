@@ -36,7 +36,7 @@ object IndSelectAddressSummary {
           actions = Seq(
             changeAction(
               IndSelectAddressPage.toString,
-              controllers.individual.routes.IndSelectAddressController.onPageLoad(CheckMode).url
+              controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(CheckMode).url
             )
           )
         )
