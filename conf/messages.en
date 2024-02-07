@@ -619,3 +619,14 @@ organisationSecondContactPhone.error.required = Enter a telephone number for the
 organisationSecondContactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 organisationSecondContactPhone.error.length = The telephone number must be 24 characters or less
 organisationSecondContactPhone.change.hidden = Change second contact telephone number
+
+registrationConfirmation.title = Registration successful
+registrationConfirmation.heading = Registration successful
+registrationConfirmation.subheading.1 = What you should do next
+registrationConfirmation.para.1 = To send CRS and FATCA reports, you must {0}.
+registrationConfirmation.para.2 = You will need to provide your CRS and FATCA user ID in every file you send to HMRC.
+registrationConfirmation.subheading.2 = Before you go
+registrationConfirmation.para.3 = Your feedback helps us make our service better.
+registrationConfirmation.para.4 = {0} to share your feedback on this service.
+registrationConfirmation.link.survey = Take a short survey
+registrationConfirmation.link.addFI = Registration successful
