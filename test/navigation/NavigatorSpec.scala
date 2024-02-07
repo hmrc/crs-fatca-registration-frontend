@@ -619,6 +619,96 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad
       }
+
+      "must go from IndWhereDoYouLivePage to IndWhatIsYourPostcodePage when user answers Yes" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndWhereDoYouLivePage, true)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndWhereDoYouLivePage, CheckMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndWhatIsYourPostcodeController.onPageLoad(CheckMode))
+      }
+
+      "must go from IndWhereDoYouLivePage to IndNonUKAddressWithoutIdPage when user answers No" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndWhereDoYouLivePage, false)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndWhereDoYouLivePage, CheckMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndNonUKAddressWithoutIdController.onPageLoad(CheckMode))
+      }
+
+      "must go from IndNonUKAddressWithoutIdPage to CheckYourAnswersPage" in {
+        navigator
+          .nextPage(IndNonUKAddressWithoutIdPage, CheckMode, emptyUserAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from IndWhatIsYourPostcodePage to IsThisYourAddressPage when there is only one matching address" in {
+        ScalaCheckPropertyChecks.forAll(arbitrary[models.AddressLookup]) {
+          addressLookup =>
+            val userAnswers = emptyUserAnswers
+              .set(AddressLookupPage, Seq(addressLookup))
+              .success
+              .value
+
+            navigator
+              .nextPage(IndWhatIsYourPostcodePage, CheckMode, userAnswers)
+              .mustBe(controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(CheckMode))
+        }
+      }
+
+      "must go from IndWhatIsYourPostcodePage to IndSelectAddressPage when there is more than one matching address" in {
+        ScalaCheckPropertyChecks.forAll(arbitrary[models.AddressLookup]) {
+          addressLookup =>
+            val userAnswers = emptyUserAnswers
+              .set(AddressLookupPage, Seq(addressLookup, addressLookup))
+              .success
+              .value
+
+            navigator
+              .nextPage(IndWhatIsYourPostcodePage, CheckMode, userAnswers)
+              .mustBe(controllers.individual.routes.IndSelectAddressController.onPageLoad(CheckMode))
+        }
+      }
+
+      "must go from IsThisYourAddressPage to CheckYourAnswersPage when user answers Yes" in {
+        val userAnswers = emptyUserAnswers
+          .set(IsThisYourAddressPage, true)
+          .success
+          .value
+
+        navigator
+          .nextPage(IsThisYourAddressPage, CheckMode, userAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from IsThisYourAddressPage to IndUKAddressWithoutIdPage when user answers No" in {
+        val userAnswers = emptyUserAnswers
+          .set(IsThisYourAddressPage, false)
+          .success
+          .value
+
+        navigator
+          .nextPage(IsThisYourAddressPage, CheckMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(CheckMode))
+      }
+
+      "must go from IndUKAddressWithoutIdPage to CheckYourAnswersPage" in {
+        navigator
+          .nextPage(IndUKAddressWithoutIdPage, CheckMode, emptyUserAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from NonUKBusinessAddressWithoutIDPage to CheckYourAnswersPage" in {
+        navigator
+          .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, emptyUserAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
     }
   }
 

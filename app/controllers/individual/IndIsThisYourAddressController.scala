@@ -73,7 +73,7 @@ class IndIsThisYourAddressController @Inject() (
             Future.successful(
               maybeAddresses match {
                 case Some(address :: _) => BadRequest(view(formWithErrors, address, mode))
-                case None =>
+                case _ =>
                   logger.error("No selected address was found")
                   error
               }
@@ -86,7 +86,7 @@ class IndIsThisYourAddressController @Inject() (
                   userAnswersWithAddress <- Future.fromTry(updatedAnswers.set(IndSelectAddressPage, address.format))
                   _                      <- sessionRepository.set(userAnswersWithAddress)
                 } yield Redirect(navigator.nextPage(IsThisYourAddressPage, mode, userAnswersWithAddress))
-              case None =>
+              case _ =>
                 logger.error("No selected address was found")
                 Future.successful(error)
             }

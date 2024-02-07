@@ -176,7 +176,27 @@ class Navigator @Inject() () extends Logging {
     case IndContactNamePage                   => _ => Some(controllers.individual.routes.IndDateOfBirthController.onPageLoad(CheckMode)).get
     case IndDateOfBirthPage                   => whatIsYourDateOfBirthRoutes(CheckMode)
     case DateOfBirthWithoutIdPage             => whatIsYourDateOfBirthRoutes(CheckMode)
-    case _                                    => _ => routes.CheckYourAnswersController.onPageLoad
+    case IndWhereDoYouLivePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          IndWhereDoYouLivePage,
+          controllers.individual.routes.IndWhatIsYourPostcodeController.onPageLoad(CheckMode),
+          controllers.individual.routes.IndNonUKAddressWithoutIdController.onPageLoad(CheckMode)
+        )
+    case IndNonUKAddressWithoutIdPage => _ => routes.CheckYourAnswersController.onPageLoad()
+    case IndWhatIsYourPostcodePage    => addressLookupNavigation(CheckMode)
+    case IsThisYourAddressPage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          IsThisYourAddressPage,
+          routes.CheckYourAnswersController.onPageLoad(),
+          controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(CheckMode)
+        )
+    case IndUKAddressWithoutIdPage         => _ => routes.CheckYourAnswersController.onPageLoad()
+    case NonUKBusinessAddressWithoutIDPage => _ => routes.CheckYourAnswersController.onPageLoad()
+    case _                                 => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
