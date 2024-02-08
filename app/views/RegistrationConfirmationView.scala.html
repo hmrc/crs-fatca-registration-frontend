@@ -29,14 +29,15 @@
 
 @(userId: String = "ABCD123456")(implicit request: Request[_], messages: Messages)
 
-@surveyLink = {@link(appConfig.exitSurveyUrl, messages("registrationConfirmation.link.survey"))}
 @addFILink = {@link(routes.RegistrationConfirmationController.onPageLoad.url, messages("registrationConfirmation.link.addFI"))}
+@surveyLink = {@link(appConfig.exitSurveyUrl, messages("registrationConfirmation.link.survey"))}
 
 @layout(pageTitle = titleNoForm(messages("registrationConfirmation.title")), showBackLink = false) {
 
     @govukPanel(Panel(
         title = Text(messages("registrationConfirmation.heading")),
-        content = HtmlContent(s"Your CRS and FATCA user ID $userId")
+        content = HtmlContent(s"Your CRS and FATCA user ID \n <b>$userId</b>")
+
         )
     )
 
