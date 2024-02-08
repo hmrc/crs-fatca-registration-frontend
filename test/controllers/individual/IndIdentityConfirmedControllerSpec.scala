@@ -96,7 +96,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
 
     }
 
-    "must redirect to 'confirmation' page when there is an existing subscription" in {
+    "must redirect to registration confirmation page when there is an existing subscription" in {
 
       when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
         .thenReturn(Future.successful(Right(registrationInfo)))
@@ -110,7 +110,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       val result = route(mockedApp, request).value
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url // TODO : Replace with RegistationConfirmed controller
+      redirectLocation(result).value mustEqual routes.RegistrationConfirmationController.onPageLoad().url // TODO : Replace with RegistationConfirmed controller
 
     }
 
