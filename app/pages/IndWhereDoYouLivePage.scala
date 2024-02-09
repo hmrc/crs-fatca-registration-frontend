@@ -38,7 +38,6 @@ case object IndWhereDoYouLivePage extends QuestionPage[Boolean] {
       List(
         IndWhatIsYourPostcodePage,
         IndSelectAddressPage,
-        IndNonUKAddressWithoutIdPage,
         IndSelectedAddressLookupPage,
         AddressLookupPage
       ).foldLeft(Try(userAnswers))(PageLists.removePage)
