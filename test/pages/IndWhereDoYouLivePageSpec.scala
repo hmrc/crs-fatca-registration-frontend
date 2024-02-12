@@ -32,25 +32,26 @@ class IndWhereDoYouLivePageSpec extends PageBehaviours {
     beRemovable[Boolean](IndWhereDoYouLivePage)
 
     "cleanup" - {
-      "must only remove IndUKAddressWithoutIdPage answer when true" - {
+      "must only remove IndSelectAddressPage answers when true" - {
         ScalaCheckPropertyChecks.forAll(arbitrary[models.AddressLookup]) {
           addressLookup =>
             ScalaCheckPropertyChecks.forAll(arbitrary[models.Address]) {
               address =>
                 val userAnswers = emptyUserAnswers
-                  .withPage(IndUKAddressWithoutIdPage, address)
-                  .withPage(IndWhatIsYourPostcodePage, TestPostCode)
                   .withPage(IndSelectAddressPage, addressLookup.format)
+                  .withPage(IndWhatIsYourPostcodePage, TestPostCode)
                   .withPage(IndSelectedAddressLookupPage, addressLookup)
                   .withPage(AddressLookupPage, Seq(addressLookup))
+                  .withPage(IndUKAddressWithoutIdPage, address)
 
                 val result = IndWhereDoYouLivePage.cleanup(Some(true), userAnswers).success.value
 
-                result.get(IndUKAddressWithoutIdPage) mustBe empty
+                result.get(IndSelectAddressPage) mustBe empty
+
                 result.get(IndWhatIsYourPostcodePage) must not be empty
-                result.get(IndSelectAddressPage) must not be empty
                 result.get(IndSelectedAddressLookupPage) must not be empty
                 result.get(AddressLookupPage) must not be empty
+                result.get(IndUKAddressWithoutIdPage) must not be empty
             }
         }
       }
@@ -73,6 +74,7 @@ class IndWhereDoYouLivePageSpec extends PageBehaviours {
                 result.get(IndSelectAddressPage) mustBe empty
                 result.get(IndSelectedAddressLookupPage) mustBe empty
                 result.get(AddressLookupPage) mustBe empty
+
                 result.get(IndUKAddressWithoutIdPage) must not be empty
             }
         }

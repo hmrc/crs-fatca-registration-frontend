@@ -31,7 +31,7 @@ case object IndWhereDoYouLivePage extends QuestionPage[Boolean] {
 
     case Some(true) =>
       List(
-        IndUKAddressWithoutIdPage
+        IndSelectAddressPage
       ).foldLeft(Try(userAnswers))(PageLists.removePage)
 
     case Some(false) =>
