@@ -32,53 +32,42 @@ class IndWhereDoYouLivePageSpec extends PageBehaviours {
     beRemovable[Boolean](IndWhereDoYouLivePage)
 
     "cleanup" - {
-      "must only remove IndSelectAddressPage answers when true" - {
-        ScalaCheckPropertyChecks.forAll(arbitrary[models.AddressLookup]) {
-          addressLookup =>
-            ScalaCheckPropertyChecks.forAll(arbitrary[models.Address]) {
-              address =>
-                val userAnswers = emptyUserAnswers
-                  .withPage(IndSelectAddressPage, addressLookup.format)
-                  .withPage(IndWhatIsYourPostcodePage, TestPostCode)
-                  .withPage(IndSelectedAddressLookupPage, addressLookup)
-                  .withPage(AddressLookupPage, Seq(addressLookup))
-                  .withPage(IndUKAddressWithoutIdPage, address)
+      "must remove IndNonUKAddressWithoutIdPage answers when true" - {
+        ScalaCheckPropertyChecks.forAll(arbitrary[models.Address]) {
+          address =>
+            val userAnswers = emptyUserAnswers.withPage(IndNonUKAddressWithoutIdPage, address)
 
-                val result = IndWhereDoYouLivePage.cleanup(Some(true), userAnswers).success.value
+            val result = IndWhereDoYouLivePage.cleanup(Some(true), userAnswers).success.value
 
-                result.get(IndSelectAddressPage) mustBe empty
-
-                result.get(IndWhatIsYourPostcodePage) must not be empty
-                result.get(IndSelectedAddressLookupPage) must not be empty
-                result.get(AddressLookupPage) must not be empty
-                result.get(IndUKAddressWithoutIdPage) must not be empty
-            }
+            result.get(IndNonUKAddressWithoutIdPage) mustBe empty
         }
       }
 
-      "must only remove IndWhatIsYourPostcodePage, IndSelectAddressPage, IndSelectedAddressLookupPage, and AddressLookupPage answers when false" - {
-        ScalaCheckPropertyChecks.forAll(arbitrary[models.AddressLookup]) {
-          addressLookup =>
-            ScalaCheckPropertyChecks.forAll(arbitrary[models.Address]) {
-              address =>
-                val userAnswers = emptyUserAnswers
-                  .withPage(IndWhatIsYourPostcodePage, TestPostCode)
-                  .withPage(IndSelectAddressPage, addressLookup.format)
-                  .withPage(IndSelectedAddressLookupPage, addressLookup)
-                  .withPage(AddressLookupPage, Seq(addressLookup))
-                  .withPage(IndUKAddressWithoutIdPage, address)
+      "must remove IndWhatIsYourPostcodePage, IndSelectAddressPage, IndUKAddressWithoutIdPage, IndSelectedAddressLookupPage, " +
+        "and AddressLookupPage answers when false" - {
+          val generator = for {
+            addressLookup <- arbitrary[models.AddressLookup]
+            address       <- arbitrary[models.Address]
+          } yield (addressLookup, address)
 
-                val result = IndWhereDoYouLivePage.cleanup(Some(false), userAnswers).success.value
+          forAll(generator) {
+            case (addressLookup, address) =>
+              val userAnswers = emptyUserAnswers
+                .withPage(IndSelectAddressPage, addressLookup.format)
+                .withPage(IndWhatIsYourPostcodePage, TestPostCode)
+                .withPage(IndSelectedAddressLookupPage, addressLookup)
+                .withPage(AddressLookupPage, Seq(addressLookup))
+                .withPage(IndUKAddressWithoutIdPage, address)
 
-                result.get(IndWhatIsYourPostcodePage) mustBe empty
-                result.get(IndSelectAddressPage) mustBe empty
-                result.get(IndSelectedAddressLookupPage) mustBe empty
-                result.get(AddressLookupPage) mustBe empty
+              val result = IndWhereDoYouLivePage.cleanup(Some(false), userAnswers).success.value
 
-                result.get(IndUKAddressWithoutIdPage) must not be empty
-            }
+              result.get(IndSelectAddressPage) mustBe empty
+              result.get(IndWhatIsYourPostcodePage) mustBe empty
+              result.get(IndSelectedAddressLookupPage) mustBe empty
+              result.get(AddressLookupPage) mustBe empty
+              result.get(IndUKAddressWithoutIdPage) mustBe empty
+          }
         }
-      }
     }
   }
 
