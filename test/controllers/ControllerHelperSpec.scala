@@ -72,7 +72,7 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some(routes.JourneyRecoveryController.onPageLoad().url)
+      redirectLocation(result) shouldBe Some(routes.RegistrationConfirmationController.onPageLoad().url)
 
       verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any(), any())(any(), any())
     }

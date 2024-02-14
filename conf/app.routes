@@ -228,6 +228,8 @@ POST       /register/without-id/where-do-you-live                     controller
 GET        /register/without-id/change-where-do-you-live              controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: models.Mode = models.CheckMode)
 POST       /register/without-id/change-where-do-you-live              controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: models.Mode = models.CheckMode)
 
+GET        /register/confirm-registration                             controllers.RegistrationConfirmationController.onPageLoad()
+
 GET        /individualChangeContactDetails                       controllers.changeContactDetails.IndividualChangeContactDetailsController.onPageLoad()
 
 GET        /change-contact/individual/email                        controllers.changeContactDetails.IndividualEmailController.onPageLoad(mode: Mode = NormalMode)
