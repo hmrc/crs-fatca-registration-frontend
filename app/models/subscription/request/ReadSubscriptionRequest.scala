@@ -19,7 +19,7 @@ package models.subscription.request
 import models.IdentifierType
 import play.api.libs.json.{Json, OFormat}
 
-case class ReadSubscriptionRequest(requestCommon: SubscriptionRequestCommon, requestDetail: RequestDetail)
+case class ReadSubscriptionRequest(requestDetail: RequestDetail)
 
 object ReadSubscriptionRequest {
   implicit val format: OFormat[ReadSubscriptionRequest] = Json.format[ReadSubscriptionRequest]
@@ -28,7 +28,7 @@ object ReadSubscriptionRequest {
 
   def createReadSubscriptionRequest(safeID: String): ReadSubscriptionRequest = {
     val requestDetail = RequestDetail(idType, safeID)
-    ReadSubscriptionRequest(SubscriptionRequestCommon.createSubscriptionRequestCommon(), requestDetail)
+    ReadSubscriptionRequest(requestDetail)
   }
 
 }

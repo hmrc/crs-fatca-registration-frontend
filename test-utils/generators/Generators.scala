@@ -178,7 +178,7 @@ trait Generators extends ModelGenerators with RegexConstants {
 
       pt3alphaOpt <- Gen.option(Gen.alphaChar)
       pt3numOpt   <- Gen.option(Gen.choose(0, 9))
-      pt3 = if (pt3alphaOpt.isEmpty) pt3numOpt.getOrElse("").toString else pt3alphaOpt.get.toString
+      pt3: String = if (pt3alphaOpt.isEmpty) pt3numOpt.getOrElse("").toString else pt3alphaOpt.get.toString
 
       pt4 <- Gen.choose(0, 9)
       pt5a <- Gen.alphaChar suchThat (

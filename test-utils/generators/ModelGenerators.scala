@@ -75,17 +75,7 @@ trait ModelGenerators {
     } yield RequestParameter(paramName, paramValue)
   }
 
-  implicit val arbitrarySubscriptionRequestCommon: Arbitrary[SubscriptionRequestCommon] = Arbitrary {
-    for {
-      regime                   <- arbitrary[String]
-      receiptDate              <- arbitrary[String]
-      acknowledgementReference <- arbitrary[String]
-      originatingSystem        <- arbitrary[String]
-      requestParameters        <- Gen.option(arbitrary[Seq[RequestParameter]])
-    } yield SubscriptionRequestCommon(regime, receiptDate, acknowledgementReference, originatingSystem, requestParameters)
-  }
-
-  implicit val arbitraryCreateRequestDetail: Arbitrary[CreateRequestDetail] = Arbitrary {
+  implicit val arbitraryCreateRequestDetail: Arbitrary[CreateSubscriptionDetailsRequest] = Arbitrary {
     for {
       idType           <- arbitrary[String]
       idNumber         <- arbitrary[String]
@@ -93,14 +83,13 @@ trait ModelGenerators {
       isGBUser         <- arbitrary[Boolean]
       primaryContact   <- arbitrary[ContactInformation]
       secondaryContact <- Gen.option(arbitrary[ContactInformation])
-    } yield CreateRequestDetail(idType, idNumber, tradingName, isGBUser, primaryContact, secondaryContact)
+    } yield CreateSubscriptionDetailsRequest(idType, idNumber, tradingName, isGBUser, primaryContact, secondaryContact)
   }
 
   implicit val arbitrarySubscriptionRequest: Arbitrary[SubscriptionRequest] = Arbitrary {
     for {
-      requestCommon  <- arbitrary[SubscriptionRequestCommon]
-      requestDetails <- arbitrary[CreateRequestDetail]
-    } yield SubscriptionRequest(requestCommon, requestDetails)
+      requestDetails <- arbitrary[CreateSubscriptionDetailsRequest]
+    } yield SubscriptionRequest(requestDetails)
   }
 
   implicit val arbitraryCreateSubscriptionRequest: Arbitrary[CreateSubscriptionRequest] = Arbitrary {
@@ -118,9 +107,8 @@ trait ModelGenerators {
 
   implicit val arbitraryReadSubscriptionRequest: Arbitrary[ReadSubscriptionRequest] = Arbitrary {
     for {
-      requestCommon  <- arbitrary[SubscriptionRequestCommon]
       requestDetails <- arbitrary[RequestDetail]
-    } yield ReadSubscriptionRequest(requestCommon, requestDetails)
+    } yield ReadSubscriptionRequest(requestDetails)
   }
 
   implicit val arbitraryDisplaySubscriptionRequest: Arbitrary[DisplaySubscriptionRequest] = Arbitrary {

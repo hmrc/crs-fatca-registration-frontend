@@ -22,26 +22,26 @@ import pages.{BusinessTradingNameWithoutIDPage, IndUKAddressWithoutIdPage, NonUK
 import play.api.libs.json.{Json, OFormat}
 import utils.UserAnswersHelper
 
-case class CreateRequestDetail(IDType: String,
-                               IDNumber: String,
-                               tradingName: Option[String],
-                               isGBUser: Boolean,
-                               primaryContact: ContactInformation,
-                               secondaryContact: Option[ContactInformation]
+case class CreateSubscriptionDetailsRequest(IDType: String,
+                                            IDNumber: String,
+                                            tradingName: Option[String],
+                                            isGBUser: Boolean,
+                                            primaryContact: ContactInformation,
+                                            secondaryContact: Option[ContactInformation]
 )
 
-object CreateRequestDetail extends UserAnswersHelper {
+object CreateSubscriptionDetailsRequest extends UserAnswersHelper {
 
-  implicit val format: OFormat[CreateRequestDetail] = Json.format[CreateRequestDetail]
-  private val idType: String                        = IdentifierType.SAFE
+  implicit val format: OFormat[CreateSubscriptionDetailsRequest] = Json.format[CreateSubscriptionDetailsRequest]
+  private val idType: String                                     = IdentifierType.SAFE
 
-  def convertTo(safeId: SafeId, userAnswers: UserAnswers): Option[CreateRequestDetail] = {
+  def convertTo(safeId: SafeId, userAnswers: UserAnswers): Option[CreateSubscriptionDetailsRequest] = {
     for {
       primaryContact <- ContactInformation.convertToPrimary(userAnswers)
     } yield ContactInformation.convertToSecondary(userAnswers) match {
       case Right(value) =>
         Some(
-          CreateRequestDetail(
+          CreateSubscriptionDetailsRequest(
             IDType = idType,
             IDNumber = safeId.value,
             tradingName = userAnswers.get(BusinessTradingNameWithoutIDPage),
