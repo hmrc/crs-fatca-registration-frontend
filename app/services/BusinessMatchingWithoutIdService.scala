@@ -50,14 +50,14 @@ class BusinessMatchingWithoutIdService @Inject() (registrationConnector: Registr
     }
 
   private def buildIndividualAddress(implicit request: DataRequest[AnyContent]): Option[Address] =
-    request.userAnswers.get(IndDoYouHaveNINumberPage) match {
-      case Some(false) =>
+    request.userAnswers.get(IndWhereDoYouLivePage) match {
+      case Some(true) =>
         request.userAnswers.get(IndSelectedAddressLookupPage) match {
           case Some(lookup) => lookup.toAddress
           case _ =>
             request.userAnswers.get(IndUKAddressWithoutIdPage)
         }
-      case _ => request.userAnswers.get(IndUKAddressWithoutIdPage)
+      case _ => request.userAnswers.get(IndNonUKAddressWithoutIdPage)
     }
 
   private val registrationError = Future.successful(Left(MandatoryInformationMissingError()))
