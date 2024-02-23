@@ -87,7 +87,7 @@ object IndividualDetails {
       (__ \ "individual" \ "lastName").write[String])(unlift(IndividualDetails.unapply))
 
   def convertTo(userAnswers: UserAnswers): Option[IndividualDetails] =
-    (userAnswers.get(WhatIsYourNamePage), userAnswers.get(IndContactNamePage), userAnswers.get(WhatIsYourNamePage)) match {
+    (userAnswers.get(IndWhatIsYourNamePage), userAnswers.get(IndContactNamePage), userAnswers.get(WhatIsYourNamePage)) match {
       case (Some(name), _, _)                  => Some(IndividualDetails(name.firstName, None, name.lastName))
       case (_, Some(individualContactName), _) => Some(IndividualDetails(individualContactName.firstName, None, individualContactName.lastName))
       case (_, _, Some(soleTraderName))        => Some(IndividualDetails(soleTraderName.firstName, None, soleTraderName.lastName))
