@@ -24,7 +24,7 @@ import models.error.ApiError
 import models.error.ApiError.NotFoundError
 import models.matching.SafeId
 import models.requests.DataRequest
-import models.{Address, Country}
+import models.{Address, Country, ReporterType}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.MockitoSugar.when
@@ -63,12 +63,15 @@ class BusinessMatchingWithoutIdServiceSpec extends SpecBase {
 
     "registerWithoutId" - {
 
-      "must return a safeId when individual information can be matched" in {
+      "must return a safeId for a uk individual" in {
         val response: Future[Either[ApiError, SafeId]] = Future.successful(Right(safeId))
 
         when(mockRegistrationConnector.withIndividualNoId(any())(any(), any())).thenReturn(response)
 
         val userAnswers = emptyUserAnswers
+          .set(ReporterTypePage, ReporterType.Individual)
+          .success
+          .value
           .set(IndDoYouHaveNINumberPage, false)
           .success
           .value
@@ -78,13 +81,19 @@ class BusinessMatchingWithoutIdServiceSpec extends SpecBase {
           .set(DateOfBirthWithoutIdPage, dob)
           .success
           .value
-          .set(IndContactPhonePage, TestPhoneNumber)
+          .set(IndWhereDoYouLivePage, true)
+          .success
+          .value
+          .set(IndUKAddressWithoutIdPage, address)
           .success
           .value
           .set(IndContactEmailPage, TestEmail)
           .success
           .value
-          .set(IndUKAddressWithoutIdPage, address)
+          .set(IndContactHavePhonePage, true)
+          .success
+          .value
+          .set(IndContactPhonePage, TestPhoneNumber)
           .success
           .value
 
@@ -94,22 +103,83 @@ class BusinessMatchingWithoutIdServiceSpec extends SpecBase {
         result.futureValue mustBe Right(safeId)
       }
 
-      "must return a safeId when business information can be matched" in {
+      "must return a safeId for a non-uk individual" in {
+        val response: Future[Either[ApiError, SafeId]] = Future.successful(Right(safeId))
+
+        when(mockRegistrationConnector.withIndividualNoId(any())(any(), any())).thenReturn(response)
+
+        val userAnswers = emptyUserAnswers
+          .set(ReporterTypePage, ReporterType.Individual)
+          .success
+          .value
+          .set(IndDoYouHaveNINumberPage, false)
+          .success
+          .value
+          .set(IndWhatIsYourNamePage, name)
+          .success
+          .value
+          .set(DateOfBirthWithoutIdPage, dob)
+          .success
+          .value
+          .set(IndWhereDoYouLivePage, false)
+          .success
+          .value
+          .set(IndNonUKAddressWithoutIdPage, address)
+          .success
+          .value
+          .set(IndContactEmailPage, TestEmail)
+          .success
+          .value
+          .set(IndContactHavePhonePage, true)
+          .success
+          .value
+          .set(IndContactPhonePage, TestPhoneNumber)
+          .success
+          .value
+
+        val request: DataRequest[AnyContent]         = DataRequest(FakeRequest(), userAnswers.id, Individual, userAnswers)
+        val result: Future[Either[ApiError, SafeId]] = service.registerWithoutId()(request, hc)
+
+        result.futureValue mustBe Right(safeId)
+      }
+
+      "must return a safeId for a business" in {
         val response: Future[Either[ApiError, SafeId]] = Future.successful(Right(safeId))
 
         when(mockRegistrationConnector.withOrganisationNoId(any())(any(), any())).thenReturn(response)
 
         val userAnswers = emptyUserAnswers
+          .set(ReporterTypePage, ReporterType.LimitedCompany)
+          .success
+          .value
+          .set(RegisteredAddressInUKPage, false)
+          .success
+          .value
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
+          .success
+          .value
           .set(BusinessNameWithoutIDPage, OrgName)
           .success
           .value
-          .set(ContactPhonePage, TestPhoneNumber)
+          .set(HaveTradingNamePage, false)
+          .success
+          .value
+          .set(NonUKBusinessAddressWithoutIDPage, address)
+          .success
+          .value
+          .set(ContactNamePage, s"$FirstName $LastName")
           .success
           .value
           .set(ContactEmailPage, TestEmail)
           .success
           .value
-          .set(NonUKBusinessAddressWithoutIDPage, address)
+          .set(ContactHavePhonePage, true)
+          .success
+          .value
+          .set(ContactPhonePage, TestPhoneNumber)
+          .success
+          .value
+          .set(HaveSecondContactPage, false)
           .success
           .value
 
