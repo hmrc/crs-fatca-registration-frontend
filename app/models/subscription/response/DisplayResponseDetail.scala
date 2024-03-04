@@ -19,9 +19,9 @@ package models.subscription.response
 import models.subscription.request.ContactInformation
 import play.api.libs.json.{Json, OFormat}
 
-case class DisplayResponseDetail(subscriptionID: String,
+case class DisplayResponseDetail(subscriptionId: String,
                                  tradingName: Option[String],
-                                 isGBUser: Boolean,
+                                 gbUser: Boolean,
                                  primaryContact: ContactInformation,
                                  secondaryContact: Option[ContactInformation]
 )

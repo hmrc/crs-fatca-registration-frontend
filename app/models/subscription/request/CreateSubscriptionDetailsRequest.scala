@@ -22,10 +22,10 @@ import pages.{BusinessTradingNameWithoutIDPage, IndUKAddressWithoutIdPage, NonUK
 import play.api.libs.json.{Json, OFormat}
 import utils.UserAnswersHelper
 
-case class CreateSubscriptionDetailsRequest(IDType: String,
-                                            IDNumber: String,
+case class CreateSubscriptionDetailsRequest(idType: String,
+                                            idNumber: String,
                                             tradingName: Option[String],
-                                            isGBUser: Boolean,
+                                            gbUser: Boolean,
                                             primaryContact: ContactInformation,
                                             secondaryContact: Option[ContactInformation]
 )
@@ -42,10 +42,10 @@ object CreateSubscriptionDetailsRequest extends UserAnswersHelper {
       case Right(value) =>
         Some(
           CreateSubscriptionDetailsRequest(
-            IDType = idType,
-            IDNumber = safeId.value,
+            idType = idType,
+            idNumber = safeId.value,
             tradingName = userAnswers.get(BusinessTradingNameWithoutIDPage),
-            isGBUser = isGBUser(userAnswers),
+            gbUser = isGBUser(userAnswers),
             primaryContact = primaryContact,
             secondaryContact = value
           )

@@ -51,17 +51,17 @@ object ContactType {
 
 }
 
-case class OrganisationDetails(organisationName: String) extends ContactType
+case class OrganisationDetails(name: String) extends ContactType
 
 object OrganisationDetails {
 
   implicit lazy val reads: Reads[OrganisationDetails] = {
     import play.api.libs.functional.syntax._
-    (__ \ "organisation" \ "organisationName").read[String] fmap OrganisationDetails.apply
+    (__ \ "organisation" \ "name").read[String] fmap OrganisationDetails.apply
   }
 
   implicit val writes: Writes[OrganisationDetails] =
-    (__ \ "organisation" \ "organisationName").write[String] contramap unlift(OrganisationDetails.unapply)
+    (__ \ "organisation" \ "name").write[String] contramap unlift(OrganisationDetails.unapply)
 
   def convertTo(contactName: Option[String]): Option[OrganisationDetails] =
     contactName.map(OrganisationDetails(_))
