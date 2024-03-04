@@ -37,7 +37,7 @@
         <p  class="govuk-body">@messages("yourContactDetails.p2")</p>
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
         )
     }
 }

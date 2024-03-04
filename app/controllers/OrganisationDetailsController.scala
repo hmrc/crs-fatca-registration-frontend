@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,41 +14,26 @@
  * limitations under the License.
  */
 
-package controllers.organisation
+package controllers
 
-import config.FrontendAppConfig
 import controllers.actions._
-import models.ReporterType.Sole
-import pages.ReporterTypePage
-import play.api.Logging
+import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.SoleTraderNotIdentifiedView
-import views.html.organisation.BusinessNotIdentifiedView
+import views.html.OrganisationDetailsView
 
-import javax.inject.Inject
-
-class BusinessNotIdentifiedController @Inject() (
+class OrganisationDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
-  appConfig: FrontendAppConfig,
-  view: BusinessNotIdentifiedView,
-  viewSoleTrader: SoleTraderNotIdentifiedView
+  view: OrganisationDetailsView
 ) extends FrontendBaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad: Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
-      val startUrl     = controllers.routes.IndexController.onPageLoad.url
-      val reporterType = request.userAnswers.get(ReporterTypePage)
-
-      reporterType match {
-        case Some(Sole) => Ok(viewSoleTrader(startUrl))
-        case _          => Ok(view(appConfig.findCompanyName, reporterType, startUrl))
-      }
+      Ok(view())
   }
 
 }

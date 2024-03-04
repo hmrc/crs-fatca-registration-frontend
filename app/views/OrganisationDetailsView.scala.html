@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,29 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package forms.changeContactDetails
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
 
-import forms.mappings.Mappings
-import play.api.data.Form
-import utils.RegexConstants
+@()(implicit request: Request[_], messages: Messages)
 
-import javax.inject.Inject
+@layout(pageTitle = titleNoForm(messages("organisationDetails.title"))) {
 
-class IndividualEmailFormProvider @Inject() extends Mappings with RegexConstants {
-
-  private val maxLength = 132
-
-  def apply(): Form[String] =
-    Form(
-      "value" -> validatedText(
-        "individualEmail.error.required",
-        "individualEmail.error.invalid",
-        "individualEmail.error.length",
-        emailRegex,
-        maxLength
-      )
-    )
-
+    <h1 class="govuk-heading-xl">@messages("organisationDetails.heading")</h1>
 }
