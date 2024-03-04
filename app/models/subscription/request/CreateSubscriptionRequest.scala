@@ -19,7 +19,7 @@ package models.subscription.request
 import models.matching.SafeId
 import models.{IdentifierType, UserAnswers}
 import pages.{BusinessTradingNameWithoutIDPage, IndUKAddressWithoutIdPage, NonUKBusinessAddressWithoutIDPage}
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, Reads, Writes}
 import utils.UserAnswersHelper
 
 case class CreateSubscriptionRequest(idType: String,
@@ -32,8 +32,8 @@ case class CreateSubscriptionRequest(idType: String,
 
 object CreateSubscriptionRequest extends UserAnswersHelper {
 
-  implicit val format: OFormat[CreateSubscriptionRequest] = Json.format[CreateSubscriptionRequest]
-  private val idType: String                              = IdentifierType.SAFE
+  implicit val reads: Reads[CreateSubscriptionRequest]   = Json.reads[CreateSubscriptionRequest]
+  implicit val writes: Writes[CreateSubscriptionRequest] = Json.writes[CreateSubscriptionRequest]
 
   def convertTo(safeId: SafeId, userAnswers: UserAnswers): Option[CreateSubscriptionRequest] = {
     for {
@@ -42,7 +42,7 @@ object CreateSubscriptionRequest extends UserAnswersHelper {
       case Right(value) =>
         Some(
           CreateSubscriptionRequest(
-            idType = idType,
+            idType = IdentifierType.SAFE,
             idNumber = safeId.value,
             tradingName = userAnswers.get(BusinessTradingNameWithoutIDPage),
             gbUser = isGBUser(userAnswers),

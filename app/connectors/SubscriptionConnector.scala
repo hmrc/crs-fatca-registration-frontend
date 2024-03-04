@@ -68,15 +68,13 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
         .POST[CreateSubscriptionRequest, HttpResponse](
           submissionUrl,
           createSubscriptionRequest
-        )(wts = CreateSubscriptionRequest.format.writes, rds = readRaw, hc = hc, ec = ec)
+        )(wts = CreateSubscriptionRequest.writes, rds = readRaw, hc = hc, ec = ec)
         .map {
           case response if is2xx(response.status) =>
-            response.json
-              .asOpt[CreateSubscriptionResponse]
-              .map(
-                r => Right(SubscriptionID(r.success.subscriptionId))
-              )
-              .getOrElse(Left(UnableToCreateEMTPSubscriptionError))
+            response.json.asOpt[CreateSubscriptionResponse] match {
+              case Some(response) => Right(response.subscriptionId)
+              case _              => Left(UnableToCreateEMTPSubscriptionError)
+            }
           case response if response.status equals CONFLICT =>
             logger.warn(s"Duplicate submission to ETMP. ${response.status} response status")
             Left(DuplicateSubmissionError)
