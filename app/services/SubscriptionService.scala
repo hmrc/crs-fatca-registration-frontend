@@ -22,8 +22,8 @@ import connectors.SubscriptionConnector
 import models.error.ApiError
 import models.error.ApiError.MandatoryInformationMissingError
 import models.matching.SafeId
-import models.subscription.request.{CreateSubscriptionRequest, DisplaySubscriptionRequest, SubscriptionRequest}
-import models.{SubscriptionID, UserAnswers}
+import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
+import models.{IdentifierType, SubscriptionID, UserAnswers}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -39,9 +39,9 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
       case Some(subscriptionID) =>
         EitherT.rightT(subscriptionID).value
       case _ =>
-        (SubscriptionRequest.convertTo(safeID, userAnswers) match {
+        (CreateSubscriptionRequest.convertTo(safeID, userAnswers) match {
           case Some(subscriptionRequest) =>
-            val response = subscriptionConnector.createSubscription(CreateSubscriptionRequest(subscriptionRequest))
+            val response = subscriptionConnector.createSubscription(subscriptionRequest)
 
             response
           case _ =>
@@ -52,9 +52,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
   def getDisplaySubscriptionId(safeId: SafeId)(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
-  ): Future[Option[SubscriptionID]] = {
-    val displaySubscription: DisplaySubscriptionRequest = DisplaySubscriptionRequest.convertTo(safeId.value)
-    subscriptionConnector.readSubscription(displaySubscription)
-  }
+  ): Future[Option[SubscriptionID]] =
+    subscriptionConnector.readSubscription(ReadSubscriptionRequest(IdentifierType.SAFEID, safeId.value))
 
 }

@@ -75,7 +75,7 @@ trait ModelGenerators {
     } yield RequestParameter(paramName, paramValue)
   }
 
-  implicit val arbitraryCreateRequestDetail: Arbitrary[CreateSubscriptionDetailsRequest] = Arbitrary {
+  implicit val arbitraryCreateRequestDetail: Arbitrary[CreateSubscriptionRequest] = Arbitrary {
     for {
       idType           <- arbitrary[String]
       idNumber         <- arbitrary[String]
@@ -83,38 +83,14 @@ trait ModelGenerators {
       isGBUser         <- arbitrary[Boolean]
       primaryContact   <- arbitrary[ContactInformation]
       secondaryContact <- Gen.option(arbitrary[ContactInformation])
-    } yield CreateSubscriptionDetailsRequest(idType, idNumber, tradingName, isGBUser, primaryContact, secondaryContact)
+    } yield CreateSubscriptionRequest(idType, idNumber, tradingName, isGBUser, primaryContact, secondaryContact)
   }
 
-  implicit val arbitrarySubscriptionRequest: Arbitrary[SubscriptionRequest] = Arbitrary {
-    for {
-      requestDetails <- arbitrary[CreateSubscriptionDetailsRequest]
-    } yield SubscriptionRequest(requestDetails)
-  }
-
-  implicit val arbitraryCreateSubscriptionRequest: Arbitrary[CreateSubscriptionRequest] = Arbitrary {
-    for {
-      subscriptionRequest <- arbitrary[SubscriptionRequest]
-    } yield CreateSubscriptionRequest(subscriptionRequest)
-  }
-
-  implicit val arbitraryRequestDetail: Arbitrary[RequestDetail] = Arbitrary {
+  implicit val arbitraryRequestDetail: Arbitrary[ReadSubscriptionRequest] = Arbitrary {
     for {
       idType   <- arbitrary[String]
       idNumber <- arbitrary[String]
-    } yield RequestDetail(idType, idNumber)
-  }
-
-  implicit val arbitraryReadSubscriptionRequest: Arbitrary[ReadSubscriptionRequest] = Arbitrary {
-    for {
-      requestDetails <- arbitrary[RequestDetail]
-    } yield ReadSubscriptionRequest(requestDetails)
-  }
-
-  implicit val arbitraryDisplaySubscriptionRequest: Arbitrary[DisplaySubscriptionRequest] = Arbitrary {
-    for {
-      subscriptionRequest <- arbitrary[ReadSubscriptionRequest]
-    } yield DisplaySubscriptionRequest(subscriptionRequest)
+    } yield ReadSubscriptionRequest(idType, idNumber)
   }
 
   implicit lazy val arbitraryCountry: Arbitrary[Country] =

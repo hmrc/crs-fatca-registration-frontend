@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import models.SubscriptionID
 import models.error.ApiError
 import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
-import models.subscription.request.{CreateSubscriptionDetailsRequest, CreateSubscriptionRequest, DisplaySubscriptionRequest, RequestDetail}
+import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
 import models.subscription.response.{CreateSubscriptionResponse, DisplaySubscriptionResponse}
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, CONFLICT, NOT_FOUND, SERVICE_UNAVAILABLE}
@@ -35,13 +35,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: HttpClient) extends Logging {
 
   def readSubscription(
-    displaySubscriptionRequest: DisplaySubscriptionRequest
+    readSubscriptionRequest: ReadSubscriptionRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SubscriptionID]] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/subscription/read-subscription"
 
     http
-      .POST[RequestDetail, HttpResponse](submissionUrl, displaySubscriptionRequest.displaySubscriptionRequest.requestDetail)
+      .POST[ReadSubscriptionRequest, HttpResponse](submissionUrl, readSubscriptionRequest)
       .map {
         case responseMessage if is2xx(responseMessage.status) =>
           responseMessage.json
@@ -65,10 +65,10 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
     val submissionUrl = s"${config.businessMatchingUrl}/subscription/create-subscription"
     EitherT {
       http
-        .POST[CreateSubscriptionDetailsRequest, HttpResponse](
+        .POST[CreateSubscriptionRequest, HttpResponse](
           submissionUrl,
-          createSubscriptionRequest.createSubscriptionRequest.requestDetail
-        )(wts = CreateSubscriptionDetailsRequest.format.writes, rds = readRaw, hc = hc, ec = ec)
+          createSubscriptionRequest
+        )(wts = CreateSubscriptionRequest.format.writes, rds = readRaw, hc = hc, ec = ec)
         .map {
           case response if is2xx(response.status) =>
             response.json

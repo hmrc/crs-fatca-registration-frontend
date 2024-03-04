@@ -25,7 +25,7 @@ import helpers.WireMockServerHandler
 import models.SubscriptionID
 import models.error.ApiError
 import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
-import models.subscription.request.{CreateSubscriptionRequest, DisplaySubscriptionRequest}
+import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -53,8 +53,8 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
   "SubscriptionConnector" - {
     "readSubscription" - {
       "must return SubscriptionID for individual subscription" in {
-        val displaySubscriptionRequest = arbitrary[DisplaySubscriptionRequest].sample.value
-        val expectedResponse           = Some(SubscriptionID("Subscription 123"))
+        val request          = arbitrary[ReadSubscriptionRequest].sample.value
+        val expectedResponse = Some(SubscriptionID("Subscription 123"))
 
         val subscriptionResponse = Json.obj(
           "success" -> Json.obj(
@@ -84,13 +84,13 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         stubPostResponse("/read-subscription", OK, subscriptionResponse.toString())
 
-        val result: Future[Option[SubscriptionID]] = connector.readSubscription(displaySubscriptionRequest)
+        val result: Future[Option[SubscriptionID]] = connector.readSubscription(request)
         result.futureValue mustBe expectedResponse
       }
 
       "must return SubscriptionID for organisation subscription" in {
-        val displaySubscriptionRequest = arbitrary[DisplaySubscriptionRequest].sample.value
-        val expectedResponse           = Some(SubscriptionID("Subscription 123"))
+        val request          = arbitrary[ReadSubscriptionRequest].sample.value
+        val expectedResponse = Some(SubscriptionID("Subscription 123"))
 
         val subscriptionResponse = Json.obj(
           "success" -> Json.obj(
@@ -119,12 +119,12 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         stubPostResponse("/read-subscription", OK, subscriptionResponse.toString())
 
-        val result: Future[Option[SubscriptionID]] = connector.readSubscription(displaySubscriptionRequest)
+        val result: Future[Option[SubscriptionID]] = connector.readSubscription(request)
         result.futureValue mustBe expectedResponse
       }
 
       "must return None when read subscription fails" in {
-        val displaySubscriptionRequest = arbitrary[DisplaySubscriptionRequest].sample.value
+        val request = arbitrary[ReadSubscriptionRequest].sample.value
 
         val subscriptionResponse = Json.obj(
           "errorDetail" -> Json.obj(
@@ -141,7 +141,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         stubPostResponse("/read-subscription", OK, subscriptionResponse.toString())
 
-        val result = connector.readSubscription(displaySubscriptionRequest)
+        val result = connector.readSubscription(request)
         result.futureValue mustBe None
       }
     }
