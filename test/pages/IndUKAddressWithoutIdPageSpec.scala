@@ -31,7 +31,7 @@ class IndUKAddressWithoutIdPageSpec extends PageBehaviours {
     beRemovable[Address](IndUKAddressWithoutIdPage)
 
     "cleanup" - {
-      "must remove IndSelectAddressPage" - {
+      "must remove IndSelectAddressPage" in {
         val generator = for {
           addressLookup <- arbitrary[models.AddressLookup]
           address       <- arbitrary[models.Address]

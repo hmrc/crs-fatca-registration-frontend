@@ -17,10 +17,13 @@
 package generators
 
 import models._
+import models.register.response.details.{AddressResponse => RegistrationAddressResponse}
+import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, RegistrationInfo, SafeId}
 import models.subscription.request._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
+import wolfendale.scalacheck.regexp.RegexpGen
 
 trait ModelGenerators {
 
@@ -141,9 +144,9 @@ trait ModelGenerators {
   implicit lazy val arbitraryAddressWithoutId: Arbitrary[models.Address] =
     Arbitrary {
       for {
-        addressLine1 <- arbitrary[String]
+        addressLine1 <- arbitrary[String].suchThat(_.nonEmpty)
         addressLine2 <- arbitrary[Option[String]]
-        addressLine3 <- arbitrary[String]
+        addressLine3 <- arbitrary[String].suchThat(_.nonEmpty)
         addressLine4 <- arbitrary[Option[String]]
         postCode     <- arbitrary[Option[String]]
         country      <- arbitrary[Country]
@@ -166,8 +169,8 @@ trait ModelGenerators {
   implicit lazy val arbitraryName: Arbitrary[models.Name] =
     Arbitrary {
       for {
-        firstName <- arbitrary[String]
-        lastName  <- arbitrary[String]
+        firstName <- RegexpGen.from(Name.RegexString)
+        lastName  <- RegexpGen.from(Name.RegexString)
       } yield models.Name(firstName, lastName)
     }
 
@@ -177,6 +180,40 @@ trait ModelGenerators {
       number <- Gen.choose(minimumNumber, maximumNumber)
       suffix <- Gen.oneOf(Nino.validSuffixes)
     } yield Nino(f"$prefix$number%06d$suffix")
+  }
+
+  implicit val arbitraryAddressResponse: Arbitrary[RegistrationAddressResponse] = Arbitrary {
+    arbitrary[Address].map {
+      address =>
+        RegistrationAddressResponse(
+          address.addressLine1,
+          address.addressLine2,
+          Option(address.addressLine3),
+          address.addressLine4,
+          address.postCode,
+          address.country.code
+        )
+    }
+  }
+
+  implicit val arbitraryOrgRegistrationInfo: Arbitrary[OrgRegistrationInfo] = Arbitrary {
+    for {
+      idNumber        <- arbitrary[String].suchThat(_.nonEmpty)
+      name            <- arbitrary[Name]
+      addressResponse <- arbitrary[RegistrationAddressResponse]
+    } yield OrgRegistrationInfo(SafeId(idNumber), name.fullName, addressResponse)
+  }
+
+  implicit val arbitraryIndRegistrationInfo: Arbitrary[IndRegistrationInfo] = Arbitrary {
+    arbitrary[String]
+      .suchThat(_.nonEmpty)
+      .map(
+        idNumber => IndRegistrationInfo(SafeId(idNumber))
+      )
+  }
+
+  implicit val arbitraryRegistrationInfo: Arbitrary[RegistrationInfo] = Arbitrary {
+    Gen.oneOf(arbitrary[OrgRegistrationInfo], arbitrary[IndRegistrationInfo])
   }
 
 //Line holder for template scripts
