@@ -16,10 +16,49 @@
 
 package models.subscription.request
 
-import play.api.libs.json.{Json, OWrites}
+import models.matching.SafeId
+import models.{IdentifierType, UserAnswers}
+import pages.{BusinessTradingNameWithoutIDPage, IndUKAddressWithoutIdPage, NonUKBusinessAddressWithoutIDPage}
+import play.api.libs.json.{Json, Reads, Writes}
+import utils.UserAnswersHelper
 
-case class CreateSubscriptionRequest(createSubscriptionRequest: SubscriptionRequest)
+case class CreateSubscriptionRequest(idType: String,
+                                     idNumber: String,
+                                     tradingName: Option[String],
+                                     gbUser: Boolean,
+                                     primaryContact: ContactInformation,
+                                     secondaryContact: Option[ContactInformation]
+)
 
-object CreateSubscriptionRequest {
-  implicit val writes: OWrites[CreateSubscriptionRequest] = Json.writes[CreateSubscriptionRequest]
+object CreateSubscriptionRequest extends UserAnswersHelper {
+
+  implicit val reads: Reads[CreateSubscriptionRequest]   = Json.reads[CreateSubscriptionRequest]
+  implicit val writes: Writes[CreateSubscriptionRequest] = Json.writes[CreateSubscriptionRequest]
+
+  def convertTo(safeId: SafeId, userAnswers: UserAnswers): Option[CreateSubscriptionRequest] = {
+    for {
+      primaryContact <- ContactInformation.convertToPrimary(userAnswers)
+    } yield ContactInformation.convertToSecondary(userAnswers) match {
+      case Right(value) =>
+        Some(
+          CreateSubscriptionRequest(
+            idType = IdentifierType.SAFE,
+            idNumber = safeId.value,
+            tradingName = userAnswers.get(BusinessTradingNameWithoutIDPage),
+            gbUser = isGBUser(userAnswers),
+            primaryContact = primaryContact,
+            secondaryContact = value
+          )
+        )
+      case _ => None
+    }
+  }.flatten
+
+  private def isGBUser(userAnswers: UserAnswers): Boolean =
+    if (userAnswers.get(NonUKBusinessAddressWithoutIDPage).exists(_.isOtherCountry) || userAnswers.get(IndUKAddressWithoutIdPage).exists(_.isOtherCountry)) {
+      false
+    } else {
+      true
+    }
+
 }

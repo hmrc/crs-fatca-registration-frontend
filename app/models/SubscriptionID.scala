@@ -16,14 +16,10 @@
 
 package models
 
-import models.subscription.response.SubscriptionIDResponse
 import play.api.libs.json.Json
 
 case class SubscriptionID(value: String)
 
 object SubscriptionID {
-
-  def apply(response: SubscriptionIDResponse): SubscriptionID = new SubscriptionID(response.subscriptionID)
-
   implicit val format = Json.format[SubscriptionID]
 }

@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import models.SubscriptionID
 import models.error.ApiError
 import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
-import models.subscription.request.{CreateSubscriptionRequest, DisplaySubscriptionRequest}
+import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
 import models.subscription.response.{CreateSubscriptionResponse, DisplaySubscriptionResponse}
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, CONFLICT, NOT_FOUND, SERVICE_UNAVAILABLE}
@@ -35,18 +35,18 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: HttpClient) extends Logging {
 
   def readSubscription(
-    displaySubscriptionRequest: DisplaySubscriptionRequest
+    readSubscriptionRequest: ReadSubscriptionRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SubscriptionID]] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/subscription/read-subscription"
 
     http
-      .POST[DisplaySubscriptionRequest, HttpResponse](submissionUrl, displaySubscriptionRequest)
+      .POST[ReadSubscriptionRequest, HttpResponse](submissionUrl, readSubscriptionRequest)
       .map {
         case responseMessage if is2xx(responseMessage.status) =>
           responseMessage.json
             .asOpt[DisplaySubscriptionResponse]
-            .map(_.subscriptionID)
+            .map(_.subscriptionId)
         case errorStatus =>
           logger.warn(s"Status $errorStatus has been thrown when display subscription was called")
           None
@@ -71,12 +71,10 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
         )(wts = CreateSubscriptionRequest.writes, rds = readRaw, hc = hc, ec = ec)
         .map {
           case response if is2xx(response.status) =>
-            response.json
-              .asOpt[CreateSubscriptionResponse]
-              .map(
-                r => Right(SubscriptionID(r.createSubscriptionResponse.subscriptionID))
-              )
-              .getOrElse(Left(UnableToCreateEMTPSubscriptionError))
+            response.json.asOpt[CreateSubscriptionResponse] match {
+              case Some(response) => Right(response.subscriptionId)
+              case _              => Left(UnableToCreateEMTPSubscriptionError)
+            }
           case response if response.status equals CONFLICT =>
             logger.warn(s"Duplicate submission to ETMP. ${response.status} response status")
             Left(DuplicateSubmissionError)

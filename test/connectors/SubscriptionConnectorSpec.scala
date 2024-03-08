@@ -25,13 +25,14 @@ import helpers.WireMockServerHandler
 import models.SubscriptionID
 import models.error.ApiError
 import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
-import models.subscription.request.{CreateSubscriptionRequest, DisplaySubscriptionRequest}
+import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -51,69 +52,96 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
   "SubscriptionConnector" - {
     "readSubscription" - {
-      "must return SubscriptionID for valid input request for CRS-FATCA" in {
-        val displaySubscriptionRequest = arbitrary[DisplaySubscriptionRequest].sample.value
-        val expectedResponse           = SubscriptionID("subscriptionID")
+      "must return SubscriptionID for individual subscription" in {
+        val request          = arbitrary[ReadSubscriptionRequest].sample.value
+        val expectedResponse = Some(SubscriptionID("Subscription 123"))
 
-        val subscriptionResponse: String =
-          s"""
-             |{
-             | "displaySubscriptionResponse": {
-             |   "responseCommon": {
-             |     "status": "OK",
-             |     "processingDate": "2020-09-23T16:12:11Z"
-             |   },
-             |   "responseDetail": {
-             |      "subscriptionID": "subscriptionID"
-             |   }
-             | }
-             |}""".stripMargin
+        val subscriptionResponse = Json.obj(
+          "success" -> Json.obj(
+            "processingDate" -> "2020-01-01T00:00:00Z",
+            "subscriptionId" -> "Subscription 123",
+            "gbUser"         -> true,
+            "primaryContact" -> Json.obj(
+              "individual" -> Json.obj(
+                "firstName" -> "Primary",
+                "lastName"  -> "Contact"
+              ),
+              "email"  -> "test1@example.com",
+              "phone"  -> "0191 498 0001",
+              "mobile" -> "0770 090 0001"
+            ),
+            "secondaryContact" -> Json.obj(
+              "individual" -> Json.obj(
+                "firstName" -> "Secondary",
+                "lastName"  -> "Contact"
+              ),
+              "email"  -> "test2@example.com",
+              "phone"  -> "0191 498 0002",
+              "mobile" -> "0770 090 0002"
+            )
+          )
+        )
 
-        stubPostResponse("/read-subscription", OK, subscriptionResponse)
+        stubPostResponse("/read-subscription", OK, subscriptionResponse.toString())
 
-        val result: Future[Option[SubscriptionID]] = connector.readSubscription(displaySubscriptionRequest)
-        result.futureValue.value mustBe expectedResponse
+        val result: Future[Option[SubscriptionID]] = connector.readSubscription(request)
+        result.futureValue mustBe expectedResponse
       }
 
-      "must return None for invalid json response" in {
-        val displaySubscriptionRequest = arbitrary[DisplaySubscriptionRequest].sample.value
+      "must return SubscriptionID for organisation subscription" in {
+        val request          = arbitrary[ReadSubscriptionRequest].sample.value
+        val expectedResponse = Some(SubscriptionID("Subscription 123"))
 
-        val subscriptionResponse: String =
-          s"""
-             |{
-             | "displaySubscriptionResponse": {
-             |   "responseCommon": {
-             |     "status": "OK",
-             |     "processingDate": "2020-09-23T16:12:11Z"
-             |   },
-             |   "responseDetail": {}
-             | }
-             |}""".stripMargin
+        val subscriptionResponse = Json.obj(
+          "success" -> Json.obj(
+            "processingDate" -> "2020-01-01T00:00:00Z",
+            "subscriptionId" -> "Subscription 123",
+            "tradingName"    -> "Test Business",
+            "gbUser"         -> true,
+            "primaryContact" -> Json.obj(
+              "organisation" -> Json.obj(
+                "name" -> "Department 1"
+              ),
+              "email"  -> "test1@example.com",
+              "phone"  -> "0191 498 0001",
+              "mobile" -> "0770 090 0001"
+            ),
+            "secondaryContact" -> Json.obj(
+              "organisation" -> Json.obj(
+                "name" -> "Department 1"
+              ),
+              "email"  -> "test2@example.com",
+              "phone"  -> "0191 498 0002",
+              "mobile" -> "0770 090 0002"
+            )
+          )
+        )
 
-        stubPostResponse("/read-subscription", OK, subscriptionResponse)
+        stubPostResponse("/read-subscription", OK, subscriptionResponse.toString())
 
-        val result = connector.readSubscription(displaySubscriptionRequest)
-        result.futureValue mustBe None
+        val result: Future[Option[SubscriptionID]] = connector.readSubscription(request)
+        result.futureValue mustBe expectedResponse
       }
 
       "must return None when read subscription fails" in {
-        val displaySubscriptionRequest = arbitrary[DisplaySubscriptionRequest].sample.value
-        val errorCode                  = errorCodes.sample.value
+        val request = arbitrary[ReadSubscriptionRequest].sample.value
 
-        val subscriptionErrorResponse: String =
-          s"""
-                 | "errorDetail": {
-                 |    "timestamp": "2016-08-16T18:15:41Z",
-                 |    "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
-                 |    "errorCode": "$errorCode",
-                 |    "errorMessage": "Internal error",
-                 |    "source": "Internal error"
-                 |  }
-                 |""".stripMargin
+        val subscriptionResponse = Json.obj(
+          "errorDetail" -> Json.obj(
+            "errorCode"    -> "001",
+            "errorMessage" -> "Regime Missing or Invalid",
+            "source"       -> "ETMP",
+            "sourceFaultDetail" -> Json.obj(
+              "detail" -> Json.arr("Regime missing or invalid")
+            ),
+            "timestamp"     -> "2023-08-31T13:00:21.655Z",
+            "correlationId" -> "d60de98c-f499-47f5-b2d6-e80966e8d19e"
+          )
+        )
 
-        stubPostResponse("/read-subscription", errorCode, subscriptionErrorResponse)
+        stubPostResponse("/read-subscription", OK, subscriptionResponse.toString())
 
-        val result = connector.readSubscription(displaySubscriptionRequest)
+        val result = connector.readSubscription(request)
         result.futureValue mustBe None
       }
     }
@@ -121,23 +149,16 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
     "createSubscription" - {
       "must return SubscriptionResponse for valid input request" in {
         val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
-        val expectedResponse          = SubscriptionID("subscriptionID")
+        val expectedResponse          = SubscriptionID("Subscription 123")
 
-        val subscriptionResponse: String =
-          s"""
-             |{
-             | "createSubscriptionResponse": {
-             |   "responseCommon": {
-             |     "status": "OK",
-             |     "processingDate": "2020-09-23T16:12:11Z"
-             |   },
-             |   "responseDetail": {
-             |      "subscriptionID": "subscriptionID"
-             |   }
-             | }
-             |}""".stripMargin
+        val subscriptionResponse = Json.obj(
+          "success" -> Json.obj(
+            "processingDate" -> "2020-01-01T00:00:00Z",
+            "subscriptionId" -> "Subscription 123"
+          )
+        )
 
-        stubPostResponse("/create-subscription", OK, subscriptionResponse)
+        stubPostResponse("/create-subscription", OK, subscriptionResponse.toString())
 
         val result = connector.createSubscription(createSubscriptionRequest)
         result.value.futureValue mustBe Right(expectedResponse)
@@ -146,21 +167,14 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
       "must return UnableToCreateEMTPSubscriptionError for invalid response" in {
         val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
 
-        val subscriptionResponse: String =
-          s"""
-             |{
-             | "createSubscriptionResponse": {
-             |   "responseCommon": {
-             |     "status": "OK",
-             |     "processingDate": "2020-09-23T16:12:11Z"
-             |   },
-             |   "responseDetail1": {
-             |      "subscriptionID": "subscriptionID"
-             |   }
-             | }
-             |}""".stripMargin
+        val subscriptionResponse = Json.obj(
+          "failure" -> Json.obj(
+            "processingDate" -> "2020-01-01T00:00:00Z",
+            "subscriptionId" -> "Subscription 123"
+          )
+        )
 
-        stubPostResponse("/create-subscription", OK, subscriptionResponse)
+        stubPostResponse("/create-subscription", OK, subscriptionResponse.toString())
 
         val result: EitherT[Future, ApiError, SubscriptionID] = connector.createSubscription(createSubscriptionRequest)
         result.value.futureValue mustBe Left(UnableToCreateEMTPSubscriptionError)
