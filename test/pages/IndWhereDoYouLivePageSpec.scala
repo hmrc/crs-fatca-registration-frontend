@@ -32,7 +32,7 @@ class IndWhereDoYouLivePageSpec extends PageBehaviours {
     beRemovable[Boolean](IndWhereDoYouLivePage)
 
     "cleanup" - {
-      "must remove IndNonUKAddressWithoutIdPage answers when true" - {
+      "must remove IndNonUKAddressWithoutIdPage answers when true" in {
         ScalaCheckPropertyChecks.forAll(arbitrary[models.Address]) {
           address =>
             val userAnswers = emptyUserAnswers.withPage(IndNonUKAddressWithoutIdPage, address)
@@ -44,7 +44,7 @@ class IndWhereDoYouLivePageSpec extends PageBehaviours {
       }
 
       "must remove IndWhatIsYourPostcodePage, IndSelectAddressPage, IndUKAddressWithoutIdPage, IndSelectedAddressLookupPage, " +
-        "and AddressLookupPage answers when false" - {
+        "and AddressLookupPage answers when false" in {
           val generator = for {
             addressLookup <- arbitrary[models.AddressLookup]
             address       <- arbitrary[models.Address]

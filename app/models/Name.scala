@@ -25,5 +25,7 @@ case class Name(firstName: String, lastName: String) {
 }
 
 object Name {
+
+  val RegexString     = "^[a-zA-Z &`\\-\\'^]{1,35}$"
   implicit val format = Json.format[Name]
 }
