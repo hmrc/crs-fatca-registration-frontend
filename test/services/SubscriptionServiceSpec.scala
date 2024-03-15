@@ -30,6 +30,7 @@ import org.mockito.MockitoSugar.reset
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.inject.bind
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -58,26 +59,14 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
 
       val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
       val userAnswers = UserAnswers("")
-        .set(ReporterTypePage, ReporterType.Individual)
-        .success
-        .value
-        .set(IndDoYouHaveNINumberPage, false)
-        .success
-        .value
-        .set(IndWhatIsYourNamePage, name)
-        .success
-        .value
-        .set(IndContactEmailPage, TestEmail)
-        .success
-        .value
-        .set(IndContactHavePhonePage, false)
-        .success
-        .value
-        .set(IndUKAddressWithoutIdPage, address)
-        .success
-        .value
+        .set(ReporterTypePage, ReporterType.Individual).success.value
+        .set(IndDoYouHaveNINumberPage, false).success.value
+        .set(IndWhatIsYourNamePage, name).success.value
+        .set(IndContactEmailPage, TestEmail).success.value
+        .set(IndContactHavePhonePage, false).success.value
+        .set(IndUKAddressWithoutIdPage, address).success.value
 
-      val result = service.checkAndCreateSubscription(safeId, userAnswers)
+      val result = service.checkAndCreateSubscription(safeId, userAnswers, AffinityGroup.Individual)
       result.futureValue mustBe Right(SubscriptionID("id"))
 
       verify(mockSubscriptionConnector, times(1)).readSubscription(any())(any(), any())
@@ -93,32 +82,14 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
 
       val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
       val userAnswers = UserAnswers("")
-        .set(ReporterTypePage, ReporterType.Individual)
-        .success
-        .value
-        .set(IndDoYouHaveNINumberPage, false)
-        .success
-        .value
-        .set(IndWhatIsYourNamePage, name)
-        .success
-        .value
-        .set(IndContactEmailPage, TestEmail)
-        .success
-        .value
-        .set(ContactHavePhonePage, false)
-        .success
-        .value
-        .set(IndUKAddressWithoutIdPage, address)
-        .success
-        .value
-        .set(HaveSecondContactPage, true)
-        .success
-        .value
-        .set(SecondContactHavePhonePage, false)
-        .success
-        .value
+        .set(ReporterTypePage, ReporterType.Individual).success.value
+        .set(IndDoYouHaveNINumberPage, false).success.value
+        .set(IndWhatIsYourNamePage, name).success.value
+        .set(IndContactEmailPage, TestEmail).success.value
+        .set(ContactHavePhonePage, false).success.value
+        .set(IndUKAddressWithoutIdPage, address).success.value
 
-      val result = service.checkAndCreateSubscription(safeId, userAnswers)
+      val result = service.checkAndCreateSubscription(safeId, userAnswers, AffinityGroup.Individual)
       result.futureValue mustBe Right(SubscriptionID("id"))
 
       verify(mockSubscriptionConnector, times(1)).readSubscription(any())(any(), any())
@@ -130,7 +101,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
 
       when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(Some(subscriptionID)))
 
-      val result = service.checkAndCreateSubscription(safeId, emptyUserAnswers)
+      val result = service.checkAndCreateSubscription(safeId, emptyUserAnswers, AffinityGroup.Individual)
       result.futureValue mustBe Right(subscriptionID)
     }
 
@@ -140,7 +111,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
       when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
       when(mockSubscriptionConnector.createSubscription(any())(any(), any())).thenReturn(response)
 
-      val result = service.checkAndCreateSubscription(safeId, UserAnswers("id"))
+      val result = service.checkAndCreateSubscription(safeId, UserAnswers("id"), AffinityGroup.Individual)
 
       result.futureValue mustBe Left(MandatoryInformationMissingError())
     }
@@ -149,27 +120,17 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
       val errors = Seq(NotFoundError, BadRequestError, DuplicateSubmissionError, UnableToCreateEMTPSubscriptionError)
       for (error <- errors) {
         val userAnswers = UserAnswers("id")
-          .set(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .success
-          .value
-          .set(ContactEmailPage, TestEmail)
-          .success
-          .value
-          .set(ContactNamePage, s"$FirstName $LastName")
-          .success
-          .value
-          .set(ContactHavePhonePage, false)
-          .success
-          .value
-          .set(HaveSecondContactPage, false)
-          .success
-          .value
+          .set(DoYouHaveUniqueTaxPayerReferencePage, true).success.value
+          .set(ContactEmailPage, TestEmail).success.value
+          .set(ContactNamePage, s"$FirstName $LastName").success.value
+          .set(ContactHavePhonePage, false).success.value
+          .set(HaveSecondContactPage, false).success.value
 
         val response: EitherT[Future, ApiError, SubscriptionID] = EitherT.fromEither[Future](Left(error))
         when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
         when(mockSubscriptionConnector.createSubscription(any())(any(), any())).thenReturn(response)
 
-        val result = service.checkAndCreateSubscription(safeId, userAnswers)
+        val result = service.checkAndCreateSubscription(safeId, userAnswers, AffinityGroup.Organisation)
 
         result.futureValue mustBe Left(error)
       }

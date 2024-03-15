@@ -24,6 +24,7 @@ import models.error.ApiError.MandatoryInformationMissingError
 import models.matching.SafeId
 import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
 import models.{IdentifierType, SubscriptionID, UserAnswers}
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -31,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConnector) {
 
-  def checkAndCreateSubscription(safeID: SafeId, userAnswers: UserAnswers)(implicit
+  def checkAndCreateSubscription(safeID: SafeId, userAnswers: UserAnswers, affinityGroup: AffinityGroup)(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Either[ApiError, SubscriptionID]] =
@@ -39,7 +40,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
       case Some(subscriptionID) =>
         EitherT.rightT(subscriptionID).value
       case _ =>
-        (CreateSubscriptionRequest.convertTo(safeID, userAnswers) match {
+        (CreateSubscriptionRequest.buildSubscriptionRequest(safeID, userAnswers, affinityGroup) match {
           case Some(subscriptionRequest) =>
             val response = subscriptionConnector.createSubscription(subscriptionRequest)
 

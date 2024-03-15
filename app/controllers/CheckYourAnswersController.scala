@@ -66,7 +66,7 @@ class CheckYourAnswersController @Inject() (
     implicit request =>
       val result = for {
         safeId         <- EitherT(getSafeIdFromRegistration())
-        subscriptionID <- EitherT(subscriptionService.checkAndCreateSubscription(safeId, request.userAnswers))
+        subscriptionID <- EitherT(subscriptionService.checkAndCreateSubscription(safeId, request.userAnswers, request.affinityGroup))
         result         <- EitherT.right[ApiError](controllerHelper.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionID))
       } yield result
 

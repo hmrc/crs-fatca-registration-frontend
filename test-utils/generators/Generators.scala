@@ -147,6 +147,15 @@ trait Generators extends ModelGenerators with RegexConstants {
     }
   }
 
+  def validDateOfBirth(): Gen[LocalDate] = {
+    val minDate = LocalDate.of(1900, 1, 1)
+
+    datesBetween(
+      min = minDate,
+      max = LocalDate.now(ZoneOffset.UTC)
+    )
+  }
+
   def stringMatchingRegexAndLength(regex: String, length: Int): Gen[String] =
     RegexpGen
       .from(regex)

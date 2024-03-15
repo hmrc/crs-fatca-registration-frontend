@@ -69,33 +69,15 @@ class BusinessMatchingWithoutIdServiceSpec extends SpecBase {
         when(mockRegistrationConnector.withIndividualNoId(any())(any(), any())).thenReturn(response)
 
         val userAnswers = emptyUserAnswers
-          .set(ReporterTypePage, ReporterType.Individual)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, false)
-          .success
-          .value
-          .set(IndWhatIsYourNamePage, name)
-          .success
-          .value
-          .set(DateOfBirthWithoutIdPage, dob)
-          .success
-          .value
-          .set(IndWhereDoYouLivePage, true)
-          .success
-          .value
-          .set(IndUKAddressWithoutIdPage, address)
-          .success
-          .value
-          .set(IndContactEmailPage, TestEmail)
-          .success
-          .value
-          .set(IndContactHavePhonePage, true)
-          .success
-          .value
-          .set(IndContactPhonePage, TestPhoneNumber)
-          .success
-          .value
+          .set(ReporterTypePage, ReporterType.Individual).success.value
+          .set(IndDoYouHaveNINumberPage, false).success.value
+          .set(IndWhatIsYourNamePage, name).success.value
+          .set(DateOfBirthWithoutIdPage, dob).success.value
+          .set(IndWhereDoYouLivePage, true).success.value
+          .set(IndUKAddressWithoutIdPage, address).success.value
+          .set(IndContactEmailPage, TestEmail).success.value
+          .set(IndContactHavePhonePage, true).success.value
+          .set(IndContactPhonePage, TestPhoneNumber).success.value
 
         val request: DataRequest[AnyContent]         = DataRequest(FakeRequest(), userAnswers.id, Individual, userAnswers)
         val result: Future[Either[ApiError, SafeId]] = service.registerWithoutId()(request, hc)
@@ -109,33 +91,15 @@ class BusinessMatchingWithoutIdServiceSpec extends SpecBase {
         when(mockRegistrationConnector.withIndividualNoId(any())(any(), any())).thenReturn(response)
 
         val userAnswers = emptyUserAnswers
-          .set(ReporterTypePage, ReporterType.Individual)
-          .success
-          .value
-          .set(IndDoYouHaveNINumberPage, false)
-          .success
-          .value
-          .set(IndWhatIsYourNamePage, name)
-          .success
-          .value
-          .set(DateOfBirthWithoutIdPage, dob)
-          .success
-          .value
-          .set(IndWhereDoYouLivePage, false)
-          .success
-          .value
-          .set(IndNonUKAddressWithoutIdPage, address)
-          .success
-          .value
-          .set(IndContactEmailPage, TestEmail)
-          .success
-          .value
-          .set(IndContactHavePhonePage, true)
-          .success
-          .value
-          .set(IndContactPhonePage, TestPhoneNumber)
-          .success
-          .value
+          .set(ReporterTypePage, ReporterType.Individual).success.value
+          .set(IndDoYouHaveNINumberPage, false).success.value
+          .set(IndWhatIsYourNamePage, name).success.value
+          .set(DateOfBirthWithoutIdPage, dob).success.value
+          .set(IndWhereDoYouLivePage, false).success.value
+          .set(IndNonUKAddressWithoutIdPage, address).success.value
+          .set(IndContactEmailPage, TestEmail).success.value
+          .set(IndContactHavePhonePage, true).success.value
+          .set(IndContactPhonePage, TestPhoneNumber).success.value
 
         val request: DataRequest[AnyContent]         = DataRequest(FakeRequest(), userAnswers.id, Individual, userAnswers)
         val result: Future[Either[ApiError, SafeId]] = service.registerWithoutId()(request, hc)
@@ -149,45 +113,24 @@ class BusinessMatchingWithoutIdServiceSpec extends SpecBase {
         when(mockRegistrationConnector.withOrganisationNoId(any())(any(), any())).thenReturn(response)
 
         val userAnswers = emptyUserAnswers
-          .set(ReporterTypePage, ReporterType.LimitedCompany)
-          .success
-          .value
-          .set(RegisteredAddressInUKPage, false)
-          .success
-          .value
-          .set(DoYouHaveUniqueTaxPayerReferencePage, false)
-          .success
-          .value
-          .set(BusinessNameWithoutIDPage, OrgName)
-          .success
-          .value
-          .set(HaveTradingNamePage, false)
-          .success
-          .value
-          .set(NonUKBusinessAddressWithoutIDPage, address)
-          .success
-          .value
-          .set(ContactNamePage, s"$FirstName $LastName")
-          .success
-          .value
-          .set(ContactEmailPage, TestEmail)
-          .success
-          .value
-          .set(ContactHavePhonePage, true)
-          .success
-          .value
-          .set(ContactPhonePage, TestPhoneNumber)
-          .success
-          .value
-          .set(HaveSecondContactPage, false)
-          .success
-          .value
+          .set(ReporterTypePage, ReporterType.LimitedCompany).success.value
+          .set(RegisteredAddressInUKPage, false).success.value
+          .set(DoYouHaveUniqueTaxPayerReferencePage, false).success.value
+          .set(BusinessNameWithoutIDPage, OrgName).success.value
+          .set(HaveTradingNamePage, false).success.value
+          .set(NonUKBusinessAddressWithoutIDPage, address).success.value
+          .set(ContactNamePage, s"$FirstName $LastName").success.value
+          .set(ContactEmailPage, TestEmail).success.value
+          .set(ContactHavePhonePage, true).success.value
+          .set(ContactPhonePage, TestPhoneNumber).success.value
+          .set(HaveSecondContactPage, false).success.value
 
         val request: DataRequest[AnyContent]         = DataRequest(FakeRequest(), emptyUserAnswers.id, Organisation, userAnswers)
         val result: Future[Either[ApiError, SafeId]] = service.registerWithoutId()(request, hc)
 
         result.futureValue mustBe Right(safeId)
       }
+
     }
 
     "sendIndividualRegistration" - {
@@ -213,6 +156,7 @@ class BusinessMatchingWithoutIdServiceSpec extends SpecBase {
 
         result.futureValue mustBe Left(NotFoundError)
       }
+
     }
 
     "sendBusinessRegistration" - {
@@ -238,7 +182,9 @@ class BusinessMatchingWithoutIdServiceSpec extends SpecBase {
 
         result.futureValue mustBe Left(NotFoundError)
       }
+
     }
+
   }
 
 }
