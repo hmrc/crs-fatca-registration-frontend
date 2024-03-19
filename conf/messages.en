@@ -631,8 +631,10 @@ registrationConfirmation.para.4 = {0} to share your feedback on this service.
 registrationConfirmation.link.survey = Take a short survey
 registrationConfirmation.link.addFI = add a financial institution
 
-detailsUpdated.title = detailsUpdated
-detailsUpdated.heading = detailsUpdated
+detailsUpdated.title = Contact details updated
+detailsUpdated.heading = Contact details updated
+detailsUpdated.para.1 = We will use your new details if we need to contact you.
+detailsUpdated.link.text = Back to manage your CRS and FATCA reports
 
 individualDetails.title = individualDetails
 individualDetails.heading = individualDetails

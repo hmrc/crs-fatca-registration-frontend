@@ -14,14 +14,25 @@
  * limitations under the License.
  *@
 
+@import components._
+
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        govukPanel: GovukPanel,
+        para: Paragraph,
+        link: Link
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("detailsUpdated.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("detailsUpdated.heading")</h1>
+    @govukPanel(Panel(
+            title = Text(messages("detailsUpdated.heading"))
+            ))
+    @para(Html(messages("detailsUpdated.para.1")))
+    @link(routes.DetailsUpdatedController.onPageLoad.url, messages("detailsUpdated.link.text"), classes = "govuk-link govuk-body")
+
+
 }

@@ -292,8 +292,8 @@ POST        /change-contact/organisation/second-contact-phone                   
 GET         /change-contact/organisation/change-second-contact-phone            controllers.changeContactDetails.OrganisationSecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
 POST        /change-contact/organisation/change-second-contact-phone            controllers.changeContactDetails.OrganisationSecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
 
-GET        /detailsUpdated                       controllers.DetailsUpdatedController.onPageLoad()
+GET         /change-contact/details-updated                                     controllers.DetailsUpdatedController.onPageLoad()
 
-GET        /individualDetails                       controllers.IndividualDetailsController.onPageLoad()
+GET         /individualDetails                                                   controllers.IndividualDetailsController.onPageLoad()
 
-GET        /organisationDetails                       controllers.OrganisationDetailsController.onPageLoad()
+GET         /organisationDetails                                                 controllers.OrganisationDetailsController.onPageLoad()
