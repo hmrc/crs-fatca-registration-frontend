@@ -18,17 +18,9 @@ package navigation
 
 import controllers.routes
 import models.ReporterType.{Individual, Sole}
-import pages._
 import models._
-import pages.changeContactDetails.{
-  IndividualEmailPage,
-  IndividualHavePhonePage,
-  IndividualPhonePage,
-  OrganisationContactNamePage,
-  OrganisationEmailPage,
-  OrganisationHavePhonePage,
-  OrganisationPhonePage
-}
+import pages._
+import pages.changeContactDetails._
 import play.api.Logging
 import play.api.libs.json.Reads
 import play.api.mvc.Call
