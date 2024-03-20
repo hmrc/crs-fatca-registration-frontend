@@ -33,7 +33,7 @@ class DetailsUpdatedController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { // standardActionSets.identifiedUserWithData() {
+  def onPageLoad: Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
       Ok(view())
   }
