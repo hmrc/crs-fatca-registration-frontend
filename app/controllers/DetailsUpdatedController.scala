@@ -17,21 +17,19 @@
 package controllers
 
 import controllers.actions._
-import models.requests.DataRequest
-
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, ActionBuilder, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DetailsUpdatedView
 
 class DetailsUpdatedController @Inject() (
-  override val messagesApi: MessagesApi,
-  standardActionSets: StandardActionSets,
-  val controllerComponents: MessagesControllerComponents,
-  view: DetailsUpdatedView
-) extends FrontendBaseController
-    with I18nSupport {
+                                           override val messagesApi: MessagesApi,
+                                           standardActionSets: StandardActionSets,
+                                           val controllerComponents: MessagesControllerComponents,
+                                           view: DetailsUpdatedView
+                                         ) extends FrontendBaseController
+  with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
