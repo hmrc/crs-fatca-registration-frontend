@@ -18,8 +18,9 @@ package models.subscription.request
 
 import models.matching.SafeId
 import models.{IdentifierType, UserAnswers}
-import pages.{BusinessTradingNameWithoutIDPage, IndUKAddressWithoutIdPage, NonUKBusinessAddressWithoutIDPage}
+import pages._
 import play.api.libs.json.{Json, Reads, Writes}
+import uk.gov.hmrc.auth.core.AffinityGroup
 import utils.UserAnswersHelper
 
 case class CreateSubscriptionRequest(idType: String,
@@ -35,10 +36,10 @@ object CreateSubscriptionRequest extends UserAnswersHelper {
   implicit val reads: Reads[CreateSubscriptionRequest]   = Json.reads[CreateSubscriptionRequest]
   implicit val writes: Writes[CreateSubscriptionRequest] = Json.writes[CreateSubscriptionRequest]
 
-  def convertTo(safeId: SafeId, userAnswers: UserAnswers): Option[CreateSubscriptionRequest] = {
+  def buildSubscriptionRequest(safeId: SafeId, userAnswers: UserAnswers, affinityGroup: AffinityGroup): Option[CreateSubscriptionRequest] = {
     for {
       primaryContact <- ContactInformation.convertToPrimary(userAnswers)
-    } yield ContactInformation.convertToSecondary(userAnswers) match {
+    } yield ContactInformation.convertToSecondary(userAnswers, affinityGroup) match {
       case Right(value) =>
         Some(
           CreateSubscriptionRequest(
@@ -54,11 +55,13 @@ object CreateSubscriptionRequest extends UserAnswersHelper {
     }
   }.flatten
 
-  private def isGBUser(userAnswers: UserAnswers): Boolean =
-    if (userAnswers.get(NonUKBusinessAddressWithoutIDPage).exists(_.isOtherCountry) || userAnswers.get(IndUKAddressWithoutIdPage).exists(_.isOtherCountry)) {
-      false
-    } else {
-      true
-    }
+  def isGBUser(userAnswers: UserAnswers): Boolean = {
+    val businessHasUtr              = userAnswers.get(WhatIsYourUTRPage).exists(_.uniqueTaxPayerReference.trim.nonEmpty)
+    val individualHasNino           = userAnswers.get(IndDoYouHaveNINumberPage).getOrElse(false)
+    val individualAddressLookupIsGb = userAnswers.get(IndSelectedAddressLookupPage).nonEmpty
+    val individualManualAddressIsGb = userAnswers.get(IndUKAddressWithoutIdPage).exists(_.isGB)
+
+    businessHasUtr || individualHasNino || individualAddressLookupIsGb || individualManualAddressIsGb
+  }
 
 }

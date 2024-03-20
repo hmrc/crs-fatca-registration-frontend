@@ -307,7 +307,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
       "must redirect to RegistrationConfirmationPage for Individual with Id" in {
         when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(NO_CONTENT)))
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
         when(mockRegistrationService.registerWithoutId()(any(), any()))
           .thenReturn(Future.successful(Right(safeId)))
@@ -339,7 +339,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
       "must redirect to RegistrationConfirmationPage for Business with Id" in {
         when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(NO_CONTENT)))
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
         when(mockRegistrationService.registerWithoutId()(any(), any()))
           .thenReturn(Future.successful(Right(safeId)))
@@ -372,7 +372,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Left(UnableToCreateEnrolmentError)))
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any())).thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any())).thenReturn(
+          Future.successful(Right(SubscriptionID(UserAnswersId)))
+        )
         val userAnswers = emptyUserAnswers.withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
 
         val application = applicationBuilder(userAnswers = Option(userAnswers))
@@ -395,7 +397,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
       "must redirect to RegistrationConfirmationPage for Individual without Id" in {
         when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(NO_CONTENT)))
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
         when(mockRegistrationService.registerWithoutId()(any(), any()))
           .thenReturn(Future.successful(Right(safeId)))
@@ -429,7 +431,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
         when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(NO_CONTENT)))
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
         when(mockRegistrationService.registerWithoutId()(any(), any()))
           .thenReturn(Future.successful(Right(safeId)))
@@ -486,7 +488,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
       "must redirect to IndividualAlreadyRegisteredPage when there is EnrolmentExistsError and Affinity Group is Individual" in {
 
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
         when(mockRegistrationService.registerWithoutId()(any(), any()))
           .thenReturn(Future.successful(Right(safeId)))
@@ -520,7 +522,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
       "must redirect to BusinessAlreadyRegisteredPage when there is EnrolmentExistsError" in {
 
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
         when(mockRegistrationService.registerWithoutId()(any(), any()))
           .thenReturn(Future.successful(Right(safeId)))
@@ -553,7 +555,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
       "must redirect to BusinessAlreadyRegisteredPage when EnrolmentExistsError occurs in registration with Id" in {
 
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
@@ -583,7 +585,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
       }
 
       "must return ThereIsAProblemPage when subscription creation fails with UnableToCreateEMTPSubscriptionError" in {
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Left(UnableToCreateEMTPSubscriptionError)))
         when(mockRegistrationService.registerWithoutId()(any(), any()))
           .thenReturn(Future.successful(Right(safeId)))
@@ -616,7 +618,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
       }
 
       "must return ThereIsAProblemPage when subscription creation fails with ServiceUnavailableError" in {
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Left(ServiceUnavailableError)))
         when(mockRegistrationService.registerWithoutId()(any(), any()))
           .thenReturn(Future.successful(Right(safeId)))
@@ -648,7 +650,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
       }
 
       "must redirect to InformationMissingPage if both individual and organisation are not present" in {
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any())(any(), any()))
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Left(UnableToCreateEMTPSubscriptionError)))
         when(mockSessionRepository.set(any()))
           .thenReturn(Future.successful(true))

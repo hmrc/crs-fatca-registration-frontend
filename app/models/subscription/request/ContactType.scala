@@ -22,6 +22,7 @@ import models.error.ApiError.MandatoryInformationMissingError
 import pages._
 import play.api.libs.functional.syntax.unlift
 import play.api.libs.json._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import utils.UserAnswersHelper
 
 import scala.language.implicitConversions
@@ -145,22 +146,22 @@ object ContactInformation extends UserAnswersHelper {
     }
   }
 
-  def convertToSecondary(userAnswers: UserAnswers): Either[ApiError, Option[ContactInformation]] = {
-    lazy val buildSecondContact =
-      for {
-        orgDetails     <- OrganisationDetails.convertTo(userAnswers.get(SecondContactNamePage))
-        secondaryEmail <- userAnswers.get(SecondContactEmailPage)
-      } yield ContactInformation(contactInformation = orgDetails, email = secondaryEmail, phone = userAnswers.get(SecondContactPhonePage), mobile = None)
+  def convertToSecondary(userAnswers: UserAnswers, affinityGroup: AffinityGroup): Either[ApiError, Option[ContactInformation]] = {
+    val canHaveSecondContact    = isRegisteringAsBusiness(userAnswers) && affinityGroup != AffinityGroup.Individual
+    val shouldHaveSecondContact = userAnswers.get(HaveSecondContactPage).contains(true)
 
-    if (isRegisteringAsBusiness(userAnswers)) {
-      val secondContactHavePhonePage = userAnswers.get(SecondContactHavePhonePage)
-      val secondContactPage          = userAnswers.get(HaveSecondContactPage)
+    if (canHaveSecondContact && shouldHaveSecondContact) {
+      val secondaryContact =
+        for {
+          orgDetails     <- OrganisationDetails.convertTo(userAnswers.get(SecondContactNamePage))
+          secondaryEmail <- userAnswers.get(SecondContactEmailPage)
+        } yield Some(
+          ContactInformation(contactInformation = orgDetails, email = secondaryEmail, phone = userAnswers.get(SecondContactPhonePage), mobile = None)
+        )
 
-      (secondContactPage, secondContactHavePhonePage) match {
-        case (Some(false), _)      => Right(None)
-        case (Some(true), Some(_)) => Right(buildSecondContact)
-        case (Some(true), None)    => Left(MandatoryInformationMissingError("Have Second Contact Phone not answered"))
-        case (_, _)                => Left(MandatoryInformationMissingError("Have Second Contact Information not answered"))
+      secondaryContact match {
+        case Some(contactInfo) => Right(contactInfo)
+        case _                 => Left(MandatoryInformationMissingError())
       }
     } else {
       Right(None)

@@ -23,6 +23,7 @@ import models.matching.SafeId
 import models.register.request.RegisterWithoutID
 import models.requests.DataRequest
 import models.shared.ContactDetails
+import models.subscription.request.ContactInformation.isRegisteringAsBusiness
 import models.{Address, Name, UUIDGen}
 import pages._
 import play.api.mvc.AnyContent
@@ -38,15 +39,17 @@ class BusinessMatchingWithoutIdService @Inject() (registrationConnector: Registr
   implicit private val implicitClock: Clock   = clock
 
   def registerWithoutId()(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Either[ApiError, SafeId]] =
-    request.userAnswers.get(IndDoYouHaveNINumberPage) match {
-      case Some(false) => individualRegistration()
-      case _           => businessRegistration()
+    if (isRegisteringAsBusiness(request.userAnswers)) {
+      businessRegistration()
+    } else {
+      individualRegistration()
     }
 
   private def buildIndividualName(implicit request: DataRequest[AnyContent]): Option[Name] =
-    request.userAnswers.get(IndDoYouHaveNINumberPage) match {
-      case Some(false) => request.userAnswers.get(IndWhatIsYourNamePage)
-      case _           => request.userAnswers.get(WhatIsYourNamePage)
+    if (isRegisteringAsBusiness(request.userAnswers)) {
+      request.userAnswers.get(WhatIsYourNamePage)
+    } else {
+      request.userAnswers.get(IndWhatIsYourNamePage)
     }
 
   private def buildIndividualAddress(implicit request: DataRequest[AnyContent]): Option[Address] =
