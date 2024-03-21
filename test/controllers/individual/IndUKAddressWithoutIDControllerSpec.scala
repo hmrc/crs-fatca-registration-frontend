@@ -36,10 +36,11 @@ import scala.concurrent.Future
 
 class IndUKAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
 
-  val testCountryList: Seq[Country] = Seq(Country("valid", "GG", "Guernsey"))
+  private val testCountry: Country  = Country("valid", "GG", "Guernsey", Option("Guernsey"))
+  val testCountryList: Seq[Country] = Seq(testCountry)
   val formProvider                  = new UKAddressWithoutIdFormProvider()
   val form: Form[Address]           = formProvider(testCountryList)
-  val address: Address              = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("valid", "GG", "Guernsey"))
+  val address: Address              = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), testCountry)
 
   val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
@@ -117,12 +118,13 @@ class IndUKAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, LoadUKIndAddressWithoutIDRoute)
-            .withFormUrlEncodedBody(("addressLine1", "value 1"),
-                                    ("addressLine2", "value 2"),
-                                    ("addressLine3", "value 2"),
-                                    ("addressLine4", "value 2"),
-                                    ("postCode", "XX9 9XX"),
-                                    ("country", "GG")
+            .withFormUrlEncodedBody(
+              ("addressLine1", "value 1"),
+              ("addressLine2", "value 2"),
+              ("addressLine3", "value 2"),
+              ("addressLine4", "value 2"),
+              ("postCode", "XX9 9XX"),
+              ("country", "Guernsey")
             )
 
         val result = route(application, request).value

@@ -46,6 +46,15 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       }
     }
 
+  def fieldWithInvalidData(form: Form[_], fieldName: String, invalidDataGenerator: Gen[String], error: FormError): Unit =
+    "must not bind invalid data" in {
+      forAll(invalidDataGenerator -> "invalidDataItem") {
+        dataItem: String =>
+          val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
+          result.errors mustEqual Seq(error)
+      }
+    }
+
   def mandatoryField(form: Form[_], fieldName: String, requiredError: FormError): Unit = {
 
     "not bind when key is not present at all" in {

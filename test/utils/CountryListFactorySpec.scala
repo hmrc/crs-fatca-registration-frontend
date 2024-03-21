@@ -21,12 +21,16 @@ import config.FrontendAppConfig
 import models.Country
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalatest.Inspectors.forAll
 import play.api.Environment
 import play.api.libs.json.Json
+import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
 import java.io.ByteArrayInputStream
 
 class CountryListFactorySpec extends SpecBase {
+
+  private val ukCountryCodes = Set("GB", "UK", "GG", "JE", "IM")
 
   "Factory  must " - {
     "return option of country sequence when given a valid json file" in {
@@ -34,7 +38,11 @@ class CountryListFactorySpec extends SpecBase {
       val conf: FrontendAppConfig = mock[FrontendAppConfig]
       val env                     = mock[Environment]
 
-      val countries = Json.arr(Json.obj("state" -> "valid", "code" -> "XX", "description" -> "Somewhere"))
+      val countries = Json.arr(
+        Json.obj("state" -> "valid", "code" -> "AB", "description" -> "Country_1"),
+        Json.obj("state" -> "valid", "code" -> "AB", "description" -> "Country_1", "alternativeName" -> "Country_1_2"),
+        Json.obj("state" -> "valid", "code" -> "BC", "description" -> "Country_2")
+      )
 
       when(conf.countryCodeJson).thenReturn("countries.json")
 
@@ -43,7 +51,13 @@ class CountryListFactorySpec extends SpecBase {
 
       val factory = sut(env, conf)
 
-      factory.countryList mustBe Some(Seq(Country("valid", "XX", "Somewhere")))
+      factory.countryList mustBe Some(
+        Seq(
+          Country("valid", "AB", "Country_1", Some("Country_1")),
+          Country("valid", "AB", "Country_1", Some("Country_1_2")),
+          Country("valid", "BC", "Country_2", Some("Country_2"))
+        )
+      )
     }
 
     "return option of country sequence without GB when given a valid json file" in {
@@ -62,7 +76,7 @@ class CountryListFactorySpec extends SpecBase {
 
       val factory = sut(env, conf)
 
-      factory.countryListWithoutGB mustBe Some(Seq(Country("valid", "ZW", "Zimbabwe")))
+      factory.countryListWithoutGB mustBe Some(Seq(Country("valid", "ZW", "Zimbabwe", Some("Zimbabwe"))))
     }
 
     "return None when country list cannot be loaded from environment" in {
@@ -91,6 +105,91 @@ class CountryListFactorySpec extends SpecBase {
       val factory = sut(env, conf)
 
       factory.getDescriptionFromCode("XX") mustBe Some("Somewhere")
+    }
+  }
+
+  "countryListWithUKCountries" - {
+    "return countries in the UK" in {
+      val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
+
+      forAll(factory.countryListWithUKCountries.value) {
+        country =>
+          ukCountryCodes must contain(country.code)
+      }
+    }
+  }
+
+  "countryListWithoutUKCountries" - {
+    "return countries not in the UK" in {
+      val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
+
+      forAll(factory.countryListWithoutUKCountries.value) {
+        country =>
+          ukCountryCodes must not contain country.code
+      }
+    }
+  }
+
+  "countryListWithoutGB" - {
+    "return countries with country code excluding GB" in {
+      val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
+
+      forAll(factory.countryListWithoutGB.value) {
+        country => country.code must not be "GB"
+      }
+    }
+  }
+
+  "countrySelectList" - {
+
+    "must return non-breaking-space item when no country is selected" in {
+      val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
+      val countries = Seq(
+        Country("valid", "AB", "Country_1", Some("Country_1")),
+        Country("valid", "AB", "Country_1", Some("Country_1_2")),
+        Country("valid", "BC", "Country_2", Some("Country_2"))
+      )
+
+      factory.countrySelectList(Map.empty, countries) must contain theSameElementsAs Seq(
+        SelectItem(None, "&nbsp"),
+        SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
+        SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = false),
+        SelectItem(value = Some("Country_2"), text = "Country_2", selected = false)
+      )
+    }
+
+    "must return selected country when there is one" in {
+      val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
+      val countries = Seq(
+        Country("valid", "AB", "Country_1", Some("Country_1")),
+        Country("valid", "AB", "Country_1", Some("Country_1_2")),
+        Country("valid", "BC", "Country_2", Some("Country_2"))
+      )
+      val selectedCountry = Map("country" -> "Country_2")
+
+      factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
+        SelectItem(value = None, text = "&nbsp"),
+        SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
+        SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = false),
+        SelectItem(value = Some("Country_2"), text = "Country_2", selected = true)
+      )
+    }
+
+    "must return the correct selected country when there are alternative names" in {
+      val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
+      val countries = Seq(
+        Country("valid", "AB", "Country_1", Some("Country_1")),
+        Country("valid", "AB", "Country_1", Some("Country_1_2")),
+        Country("valid", "BC", "Country_2", Some("Country_2"))
+      )
+      val selectedCountry = Map("country" -> "Country_1_2")
+
+      factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
+        SelectItem(value = None, text = "&nbsp"),
+        SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
+        SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = true),
+        SelectItem(value = Some("Country_2"), text = "Country_2", selected = false)
+      )
     }
   }
 

@@ -63,8 +63,19 @@ class NonUKAddressWithoutIdFormProvider @Inject() extends Mappings with RegexCon
         "country"
       ),
       "country" -> text("addressWithoutId.error.country.required")
-        .verifying("addressWithoutId.error.country.required", value => countryList.exists(_.code == value))
-        .transform[Country](value => countryList.find(_.code == value).get, _.code)
+        .verifying(
+          "addressWithoutId.error.country.required",
+          value => countryList.exists(_.alternativeName.contains(value))
+        )
+        .transform[Country](
+          value =>
+            countryList
+              .find(_.alternativeName.contains(value))
+              .getOrElse(throw new IllegalStateException(s"Failed to derive country given text [$value]")),
+          country =>
+            country.alternativeName
+              .getOrElse(throw new IllegalStateException(s"Failed to derive text given country [$country]"))
+        )
     )(Address.apply)(Address.unapply)
   )
 

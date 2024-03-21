@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import models.Country
 import play.api.Environment
 import play.api.libs.json.Json
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
 import javax.inject.{Inject, Singleton}
@@ -27,17 +28,20 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class CountryListFactory @Inject() (environment: Environment, appConfig: FrontendAppConfig) {
 
-  def uk: Country = Country("valid", "GB", "United Kingdom")
+  private val countryCodesForUkCountries: Set[String] = Set("GB", "UK", "GG", "JE", "IM")
 
-  val ukSelectItem = Seq(SelectItem(Some(uk.code), uk.description, selected = true))
+  def countryList: Option[Seq[Country]] = getCountryList
 
-  lazy val countryList: Option[Seq[Country]] = getCountryList
-
-  private def getCountryList: Option[Seq[Country]] = environment.resourceAsStream(appConfig.countryCodeJson) map Json.parse map {
-    _.as[Seq[Country]].sortWith(
-      (country, country2) => country.description < country2.description
-    )
-  }
+  private def getCountryList: Option[Seq[Country]] =
+    environment.resourceAsStream(appConfig.countryCodeJson) map Json.parse map {
+      _.as[Seq[Country]]
+        .map(
+          country => if (country.alternativeName.isEmpty) country.copy(alternativeName = Option(country.description)) else country
+        )
+        .sortWith(
+          (country, country2) => country.description < country2.description
+        )
+    }
 
   def getDescriptionFromCode(code: String): Option[String] = countryList map {
     _.filter(
@@ -53,31 +57,28 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
 
   lazy val countryListWithoutUKCountries: Option[Seq[Country]] = countryList.map {
     countries =>
-      val excludedCodes = Set("GB", "UK", "GG", "JE", "IM")
       countries.filter(
-        country => !excludedCodes.contains(country.code)
+        country => !countryCodesForUkCountries.contains(country.code)
       )
   }
 
   lazy val countryListWithUKCountries: Option[Seq[Country]] = countryList.map {
     countries =>
-      val includedCodes = Set("GB", "UK", "GG", "JE", "IM")
       countries.filter(
-        country => includedCodes.contains(country.code)
+        country => countryCodesForUkCountries.contains(country.code)
       )
   }
 
   def countrySelectList(value: Map[String, String], countries: Seq[Country]): Seq[SelectItem] = {
-    def containsCountry(country: Country): Boolean =
-      value.get("country") match {
-        case Some(countryCode) => countryCode == country.code
-        case _                 => false
-      }
-
-    val countryJsonList = countries.map {
-      country =>
-        SelectItem(Some(country.code), country.description, containsCountry(country))
-    }
+    val countryJsonList =
+      for {
+        country         <- countries
+        alternativeName <- country.alternativeName
+      } yield SelectItem(
+        country.alternativeName,
+        alternativeName,
+        value.get("country") == country.alternativeName
+      )
     SelectItem(None, "&nbsp") +: countryJsonList
   }
 
