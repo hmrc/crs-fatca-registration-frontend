@@ -10,16 +10,14 @@ GET         /language/:lang                              controllers.LanguageSwi
 
 GET         /refresh-session                             controllers.KeepAliveController.keepAlive
 
-GET         /register/problem/there-is-a-problem                  controllers.ThereIsAProblemController.onPageLoad()
-
-GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /register/problem/there-is-a-problem              controllers.JourneyRecoveryController.onPageLoad()
 
 GET         /register/check-your-answers                      controllers.CheckYourAnswersController.onPageLoad()
 POST        /register/check-your-answers                      controllers.CheckYourAnswersController.onSubmit()
 
-GET         /register/sole-trader-not-identified               controllers.SoleTraderNotIdentifiedController.onPageLoad
+GET         /register/sole-trader-not-identified              controllers.SoleTraderNotIdentifiedController.onPageLoad
 
-GET         /register/problem/signed-out                 controllers.SessionExpiredController.onPageLoad()
+GET         /register/problem/signed-out                    controllers.SessionExpiredController.onPageLoad()
 
 GET         /register/problem/some-information-is-missing   controllers.InformationMissingController.onPageLoad()
 
