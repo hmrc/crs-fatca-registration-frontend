@@ -16,6 +16,6 @@
 
 @this()
 
-@(href: String, key: String, id: Option[String] = None, openInNewWindow: Boolean = false)(implicit messages: Messages)
+@(href: String, key: String, id: Option[String] = None, openInNewWindow: Boolean = false, classes: String = "govuk-link")(implicit messages: Messages)
 
-<a class="govuk-link" @if(id.isDefined){id="@id"} href="@href" @if(openInNewWindow) {target="_blank" rel="noopener noreferrer"}>@messages(key)</a>
+<a class="@classes" @if(id.isDefined){id="@id"} href="@href" @if(openInNewWindow) {target="_blank" rel="noopener noreferrer"}>@messages(key)</a>
