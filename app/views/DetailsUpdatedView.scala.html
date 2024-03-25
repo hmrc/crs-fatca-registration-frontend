@@ -26,13 +26,14 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
+@homepageLink = @{link(routes.DetailsUpdatedController.onPageLoad.url, messages("detailsUpdated.link.text"), classes = "govuk-link govuk-body")}
+
 @layout(pageTitle = titleNoForm(messages("detailsUpdated.title")), showBackLink = false) {
 
     @govukPanel(Panel(
             title = Text(messages("detailsUpdated.heading"))
             ))
     @para(Html(messages("detailsUpdated.para.1")))
-    @link(routes.DetailsUpdatedController.onPageLoad.url, messages("detailsUpdated.link.text"), classes = "govuk-link govuk-body")
-
+    <p class="govuk-!-padding-top-3">@homepageLink</p>
 
 }
