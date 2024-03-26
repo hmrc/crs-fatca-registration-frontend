@@ -17,7 +17,10 @@
 package pages
 
 import models.matching.RegistrationInfo
+import models.register.response.details.AddressResponse
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen.alphaNumStr
 import pages.behaviours.PageBehaviours
 import uk.gov.hmrc.domain.Nino
 
@@ -32,6 +35,17 @@ class IndDoYouHaveNINumberPageSpec extends PageBehaviours {
     name          <- arbitrary[models.Name]
     booleanField  <- arbitrary[Boolean]
   } yield (addressLookup, address, postcode, name, booleanField)
+
+  private val addressResponseGen: Gen[AddressResponse] = for {
+    addressline  <- arbitrary[String]
+    addressline2 <- arbitrary[Option[String]]
+    addressline3 <- arbitrary[Option[String]]
+    addressline4 <- arbitrary[Option[String]]
+    postcode     <- Gen.option(alphaNumStr.suchThat(_.length >= 5))
+    countrycode  <- arbitrary[String]
+  } yield AddressResponse(addressline, addressline2, addressline3, addressline4, postcode, countrycode)
+
+  implicit override val arbitraryAddressResponse: Arbitrary[AddressResponse] = Arbitrary(addressResponseGen)
 
   private val individualWithIdTestParamGenerator = for {
     name             <- arbitrary[models.Name]
@@ -88,7 +102,6 @@ class IndDoYouHaveNINumberPageSpec extends PageBehaviours {
               .withPage(RegistrationInfoPage, registrationInfo)
 
             val result = IndDoYouHaveNINumberPage.cleanup(Some(false), userAnswers).success.value
-
             result.get(IndWhatIsYourNINumberPage) mustBe empty
             result.get(IndContactNamePage) mustBe empty
             result.get(IndDateOfBirthPage) mustBe empty
