@@ -18,13 +18,21 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import models.Country
+import org.scalacheck.Gen
 import play.api.data.FormError
 import wolfendale.scalacheck.regexp.RegexpGen
 
 class UKAddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
 
-  val countries = Seq(Country("valid", "AD", "Andorra"))
-  val form      = new UKAddressWithoutIdFormProvider()(countries)
+  private val countries = Seq(
+    Country("valid", "AD", "Andorra", Some("Andorra")),
+    Country("valid", "FJ", "Fiji", Some("Fiji")),
+    Country("valid", "GG", "Guernsey", Some("Guernsey")),
+    Country("valid", "GG", "Guernsey", Some("Alderney")),
+    Country("valid", "GG", "Guernsey", Some("Sark"))
+  )
+
+  val form = new UKAddressWithoutIdFormProvider()(countries)
 
   val addressLineMaxLength = 35
 
@@ -208,6 +216,31 @@ class UKAddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
       "!#2",
       FormError(fieldName, invalidCharKey),
       Some("chars")
+    )
+  }
+
+  ".country" - {
+
+    val fieldName   = "country"
+    val requiredKey = "addressWithoutId.error.country.required"
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      Gen.oneOf(countries.map(_.alternativeName.value))
+    )
+
+    behave like fieldWithInvalidData(
+      form,
+      fieldName,
+      invalidCountry,
+      error = FormError(fieldName, requiredKey)
     )
   }
 

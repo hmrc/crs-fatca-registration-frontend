@@ -61,7 +61,7 @@ class IndUKAddressWithoutIdController @Inject() (
           Ok(
             view(
               preparedForm,
-              countryListFactory.countrySelectList(form.data, countries),
+              countryListFactory.countrySelectList(preparedForm.data, countries),
               mode
             )
           )
@@ -84,7 +84,7 @@ class IndUKAddressWithoutIdController @Inject() (
                   BadRequest(
                     view(
                       formWithErrors,
-                      countryListFactory.countrySelectList(form.data, countries),
+                      countryListFactory.countrySelectList(formWithErrors.data, countries),
                       mode
                     )
                   )
