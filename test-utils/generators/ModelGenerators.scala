@@ -17,8 +17,8 @@
 package generators
 
 import models._
-import models.register.response.details.{AddressResponse => RegistrationAddressResponse}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, RegistrationInfo, SafeId}
+import models.register.response.details.{AddressResponse => RegistrationAddressResponse}
 import models.subscription.request._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
@@ -147,17 +147,18 @@ trait ModelGenerators {
   }
 
   implicit val arbitraryAddressResponse: Arbitrary[RegistrationAddressResponse] = Arbitrary {
-    arbitrary[Address].map {
-      address =>
-        RegistrationAddressResponse(
-          address.addressLine1,
-          address.addressLine2,
-          Option(address.addressLine3),
-          address.addressLine4,
-          address.postCode,
-          address.country.code
-        )
-    }
+    val postCode = for {
+      size     <- Gen.chooseNum(5, 7)
+      postCode <- Gen.option(Gen.listOfN(size, Gen.alphaNumChar).map(_.mkString))
+    } yield postCode
+    for {
+      addressline  <- arbitrary[String]
+      addressline2 <- arbitrary[Option[String]]
+      addressline3 <- arbitrary[Option[String]]
+      addressline4 <- arbitrary[Option[String]]
+      postcode     <- postCode
+      countrycode  <- arbitrary[String]
+    } yield RegistrationAddressResponse(addressline, addressline2, addressline3, addressline4, postcode, countrycode)
   }
 
   implicit val arbitraryOrgRegistrationInfo: Arbitrary[OrgRegistrationInfo] = Arbitrary {
