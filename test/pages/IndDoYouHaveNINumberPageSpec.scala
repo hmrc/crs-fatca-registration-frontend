@@ -88,7 +88,6 @@ class IndDoYouHaveNINumberPageSpec extends PageBehaviours {
               .withPage(RegistrationInfoPage, registrationInfo)
 
             val result = IndDoYouHaveNINumberPage.cleanup(Some(false), userAnswers).success.value
-
             result.get(IndWhatIsYourNINumberPage) mustBe empty
             result.get(IndContactNamePage) mustBe empty
             result.get(IndDateOfBirthPage) mustBe empty
