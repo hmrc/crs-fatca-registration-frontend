@@ -18,19 +18,50 @@ package pages
 
 import models.UserAnswers
 import play.api.libs.json.JsPath
+import utils.UserAnswersHelper
 
 import scala.util.Try
 
-case object DoYouHaveUniqueTaxPayerReferencePage extends QuestionPage[Boolean] {
+case object DoYouHaveUniqueTaxPayerReferencePage extends QuestionPage[Boolean] with UserAnswersHelper {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "doYouHaveUniqueTaxPayerReference"
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = value match {
-    case Some(true)  => PageLists.individualAndWithoutIdPages.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case Some(false) => PageLists.businessWithIdPages.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case _           => super.cleanup(value, userAnswers)
-  }
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(true)  => trueCleanupPages.foldLeft(Try(userAnswers))(removePage)
+      case Some(false) => falseCleanupPages.foldLeft(Try(userAnswers))(removePage)
+      case _           => super.cleanup(value, userAnswers)
+    }
+
+  private val falseCleanupPages: Seq[QuestionPage[_]] = List(
+    WhatIsYourUTRPage,
+    WhatIsYourNamePage,
+    BusinessNamePage,
+    IsThisYourBusinessPage
+  )
+
+  private val trueCleanupPages: Seq[QuestionPage[_]] = List(
+    IndWhatIsYourNamePage,
+    DateOfBirthWithoutIdPage,
+    IndWhereDoYouLivePage,
+    IndWhatIsYourPostcodePage,
+    AddressLookupPage,
+    IndSelectAddressPage,
+    IndSelectedAddressLookupPage,
+    IsThisYourAddressPage,
+    IndUKAddressWithoutIdPage,
+    IndNonUKAddressWithoutIdPage,
+    BusinessNameWithoutIDPage,
+    HaveTradingNamePage,
+    BusinessTradingNameWithoutIDPage,
+    NonUKBusinessAddressWithoutIDPage,
+    IndWhatIsYourNINumberPage,
+    IndContactNamePage,
+    IndDateOfBirthPage,
+    RegistrationInfoPage,
+    IndDoYouHaveNINumberPage
+  )
 
 }

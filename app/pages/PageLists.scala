@@ -16,14 +16,9 @@
 
 package pages
 
-import models.UserAnswers
+import utils.UserAnswersHelper
 
-import scala.util.Try
-
-object PageLists {
-
-  val removePage: (Try[UserAnswers], QuestionPage[_]) => Try[UserAnswers] =
-    (ua: Try[UserAnswers], page: QuestionPage[_]) => ua.flatMap(_.remove(page))
+object PageLists extends UserAnswersHelper {
 
   val businessWithIdPages: Seq[QuestionPage[_]] = List(
     WhatIsYourUTRPage,
