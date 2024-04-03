@@ -52,6 +52,31 @@ object PageLists {
   val individualAndWithoutIdPages: Seq[QuestionPage[_]] = List(
     WhatIsYourNamePage,
     IndWhereDoYouLivePage,
+    IndWhatIsYourPostcodePage,
+    IndSelectAddressPage,
+    IndSelectedAddressLookupPage,
+    AddressLookupPage,
+    IndUKAddressWithoutIdPage,
+    IndNonUKAddressWithoutIdPage,
+    IndContactEmailPage,
+    IndContactHavePhonePage,
+    IndContactNamePage,
+    IndContactPhonePage,
+    IndDateOfBirthPage,
+    DateOfBirthWithoutIdPage,
+    IndDoYouHaveNINumberPage,
+    IndWhatIsYourNamePage,
+    IndWhatIsYourNINumberPage,
+    NonUKBusinessAddressWithoutIDPage,
+    BusinessNameWithoutIDPage,
+    HaveTradingNamePage,
+    BusinessTradingNameWithoutIDPage,
+    RegistrationInfoPage
+  )
+
+  val businessWithoutIDandIndPages: Seq[QuestionPage[_]] = List(
+    WhatIsYourNamePage,
+    IndWhereDoYouLivePage,
     IsThisYourAddressPage,
     IndWhatIsYourPostcodePage,
     IndSelectAddressPage,
