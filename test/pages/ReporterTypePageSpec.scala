@@ -16,12 +16,13 @@
 
 package pages
 
-import models.ReporterType
 import models.ReporterType._
 import models.matching.RegistrationInfo
+import models._
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import uk.gov.hmrc.domain.Nino
+import org.scalatest.matchers.should.Matchers._
 
 import java.time.LocalDate
 
@@ -37,7 +38,8 @@ class ReporterTypePageSpec extends PageBehaviours {
     registrationInfo <- arbitrary[RegistrationInfo]
     dob              <- arbitrary[LocalDate]
     stringField      <- arbitrary[String]
-  } yield (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField)
+    utr              <- arbitrary[UniqueTaxpayerReference]
+  } yield (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr)
 
   "ReporterTypePage" - {
 
@@ -48,10 +50,40 @@ class ReporterTypePageSpec extends PageBehaviours {
     beRemovable[ReporterType](ReporterTypePage)
 
     "cleanUp" - {
+      "must not clear answers" - {
+        "when answer changes to 'Sole Trader'" in {
+          // spot check
+          forAll(testParamGenerator) {
+            case (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) =>
+              val ua = emptyUserAnswers
+                .withPage(IndWhatIsYourNINumberPage, nino)
+                .withPage(IndContactNamePage, name)
+                .withPage(IndDateOfBirthPage, dob)
+                .withPage(RegistrationInfoPage, registrationInfo)
+                .withPage(IndWhatIsYourNamePage, name)
+                .withPage(DateOfBirthWithoutIdPage, dob)
+                .withPage(IndWhereDoYouLivePage, booleanField)
+                .withPage(IndWhatIsYourPostcodePage, postcode)
+                .withPage(AddressLookupPage, Seq(addressLookup))
+
+              val result = ReporterTypePage.cleanup(Some(LimitedCompany), ua).success.value
+
+              result.get(IndWhatIsYourNINumberPage) should (be(None) or not be empty)
+              result.get(IndContactNamePage) should (be(None) or not be empty)
+              result.get(IndDateOfBirthPage) should (be(None) or not be empty)
+              result.get(RegistrationInfoPage) should (be(None) or not be empty)
+              result.get(IndWhatIsYourNamePage) should (be(None) or not be empty)
+              result.get(DateOfBirthWithoutIdPage) should (be(None) or not be empty)
+              result.get(IndWhereDoYouLivePage) should (be(None) or not be empty)
+              result.get(IndWhatIsYourPostcodePage) should (be(None) or not be empty)
+              result.get(AddressLookupPage) should (be(None) or not be empty)
+          }
+        }
+      }
       "must clear answers" - {
         "when answer changes to anything other than 'An individual not connected to a business' or 'Sole Trader'" in {
           forAll(testParamGenerator) {
-            case (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField) =>
+            case (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) =>
               val ua = emptyUserAnswers
                 .withPage(IndWhatIsYourNINumberPage, nino)
                 .withPage(IndContactNamePage, name)
@@ -92,6 +124,36 @@ class ReporterTypePageSpec extends PageBehaviours {
               result.get(IndContactHavePhonePage) mustBe empty
               result.get(IndContactPhonePage) mustBe empty
               result.get(IndDoYouHaveNINumberPage) mustBe empty
+          }
+        }
+        "when answer changes to 'An individual not connected to a business'" in {
+          forAll(testParamGenerator) {
+            case (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) =>
+              val ua = emptyUserAnswers
+                .withPage(WhatIsYourUTRPage, utr)
+                .withPage(WhatIsYourNamePage, name)
+                .withPage(BusinessNamePage, stringField)
+                .withPage(IsThisYourBusinessPage, booleanField)
+                .withPage(BusinessNameWithoutIDPage, stringField)
+                .withPage(HaveTradingNamePage, booleanField)
+                .withPage(BusinessTradingNameWithoutIDPage, stringField)
+                .withPage(NonUKBusinessAddressWithoutIDPage, address)
+                .withPage(ContactNamePage, stringField)
+                .withPage(ContactEmailPage, stringField)
+                .withPage(ContactHavePhonePage, booleanField)
+                .withPage(ContactPhonePage, stringField)
+                .withPage(HaveSecondContactPage, booleanField)
+                .withPage(SecondContactNamePage, stringField)
+                .withPage(SecondContactEmailPage, stringField)
+                .withPage(SecondContactHavePhonePage, booleanField)
+                .withPage(SecondContactPhonePage, stringField)
+                .withPage(RegisteredAddressInUKPage, booleanField)
+                .withPage(DoYouHaveUniqueTaxPayerReferencePage, booleanField)
+
+              val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
+
+              result.get(WhatIsYourUTRPage) mustBe empty
+
           }
         }
       }
