@@ -157,16 +157,12 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           }
       }
 
-      forAll(Table("nonOrgReporterTypes", ReporterType.nonOrgReporterTypes: _*)) {
-        reporterType =>
-          s"must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for $reporterType reporter with no UTR" in {
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for Sole trader with no UTR" in {
+        val userAnswers = emptyUserAnswers
+          .withPage(ReporterTypePage, Sole)
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
 
-            val userAnswers = emptyUserAnswers
-              .withPage(ReporterTypePage, reporterType)
-              .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
-
-            navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
-          }
+        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
       }
 
       forAll(organisationReporterTypes) {
@@ -626,6 +622,64 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator
           .nextPage(WhatIsYourNamePage, CheckMode, emptyUserAnswers)
           .mustBe(controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode))
+      }
+
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to" - {
+        "WhatIsYourUtrPage when user says Yes" in {
+          val userAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, LimitedCompany)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+
+          navigator
+            .nextPage(DoYouHaveUniqueTaxPayerReferencePage, CheckMode, userAnswers)
+            .mustBe(controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(CheckMode))
+        }
+
+        "BusinessNameWithoutIDPage when org user says No" in {
+          val userAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, LimitedCompany)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+
+          navigator
+            .nextPage(DoYouHaveUniqueTaxPayerReferencePage, CheckMode, userAnswers)
+            .mustBe(controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(CheckMode))
+        }
+
+        "IndDoYouHaveNINumberPage when sole trader says No" in {
+          val userAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, Sole)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+
+          navigator
+            .nextPage(DoYouHaveUniqueTaxPayerReferencePage, CheckMode, userAnswers)
+            .mustBe(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode))
+        }
+      }
+
+      "must go from BusinessNameWithoutIDPage to HaveTradingNamePage" in {
+        navigator
+          .nextPage(BusinessNameWithoutIDPage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.organisation.routes.HaveTradingNameController.onPageLoad(CheckMode))
+      }
+
+      "must go from HaveTradingNamePage to BusinessTradingNameWithoutID when user says Yes" in {
+        val userAnswers = emptyUserAnswers.withPage(HaveTradingNamePage, true)
+        navigator
+          .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode))
+      }
+
+      "must go from HaveTradingNamePage to NonUKBusinessAddressWithoutIDController when user says No" in {
+        val userAnswers = emptyUserAnswers.withPage(HaveTradingNamePage, false)
+        navigator
+          .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
+      }
+
+      "must go from BusinessTradingNameWithoutIDPage to NonUKBusinessAddressWithoutIDPage" in {
+        navigator
+          .nextPage(BusinessTradingNameWithoutIDPage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
       }
 
       "must go from IndWhereDoYouLivePage to IndWhatIsYourPostcodePage when user answers Yes" in {
