@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -30,7 +31,7 @@ import scala.concurrent.Future
 
 class YourContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val yourContactDetailsRoute = routes.YourContactDetailsController.onPageLoad().url
+  lazy val yourContactDetailsRoute = routes.YourContactDetailsController.onPageLoad(NormalMode).url
 
   "YourContactDetails Controller" - {
 
@@ -46,7 +47,7 @@ class YourContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[YourContactDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(NormalMode)(request, messages(application)).toString
       }
     }
 
