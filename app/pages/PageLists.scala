@@ -43,12 +43,6 @@ object PageLists {
     SecondContactPhonePage
   )
 
-  val individualWithIDPages: Seq[QuestionPage[_]] = List(
-    IndWhatIsYourNINumberPage,
-    IndWhatIsYourNamePage,
-    IndDateOfBirthPage
-  )
-
   val individualAndWithoutIdPages: Seq[QuestionPage[_]] = List(
     WhatIsYourNamePage,
     IndWhereDoYouLivePage,
