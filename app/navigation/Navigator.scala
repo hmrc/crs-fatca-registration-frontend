@@ -164,6 +164,8 @@ class Navigator @Inject() () extends Logging {
     case DoYouHaveUniqueTaxPayerReferencePage => doYouHaveUniqueTaxPayerReference(CheckMode)
     case WhatIsYourUTRPage                    => isSoleProprietor(CheckMode)
     case WhatIsYourNamePage                   => _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode)
+    case BusinessNamePage                     => _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode)
+    case IsThisYourBusinessPage               => isThisYourBusiness(CheckMode)
     case IndDoYouHaveNINumberPage             => doYouHaveNINORoutes(CheckMode)
     case IndWhatIsYourNINumberPage            => whatIsYourNINumberRoutes(CheckMode)
     case IndContactNamePage                   => contactNameRoutes(CheckMode)
@@ -225,8 +227,6 @@ class Navigator @Inject() () extends Logging {
           controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
         )
     case NonUKBusinessAddressWithoutIDPage => businessAddressWithoutIdRouting(CheckMode)
-    case BusinessNamePage                  => _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode)
-    case IsThisYourBusinessPage            => isThisYourBusiness(CheckMode)
     case _                                 => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
