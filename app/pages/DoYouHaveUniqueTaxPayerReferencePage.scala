@@ -39,7 +39,8 @@ case object DoYouHaveUniqueTaxPayerReferencePage extends QuestionPage[Boolean] w
     WhatIsYourUTRPage,
     WhatIsYourNamePage,
     BusinessNamePage,
-    IsThisYourBusinessPage
+    IsThisYourBusinessPage,
+    RegistrationInfoPage
   )
 
   private val trueCleanupPages: Seq[QuestionPage[_]] = List(

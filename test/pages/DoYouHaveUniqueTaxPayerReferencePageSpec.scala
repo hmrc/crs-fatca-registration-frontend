@@ -16,8 +16,8 @@
 
 package pages
 
+import models.UniqueTaxpayerReference
 import models.matching.RegistrationInfo
-import models.{Name, UniqueTaxpayerReference}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import uk.gov.hmrc.domain.Nino
@@ -48,19 +48,24 @@ class DoYouHaveUniqueTaxPayerReferencePageSpec extends PageBehaviours {
 
   "cleanup" - {
     "if answer is false" in {
-      val ua = emptyUserAnswers
-        .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("utr12345"))
-        .withPage(WhatIsYourNamePage, Name("first", "second"))
-        .withPage(BusinessNamePage, "businessName")
-        .withPage(IsThisYourBusinessPage, true)
+      forAll(testParamGenerator) {
+        case (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob) =>
+          val ua = emptyUserAnswers
+            .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("utr12345"))
+            .withPage(WhatIsYourNamePage, name)
+            .withPage(BusinessNamePage, "businessName")
+            .withPage(IsThisYourBusinessPage, booleanField)
+            .withPage(RegistrationInfoPage, registrationInfo)
 
-      val result = DoYouHaveUniqueTaxPayerReferencePage.cleanup(Some(false), ua).success.value
+          val result = DoYouHaveUniqueTaxPayerReferencePage.cleanup(Some(false), ua).success.value
 
-      result.get(WhatIsYourUTRPage) mustBe empty
-      result.get(WhatIsYourNamePage) mustBe empty
-      result.get(BusinessNamePage) mustBe empty
-      result.get(IsThisYourBusinessPage) mustBe empty
+          result.get(WhatIsYourUTRPage) mustBe empty
+          result.get(WhatIsYourNamePage) mustBe empty
+          result.get(BusinessNamePage) mustBe empty
+          result.get(IsThisYourBusinessPage) mustBe empty
+          result.get(RegistrationInfoPage) mustBe empty
 
+      }
     }
 
     "if answer is true" in {
