@@ -359,7 +359,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
                   navigator
                     .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
-                    .mustBe(routes.YourContactDetailsController.onPageLoad(NormalMode))
+                    .mustBe(routes.YourContactDetailsController.onPageLoad())
               }
             }
         }
@@ -402,7 +402,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
               navigator
                 .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
-                .mustBe(routes.YourContactDetailsController.onPageLoad(NormalMode))
+                .mustBe(routes.YourContactDetailsController.onPageLoad())
           }
         }
 
@@ -804,7 +804,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
           navigator
             .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
-            .mustBe(routes.YourContactDetailsController.onPageLoad(NormalMode))
+            .mustBe(routes.YourContactDetailsController.onPageLoad())
         }
 
       }
@@ -946,7 +946,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
               navigator
                 .nextPage(IsThisYourBusinessPage, CheckMode, answers)
-                .mustBe(routes.YourContactDetailsController.onPageLoad(NormalMode))
+                .mustBe(routes.YourContactDetailsController.onPageLoad())
             }
 
             s"to CheckYourAnswersPage when Yes is selected for a $reporterType and there is a contact name" in {
@@ -988,7 +988,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
           navigator
             .nextPage(IsThisYourBusinessPage, CheckMode, answers)
-            .mustBe(routes.YourContactDetailsController.onPageLoad(NormalMode))
+            .mustBe(routes.YourContactDetailsController.onPageLoad())
         }
 
       }

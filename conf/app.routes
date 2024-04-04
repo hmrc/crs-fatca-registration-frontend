@@ -32,10 +32,8 @@ GET        /register/problem/organisation-with-utr-pre-registered           cont
 
 GET        /register/problem/individual-pre-registered                                  controllers.individual.IndividualAlreadyRegisteredController.onPageLoad()
 
-GET        /register/your-contact-details                controllers.YourContactDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/your-contact-details                controllers.YourContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-your-contact-details         controllers.YourContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-your-contact-details         controllers.YourContactDetailsController.onSubmit(mode: Mode = CheckMode)
+GET        /register/your-contact-details                controllers.YourContactDetailsController.onPageLoad()
+POST       /register/your-contact-details                controllers.YourContactDetailsController.onSubmit()
 
 GET        /register/contact-name                        controllers.organisation.ContactNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /register/contact-name                        controllers.organisation.ContactNameController.onSubmit(mode: Mode = NormalMode)

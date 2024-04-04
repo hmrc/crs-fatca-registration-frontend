@@ -297,7 +297,7 @@ class Navigator @Inject() () extends Logging {
           mode,
           ua,
           ContactNamePage,
-          routes.YourContactDetailsController.onPageLoad(NormalMode)
+          routes.YourContactDetailsController.onPageLoad()
         )
       case _ =>
         logger.warn(s"ReporterType answer not found when routing from NonUKBusinessAddressWithoutIDPage in mode $mode")
@@ -314,7 +314,7 @@ class Navigator @Inject() () extends Logging {
           controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
         )
       case (Some(true), _, _) =>
-        checkNextPageForValueThenRoute(mode, ua, ContactNamePage, routes.YourContactDetailsController.onPageLoad(NormalMode))
+        checkNextPageForValueThenRoute(mode, ua, ContactNamePage, routes.YourContactDetailsController.onPageLoad())
       case (Some(false), _, true)       => controllers.organisation.routes.DifferentBusinessController.onPageLoad()
       case (Some(false), Some(Sole), _) => controllers.routes.SoleTraderNotIdentifiedController.onPageLoad
       case _                            => controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad()

@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions._
-import models.Mode
+import models.NormalMode
 import navigation.Navigator
 import pages.YourContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -38,14 +38,14 @@ class YourContactDetailsController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() {
+  def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() {
     implicit request =>
-      Ok(view(mode))
+      Ok(view())
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData().async {
+  def onSubmit(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData().async {
     implicit request =>
-      Future.successful(Redirect(navigator.nextPage(YourContactDetailsPage, mode, request.userAnswers)))
+      Future.successful(Redirect(navigator.nextPage(YourContactDetailsPage, NormalMode, request.userAnswers)))
   }
 
 }
