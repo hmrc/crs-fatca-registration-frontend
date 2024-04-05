@@ -16,13 +16,15 @@
 
 package pages
 
+import models.Regime.reads
 import models.ReporterType._
-import models.matching.RegistrationInfo
 import models._
+import models.matching.RegistrationInfo
 import org.scalacheck.Arbitrary.arbitrary
-import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 import org.scalatest.matchers.should.Matchers._
+import pages.behaviours.PageBehaviours
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
+import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
 
@@ -176,9 +178,9 @@ class ReporterTypePageSpec extends PageBehaviours {
 
           }
         }
+
       }
     }
-
   }
 
 }

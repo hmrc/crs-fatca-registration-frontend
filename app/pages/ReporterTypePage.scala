@@ -16,8 +16,8 @@
 
 package pages
 
+import models.ReporterType.{orgReporterTypes, Individual}
 import models.{ReporterType, UserAnswers}
-import models.ReporterType.{Individual, Sole}
 import play.api.libs.json.JsPath
 
 import scala.util.Try
@@ -47,7 +47,7 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
     RegistrationInfoPage
   )
 
-  private val otherBusinessTyeCleanup = List(
+  private val otherBusinessTypeCleanup = List(
     IndWhatIsYourNINumberPage,
     IndContactNamePage,
     IndDateOfBirthPage,
@@ -73,10 +73,9 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
   override def toString: String = "reporterType"
 
   override def cleanup(value: Option[ReporterType], userAnswers: UserAnswers): Try[UserAnswers] = value match {
-    case Some(Sole)       => Try(userAnswers)
-    case Some(Individual) => individualCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case Some(_)          => otherBusinessTyeCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case _                => super.cleanup(value, userAnswers)
+    case Some(Individual)                                              => individualCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
+    case Some(reporterType) if orgReporterTypes.contains(reporterType) => otherBusinessTypeCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
+    case _                                                             => super.cleanup(value, userAnswers)
   }
 
 }
