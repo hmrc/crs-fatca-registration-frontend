@@ -137,7 +137,7 @@ class Navigator @Inject() () extends Logging {
 
     case IndSelectAddressPage => _ => controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
     case IndContactEmailPage  => _ => controllers.individual.routes.IndContactHavePhoneController.onPageLoad(NormalMode)
-    case IndContactPhonePage  => _ => controllers.routes.CheckYourAnswersController.onPageLoad
+    case IndContactPhonePage  => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
     case IndDateOfBirthPage   => whatIsYourDateOfBirthRoutes(NormalMode)
     case IndContactHavePhonePage =>
       userAnswers =>
@@ -145,7 +145,7 @@ class Navigator @Inject() () extends Logging {
           userAnswers,
           IndContactHavePhonePage,
           controllers.individual.routes.IndContactPhoneController.onPageLoad(NormalMode),
-          controllers.routes.CheckYourAnswersController.onPageLoad
+          controllers.routes.CheckYourAnswersController.onPageLoad()
         )
 
     case _ => _ => routes.IndexController.onPageLoad
@@ -163,12 +163,33 @@ class Navigator @Inject() () extends Logging {
         )
     case DoYouHaveUniqueTaxPayerReferencePage => doYouHaveUniqueTaxPayerReference(CheckMode)
     case WhatIsYourUTRPage                    => isSoleProprietor(CheckMode)
-    case IndDoYouHaveNINumberPage             => doYouHaveNINORoutes(CheckMode)
-    case IndWhatIsYourNINumberPage            => whatIsYourNINumberRoutes(CheckMode)
-    case IndContactNamePage                   => contactNameRoutes(CheckMode)
-    case IndWhatIsYourNamePage                => whatIsYourNameRoutes(CheckMode)
-    case IndDateOfBirthPage                   => whatIsYourDateOfBirthRoutes(CheckMode)
-    case DateOfBirthWithoutIdPage             => whatIsYourDateOfBirthRoutes(CheckMode)
+    case WhatIsYourNamePage                   => _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode)
+    case BusinessNamePage                     => _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode)
+    case IsThisYourBusinessPage               => isThisYourBusiness(CheckMode)
+    case BusinessNameWithoutIDPage            => _ => controllers.organisation.routes.HaveTradingNameController.onPageLoad(CheckMode)
+    case HaveTradingNamePage => userAnswers =>
+        yesNoPage(
+          userAnswers,
+          HaveTradingNamePage,
+          controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode),
+          controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode)
+        )
+    case BusinessTradingNameWithoutIDPage  => _ => controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode)
+    case NonUKBusinessAddressWithoutIDPage => businessAddressWithoutIdRouting(CheckMode)
+    case IndDoYouHaveNINumberPage          => doYouHaveNINORoutes(CheckMode)
+    case IndWhatIsYourNINumberPage         => whatIsYourNINumberRoutes(CheckMode)
+    case IndContactNamePage                => contactNameRoutes(CheckMode)
+    case IndWhatIsYourNamePage             => whatIsYourNameRoutes(CheckMode)
+    case IndDateOfBirthPage                => whatIsYourDateOfBirthRoutes(CheckMode)
+    case RegistrationInfoPage =>
+      userAnswers =>
+        checkNextPageForValueThenRoute(
+          CheckMode,
+          userAnswers,
+          IndContactEmailPage,
+          controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+        )
+    case DateOfBirthWithoutIdPage => whatIsYourDateOfBirthRoutes(CheckMode)
     case IndWhereDoYouLivePage =>
       userAnswers =>
         yesNoPage(
@@ -177,19 +198,45 @@ class Navigator @Inject() () extends Logging {
           controllers.individual.routes.IndWhatIsYourPostcodeController.onPageLoad(CheckMode),
           controllers.individual.routes.IndNonUKAddressWithoutIdController.onPageLoad(CheckMode)
         )
-    case IndNonUKAddressWithoutIdPage => _ => routes.CheckYourAnswersController.onPageLoad()
-    case IndWhatIsYourPostcodePage    => addressLookupNavigation(CheckMode)
+    case IndNonUKAddressWithoutIdPage =>
+      userAnswers =>
+        checkNextPageForValueThenRoute(
+          CheckMode,
+          userAnswers,
+          IndContactEmailPage,
+          controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+        )
+    case IndWhatIsYourPostcodePage => addressLookupNavigation(CheckMode)
+    case IndSelectAddressPage =>
+      userAnswers =>
+        checkNextPageForValueThenRoute(
+          CheckMode,
+          userAnswers,
+          IndContactEmailPage,
+          controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+        )
     case IsThisYourAddressPage =>
       userAnswers =>
         yesNoPage(
           userAnswers,
           IsThisYourAddressPage,
-          routes.CheckYourAnswersController.onPageLoad(),
+          checkNextPageForValueThenRoute(
+            CheckMode,
+            userAnswers,
+            IndContactEmailPage,
+            controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+          ),
           controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(CheckMode)
         )
-    case IndUKAddressWithoutIdPage         => _ => routes.CheckYourAnswersController.onPageLoad()
-    case NonUKBusinessAddressWithoutIDPage => _ => routes.CheckYourAnswersController.onPageLoad()
-    case _                                 => _ => routes.CheckYourAnswersController.onPageLoad()
+    case IndUKAddressWithoutIdPage =>
+      userAnswers =>
+        checkNextPageForValueThenRoute(
+          CheckMode,
+          userAnswers,
+          IndContactEmailPage,
+          controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+        )
+    case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -207,7 +254,7 @@ class Navigator @Inject() () extends Logging {
           _ => true
         )
     ) {
-      routes.CheckYourAnswersController.onPageLoad
+      routes.CheckYourAnswersController.onPageLoad()
     } else {
       call
     }
@@ -232,10 +279,9 @@ class Navigator @Inject() () extends Logging {
 
   private def doYouHaveUniqueTaxPayerReference(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(DoYouHaveUniqueTaxPayerReferencePage), ua.get(ReporterTypePage)) match {
-      case (Some(true), _)                 => controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(mode)
-      case (Some(false), Some(Individual)) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case (Some(false), Some(Sole))       => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case (Some(false), Some(_))          => controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(mode)
+      case (Some(true), _)           => controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(mode)
+      case (Some(false), Some(Sole)) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
+      case (Some(false), Some(_))    => controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(mode)
       case (None, Some(_)) =>
         logger.warn("DoYouHaveUniqueTaxPayerReference answer not found when routing from DoYouHaveUniqueTaxPayerReferencePage")
         routes.JourneyRecoveryController.onPageLoad()
@@ -249,10 +295,20 @@ class Navigator @Inject() () extends Logging {
 
   private def businessAddressWithoutIdRouting(mode: Mode)(ua: UserAnswers): Call =
     ua.get(ReporterTypePage) match {
-      case Some(Sole) | Some(Individual) => controllers.individual.routes.IndContactEmailController.onPageLoad(mode)
-      case Some(_)                       => controllers.routes.YourContactDetailsController.onPageLoad()
+      case Some(Sole) => checkNextPageForValueThenRoute(
+          mode,
+          ua,
+          IndContactEmailPage,
+          controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
+        )
+      case Some(_) => checkNextPageForValueThenRoute(
+          mode,
+          ua,
+          ContactNamePage,
+          routes.YourContactDetailsController.onPageLoad()
+        )
       case _ =>
-        logger.warn("ReporterType answer not found when routing from NonUKBusinessAddressWithoutIDPage")
+        logger.warn(s"ReporterType answer not found when routing from NonUKBusinessAddressWithoutIDPage in mode $mode")
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -263,12 +319,13 @@ class Navigator @Inject() () extends Logging {
           mode,
           ua,
           IndContactEmailPage,
-          controllers.individual.routes.IndContactEmailController.onPageLoad(mode)
+          controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
         )
       case (Some(true), _, _) =>
         checkNextPageForValueThenRoute(mode, ua, ContactNamePage, routes.YourContactDetailsController.onPageLoad())
-      case (Some(false), _, true) => controllers.organisation.routes.DifferentBusinessController.onPageLoad()
-      case _                      => controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad()
+      case (Some(false), _, true)       => controllers.organisation.routes.DifferentBusinessController.onPageLoad()
+      case (Some(false), Some(Sole), _) => controllers.routes.SoleTraderNotIdentifiedController.onPageLoad
+      case _                            => controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad()
     }
 
   private def isSoleProprietor(mode: Mode)(ua: UserAnswers): Call =
