@@ -43,7 +43,8 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
     SecondContactHavePhonePage,
     SecondContactPhonePage,
     RegisteredAddressInUKPage,
-    DoYouHaveUniqueTaxPayerReferencePage
+    DoYouHaveUniqueTaxPayerReferencePage,
+    RegistrationInfoPage
   )
 
   private val otherBusinessTyeCleanup = List(

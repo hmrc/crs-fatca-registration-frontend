@@ -131,6 +131,7 @@ class ReporterTypePageSpec extends PageBehaviours {
             case (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) =>
               val ua = emptyUserAnswers
                 .withPage(WhatIsYourUTRPage, utr)
+                .withPage(RegistrationInfoPage, registrationInfo)
                 .withPage(WhatIsYourNamePage, name)
                 .withPage(BusinessNamePage, stringField)
                 .withPage(IsThisYourBusinessPage, booleanField)
@@ -153,6 +154,25 @@ class ReporterTypePageSpec extends PageBehaviours {
               val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
 
               result.get(WhatIsYourUTRPage) mustBe empty
+              result.get(RegistrationInfoPage) mustBe empty
+              result.get(WhatIsYourNamePage) mustBe empty
+              result.get(BusinessNamePage) mustBe empty
+              result.get(IsThisYourBusinessPage) mustBe empty
+              result.get(BusinessNameWithoutIDPage) mustBe empty
+              result.get(HaveTradingNamePage) mustBe empty
+              result.get(BusinessTradingNameWithoutIDPage) mustBe empty
+              result.get(NonUKBusinessAddressWithoutIDPage) mustBe empty
+              result.get(ContactNamePage) mustBe empty
+              result.get(ContactEmailPage) mustBe empty
+              result.get(ContactHavePhonePage) mustBe empty
+              result.get(ContactPhonePage) mustBe empty
+              result.get(HaveSecondContactPage) mustBe empty
+              result.get(SecondContactNamePage) mustBe empty
+              result.get(SecondContactEmailPage) mustBe empty
+              result.get(SecondContactHavePhonePage) mustBe empty
+              result.get(SecondContactPhonePage) mustBe empty
+              result.get(RegisteredAddressInUKPage) mustBe empty
+              result.get(DoYouHaveUniqueTaxPayerReferencePage) mustBe empty
 
           }
         }
