@@ -17,24 +17,41 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
+import helpers.JsonFixtures.subscriptionId
+import org.mockito.MockitoSugar.when
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.DetailsUpdatedView
 
 class DetailsUpdatedControllerSpec extends SpecBase {
 
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
+
+  private val allowedAffinityGroups: Set[AffinityGroup] = Set(
+    AffinityGroup.Organisation,
+    AffinityGroup.Agent,
+    AffinityGroup.Individual
+  )
+
   "detailsUpdated Controller" - {
+
+    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.DetailsUpdatedController.onPageLoad().url)
+        val view    = application.injector.instanceOf[DetailsUpdatedView]
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[DetailsUpdatedView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString

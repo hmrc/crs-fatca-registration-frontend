@@ -17,17 +17,20 @@
 package controllers.changeContactDetails
 
 import base.SpecBase
+import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.routes
 import forms.changeContactDetails.OrganisationContactNameFormProvider
-import models.{NormalMode, UserAnswers}
+import helpers.JsonFixtures.subscriptionId
+import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.changeContactDetails.OrganisationContactNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.OrganisationContactNameView
 
 import scala.concurrent.Future
@@ -37,20 +40,28 @@ class OrganisationContactNameControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new OrganisationContactNameFormProvider()
   val form         = formProvider()
 
+  private val mockSubscriptionIdRetrievalAction         = mock[SubscriptionIdRetrievalAction]
+  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
+
   lazy val organisationContactNameRoute = controllers.changeContactDetails.routes.OrganisationContactNameController.onPageLoad(NormalMode).url
 
   "OrganisationContactName Controller" - {
+    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(emptyUserAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, organisationContactNameRoute)
+        val view    = application.injector.instanceOf[OrganisationContactNameView]
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[OrganisationContactNameView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -59,14 +70,17 @@ class OrganisationContactNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(OrganisationContactNamePage, "answer").success.value
+      val userAnswers = emptyUserAnswers.withPage(OrganisationContactNamePage, "answer")
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, organisationContactNameRoute)
-
-        val view = application.injector.instanceOf[OrganisationContactNameView]
+        val view    = application.injector.instanceOf[OrganisationContactNameView]
 
         val result = route(application, request).value
 
@@ -77,19 +91,16 @@ class OrganisationContactNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(emptyUserAnswers)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, organisationContactNameRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+        val request = FakeRequest(POST, organisationContactNameRoute).withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
@@ -100,16 +111,16 @@ class OrganisationContactNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(emptyUserAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, organisationContactNameRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
+        val request   = FakeRequest(POST, organisationContactNameRoute).withFormUrlEncodedBody(("value", ""))
         val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[OrganisationContactNameView]
+        val view      = application.injector.instanceOf[OrganisationContactNameView]
 
         val result = route(application, request).value
 
@@ -120,7 +131,11 @@ class OrganisationContactNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, organisationContactNameRoute)
@@ -134,12 +149,14 @@ class OrganisationContactNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, organisationContactNameRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+        val request = FakeRequest(POST, organisationContactNameRoute).withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 

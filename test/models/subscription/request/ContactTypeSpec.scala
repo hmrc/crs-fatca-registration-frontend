@@ -17,14 +17,14 @@
 package models.subscription.request
 
 import base.SpecBase
-import generators.Generators
+import generators.ModelGenerators
 import models.error.ApiError.MandatoryInformationMissingError
 import models.{ReporterType, UserAnswers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import uk.gov.hmrc.auth.core.AffinityGroup
 
-class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
+class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with ModelGenerators {
 
   "ContactInformation" - {
 
@@ -63,12 +63,10 @@ class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           result mustBe Some(ContactInformation(
             contactInformation = IndividualDetails(
               firstName = contactName.firstName,
-              middleName = None,
               lastName = contactName.lastName
             ),
             email = contactEmail,
-            phone = Some(contactNumber),
-            mobile = None
+            phone = Some(contactNumber)
           ))
         }
 
@@ -105,12 +103,10 @@ class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           result mustBe Some(ContactInformation(
             contactInformation = IndividualDetails(
               firstName = contactName.firstName,
-              middleName = None,
               lastName = contactName.lastName
             ),
             email = contactEmail,
-            phone = None,
-            mobile = None
+            phone = None
           ))
         }
 
@@ -151,8 +147,7 @@ class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               name = contactName.fullName
             ),
             email = contactEmail,
-            phone = Some(contactNumber),
-            mobile = None
+            phone = Some(contactNumber)
           ))
         }
 
@@ -189,8 +184,7 @@ class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               name = contactName.fullName
             ),
             email = contactEmail,
-            phone = None,
-            mobile = None
+            phone = None
           ))
         }
 
@@ -227,12 +221,10 @@ class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           result mustBe Some(ContactInformation(
             contactInformation = IndividualDetails(
               firstName = contactName.firstName,
-              middleName = None,
               lastName = contactName.lastName
             ),
             email = contactEmail,
-            phone = Some(contactNumber),
-            mobile = None
+            phone = Some(contactNumber)
           ))
         }
 
@@ -306,8 +298,7 @@ class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               result mustBe Right(Some(ContactInformation(
                 contactInformation = OrganisationDetails(contactName),
                 email = contactEmail,
-                phone = Some(contactNumber),
-                mobile = None
+                phone = Some(contactNumber)
               )))
             }
 
@@ -327,8 +318,7 @@ class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               result mustBe Right(Some(ContactInformation(
                 contactInformation = OrganisationDetails(contactName),
                 email = contactEmail,
-                phone = None,
-                mobile = None
+                phone = None
               )))
             }
 

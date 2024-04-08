@@ -20,9 +20,12 @@ import base.SpecBase
 import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import connectors.SubscriptionConnector
+import generators.ModelGenerators
 import helpers.JsonFixtures._
 import models.error.ApiError
-import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, MandatoryInformationMissingError, NotFoundError, UnableToCreateEMTPSubscriptionError}
+import models.error.ApiError._
+import models.subscription.request.{ContactInformation, OrganisationDetails, ReadSubscriptionRequest}
+import models.subscription.response.DisplaySubscriptionResponse
 import models.{Address, Country, ReporterType, SubscriptionID, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
@@ -31,11 +34,15 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import play.api.inject.bind
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import com.softwaremill.quicklens._
+import org.scalacheck.Arbitrary.arbitrary
+import pages.changeContactDetails._
 
-class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
+class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks with ModelGenerators {
 
   val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
 
@@ -97,12 +104,14 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
     }
 
     "must return 'SubscriptionID' when a subscription already exists" in {
-      val subscriptionID = SubscriptionID("id")
 
-      when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(Some(subscriptionID)))
+      forAll(arbitrary[DisplaySubscriptionResponse]) {
+        subscription =>
+          when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(Some(subscription)))
 
-      val result = service.checkAndCreateSubscription(safeId, emptyUserAnswers, AffinityGroup.Individual)
-      result.futureValue mustBe Right(subscriptionID)
+          val result = service.checkAndCreateSubscription(safeId, emptyUserAnswers, AffinityGroup.Individual)
+          result.futureValue.value mustBe subscription.subscriptionId
+      }
     }
 
     "must return MandatoryInformationMissingError when UserAnswers is empty" in {
@@ -136,18 +145,200 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks {
       }
     }
 
-    "getDisplaySubscriptionId" - {
+    "getSubscription" - {
 
-      "must return 'SubscriptionID' for valid input" in {
-        when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(Some(SubscriptionID("id"))))
-        val result = service.getDisplaySubscriptionId(safeId)
-        result.futureValue mustBe Some(SubscriptionID("id"))
+      "must return subscription details for valid input" in {
+        forAll(arbitrary[DisplaySubscriptionResponse]) {
+          subscription =>
+            when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(Some(subscription)))
+            val result = service.getSubscription(safeId)
+            result.futureValue mustBe Some(subscription)
+        }
       }
 
       "must return 'None' for any failures of exceptions" in {
         when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
-        val result = service.getDisplaySubscriptionId(safeId)
+        val result = service.getSubscription(safeId)
         result.futureValue mustBe None
+      }
+    }
+
+    "updateContactDetails" - {
+
+      "must return true when primary contact details are updated" in {
+        forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails], validPhoneNumber(PhoneNumberLength)) {
+          (subscription, organisationDetails, contactPhoneNumber) =>
+            val subscriptionResponse = subscription
+              .modify(_.success.primaryContact.contactInformation).setTo(organisationDetails)
+              .modify(_.success.secondaryContact).setTo(None)
+
+            val userAnswers = emptyUserAnswers
+              .withPage(OrganisationContactNamePage, name.fullName)
+              .withPage(OrganisationContactEmailPage, subscription.success.primaryContact.email)
+              .withPage(OrganisationContactHavePhonePage, true)
+              .withPage(OrganisationContactPhonePage, contactPhoneNumber)
+              .withPage(OrganisationHaveSecondContactPage, false)
+
+            when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
+              .thenReturn(Future.successful(Some(subscriptionResponse)))
+            when(mockSubscriptionConnector.updateSubscription(any())(any[HeaderCarrier](), any[ExecutionContext]()))
+              .thenReturn(Future.successful(true))
+
+            service.updateContactDetails(subscriptionId, userAnswers).futureValue mustBe true
+        }
+
+      }
+
+      "must return false when unable to update contact details" in {
+        forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails]) {
+          (subscription, organisationDetails) =>
+            val subscriptionResponse = subscription
+              .modify(_.success.primaryContact.contactInformation)
+              .setTo(organisationDetails)
+
+            val userAnswers = emptyUserAnswers
+              .withPage(OrganisationContactNamePage, name.fullName)
+              .withPage(OrganisationContactEmailPage, subscription.success.primaryContact.email)
+              .withPage(OrganisationContactHavePhonePage, true)
+              .withPage(OrganisationHaveSecondContactPage, false)
+
+            when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
+              .thenReturn(Future.successful(Some(subscriptionResponse)))
+            when(mockSubscriptionConnector.updateSubscription(any())(any[HeaderCarrier](), any[ExecutionContext]()))
+              .thenReturn(Future.successful(false))
+
+            service.updateContactDetails(subscriptionId, userAnswers).futureValue mustBe false
+        }
+      }
+
+      "must return false when the connector returns None when retrieving the subscription" in {
+        when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(None))
+
+        service.updateContactDetails(subscriptionId, emptyUserAnswers).futureValue mustBe false
+      }
+    }
+
+    "checkIfContactDetailsHasChanged" - {
+
+      "must return false when no change is made to primary contact details" in {
+        forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails], validPhoneNumber(PhoneNumberLength)) {
+          (subscription, organisationDetails, phoneNumber) =>
+            val subscriptionResponse = subscription
+              .modify(_.success.primaryContact.contactInformation)
+              .setTo(organisationDetails)
+              .modify(_.success.primaryContact.phone)
+              .setTo(Some(phoneNumber))
+              .modify(_.success.secondaryContact)
+              .setTo(None)
+
+            val userAnswers = emptyUserAnswers
+              .withPage(OrganisationContactNamePage, organisationDetails.name)
+              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.primaryContact.email)
+              .withPage(OrganisationContactHavePhonePage, true)
+              .withPage(OrganisationContactPhonePage, phoneNumber)
+              .withPage(OrganisationHaveSecondContactPage, false)
+
+            val result = service.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers)
+
+            result mustBe Some(false)
+        }
+      }
+
+      "must return true when primary contact details are changed for organisation" in {
+        forAll(
+          arbitrary[DisplaySubscriptionResponse],
+          arbitrary[OrganisationDetails],
+          validPhoneNumber(PhoneNumberLength),
+          emailMatchingRegexAndLength(emailRegex, EmailLength),
+          validPhoneNumber(PhoneNumberLength),
+          arbitrary[String]
+        ) {
+          (subscription, organisationDetails, contactPhoneNumber, secondContactEmail, secondContactPhoneNumber, secondContactName) =>
+            val subscriptionResponse = subscription
+              .modify(_.success.primaryContact.contactInformation)
+              .setTo(organisationDetails)
+
+            val userAnswers = emptyUserAnswers
+              .withPage(OrganisationContactNamePage, name.fullName)
+              .withPage(OrganisationContactEmailPage, subscription.success.primaryContact.email)
+              .withPage(OrganisationContactHavePhonePage, true)
+              .withPage(OrganisationContactPhonePage, contactPhoneNumber)
+              .withPage(OrganisationHaveSecondContactPage, true)
+              .withPage(OrganisationSecondContactNamePage, secondContactName)
+              .withPage(OrganisationSecondContactEmailPage, secondContactEmail)
+              .withPage(OrganisationSecondContactHavePhonePage, true)
+              .withPage(OrganisationSecondContactPhonePage, secondContactPhoneNumber)
+
+            val result = service.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers)
+
+            result mustBe Some(true)
+        }
+      }
+
+      "must return true when a secondary contact is added" in {
+        forAll(
+          arbitrary[DisplaySubscriptionResponse],
+          validPhoneNumber(PhoneNumberLength),
+          emailMatchingRegexAndLength(emailRegex, EmailLength),
+          validPhoneNumber(PhoneNumberLength),
+          arbitrary[String]
+        ) {
+          (subscription, contactPhoneNumber, secondContactEmail, secondContactPhoneNumber, secondContactName) =>
+            val subscriptionResponse = subscription
+              .modify(_.success.primaryContact.contactInformation)
+              .setTo(OrganisationDetails(name.fullName))
+              .modify(_.success.primaryContact.phone)
+              .setTo(Some(contactPhoneNumber))
+              .modify(_.success.secondaryContact)
+              .setTo(None)
+
+            val userAnswers = emptyUserAnswers
+              .withPage(OrganisationContactNamePage, name.fullName)
+              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.primaryContact.email)
+              .withPage(OrganisationContactHavePhonePage, true)
+              .withPage(OrganisationContactPhonePage, contactPhoneNumber)
+              .withPage(OrganisationHaveSecondContactPage, true)
+              .withPage(OrganisationSecondContactNamePage, secondContactName)
+              .withPage(OrganisationSecondContactEmailPage, secondContactEmail)
+              .withPage(OrganisationSecondContactHavePhonePage, true)
+              .withPage(OrganisationSecondContactPhonePage, secondContactPhoneNumber)
+
+            val result = service.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers)
+
+            result mustBe Some(true)
+        }
+      }
+
+      "must return true when secondary contact is removed" in {
+        forAll(
+          arbitrary[DisplaySubscriptionResponse],
+          emailMatchingRegexAndLength(emailRegex, EmailLength),
+          validPhoneNumber(PhoneNumberLength),
+          emailMatchingRegexAndLength(emailRegex, EmailLength)
+        ) {
+          (subscription, contactEmail, contactPhoneNumber, secondContactEmail) =>
+            val subscriptionResponse = subscription
+              .modify(_.success.primaryContact.contactInformation)
+              .setTo(OrganisationDetails(name.fullName))
+              .modify(_.success.primaryContact.email)
+              .setTo(contactEmail)
+              .modify(_.success.primaryContact.phone)
+              .setTo(Some(contactPhoneNumber))
+              .modify(_.success.secondaryContact)
+              .setTo(Some(ContactInformation(OrganisationDetails(name.fullName), secondContactEmail, phone = None)))
+
+            val userAnswers = emptyUserAnswers
+              .withPage(OrganisationContactNamePage, name.fullName)
+              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.primaryContact.email)
+              .withPage(OrganisationContactHavePhonePage, true)
+              .withPage(OrganisationContactPhonePage, contactPhoneNumber)
+              .withPage(OrganisationHaveSecondContactPage, false)
+
+            val result = service.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers)
+
+            result mustBe Some(true)
+        }
       }
     }
   }

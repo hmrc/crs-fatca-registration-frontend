@@ -17,25 +17,28 @@
 package viewmodels.changeContactDetails
 
 import models.{CheckMode, UserAnswers}
-import pages.changeContactDetails.OrganisationHavePhonePage
+import pages.changeContactDetails.OrganisationContactHavePhonePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object OrganisationHavePhoneSummary {
+object OrganisationContactHavePhoneSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(OrganisationHavePhonePage).map {
+    answers.get(OrganisationContactHavePhonePage).map {
       answer =>
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key = "organisationHavePhone.checkYourAnswersLabel",
+          key = s"$OrganisationContactHavePhonePage.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.changeContactDetails.routes.OrganisationHavePhoneController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("organisationHavePhone.change.hidden"))
+            changeAction(
+              OrganisationContactHavePhonePage.toString,
+              controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode).url
+            )
           )
         )
     }

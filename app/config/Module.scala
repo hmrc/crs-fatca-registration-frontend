@@ -34,6 +34,9 @@ class Module extends AbstractModule {
     bind(classOf[CheckForSubmissionAction]).to(classOf[CheckForSubmissionActionImpl]).asEagerSingleton()
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
     bind(classOf[CtUtrRetrievalAction]).to(classOf[CtUtrRetrievalActionImpl]).asEagerSingleton()
+    bind(classOf[SubscriptionIdRetrievalAction]).to(classOf[SubscriptionIdRetrievalActionImpl]).asEagerSingleton()
+    bind(classOf[ChangeDetailsDataRetrievalAction]).to(classOf[ChangeDetailsDataRetrievalActionImpl]).asEagerSingleton()
+    bind(classOf[ChangeDetailsDataRequiredAction]).to(classOf[ChangeDetailsDataRequiredActionImpl]).asEagerSingleton()
     bind(classOf[UUIDGen]).to(classOf[UUIDGenImpl])
   }
 

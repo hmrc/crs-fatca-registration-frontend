@@ -17,12 +17,12 @@
 package models.subscription.response
 
 import models.SubscriptionID
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OFormat}
 
 case class DisplaySubscriptionResponse(success: DisplayResponseDetail) {
   def subscriptionId: SubscriptionID = SubscriptionID(success.subscriptionId)
 }
 
 object DisplaySubscriptionResponse {
-  implicit lazy val reads: Reads[DisplaySubscriptionResponse] = Json.reads[DisplaySubscriptionResponse]
+  implicit lazy val format: OFormat[DisplaySubscriptionResponse] = Json.format[DisplaySubscriptionResponse]
 }

@@ -70,9 +70,9 @@ class IndIdentityConfirmedController @Inject() (
               .flatMap {
                 case Right(info) =>
                   request.userAnswers.set(RegistrationInfoPage, info).map(sessionRepository.set)
-                  subscriptionService.getDisplaySubscriptionId(info.safeId) flatMap {
-                    case Some(subscriptionId) =>
-                      controllerHelper.updateSubscriptionIdAndCreateEnrolment(info.safeId, subscriptionId)
+                  subscriptionService.getSubscription(info.safeId) flatMap {
+                    case Some(displaySubscriptionResponse) =>
+                      controllerHelper.updateSubscriptionIdAndCreateEnrolment(info.safeId, displaySubscriptionResponse.subscriptionId)
                     case _ =>
                       val action = navigator.nextPage(RegistrationInfoPage, mode, request.userAnswers).url
                       Future.successful(Ok(view(mode, action)))

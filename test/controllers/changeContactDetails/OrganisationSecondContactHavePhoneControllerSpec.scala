@@ -17,16 +17,18 @@
 package controllers.changeContactDetails
 
 import base.{SpecBase, TestValues}
+import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import forms.changeContactDetails.OrganisationSecondContactHavePhoneFormProvider
 import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.changeContactDetails.{OrganisationSecondContactHavePhonePage, OrganisationSecondContactNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.OrganisationSecondContactHavePhoneView
 
 import scala.concurrent.Future
@@ -36,21 +38,30 @@ class OrganisationSecondContactHavePhoneControllerSpec extends SpecBase with Moc
   val formProvider = new OrganisationSecondContactHavePhoneFormProvider()
   private val form = formProvider()
 
+  private val mockSubscriptionIdRetrievalAction         = mock[SubscriptionIdRetrievalAction]
+  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
+
   private lazy val secondContactHavePhoneRoute = routes.OrganisationSecondContactHavePhoneController.onPageLoad(NormalMode).url
 
   "Change Organisation SecondContactHavePhone Controller" - {
+    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.withPage(OrganisationSecondContactNamePage, name.fullName)))
+      val userAnswers = emptyUserAnswers.withPage(OrganisationSecondContactNamePage, name.fullName)
+
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
         .build()
 
       running(application) {
         val request = FakeRequest(GET, secondContactHavePhoneRoute)
+        val view    = application.injector.instanceOf[OrganisationSecondContactHavePhoneView]
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[OrganisationSecondContactHavePhoneView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, name.fullName)(request, messages(application)).toString
@@ -63,12 +74,15 @@ class OrganisationSecondContactHavePhoneControllerSpec extends SpecBase with Moc
         .withPage(OrganisationSecondContactHavePhonePage, true)
         .withPage(OrganisationSecondContactNamePage, name.fullName)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, secondContactHavePhoneRoute)
-
-        val view = application.injector.instanceOf[OrganisationSecondContactHavePhoneView]
+        val view    = application.injector.instanceOf[OrganisationSecondContactHavePhoneView]
 
         val result = route(application, request).value
 
@@ -79,19 +93,19 @@ class OrganisationSecondContactHavePhoneControllerSpec extends SpecBase with Moc
 
     "must redirect to the next page when valid data is submitted" in {
 
+      val userAnswers = emptyUserAnswers.withPage(OrganisationSecondContactNamePage, name.fullName)
+
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers.withPage(OrganisationSecondContactNamePage, name.fullName)))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
           .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, secondContactHavePhoneRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        val request = FakeRequest(POST, secondContactHavePhoneRoute).withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
@@ -102,17 +116,18 @@ class OrganisationSecondContactHavePhoneControllerSpec extends SpecBase with Moc
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.withPage(OrganisationSecondContactNamePage, name.fullName)))
+      val userAnswers = emptyUserAnswers.withPage(OrganisationSecondContactNamePage, name.fullName)
+
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
         .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, secondContactHavePhoneRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
+        val request   = FakeRequest(POST, secondContactHavePhoneRoute).withFormUrlEncodedBody(("value", ""))
         val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[OrganisationSecondContactHavePhoneView]
+        val view      = application.injector.instanceOf[OrganisationSecondContactHavePhoneView]
 
         val result = route(application, request).value
 
@@ -123,7 +138,11 @@ class OrganisationSecondContactHavePhoneControllerSpec extends SpecBase with Moc
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, secondContactHavePhoneRoute)
@@ -137,12 +156,14 @@ class OrganisationSecondContactHavePhoneControllerSpec extends SpecBase with Moc
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, secondContactHavePhoneRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        val request = FakeRequest(POST, secondContactHavePhoneRoute).withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 

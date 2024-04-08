@@ -26,8 +26,6 @@ import play.api.libs.json._
 
 class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues with ModelGenerators {
 
-  implicit def dontShrink[A]: Shrink[A] = Shrink.shrinkAny
-
   val min                           = 2
   val max                           = 10
   val nonEmptyAlphaStr: Gen[String] = Gen.alphaStr.suchThat(_.nonEmpty)

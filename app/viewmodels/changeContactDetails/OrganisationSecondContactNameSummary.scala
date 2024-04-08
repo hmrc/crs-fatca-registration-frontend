@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package viewmodels.changeContactDetails
 
 import models.{CheckMode, UserAnswers}
-import pages.changeContactDetails.OrganisationContactEmailPage
+import pages.changeContactDetails.OrganisationSecondContactNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,18 +25,18 @@ import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object OrganisationEmailSummary {
+object OrganisationSecondContactNameSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(OrganisationContactEmailPage).map {
+    answers.get(OrganisationSecondContactNamePage).map {
       answer =>
         SummaryListRowViewModel(
-          key = s"$OrganisationContactEmailPage.checkYourAnswersLabel",
+          key = s"$OrganisationSecondContactNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             changeAction(
-              OrganisationContactEmailPage.toString,
-              controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode).url
+              OrganisationSecondContactNamePage.toString,
+              controllers.changeContactDetails.routes.OrganisationSecondContactNameController.onPageLoad(CheckMode).url
             )
           )
         )

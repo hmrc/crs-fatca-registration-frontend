@@ -69,7 +69,7 @@ object OrganisationDetails {
 
 }
 
-case class IndividualDetails(firstName: String, middleName: Option[String], lastName: String) extends ContactType
+case class IndividualDetails(firstName: String, lastName: String) extends ContactType
 
 object IndividualDetails {
 
@@ -78,26 +78,24 @@ object IndividualDetails {
   implicit lazy val reads: Reads[IndividualDetails] =
     (
       (__ \ "individual" \ "firstName").read[String] and
-        (__ \ "individual" \ "middleName").readNullable[String] and
         (__ \ "individual" \ "lastName").read[String]
     )(IndividualDetails.apply _)
 
   implicit val writes: OWrites[IndividualDetails] =
     ((__ \ "individual" \ "firstName").write[String] and
-      (__ \ "individual" \ "middleName").writeNullable[String] and
       (__ \ "individual" \ "lastName").write[String])(unlift(IndividualDetails.unapply))
 
   def convertTo(userAnswers: UserAnswers): Option[IndividualDetails] =
     (userAnswers.get(IndWhatIsYourNamePage), userAnswers.get(IndContactNamePage), userAnswers.get(WhatIsYourNamePage)) match {
-      case (Some(name), _, _)                  => Some(IndividualDetails(name.firstName, None, name.lastName))
-      case (_, Some(individualContactName), _) => Some(IndividualDetails(individualContactName.firstName, None, individualContactName.lastName))
-      case (_, _, Some(soleTraderName))        => Some(IndividualDetails(soleTraderName.firstName, None, soleTraderName.lastName))
+      case (Some(name), _, _)                  => Some(IndividualDetails(name.firstName, name.lastName))
+      case (_, Some(individualContactName), _) => Some(IndividualDetails(individualContactName.firstName, individualContactName.lastName))
+      case (_, _, Some(soleTraderName))        => Some(IndividualDetails(soleTraderName.firstName, soleTraderName.lastName))
       case _                                   => None
     }
 
 }
 
-case class ContactInformation(contactInformation: ContactType, email: String, phone: Option[String], mobile: Option[String])
+case class ContactInformation(contactInformation: ContactType, email: String, phone: Option[String])
 
 object ContactInformation extends UserAnswersHelper {
 
@@ -106,8 +104,7 @@ object ContactInformation extends UserAnswersHelper {
     (
       __.read[ContactType] and
         (__ \ "email").read[String] and
-        (__ \ "phone").readNullable[String] and
-        (__ \ "mobile").readNullable[String]
+        (__ \ "phone").readNullable[String]
     )(ContactInformation.apply _)
   }
 
@@ -116,8 +113,7 @@ object ContactInformation extends UserAnswersHelper {
     (
       __.write[ContactType] and
         (__ \ "email").write[String] and
-        (__ \ "phone").writeNullable[String] and
-        (__ \ "mobile").writeNullable[String]
+        (__ \ "phone").writeNullable[String]
     )(unlift(ContactInformation.unapply))
   }
 
@@ -128,7 +124,7 @@ object ContactInformation extends UserAnswersHelper {
         businessEmail       <- userAnswers.get(ContactEmailPage)
         businessContactInfo <- OrganisationDetails.convertTo(userAnswers.get(ContactNamePage))
       } yield Some(
-        ContactInformation(contactInformation = businessContactInfo, email = businessEmail, phone = userAnswers.get(ContactPhonePage), mobile = None)
+        ContactInformation(contactInformation = businessContactInfo, email = businessEmail, phone = userAnswers.get(ContactPhonePage))
       )).flatten
 
     lazy val buildIndividualContact =
@@ -136,7 +132,7 @@ object ContactInformation extends UserAnswersHelper {
         individualEmail       <- userAnswers.get(IndContactEmailPage)
         individualContactInfo <- IndividualDetails.convertTo(userAnswers)
       } yield Some(
-        ContactInformation(contactInformation = individualContactInfo, email = individualEmail, phone = userAnswers.get(IndContactPhonePage), mobile = None)
+        ContactInformation(contactInformation = individualContactInfo, email = individualEmail, phone = userAnswers.get(IndContactPhonePage))
       )).flatten
 
     if (isRegisteringAsBusiness(userAnswers)) {
@@ -156,7 +152,7 @@ object ContactInformation extends UserAnswersHelper {
           orgDetails     <- OrganisationDetails.convertTo(userAnswers.get(SecondContactNamePage))
           secondaryEmail <- userAnswers.get(SecondContactEmailPage)
         } yield Some(
-          ContactInformation(contactInformation = orgDetails, email = secondaryEmail, phone = userAnswers.get(SecondContactPhonePage), mobile = None)
+          ContactInformation(contactInformation = orgDetails, email = secondaryEmail, phone = userAnswers.get(SecondContactPhonePage))
         )
 
       secondaryContact match {

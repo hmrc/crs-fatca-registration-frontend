@@ -38,7 +38,7 @@ trait ContactHelper {
         contactName => contactName
       )
 
-  def getContactName(ua: UserAnswers)(implicit messages: Messages): String =
+  def getOrganisationContactName(ua: UserAnswers)(implicit messages: Messages): String =
     ua.get(OrganisationContactNamePage).getOrElse(messages("default.firstContact.name"))
 
   def getOrganisationSecondContactName(userAnswers: UserAnswers)(implicit messages: Messages): String =

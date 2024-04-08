@@ -17,11 +17,12 @@
 package controllers.changeContactDetails
 
 import base.{SpecBase, TestValues}
+import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import forms.changeContactDetails.OrganisationHaveSecondContactFormProvider
 import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.when
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
 import pages.ContactNamePage
@@ -40,58 +41,45 @@ class OrganisationHaveSecondContactControllerSpec extends SpecBase with MockitoS
   val formProvider = new OrganisationHaveSecondContactFormProvider()
   private val form = formProvider()
 
+  private val mockSubscriptionIdRetrievalAction         = mock[SubscriptionIdRetrievalAction]
+  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
+
   "Change Organisation HaveSecondContact Controller" - {
+    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
-    forAll(Table("nonIndividualAffinityGroup", Seq(AffinityGroup.Organisation, AffinityGroup.Agent): _*)) {
-      affinityGroup =>
-        s"must return OK and the correct view for a GET when affinity group is $affinityGroup" in {
+    "must return OK and the correct view for a GET" in {
 
-          val userAnswers = emptyUserAnswers.withPage(ContactNamePage, name.fullName)
-          val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup).build()
+      val userAnswers = emptyUserAnswers.withPage(ContactNamePage, name.fullName)
 
-          running(application) {
-            val request = FakeRequest(GET, haveSecondContactRoute)
-
-            val result = route(application, request).value
-
-            val view = application.injector.instanceOf[OrganisationHaveSecondContactView]
-
-            status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, name.fullName, NormalMode)(request, messages(application)).toString
-          }
-        }
-    }
-
-    "must redirect to CheckYourAnswersPage for a GET when affinity group is Individual" in {
-
-      val userAnswers = emptyUserAnswers
-      val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Individual).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, haveSecondContactRoute)
+        val view    = application.injector.instanceOf[OrganisationHaveSecondContactView]
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.CheckYourAnswersController.onPageLoad().url
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, name.fullName, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
 
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(emptyUserAnswers)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, haveSecondContactRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        val request = FakeRequest(POST, haveSecondContactRoute).withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
@@ -102,16 +90,18 @@ class OrganisationHaveSecondContactControllerSpec extends SpecBase with MockitoS
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.withPage(ContactNamePage, name.fullName))).build()
+      val userAnswers = emptyUserAnswers.withPage(ContactNamePage, name.fullName)
+
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, haveSecondContactRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
-
+        val request   = FakeRequest(POST, haveSecondContactRoute).withFormUrlEncodedBody(("value", "invalid value"))
         val boundForm = form.bind(Map("value" -> "invalid value"))
-
-        val view = application.injector.instanceOf[OrganisationHaveSecondContactView]
+        val view      = application.injector.instanceOf[OrganisationHaveSecondContactView]
 
         val result = route(application, request).value
 
@@ -122,7 +112,11 @@ class OrganisationHaveSecondContactControllerSpec extends SpecBase with MockitoS
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, haveSecondContactRoute)
@@ -136,17 +130,18 @@ class OrganisationHaveSecondContactControllerSpec extends SpecBase with MockitoS
 
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, haveSecondContactRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        val request = FakeRequest(POST, haveSecondContactRoute).withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,38 +18,41 @@ package controllers.changeContactDetails
 
 import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
-import forms.SecondContactEmailFormProvider
-import models.{NormalMode, UserAnswers}
+import controllers.routes
+import forms.changeContactDetails.OrganisationHavePhoneFormProvider
+import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
+import org.scalacheck.Arbitrary
 import org.scalatestplus.mockito.MockitoSugar
-import pages.changeContactDetails.{OrganisationSecondContactEmailPage, OrganisationSecondContactNamePage}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+import pages.changeContactDetails.{OrganisationContactHavePhonePage, OrganisationContactNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AffinityGroup
-import views.html.changeContactDetails.OrganisationSecondContactEmailView
+import views.html.changeContactDetails.OrganisationContactHavePhoneView
 
 import scala.concurrent.Future
 
-class OrganisationSecondContactEmailControllerSpec extends SpecBase with MockitoSugar with TestValues {
+class OrganisationContactHavePhoneControllerSpec extends SpecBase with TestValues with MockitoSugar {
 
-  val formProvider = new SecondContactEmailFormProvider()
-  private val form = formProvider()
+  private val formProvider = new OrganisationHavePhoneFormProvider()
+  private val form         = formProvider()
 
   private val mockSubscriptionIdRetrievalAction         = mock[SubscriptionIdRetrievalAction]
   private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
 
-  private lazy val secondContactEmailRoute = routes.OrganisationSecondContactEmailController.onPageLoad(NormalMode).url
+  lazy val organisationContactHavePhoneRoute: String = controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(NormalMode).url
 
-  "Change Organisation SecondContactEmail Controller" - {
+  "OrganisationHavePhone Controller" - {
     when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {
 
-      val userAnswers = emptyUserAnswers.withPage(OrganisationSecondContactNamePage, name.fullName)
+      val userAnswers = emptyUserAnswers.withPage(OrganisationContactNamePage, name.fullName)
 
       when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
@@ -58,10 +61,11 @@ class OrganisationSecondContactEmailControllerSpec extends SpecBase with Mockito
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, secondContactEmailRoute)
-        val result  = route(application, request).value
+        val request = FakeRequest(GET, organisationContactHavePhoneRoute)
 
-        val view = application.injector.instanceOf[OrganisationSecondContactEmailView]
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[OrganisationContactHavePhoneView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, name.fullName)(request, messages(application)).toString
@@ -71,8 +75,8 @@ class OrganisationSecondContactEmailControllerSpec extends SpecBase with Mockito
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = emptyUserAnswers
-        .withPage(OrganisationSecondContactNamePage, name.fullName)
-        .withPage(OrganisationSecondContactEmailPage, "answer")
+        .withPage(OrganisationContactNamePage, name.fullName)
+        .withPage(OrganisationContactHavePhonePage, true)
 
       when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
@@ -81,39 +85,46 @@ class OrganisationSecondContactEmailControllerSpec extends SpecBase with Mockito
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, secondContactEmailRoute)
-        val view    = application.injector.instanceOf[OrganisationSecondContactEmailView]
+        val request = FakeRequest(GET, organisationContactHavePhoneRoute)
+        val view    = application.injector.instanceOf[OrganisationContactHavePhoneView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, name.fullName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, name.fullName)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
 
-      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(emptyUserAnswers)))
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      forAll(Arbitrary.arbitrary[Boolean]) {
+        booleanAnswer =>
+          val booleanAnswerAsString = booleanAnswer.toString
+          val userAnswers           = emptyUserAnswers.withPage(OrganisationContactNamePage, name.fullName)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
-        .build()
+          when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request = FakeRequest(POST, secondContactEmailRoute).withFormUrlEncodedBody(("value", "test@test.com"))
+          val application =
+            applicationBuilder(userAnswers = Some(userAnswers))
+              .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+              .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+              .build()
 
-        val result = route(application, request).value
+          running(application) {
+            val request = FakeRequest(POST, organisationContactHavePhoneRoute).withFormUrlEncodedBody(("value", booleanAnswerAsString))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual onwardRoute.url
+          }
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val userAnswers = UserAnswers(userAnswersId).withPage(OrganisationSecondContactNamePage, name.fullName)
+      val userAnswers = emptyUserAnswers.withPage(OrganisationContactNamePage, name.fullName)
 
       when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
@@ -122,9 +133,9 @@ class OrganisationSecondContactEmailControllerSpec extends SpecBase with Mockito
         .build()
 
       running(application) {
-        val request   = FakeRequest(POST, secondContactEmailRoute).withFormUrlEncodedBody(("value", ""))
+        val request   = FakeRequest(POST, organisationContactHavePhoneRoute).withFormUrlEncodedBody(("value", ""))
         val boundForm = form.bind(Map("value" -> ""))
-        val view      = application.injector.instanceOf[OrganisationSecondContactEmailView]
+        val view      = application.injector.instanceOf[OrganisationContactHavePhoneView]
 
         val result = route(application, request).value
 
@@ -142,12 +153,12 @@ class OrganisationSecondContactEmailControllerSpec extends SpecBase with Mockito
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, secondContactEmailRoute)
+        val request = FakeRequest(GET, organisationContactHavePhoneRoute)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -160,12 +171,12 @@ class OrganisationSecondContactEmailControllerSpec extends SpecBase with Mockito
         .build()
 
       running(application) {
-        val request = FakeRequest(POST, secondContactEmailRoute).withFormUrlEncodedBody(("value", "answer"))
+        val request = FakeRequest(POST, organisationContactHavePhoneRoute).withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

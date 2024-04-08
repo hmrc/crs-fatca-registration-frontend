@@ -20,16 +20,22 @@ import models._
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, RegistrationInfo, SafeId}
 import models.register.response.details.{AddressResponse => RegistrationAddressResponse}
 import models.subscription.request._
+import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse}
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen.const
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
+import utils.RegexConstants
 import wolfendale.scalacheck.regexp.RegexpGen
 
-trait ModelGenerators {
+trait ModelGenerators extends RegexConstants with Generators {
 
-  val maximumNumber = 999999
-  val minimumNumber = 1
-  val countryNumber = 2
+  val maximumNumber     = 999999
+  val minimumNumber     = 1
+  val countryNumber     = 2
+  val EmailLength       = 132
+  val PhoneNumberLength = 24
+  val MaxNameLength     = 35
 
   implicit lazy val arbitraryReporterType: Arbitrary[ReporterType] =
     Arbitrary {
@@ -46,16 +52,15 @@ trait ModelGenerators {
 
   implicit val arbitraryOrganisationDetails: Arbitrary[OrganisationDetails] = Arbitrary {
     for {
-      organisationName <- arbitrary[String]
+      organisationName <- Gen.listOfN(MaxNameLength, Gen.asciiPrintableChar).map(_.mkString)
     } yield OrganisationDetails(organisationName)
   }
 
   implicit val arbitraryIndividualDetails: Arbitrary[IndividualDetails] = Arbitrary {
     for {
-      firstName  <- arbitrary[String]
-      middleName <- Gen.option(arbitrary[String])
-      lastName   <- arbitrary[String]
-    } yield IndividualDetails(firstName, middleName, lastName)
+      firstName <- arbitrary[String]
+      lastName  <- arbitrary[String]
+    } yield IndividualDetails(firstName, lastName)
   }
 
   implicit lazy val arbitraryContactInformation: Arbitrary[ContactType] = Arbitrary {
@@ -65,10 +70,9 @@ trait ModelGenerators {
   implicit val arbitraryPrimaryContact: Arbitrary[ContactInformation] = Arbitrary {
     for {
       contactInformation <- arbitrary[ContactType]
-      email              <- arbitrary[String]
-      phone              <- Gen.option(arbitrary[String])
-      mobile             <- Gen.option(arbitrary[String])
-    } yield ContactInformation(contactInformation, email, phone, mobile)
+      email              <- emailMatchingRegexAndLength(emailRegex, EmailLength)
+      phone              <- Gen.option(validPhoneNumber(PhoneNumberLength))
+    } yield ContactInformation(contactInformation, email, phone)
   }
 
   implicit val arbitraryRequestParameter: Arbitrary[RequestParameter] = Arbitrary {
@@ -181,6 +185,22 @@ trait ModelGenerators {
     Gen.oneOf(arbitrary[OrgRegistrationInfo], arbitrary[IndRegistrationInfo])
   }
 
+  implicit val arbitraryDisplaySubscriptionResponse: Arbitrary[DisplaySubscriptionResponse] = Arbitrary {
+    arbitrary[CreateSubscriptionRequest].flatMap {
+      subscription =>
+        DisplaySubscriptionResponse(
+          DisplayResponseDetail(
+            subscription.idNumber,
+            subscription.tradingName,
+            subscription.gbUser,
+            subscription.primaryContact,
+            subscription.secondaryContact
+          )
+        )
+    }
+  }
+
+//Line holder for template scripts
   implicit val arbitraryUniqueTaxpayerReference: Arbitrary[UniqueTaxpayerReference] = Arbitrary {
     for {
       id <- arbitrary[String]

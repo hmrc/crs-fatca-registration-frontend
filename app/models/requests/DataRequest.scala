@@ -16,11 +16,24 @@
 
 package models.requests
 
+import models.{SubscriptionID, UserAnswers}
 import play.api.mvc.{Request, WrappedRequest}
-import models.UserAnswers
 import uk.gov.hmrc.auth.core.AffinityGroup
 
 case class OptionalDataRequest[A](request: Request[A], userId: String, affinityGroup: AffinityGroup, userAnswers: Option[UserAnswers])
     extends WrappedRequest[A](request)
 
 case class DataRequest[A](request: Request[A], userId: String, affinityGroup: AffinityGroup, userAnswers: UserAnswers) extends WrappedRequest[A](request)
+
+case class DataRequestWithUserAnswers[A](
+  request: Request[A],
+  userId: String,
+  subscriptionId: SubscriptionID,
+  userAnswers: UserAnswers
+) extends WrappedRequest[A](request)
+
+case class DataRequestWithSubscriptionId[A](
+  request: Request[A],
+  userId: String,
+  subscriptionId: SubscriptionID
+) extends WrappedRequest[A](request)

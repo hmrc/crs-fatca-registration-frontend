@@ -14,37 +14,36 @@
  * limitations under the License.
  *@
 
+@import viewmodels.InputWidth._
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios,
+    govukInput: GovukInput,
     govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode, contactName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("organisationHavePhone.title"))) {
+@layout(pageTitle = title(form, messages("organisationContactPhone.title"))) {
 
-    @formHelper(action = controllers.changeContactDetails.routes.OrganisationHavePhoneController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.changeContactDetails.routes.OrganisationContactPhoneController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("organisationHavePhone.heading", contactName)</h1>
-
-        <p class="govuk-body">@messages("organisationHavePhone.p1")</p>
-
-        @govukRadios(
-            RadiosViewModel.yesNo(
+        @govukInput(
+            InputViewModel(
                 field = form("value"),
-                legend = LegendViewModel(messages("organisationHavePhone.heading", contactName)).withCssClass("govuk-visually-hidden")
-            )
+                label = LabelViewModel(messages("organisationContactPhone.heading", contactName)).asPageHeading()
+            ).withHint(HintViewModel(HtmlContent(Html(messages("organisationContactPhone.hint")))))
+            .withWidth(Fixed20)
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
+            ButtonViewModel(messages("site.continue"))
         )
     }
 }
