@@ -63,4 +63,28 @@ object PageLists extends UserAnswersHelper {
     RegistrationInfoPage
   )
 
+  val businessWithoutIDandIndPages: Seq[QuestionPage[_]] = List(
+    WhatIsYourNamePage,
+    IndWhereDoYouLivePage,
+    IsThisYourAddressPage,
+    IndWhatIsYourPostcodePage,
+    IndSelectAddressPage,
+    IndSelectedAddressLookupPage,
+    AddressLookupPage,
+    IndUKAddressWithoutIdPage,
+    IndNonUKAddressWithoutIdPage,
+    IndContactNamePage,
+    IndDateOfBirthPage,
+    DateOfBirthWithoutIdPage,
+    IndDoYouHaveNINumberPage,
+    IndWhatIsYourNamePage,
+    IndWhatIsYourNINumberPage,
+    NonUKBusinessAddressWithoutIDPage,
+    BusinessNameWithoutIDPage,
+    HaveTradingNamePage,
+    BusinessTradingNameWithoutIDPage,
+    DoYouHaveUniqueTaxPayerReferencePage,
+    RegistrationInfoPage
+  )
+
 }
