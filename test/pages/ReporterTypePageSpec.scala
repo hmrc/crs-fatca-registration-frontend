@@ -32,16 +32,16 @@ import java.time.LocalDate
 class ReporterTypePageSpec extends PageBehaviours {
 
   private val testParamGenerator = for {
-    addressLookup <- arbitrary[models.AddressLookup]
-    address <- arbitrary[models.Address]
-    postcode <- arbitrary[String]
-    name <- arbitrary[models.Name]
-    booleanField <- arbitrary[Boolean]
-    nino <- arbitrary[Nino]
+    addressLookup    <- arbitrary[models.AddressLookup]
+    address          <- arbitrary[models.Address]
+    postcode         <- arbitrary[String]
+    name             <- arbitrary[models.Name]
+    booleanField     <- arbitrary[Boolean]
+    nino             <- arbitrary[Nino]
     registrationInfo <- arbitrary[RegistrationInfo]
-    dob <- arbitrary[LocalDate]
-    stringField <- arbitrary[String]
-    utr <- arbitrary[UniqueTaxpayerReference]
+    dob              <- arbitrary[LocalDate]
+    stringField      <- arbitrary[String]
+    utr              <- arbitrary[UniqueTaxpayerReference]
   } yield (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr)
 
   "ReporterTypePage" - {
@@ -55,7 +55,7 @@ class ReporterTypePageSpec extends PageBehaviours {
     "cleanUp" - {
       "must not clear answers" - {
         "when answer changes to 'Sole Trader'" in {
-          val ua = createUserAnswers.sample.get
+          val ua     = createUserAnswers.sample.get
           val result = ReporterTypePage.cleanup(Some(Sole), ua).get
           result mustBe ua
 
@@ -64,7 +64,7 @@ class ReporterTypePageSpec extends PageBehaviours {
 
       "must clear answers" - {
         "when answer changes to anything other than 'An individual not connected to a business' or 'Sole Trader'" in {
-          val ua = createUserAnswers.sample.get
+          val ua     = createUserAnswers.sample.get
           val result = ReporterTypePage.cleanup(Some(LimitedCompany), ua).success.value
 
           result.get(IndWhatIsYourNINumberPage) mustBe empty
@@ -88,7 +88,7 @@ class ReporterTypePageSpec extends PageBehaviours {
         }
       }
       "when answer changes to 'An individual not connected to a business'" in {
-        val ua = createUserAnswers.sample.get
+        val ua     = createUserAnswers.sample.get
         val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
 
         result.get(WhatIsYourUTRPage) mustBe empty
