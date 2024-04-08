@@ -16,7 +16,7 @@
 
 package pages
 
-import models.ReporterType.{orgReporterTypes, Individual}
+import models.ReporterType.{Individual, orgReporterTypes}
 import models.{ReporterType, UserAnswers}
 import play.api.libs.json.JsPath
 
@@ -73,9 +73,9 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
   override def toString: String = "reporterType"
 
   override def cleanup(value: Option[ReporterType], userAnswers: UserAnswers): Try[UserAnswers] = value match {
-    case Some(Individual)                                              => individualCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
+    case Some(Individual) => individualCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
     case Some(reporterType) if orgReporterTypes.contains(reporterType) => otherBusinessTypeCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case _                                                             => super.cleanup(value, userAnswers)
+    case _ => super.cleanup(value, userAnswers)
   }
 
 }
