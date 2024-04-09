@@ -18,7 +18,9 @@ package utils
 
 import models.ReporterType.{Individual, Sole}
 import models.UserAnswers
-import pages.ReporterTypePage
+import pages.{QuestionPage, ReporterTypePage}
+
+import scala.util.Try
 
 trait UserAnswersHelper {
 
@@ -27,5 +29,8 @@ trait UserAnswersHelper {
       case Some(Individual) | Some(Sole) => false
       case _                             => true
     }
+
+  def removePage: (Try[UserAnswers], QuestionPage[_]) => Try[UserAnswers] =
+    (ua: Try[UserAnswers], page: QuestionPage[_]) => ua.flatMap(_.remove(page))
 
 }

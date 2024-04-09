@@ -11,16 +11,14 @@ if (window.history && window.history.replaceState && typeof window.history.repla
   window.history.replaceState(null, null, window.location.href);
 }
 
-// back click handle, dependent upon presence of referrer & no host change
+// handle back click
 var backLink = document.querySelector('.govuk-back-link');
-if(backLink && backLink.getAttribute('href') === '#'){
-  backLink.addEventListener('click', function(e){
-    e.preventDefault();
-    if (window.history && window.history.back && typeof window.history.back === 'function' &&
-        (docReferrer !== "" && docReferrer.indexOf(window.location.host) !== -1)) {
+if (backLink !== null) {
+    backLink.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
       window.history.back();
-    }
-  });
+    });
 }
 
 // This fixes error styling on accessible autocomplete for country selection

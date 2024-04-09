@@ -16,14 +16,9 @@
 
 package pages
 
-import models.UserAnswers
+import utils.UserAnswersHelper
 
-import scala.util.Try
-
-object PageLists {
-
-  val removePage: (Try[UserAnswers], QuestionPage[_]) => Try[UserAnswers] =
-    (ua: Try[UserAnswers], page: QuestionPage[_]) => ua.flatMap(_.remove(page))
+object PageLists extends UserAnswersHelper {
 
   val businessWithIdPages: Seq[QuestionPage[_]] = List(
     WhatIsYourUTRPage,
@@ -41,12 +36,6 @@ object PageLists {
     SecondContactHavePhonePage,
     SecondContactNamePage,
     SecondContactPhonePage
-  )
-
-  val individualWithIDPages: Seq[QuestionPage[_]] = List(
-    IndWhatIsYourNINumberPage,
-    IndWhatIsYourNamePage,
-    IndDateOfBirthPage
   )
 
   val individualAndWithoutIdPages: Seq[QuestionPage[_]] = List(
@@ -71,6 +60,30 @@ object PageLists {
     BusinessNameWithoutIDPage,
     HaveTradingNamePage,
     BusinessTradingNameWithoutIDPage,
+    RegistrationInfoPage
+  )
+
+  val businessWithoutIDandIndPages: Seq[QuestionPage[_]] = List(
+    WhatIsYourNamePage,
+    IndWhereDoYouLivePage,
+    IsThisYourAddressPage,
+    IndWhatIsYourPostcodePage,
+    IndSelectAddressPage,
+    IndSelectedAddressLookupPage,
+    AddressLookupPage,
+    IndUKAddressWithoutIdPage,
+    IndNonUKAddressWithoutIdPage,
+    IndContactNamePage,
+    IndDateOfBirthPage,
+    DateOfBirthWithoutIdPage,
+    IndDoYouHaveNINumberPage,
+    IndWhatIsYourNamePage,
+    IndWhatIsYourNINumberPage,
+    NonUKBusinessAddressWithoutIDPage,
+    BusinessNameWithoutIDPage,
+    HaveTradingNamePage,
+    BusinessTradingNameWithoutIDPage,
+    DoYouHaveUniqueTaxPayerReferencePage,
     RegistrationInfoPage
   )
 

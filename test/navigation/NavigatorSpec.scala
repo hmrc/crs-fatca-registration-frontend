@@ -157,16 +157,12 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           }
       }
 
-      forAll(Table("nonOrgReporterTypes", ReporterType.nonOrgReporterTypes: _*)) {
-        reporterType =>
-          s"must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for $reporterType reporter with no UTR" in {
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to IndDoYouHaveNINumberPage for Sole trader with no UTR" in {
+        val userAnswers = emptyUserAnswers
+          .withPage(ReporterTypePage, Sole)
+          .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
 
-            val userAnswers = emptyUserAnswers
-              .withPage(ReporterTypePage, reporterType)
-              .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
-
-            navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
-          }
+        navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe IndDoYouHaveNINumberController.onPageLoad(NormalMode)
       }
 
       forAll(organisationReporterTypes) {
@@ -223,7 +219,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
       }
 
-      "must gro from BusinessTradingNameWithoutIDPage to BusinessAddressWithoutIDPage" in {
+      "must go from BusinessTradingNameWithoutIDPage to BusinessAddressWithoutIDPage" in {
 
         navigator.nextPage(BusinessTradingNameWithoutIDPage, NormalMode, emptyUserAnswers) mustBe NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
       }
@@ -304,51 +300,38 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
       "must go from IsThisYourBusinessPage" - {
 
-        val nonOrgReporters = Table(
-          "nonOrgReporter",
-          Seq(Sole, Individual): _*
-        )
-
         "to IndContactEmailPage when Yes is selected for Sole reporter type" in {
-          ScalaCheckPropertyChecks.forAll(arbitrary[UserAnswers]) {
-            answers =>
-              val updatedAnswers =
-                answers
-                  .set(ReporterTypePage, Sole)
-                  .success
-                  .value
-                  .set(IsThisYourBusinessPage, true)
-                  .success
-                  .value
+          val updatedAnswers =
+            emptyUserAnswers
+              .set(ReporterTypePage, Sole).success.value
+              .set(IsThisYourBusinessPage, true).success.value
 
-              navigator
-                .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
-                .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
-          }
+          navigator
+            .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
         }
 
-        forAll(nonOrgReporters) {
-          nonOrgReporter =>
-            s"to DifferentBusinessPage when No is selected for an auto-matched $nonOrgReporter reporter type" in {
-              ScalaCheckPropertyChecks.forAll(arbitrary[UserAnswers]) {
-                answers =>
-                  val updatedAnswers =
-                    answers
-                      .set(ReporterTypePage, nonOrgReporter)
-                      .success
-                      .value
-                      .set(IsThisYourBusinessPage, false)
-                      .success
-                      .value
-                      .set(AutoMatchedUTRPage, utr)
-                      .success
-                      .value
+        "to SoleTraderNotIdentifiedPage when No is selected for a Sole reporter type" in {
+          val updatedAnswers =
+            emptyUserAnswers
+              .set(ReporterTypePage, Sole).success.value
+              .set(IsThisYourBusinessPage, false).success.value
 
-                  navigator
-                    .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
-                    .mustBe(controllers.organisation.routes.DifferentBusinessController.onPageLoad())
-              }
-            }
+          navigator
+            .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+            .mustBe(routes.SoleTraderNotIdentifiedController.onPageLoad)
+        }
+
+        "to DifferentBusinessPage when No is selected for an auto-matched Sole reporter type" in {
+          val updatedAnswers =
+            emptyUserAnswers
+              .set(ReporterTypePage, Sole).success.value
+              .set(IsThisYourBusinessPage, false).success.value
+              .set(AutoMatchedUTRPage, utr).success.value
+
+          navigator
+            .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
+            .mustBe(controllers.organisation.routes.DifferentBusinessController.onPageLoad())
         }
 
         val orgReporters = Table(
@@ -615,9 +598,88 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
     "in Check mode" - {
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
-
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad
+      }
+
+      "must go from WhatIsYourUTRPage to WhatIsYourNamePage for a Sole Trader" in {
+        val answers = emptyUserAnswers.withPage(ReporterTypePage, Sole)
+
+        navigator
+          .nextPage(WhatIsYourUTRPage, CheckMode, answers)
+          .mustBe(controllers.organisation.routes.WhatIsYourNameController.onPageLoad(CheckMode))
+      }
+
+      "must go from WhatIsYourUTRPage to BusinessNamePage for any other reporter type" in {
+        val answers = emptyUserAnswers.withPage(ReporterTypePage, LimitedCompany)
+
+        navigator
+          .nextPage(WhatIsYourUTRPage, CheckMode, answers)
+          .mustBe(controllers.organisation.routes.BusinessNameController.onPageLoad(CheckMode))
+      }
+
+      "must go from WhatIsYourNamePage to IsThisYourBusinessPage" in {
+        navigator
+          .nextPage(WhatIsYourNamePage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode))
+      }
+
+      "must go from DoYouHaveUniqueTaxPayerReferencePage to" - {
+        "WhatIsYourUtrPage when user says Yes" in {
+          val userAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, LimitedCompany)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+
+          navigator
+            .nextPage(DoYouHaveUniqueTaxPayerReferencePage, CheckMode, userAnswers)
+            .mustBe(controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(CheckMode))
+        }
+
+        "BusinessNameWithoutIDPage when org user says No" in {
+          val userAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, LimitedCompany)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+
+          navigator
+            .nextPage(DoYouHaveUniqueTaxPayerReferencePage, CheckMode, userAnswers)
+            .mustBe(controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(CheckMode))
+        }
+
+        "IndDoYouHaveNINumberPage when sole trader says No" in {
+          val userAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, Sole)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+
+          navigator
+            .nextPage(DoYouHaveUniqueTaxPayerReferencePage, CheckMode, userAnswers)
+            .mustBe(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode))
+        }
+      }
+
+      "must go from BusinessNameWithoutIDPage to HaveTradingNamePage" in {
+        navigator
+          .nextPage(BusinessNameWithoutIDPage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.organisation.routes.HaveTradingNameController.onPageLoad(CheckMode))
+      }
+
+      "must go from HaveTradingNamePage to BusinessTradingNameWithoutID when user says Yes" in {
+        val userAnswers = emptyUserAnswers.withPage(HaveTradingNamePage, true)
+        navigator
+          .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode))
+      }
+
+      "must go from HaveTradingNamePage to NonUKBusinessAddressWithoutIDController when user says No" in {
+        val userAnswers = emptyUserAnswers.withPage(HaveTradingNamePage, false)
+        navigator
+          .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
+      }
+
+      "must go from BusinessTradingNameWithoutIDPage to NonUKBusinessAddressWithoutIDPage" in {
+        navigator
+          .nextPage(BusinessTradingNameWithoutIDPage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
       }
 
       "must go from IndWhereDoYouLivePage to IndWhatIsYourPostcodePage when user answers Yes" in {
@@ -642,10 +704,21 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(controllers.individual.routes.IndNonUKAddressWithoutIdController.onPageLoad(CheckMode))
       }
 
-      "must go from IndNonUKAddressWithoutIdPage to CheckYourAnswersPage" in {
+      "must go from IndNonUKAddressWithoutIdPage to CheckYourAnswersPage if there is a contact email" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndContactEmailPage, arbitrary[String].sample.value)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndNonUKAddressWithoutIdPage, CheckMode, userAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from IndNonUKAddressWithoutIdPage to IndContactEmailPage if there is no contact email" in {
         navigator
           .nextPage(IndNonUKAddressWithoutIdPage, CheckMode, emptyUserAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
       }
 
       "must go from IndWhatIsYourPostcodePage to IsThisYourAddressPage when there is only one matching address" in {
@@ -676,38 +749,118 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         }
       }
 
-      "must go from IsThisYourAddressPage to CheckYourAnswersPage when user answers Yes" in {
+      "must go from IndSelectAddressPage to CheckYourAnswersPage when there is a contact email" in {
         val userAnswers = emptyUserAnswers
-          .set(IsThisYourAddressPage, true)
-          .success
-          .value
+          .withPage(IndContactEmailPage, arbitrary[String].sample.value)
 
         navigator
-          .nextPage(IsThisYourAddressPage, CheckMode, userAnswers)
+          .nextPage(IndSelectAddressPage, CheckMode, userAnswers)
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "must go from IsThisYourAddressPage to IndUKAddressWithoutIdPage when user answers No" in {
+      "must go from IndSelectAddressPage to IndContactEmailPage when there is no contact email" in {
+        navigator
+          .nextPage(IndSelectAddressPage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+      }
+
+      "must go from IsThisYourAddressPage" - {
+
+        "to IndUKAddressWithoutIdPage when user answers No" in {
+          val userAnswers = emptyUserAnswers
+            .set(IsThisYourAddressPage, false)
+            .success
+            .value
+
+          navigator
+            .nextPage(IsThisYourAddressPage, CheckMode, userAnswers)
+            .mustBe(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(CheckMode))
+        }
+
+        "to CheckYourAnswersPage when user answers Yes and there is a contact email" in {
+          val userAnswers = emptyUserAnswers
+            .withPage(IndContactEmailPage, arbitrary[String].sample.value)
+            .withPage(IsThisYourAddressPage, true)
+
+          navigator
+            .nextPage(IsThisYourAddressPage, CheckMode, userAnswers)
+            .mustBe(routes.CheckYourAnswersController.onPageLoad())
+        }
+
+        "to CheckYourAnswersPage when user answers Yes and there is no contact email" in {
+          val userAnswers = emptyUserAnswers
+            .withPage(IsThisYourAddressPage, true)
+
+          navigator
+            .nextPage(IsThisYourAddressPage, CheckMode, userAnswers)
+            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+        }
+
+      }
+
+      "must go from IndUKAddressWithoutIdPage to CheckYourAnswersPage if there is a contact email" in {
         val userAnswers = emptyUserAnswers
-          .set(IsThisYourAddressPage, false)
+          .set(IndContactEmailPage, arbitrary[String].sample.value)
           .success
           .value
 
         navigator
-          .nextPage(IsThisYourAddressPage, CheckMode, userAnswers)
-          .mustBe(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(CheckMode))
+          .nextPage(IndUKAddressWithoutIdPage, CheckMode, userAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "must go from IndUKAddressWithoutIdPage to CheckYourAnswersPage" in {
+      "must go from IndUKAddressWithoutIdPage to IndContactEmailPage if there is no contact email" in {
         navigator
           .nextPage(IndUKAddressWithoutIdPage, CheckMode, emptyUserAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
       }
 
-      "must go from NonUKBusinessAddressWithoutIDPage to CheckYourAnswersPage" in {
-        navigator
-          .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, emptyUserAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      "must go from NonUKBusinessAddressWithoutIDPage" - {
+
+        "to JourneyRecoveryPage if there is no reporter type" in {
+          navigator
+            .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, emptyUserAnswers)
+            .mustBe(routes.JourneyRecoveryController.onPageLoad())
+        }
+
+        "to CheckYourAnswersPage if there is a contact emaile for a Sole reporter type" in {
+          val answers = emptyUserAnswers
+            .withPage(ReporterTypePage, Sole)
+            .withPage(IndContactEmailPage, arbitrary[String].sample.value)
+
+          navigator
+            .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
+            .mustBe(routes.CheckYourAnswersController.onPageLoad())
+        }
+
+        "to IndContactEmailPage if there is no contact email for a Sole reporter type" in {
+          val answers = emptyUserAnswers
+            .withPage(ReporterTypePage, Sole)
+
+          navigator
+            .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
+            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+        }
+
+        "to CheckYourAnswersPage if there is a contact name for any other reporter type" in {
+          val answers = emptyUserAnswers
+            .withPage(ReporterTypePage, LimitedCompany)
+            .withPage(ContactNamePage, arbitrary[String].sample.value)
+
+          navigator
+            .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
+            .mustBe(routes.CheckYourAnswersController.onPageLoad())
+        }
+
+        "to YourContactDetailsPage if there is no contact name for any other reporter type" in {
+          val answers = emptyUserAnswers
+            .withPage(ReporterTypePage, LimitedCompany)
+
+          navigator
+            .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
+            .mustBe(routes.YourContactDetailsController.onPageLoad())
+        }
+
       }
 
       "must go from IndWhatIsYourNINumberPage to IndContactNamePage when IndDoYouHaveNINumberPage is true but no IndContactNamePage" in {
@@ -792,6 +945,120 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator
           .nextPage(IndWhatIsYourNamePage, CheckMode, answers)
           .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from BusinessNamePage to IsThisYourBusinessController" in {
+        navigator
+          .nextPage(BusinessNamePage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode))
+      }
+
+      "must go from IsThisYourBusinessPage" - {
+
+        "to IndContactEmailPage when Yes is selected for a Sole Trader" in {
+          val answers = emptyUserAnswers
+            .set(ReporterTypePage, Sole).success.value
+            .set(IsThisYourBusinessPage, true).success.value
+
+          navigator
+            .nextPage(IsThisYourBusinessPage, CheckMode, answers)
+            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+        }
+
+        "to SoleTraderNotIdentifiedPage when No is selected for a Sole Trader" in {
+          val answers = emptyUserAnswers
+            .set(ReporterTypePage, Sole).success.value
+            .set(IsThisYourBusinessPage, false).success.value
+
+          navigator
+            .nextPage(IsThisYourBusinessPage, CheckMode, answers)
+            .mustBe(controllers.routes.SoleTraderNotIdentifiedController.onPageLoad)
+        }
+
+        "to DifferentBusinessPage when No is selected for a auto-matched Sole Trader" in {
+          val answers = emptyUserAnswers
+            .set(AutoMatchedUTRPage, utr).success.value
+            .set(ReporterTypePage, Sole).success.value
+            .set(IsThisYourBusinessPage, false).success.value
+
+          navigator
+            .nextPage(IsThisYourBusinessPage, CheckMode, answers)
+            .mustBe(controllers.organisation.routes.DifferentBusinessController.onPageLoad())
+        }
+
+        val organisationReporterTypes = TableDrivenPropertyChecks.Table(
+          "orgReporterTypes",
+          ReporterType.orgReporterTypes: _*
+        )
+
+        forAll(organisationReporterTypes) {
+          reporterType =>
+            s"to YourContactDetailsPage when Yes is selected for a $reporterType and there is no contact name" in {
+              val answers = emptyUserAnswers
+                .set(ReporterTypePage, reporterType).success.value
+                .set(IsThisYourBusinessPage, true).success.value
+
+              navigator
+                .nextPage(IsThisYourBusinessPage, CheckMode, answers)
+                .mustBe(routes.YourContactDetailsController.onPageLoad())
+            }
+
+            s"to CheckYourAnswersPage when Yes is selected for a $reporterType and there is a contact name" in {
+              val answers = emptyUserAnswers
+                .set(ReporterTypePage, reporterType).success.value
+                .set(IsThisYourBusinessPage, true).success.value
+                .set(ContactNamePage, arbitrary[String].sample.value).success.value
+
+              navigator
+                .nextPage(IsThisYourBusinessPage, CheckMode, answers)
+                .mustBe(routes.CheckYourAnswersController.onPageLoad())
+            }
+
+            s"to BusinessNotIdentifiedPage when No is selected for a $reporterType" in {
+              val answers = emptyUserAnswers
+                .set(ReporterTypePage, reporterType).success.value
+                .set(IsThisYourBusinessPage, false).success.value
+
+              navigator
+                .nextPage(IsThisYourBusinessPage, CheckMode, answers)
+                .mustBe(controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad())
+            }
+
+            s"to DifferentBusinessPage when No is selected for a auto-matched $reporterType" in {
+              val answers = emptyUserAnswers
+                .set(AutoMatchedUTRPage, utr).success.value
+                .set(ReporterTypePage, reporterType).success.value
+                .set(IsThisYourBusinessPage, false).success.value
+
+              navigator
+                .nextPage(IsThisYourBusinessPage, CheckMode, answers)
+                .mustBe(controllers.organisation.routes.DifferentBusinessController.onPageLoad())
+            }
+        }
+
+        "to YourContactDetailsPage when there is no ReporterType and Yes is selected" in {
+          val answers = emptyUserAnswers
+            .set(IsThisYourBusinessPage, true).success.value
+
+          navigator
+            .nextPage(IsThisYourBusinessPage, CheckMode, answers)
+            .mustBe(routes.YourContactDetailsController.onPageLoad())
+        }
+
+      }
+
+      "must go from RegistrationInfoPage to CheckYourAnswersPage if there is a contact email" in {
+        val answers = emptyUserAnswers.withPage(IndContactEmailPage, arbitrary[String].sample.value)
+        navigator
+          .nextPage(RegistrationInfoPage, CheckMode, answers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from RegistrationInfoPage to IndContactEmailPage if there is no contact email" in {
+        navigator
+          .nextPage(RegistrationInfoPage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
+
       }
     }
   }
