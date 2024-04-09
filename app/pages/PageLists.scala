@@ -75,7 +75,6 @@ object PageLists {
   )
 
   val businessWithoutIDandIndPages: Seq[QuestionPage[_]] = List(
-    WhatIsYourNamePage,
     IndWhereDoYouLivePage,
     IsThisYourAddressPage,
     IndWhatIsYourPostcodePage,

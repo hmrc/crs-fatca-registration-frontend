@@ -50,7 +50,6 @@ class RegisteredAddressInUKPageSpec extends PageBehaviours {
         forAll(businessWithoutIdTestParamGenerator) {
           case (addressLookup, address, postcode, name, booleanField, nino, date, stringField, registrationInfo) =>
             val userAnswers = emptyUserAnswers
-              .withPage(IndWhatIsYourNamePage, name)
               .withPage(DateOfBirthWithoutIdPage, LocalDate.now())
               .withPage(IndWhereDoYouLivePage, booleanField)
               .withPage(IndWhatIsYourPostcodePage, postcode)
@@ -73,7 +72,6 @@ class RegisteredAddressInUKPageSpec extends PageBehaviours {
 
             val result = RegisteredAddressInUKPage.cleanup(Some(true), userAnswers).success.value
 
-            result.get(IndWhatIsYourNamePage) mustBe empty
             result.get(DateOfBirthWithoutIdPage) mustBe empty
             result.get(IndWhereDoYouLivePage) mustBe empty
             result.get(IndWhatIsYourPostcodePage) mustBe empty
