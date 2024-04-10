@@ -149,8 +149,8 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         reporterType =>
           s"must go from DoYouHaveUniqueTaxPayerReferencePage to WhatIsYourUTRPage for $reporterType reporter having a UTR" in {
             val userAnswers = emptyUserAnswers
-              .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
               .withPage(ReporterTypePage, reporterType)
+              .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
 
             navigator.nextPage(DoYouHaveUniqueTaxPayerReferencePage, NormalMode, userAnswers) mustBe controllers.organisation.routes.WhatIsYourUTRController
               .onPageLoad(NormalMode)

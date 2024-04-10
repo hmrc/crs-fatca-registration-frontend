@@ -16,33 +16,56 @@
 
 package pages
 
+import models.ReporterType.{orgReporterTypes, Individual}
 import models.{ReporterType, UserAnswers}
-import models.ReporterType.{Individual, Sole}
 import play.api.libs.json.JsPath
 
 import scala.util.Try
 
 case object ReporterTypePage extends QuestionPage[ReporterType] {
 
-  private val soleTraderCleanup = List(
+  private val individualCleanup = List(
+    WhatIsYourUTRPage,
+    WhatIsYourNamePage,
+    BusinessNamePage,
+    IsThisYourBusinessPage,
+    BusinessNameWithoutIDPage,
+    HaveTradingNamePage,
+    BusinessTradingNameWithoutIDPage,
+    NonUKBusinessAddressWithoutIDPage,
     ContactNamePage,
     ContactEmailPage,
     ContactHavePhonePage,
     ContactPhonePage,
-    BusinessNamePage
-  )
-
-  private val individualCleanup = List(
+    HaveSecondContactPage,
+    SecondContactNamePage,
+    SecondContactEmailPage,
+    SecondContactHavePhonePage,
+    SecondContactPhonePage,
     RegisteredAddressInUKPage,
-    BusinessNamePage,
-    ContactNamePage,
-    ContactEmailPage,
-    ContactHavePhonePage,
-    ContactPhonePage
+    DoYouHaveUniqueTaxPayerReferencePage,
+    RegistrationInfoPage
   )
 
-  private val otherBusinessTyeCleanup = List(
-    WhatIsYourNamePage
+  private val otherBusinessTypeCleanup = List(
+    IndWhatIsYourNINumberPage,
+    IndContactNamePage,
+    IndDateOfBirthPage,
+    RegistrationInfoPage,
+    IndWhatIsYourNamePage,
+    DateOfBirthWithoutIdPage,
+    IndWhereDoYouLivePage,
+    IndWhatIsYourPostcodePage,
+    AddressLookupPage,
+    IndSelectAddressPage,
+    IndSelectedAddressLookupPage,
+    IsThisYourAddressPage,
+    IndUKAddressWithoutIdPage,
+    IndNonUKAddressWithoutIdPage,
+    IndContactEmailPage,
+    IndContactHavePhonePage,
+    IndContactPhonePage,
+    IndDoYouHaveNINumberPage
   )
 
   override def path: JsPath = JsPath \ toString
@@ -50,10 +73,9 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
   override def toString: String = "reporterType"
 
   override def cleanup(value: Option[ReporterType], userAnswers: UserAnswers): Try[UserAnswers] = value match {
-    case Some(Sole)       => soleTraderCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case Some(Individual) => individualCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case Some(_)          => otherBusinessTyeCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case _                => super.cleanup(value, userAnswers)
+    case Some(Individual)                                              => individualCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
+    case Some(reporterType) if orgReporterTypes.contains(reporterType) => otherBusinessTypeCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
+    case _                                                             => super.cleanup(value, userAnswers)
   }
 
 }

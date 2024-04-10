@@ -181,5 +181,11 @@ trait ModelGenerators {
     Gen.oneOf(arbitrary[OrgRegistrationInfo], arbitrary[IndRegistrationInfo])
   }
 
-//Line holder for template scripts
+  implicit val arbitraryUniqueTaxpayerReference: Arbitrary[UniqueTaxpayerReference] = Arbitrary {
+    for {
+      id <- arbitrary[String]
+    } yield UniqueTaxpayerReference(id)
+  }
+
+  // Line holder for template scripts
 }
