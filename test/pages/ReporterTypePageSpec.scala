@@ -53,10 +53,10 @@ class ReporterTypePageSpec extends PageBehaviours {
     beRemovable[ReporterType](ReporterTypePage)
 
     "cleanUp" - {
+      val ua = createUserAnswers.sample.value
       "must not clear answers" - {
         "when answer changes to 'Sole Trader'" in {
-          val ua     = createUserAnswers.sample.get
-          val result = ReporterTypePage.cleanup(Some(Sole), ua).get
+          val result = ReporterTypePage.cleanup(Some(Sole), ua).success.value
           result mustBe ua
 
         }
@@ -64,7 +64,6 @@ class ReporterTypePageSpec extends PageBehaviours {
 
       "must clear answers" - {
         "when answer changes to anything other than 'An individual not connected to a business' or 'Sole Trader'" in {
-          val ua     = createUserAnswers.sample.get
           val result = ReporterTypePage.cleanup(Some(LimitedCompany), ua).success.value
 
           result.get(IndWhatIsYourNINumberPage) mustBe empty
@@ -88,7 +87,7 @@ class ReporterTypePageSpec extends PageBehaviours {
         }
       }
       "when answer changes to 'An individual not connected to a business'" in {
-        val ua     = createUserAnswers.sample.get
+
         val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
 
         result.get(WhatIsYourUTRPage) mustBe empty
