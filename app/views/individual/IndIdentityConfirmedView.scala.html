@@ -26,6 +26,6 @@
     <h1 class="govuk-heading-l">@messages("indIdentityConfirmed.heading")</h1>
 
     @govukButton(
-        ButtonViewModel(messages("site.continue")).asLink(url)
+        ButtonViewModel(messages("site.continue")).asLink(url).withAttribute("id" -> "submit")
     )
 }
