@@ -24,6 +24,7 @@ import generators.{Generators, UserAnswersGenerator}
 import helpers.JsonFixtures._
 import models.ReporterType.{Individual, LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models._
+import org.mockito.internal.matchers.Any
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -603,9 +604,13 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       }
 
       "must go from ReporterTypePage" - {
+        val ua = emptyUserAnswers.withPage(ReporterTypePage, Individual)
         "to Check Your Answers if Individual is unchanged" in {
-          val answers = emptyUserAnswers.withPage(ReporterTypePage, Individual)
+          val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
           navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
+        }
+        "to IndDoYouHaveNINumber if reportYpe changed to Individual" in {
+          navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(NormalMode)
         }
       }
 
