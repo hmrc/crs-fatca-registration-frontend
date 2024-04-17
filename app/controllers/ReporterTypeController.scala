@@ -18,16 +18,17 @@ package controllers
 
 import controllers.actions._
 import forms.ReporterTypeFormProvider
-import javax.inject.Inject
-import models.Mode
+import models.ReporterType.Individual
+import models.{CheckMode, Mode}
 import navigation.Navigator
-import pages.ReporterTypePage
+import pages.{IndDoYouHaveNINumberPage, ReporterTypePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ReporterTypeView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReporterTypeController @Inject() (
@@ -56,15 +57,22 @@ class ReporterTypeController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithInitializedData().async {
     implicit request =>
+      val ua = request.userAnswers
+      val niAnswerExists = ua.get(IndDoYouHaveNINumberPage).fold(false)(_ => true)
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ReporterTypePage, value))
+              updatedAnswers <- Future.fromTry(ua.set(ReporterTypePage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ReporterTypePage, mode, updatedAnswers))
+            } yield
+              if (niAnswerExists && mode == CheckMode && value == Individual) {
+                Redirect(routes.CheckYourAnswersController.onPageLoad())
+              } else {
+                Redirect(navigator.nextPage(ReporterTypePage, mode, updatedAnswers))
+              }
         )
   }
 

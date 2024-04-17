@@ -271,15 +271,10 @@ class Navigator @Inject() () extends Logging {
       .getOrElse(controllers.routes.JourneyRecoveryController.onPageLoad())
 
   private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Call =
-    (ua.get(ReporterTypePage), mode) match {
-      case (Some(Individual), NormalMode) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case (Some(Individual), CheckMode) =>
-        ua.get(IndDoYouHaveNINumberPage)
-          .fold(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(NormalMode))(
-            _ => controllers.routes.CheckYourAnswersController.onPageLoad()
-          )
-      case (Some(_), _) => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
-      case (None, _)    => controllers.routes.JourneyRecoveryController.onPageLoad()
+    ua.get(ReporterTypePage) match {
+      case Some(Individual) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
+      case Some(_)          => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
+      case None             => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def doYouHaveUniqueTaxPayerReference(mode: Mode)(ua: UserAnswers): Call =

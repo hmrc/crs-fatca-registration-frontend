@@ -18,12 +18,13 @@ package controllers
 
 import base.SpecBase
 import forms.ReporterTypeFormProvider
-import models.{NormalMode, ReporterType, UserAnswers}
+import models.ReporterType._
+import models.{CheckMode, NormalMode, ReporterType, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.ReporterTypePage
+import pages.{IndDoYouHaveNINumberPage, ReporterTypePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -34,6 +35,7 @@ import scala.concurrent.Future
 class ReporterTypeControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val reporterTypeRoute = routes.ReporterTypeController.onPageLoad(NormalMode).url
+  lazy val checkRoute        = routes.ReporterTypeController.onPageLoad(CheckMode).url
 
   val formProvider = new ReporterTypeFormProvider()
   val form         = formProvider()
@@ -97,26 +99,44 @@ class ReporterTypeControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    "must redirect to checkYourAnswers if in CheckMode and there are no changes made to answers" in {
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val ua = emptyUserAnswers.withPage(IndDoYouHaveNINumberPage, true)
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, reporterTypeRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
-
-        val boundForm = form.bind(Map("value" -> "invalid value"))
-
-        val view = application.injector.instanceOf[ReporterTypeView]
+          FakeRequest(POST, checkRoute)
+            .withFormUrlEncodedBody(("value", Individual.toString))
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
       }
     }
+  }
 
+  "must return a Bad Request and errors when invalid data is submitted" in {
+
+    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+    running(application) {
+      val request =
+        FakeRequest(POST, reporterTypeRoute)
+          .withFormUrlEncodedBody(("value", "invalid value"))
+
+      val boundForm = form.bind(Map("value" -> "invalid value"))
+
+      val view = application.injector.instanceOf[ReporterTypeView]
+
+      val result = route(application, request).value
+
+      status(result) mustEqual BAD_REQUEST
+      contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+    }
   }
 
 }
