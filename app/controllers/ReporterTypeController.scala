@@ -58,7 +58,9 @@ class ReporterTypeController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithInitializedData().async {
     implicit request =>
       val ua = request.userAnswers
-      val niAnswerExists = ua.get(IndDoYouHaveNINumberPage).fold(false)(_ => true)
+      val niAnswerExists = ua.get(IndDoYouHaveNINumberPage).fold(false)(
+        _ => true
+      )
       form
         .bindFromRequest()
         .fold(
