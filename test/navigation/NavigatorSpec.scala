@@ -602,6 +602,17 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad
       }
 
+      "must go from ReporterTypePage" - {
+        val ua = emptyUserAnswers.withPage(ReporterTypePage, Individual)
+        "to Check Your Answers if Individual is unchanged" in {
+          val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
+        }
+        "to IndDoYouHaveNINumber if reportYpe changed to Individual" in {
+          navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
+        }
+      }
+
       "must go from WhatIsYourUTRPage to WhatIsYourNamePage for a Sole Trader" in {
         val answers = emptyUserAnswers.withPage(ReporterTypePage, Sole)
 
@@ -823,7 +834,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
             .mustBe(routes.JourneyRecoveryController.onPageLoad())
         }
 
-        "to CheckYourAnswersPage if there is a contact emaile for a Sole reporter type" in {
+        "to CheckYourAnswersPage if there is a contact email for a Sole reporter type" in {
           val answers = emptyUserAnswers
             .withPage(ReporterTypePage, Sole)
             .withPage(IndContactEmailPage, arbitrary[String].sample.value)
