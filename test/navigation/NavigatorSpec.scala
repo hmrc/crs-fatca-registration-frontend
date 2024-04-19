@@ -24,7 +24,6 @@ import generators.{Generators, UserAnswersGenerator}
 import helpers.JsonFixtures._
 import models.ReporterType.{Individual, LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models._
-import org.mockito.internal.matchers.Any
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -601,6 +600,17 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad
+      }
+
+      "must go from ReporterTypePage" - {
+        val ua = emptyUserAnswers.withPage(ReporterTypePage, Individual)
+        "to Check Your Answers if Individual is unchanged" in {
+          val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
+        }
+        "to IndDoYouHaveNINumber if reportYpe changed to Individual" in {
+          navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
+        }
       }
 
       "must go from WhatIsYourUTRPage to WhatIsYourNamePage for a Sole Trader" in {

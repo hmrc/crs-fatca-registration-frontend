@@ -18,10 +18,9 @@ package controllers
 
 import controllers.actions._
 import forms.ReporterTypeFormProvider
-import models.ReporterType.Individual
-import models.{CheckMode, Mode}
+import models.Mode
 import navigation.Navigator
-import pages.{IndDoYouHaveNINumberPage, ReporterTypePage}
+import pages.ReporterTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -57,24 +56,15 @@ class ReporterTypeController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithInitializedData().async {
     implicit request =>
-      val ua = request.userAnswers
-      val niAnswerExists = ua.get(IndDoYouHaveNINumberPage).fold(false)(
-        _ => true
-      )
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(ua.set(ReporterTypePage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ReporterTypePage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield
-              if (niAnswerExists && mode == CheckMode && value == Individual) {
-                Redirect(routes.CheckYourAnswersController.onPageLoad())
-              } else {
-                Redirect(navigator.nextPage(ReporterTypePage, mode, updatedAnswers))
-              }
+            } yield Redirect(navigator.nextPage(ReporterTypePage, mode, updatedAnswers))
         )
   }
 
