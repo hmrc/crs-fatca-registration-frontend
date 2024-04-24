@@ -1,0 +1,41 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.actions
+
+import controllers.routes
+import models.requests.{DataRequestWithSubscriptionId, DataRequestWithUserAnswers}
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionRefiner, Result}
+import repositories.SessionRepository
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
+class ChangeDetailsDataRequiredActionImpl @Inject() (
+  val sessionRepository: SessionRepository
+)(implicit val executionContext: ExecutionContext) extends ChangeDetailsDataRequiredAction {
+
+  override protected def refine[A](request: DataRequestWithSubscriptionId[A]): Future[Either[Result, DataRequestWithUserAnswers[A]]] =
+    sessionRepository.get(request.userId).map {
+      case Some(userAnswers) =>
+        Right(DataRequestWithUserAnswers(request.request, request.userId, request.subscriptionId, userAnswers))
+      case None => Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    }
+
+}
+
+trait ChangeDetailsDataRequiredAction extends ActionRefiner[DataRequestWithSubscriptionId, DataRequestWithUserAnswers]

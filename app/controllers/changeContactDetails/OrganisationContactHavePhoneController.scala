@@ -20,25 +20,25 @@ import controllers.actions._
 import forms.changeContactDetails.OrganisationHavePhoneFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.changeContactDetails.OrganisationHavePhonePage
+import pages.changeContactDetails.OrganisationContactHavePhonePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.ContactHelper
-import views.html.changeContactDetails.OrganisationHavePhoneView
+import views.html.changeContactDetails.OrganisationContactHavePhoneView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationHavePhoneController @Inject() (
+class OrganisationContactHavePhoneController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: OrganisationHavePhoneFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: OrganisationHavePhoneView
+  view: OrganisationContactHavePhoneView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -46,27 +46,27 @@ class OrganisationHavePhoneController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForOrgOrAgent() {
     implicit request =>
-      val preparedForm = request.userAnswers.get(OrganisationHavePhonePage) match {
+      val preparedForm = request.userAnswers.get(OrganisationContactHavePhonePage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, getContactName(request.userAnswers)))
+      Ok(view(preparedForm, mode, getOrganisationContactName(request.userAnswers)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForOrgOrAgent().async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, getContactName(request.userAnswers)))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, getOrganisationContactName(request.userAnswers)))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(OrganisationHavePhonePage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(OrganisationContactHavePhonePage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(OrganisationHavePhonePage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(OrganisationContactHavePhonePage, mode, updatedAnswers))
         )
   }
 

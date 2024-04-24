@@ -44,7 +44,7 @@ class ContactEmailController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck() {
     implicit request =>
       val preparedForm = request.userAnswers.get(ContactEmailPage) match {
         case None        => form
@@ -54,7 +54,7 @@ class ContactEmailController @Inject() (
       Ok(view(preparedForm, mode, getContactName(request.userAnswers)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck().async {
     implicit request =>
       form
         .bindFromRequest()

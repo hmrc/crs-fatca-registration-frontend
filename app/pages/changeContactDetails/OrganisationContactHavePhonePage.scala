@@ -16,12 +16,22 @@
 
 package pages.changeContactDetails
 
+import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object OrganisationEmailPage extends QuestionPage[String] {
+import scala.util.Try
+
+case object OrganisationContactHavePhonePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "organisationEmail"
+  override def toString: String = "organisationContactHavePhone"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(false) => userAnswers.remove(OrganisationContactPhonePage)
+      case _           => super.cleanup(value, userAnswers)
+    }
+
 }

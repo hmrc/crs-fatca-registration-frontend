@@ -18,11 +18,15 @@ package controllers.individual
 
 import base.{ControllerMockFixtures, SpecBase}
 import controllers.routes
+import generators.ModelGenerators
 import models.error.ApiError.{BadRequestError, NotFoundError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, SafeId}
-import models.{Name, NormalMode, SubscriptionID, UserAnswers}
+import models.subscription.response.DisplaySubscriptionResponse
+import models.{Name, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
+import org.scalacheck.Arbitrary
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.{IndContactNamePage, IndDateOfBirthPage, IndWhatIsYourNINumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -35,7 +39,7 @@ import views.html.individual.IndIdentityConfirmedView
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFixtures {
+class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFixtures with ModelGenerators {
   private val SafeIdValue = "XE0000123456789"
   val safeId: SafeId      = SafeId(SafeIdValue)
   val registrationInfo    = IndRegistrationInfo(safeId)
@@ -80,9 +84,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
         .thenReturn(Future.successful(Right(registrationInfo)))
 
-      when(mockSubscriptionService.getDisplaySubscriptionId(any())(any(), any())).thenReturn(Future.successful(None))
-
-      when(mockSubscriptionService.getDisplaySubscriptionId(any())(any(), any())).thenReturn(Future.successful(None))
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -98,40 +100,47 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
 
     "must redirect to registration confirmation page when there is an existing subscription" in {
 
-      when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
-        .thenReturn(Future.successful(Right(registrationInfo)))
-      when(mockSubscriptionService.getDisplaySubscriptionId(any())(any(), any())).thenReturn(Future.successful(Some(SubscriptionID("id"))))
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      forAll(Arbitrary.arbitrary[DisplaySubscriptionResponse]) {
+        subscription =>
+          when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
+            .thenReturn(Future.successful(Right(registrationInfo)))
+          when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(Some(subscription)))
+          when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      retrieveUserAnswersData(validUserAnswers)
-      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+          retrieveUserAnswersData(validUserAnswers)
+          val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
-      val result = route(mockedApp, request).value
+          val result = route(mockedApp, request).value
 
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.RegistrationConfirmationController.onPageLoad().url // TODO : Replace with RegistationConfirmed controller
-
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(
+            result
+          ).value mustEqual routes.RegistrationConfirmationController.onPageLoad().url // TODO : Replace with RegistationConfirmed controller
+      }
     }
 
     "render technical difficulties page when there is an existing subscription and fails to create an enrolment" in {
 
-      when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
-        .thenReturn(Future.successful(Right(registrationInfo)))
-      when(mockSubscriptionService.getDisplaySubscriptionId(any())(any(), any())).thenReturn(Future.successful(Some(SubscriptionID("id"))))
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
+      forAll(Arbitrary.arbitrary[DisplaySubscriptionResponse]) {
+        subscription =>
+          when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
+            .thenReturn(Future.successful(Right(registrationInfo)))
+          when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(Some(subscription)))
+          when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      retrieveUserAnswersData(validUserAnswers)
-      val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
+          retrieveUserAnswersData(validUserAnswers)
+          val request = FakeRequest(GET, controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(NormalMode).url)
 
-      val result = route(mockedApp, request).value
+          val result = route(mockedApp, request).value
 
-      val view = mockedApp.injector.instanceOf[ThereIsAProblemView]
+          val view = mockedApp.injector.instanceOf[ThereIsAProblemView]
 
-      status(result) mustEqual INTERNAL_SERVER_ERROR
-      contentAsString(result) mustEqual view()(request, messages).toString
+          status(result) mustEqual INTERNAL_SERVER_ERROR
+          contentAsString(result) mustEqual view()(request, messages).toString
+      }
     }
 
     "return redirect for a GET when there is no match" in {

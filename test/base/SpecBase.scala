@@ -24,7 +24,7 @@ import org.mockito.MockitoSugar.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{BeforeAndAfterEach, OptionValues, TryValues}
+import org.scalatest.{BeforeAndAfterEach, EitherValues, OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -48,6 +48,7 @@ trait SpecBase
     with MockitoSugar
     with Matchers
     with TryValues
+    with EitherValues
     with OptionValues
     with ScalaFutures
     with BeforeAndAfterEach

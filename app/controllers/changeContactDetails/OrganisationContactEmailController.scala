@@ -20,25 +20,25 @@ import controllers.actions._
 import forms.changeContactDetails.OrganisationEmailFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.changeContactDetails.OrganisationEmailPage
+import pages.changeContactDetails.OrganisationContactEmailPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.ContactHelper
-import views.html.changeContactDetails.OrganisationEmailView
+import views.html.changeContactDetails.OrganisationContactEmailView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationEmailController @Inject() (
+class OrganisationContactEmailController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: OrganisationEmailFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: OrganisationEmailView
+  view: OrganisationContactEmailView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -46,27 +46,27 @@ class OrganisationEmailController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForOrgOrAgent() {
     implicit request =>
-      val preparedForm = request.userAnswers.get(OrganisationEmailPage) match {
+      val preparedForm = request.userAnswers.get(OrganisationContactEmailPage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, getContactName(request.userAnswers)))
+      Ok(view(preparedForm, mode, getOrganisationContactName(request.userAnswers)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForOrgOrAgent().async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, getContactName(request.userAnswers)))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, getOrganisationContactName(request.userAnswers)))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(OrganisationEmailPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(OrganisationContactEmailPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(OrganisationEmailPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(OrganisationContactEmailPage, mode, updatedAnswers))
         )
   }
 
