@@ -18,7 +18,7 @@ package models.register.request
 
 import models.register.request.details.{AddressRequest, Identification, Individual, NoIdOrganisation}
 import models.shared.ContactDetails
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class RequestWithoutIDDetails(organisation: Option[NoIdOrganisation],
                                    individual: Option[Individual],
@@ -28,5 +28,5 @@ case class RequestWithoutIDDetails(organisation: Option[NoIdOrganisation],
 )
 
 object RequestWithoutIDDetails {
-  implicit val formats = Json.format[RequestWithoutIDDetails]
+  implicit val formats: OFormat[RequestWithoutIDDetails] = Json.format[RequestWithoutIDDetails]
 }

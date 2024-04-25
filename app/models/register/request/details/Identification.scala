@@ -16,10 +16,10 @@
 
 package models.register.request.details
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class Identification(idNumber: String, issuingInstitution: String, issuingCountryCode: String)
 
 object Identification {
-  implicit val formats = Json.format[Identification]
+  implicit val formats: OFormat[Identification] = Json.format[Identification]
 }
