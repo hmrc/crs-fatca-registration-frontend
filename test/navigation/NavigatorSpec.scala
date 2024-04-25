@@ -1073,16 +1073,16 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
       }
 
-      "must go from OrganisationContactNamePage to ChangeOrganisationContactDetailsPage" in {
+      "must go from OrganisationContactNamePage to OrganisationContactEmailPage" in {
         navigator
           .nextPage(OrganisationContactNamePage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+          .mustBe(controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode))
       }
 
-      "must go from OrganisationContactEmailPage to ChangeOrganisationContactDetailsPage" in {
+      "must go from OrganisationContactEmailPage to OrganisationContactHavePhonePage" in {
         navigator
           .nextPage(OrganisationContactEmailPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+          .mustBe(controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode))
       }
 
       "must go from OrganisationContactHavePhonePage to ChangeOrganisationContactDetailsPage when user answers no" in {
@@ -1115,13 +1115,13 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(controllers.changeContactDetails.routes.OrganisationSecondContactNameController.onPageLoad(CheckMode))
       }
 
-      "must go from OrganisationSecondContactNamePage to OrganisationSecondContactEmailPage when no previous answers" in {
+      "must go from OrganisationSecondContactNamePage to OrganisationSecondContactEmailPage" in {
         navigator
           .nextPage(OrganisationSecondContactNamePage, CheckMode, emptyUserAnswers.withPage(OrganisationHaveSecondContactPage, true))
           .mustBe(controllers.changeContactDetails.routes.OrganisationSecondContactEmailController.onPageLoad(CheckMode))
       }
 
-      "must go from OrganisationSecondContactEmailPage to OrganisationSecondContactHavePhonePage when no previous answers" in {
+      "must go from OrganisationSecondContactEmailPage to OrganisationSecondContactHavePhonePage" in {
         navigator
           .nextPage(OrganisationSecondContactEmailPage, CheckMode, emptyUserAnswers.withPage(OrganisationHaveSecondContactPage, true))
           .mustBe(controllers.changeContactDetails.routes.OrganisationSecondContactHavePhoneController.onPageLoad(CheckMode))
@@ -1142,18 +1142,6 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       "must go from OrganisationSecondContactPhonePage to ChangeOrganisationContactDetailsPage" in {
         navigator
           .nextPage(OrganisationSecondContactPhonePage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
-      }
-
-      "must go from OrganisationSecondContactNamePage to ChangeOrganisationContactDetailsPage when there are previous answers" in {
-        val answers = emptyUserAnswers
-          .withPage(OrganisationHaveSecondContactPage, true)
-          .withPage(OrganisationSecondContactEmailPage, "some-email@email.com")
-          .withPage(OrganisationSecondContactHavePhonePage, true)
-          .withPage(OrganisationSecondContactPhonePage, "123445555")
-
-        navigator
-          .nextPage(OrganisationSecondContactNamePage, CheckMode, answers)
           .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
       }
     }

@@ -42,7 +42,7 @@ index.guidance = Welcome to your new frontend. Please see the README file for a 
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
-checkYourAnswers.notProvided = Not Provided
+checkYourAnswers.notProvided = Not provided
 
 default.firstContact.name = your first contact
 default.secondContact.name = your second contact
@@ -560,14 +560,16 @@ organisationContactName.checkYourAnswersLabel = First contact name
 organisationContactName.error.required = Enter a name for the first contact
 organisationContactName.error.invalid = The name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, backslashes, carets (^), grave accents (`), hyphens and spaces
 organisationContactName.error.length = The name must be 35 characters or less
+organisationContactName.change.hidden = Change first contact name
 
-organisationContact.heading = What is the email address for {0}?
-organisationContact.title = What is the email address for the first contact?
+organisationContactEmail.heading = What is the email address for {0}?
+organisationContactEmail.title = What is the email address for the first contact?
 organisationContactEmail.checkYourAnswersLabel = First contact email address
-organisationContact.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
-organisationContact.error.required = Enter an email address for the first contact
-organisationContact.error.length = The email address must be 132 characters or less
-organisationContact.error.invalid = Enter an email address in the right format, like yourname@example.com
+organisationContactEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+organisationContactEmail.error.required = Enter an email address for the first contact
+organisationContactEmail.error.length = The email address must be 132 characters or less
+organisationContactEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
+organisationContactEmail.change.hidden = Change first contact email address
 
 organisationContactHavePhone.title = Can we contact your first contact by telephone?
 organisationContactHavePhone.heading = Can we contact {0} by telephone?
@@ -581,6 +583,7 @@ organisationContactPhone.checkYourAnswersLabel = First contact telephone number
 organisationContactPhone.error.required = Enter a telephone number for the first contact
 organisationContactPhone.error.length = The telephone number must be 24 characters or less
 organisationContactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
+organisationContactPhone.change.hidden = Change first contact telephone number
 
 organisationHaveSecondContact.title = Is there someone else we can contact if your first contact is not available?
 organisationHaveSecondContact.heading = Is there someone else we can contact if {0} is not available?

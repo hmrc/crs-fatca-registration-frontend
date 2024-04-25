@@ -25,7 +25,7 @@ class ChangeOrganisationContactDetailsHelper(userAnswers: UserAnswers, countryLi
 
   def changeOrganisationContactName: Option[SummaryListRow] = OrganisationContactNameSummary.row(userAnswers)
 
-  def changeOrganisationContactEmail: Option[SummaryListRow] = OrganisationEmailSummary.row(userAnswers)
+  def changeOrganisationContactEmail: Option[SummaryListRow] = OrganisationContactEmailSummary.row(userAnswers)
 
   def changeOrganisationContactPhone: Option[SummaryListRow] = Option(OrganisationContactPhoneSummary.row(userAnswers))
 
