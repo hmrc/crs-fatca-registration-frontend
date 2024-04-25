@@ -25,7 +25,7 @@ import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object OrganisationEmailSummary {
+object OrganisationContactEmailSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(OrganisationContactEmailPage).map {
