@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import models.SubscriptionID
 import models.error.ApiError
 import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
-import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
+import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest, UpdateSubscriptionRequest}
 import models.subscription.response.{CreateSubscriptionResponse, DisplaySubscriptionResponse}
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, CONFLICT, NOT_FOUND, SERVICE_UNAVAILABLE}
@@ -36,7 +36,7 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
 
   def readSubscription(
     readSubscriptionRequest: ReadSubscriptionRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SubscriptionID]] = {
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[DisplaySubscriptionResponse]] = {
 
     val submissionUrl = s"${config.businessMatchingUrl}/subscription/read-subscription"
 
@@ -46,7 +46,6 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
         case responseMessage if is2xx(responseMessage.status) =>
           responseMessage.json
             .asOpt[DisplaySubscriptionResponse]
-            .map(_.subscriptionId)
         case errorStatus =>
           logger.warn(s"Status $errorStatus has been thrown when display subscription was called")
           None
@@ -85,7 +84,18 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
     }
   }
 
-  def handleError[A](responseMessage: HttpResponse): Either[ApiError, A] =
+  def updateSubscription(requestDetail: UpdateSubscriptionRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
+    val updateSubscriptionUrl = s"${config.businessMatchingUrl}/subscription/update-subscription"
+    http
+      .PUT[UpdateSubscriptionRequest, HttpResponse](updateSubscriptionUrl, requestDetail)
+      .map {
+        responseMessage =>
+          logger.info(s"updateSubscription: Status ${responseMessage.status} has been received when update subscription was called")
+          is2xx(responseMessage.status)
+      }
+  }
+
+  private def handleError[A](responseMessage: HttpResponse): Either[ApiError, A] =
     responseMessage.status match {
       case NOT_FOUND =>
         Left(NotFoundError)

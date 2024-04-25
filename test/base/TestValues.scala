@@ -17,16 +17,19 @@
 package base
 
 import models.matching.SafeId
-import models.{IndContactName, Name, UniqueTaxpayerReference}
+import models.{IndContactName, Name, SubscriptionID, UniqueTaxpayerReference}
 
 trait TestValues {
 
   val UserAnswersId       = "id"
   val UtrValue            = "1234567890"
   private val SafeIdValue = "XE0000123456789"
-  val OrgName             = "Some Test Org"
-  val TestNiNumber        = "CC123456C"
-  val TestEmail           = "test@test.com"
+
+  private val SubscriptionIdValue = "XA0000123456789"
+
+  val OrgName      = "Some Test Org"
+  val TestNiNumber = "CC123456C"
+  val TestEmail    = "test@test.com"
 
   val TestPhoneNumber       = "0188899999"
   val TestFaxNumber         = "0987654323"
@@ -43,6 +46,8 @@ trait TestValues {
 
   val utr: UniqueTaxpayerReference = UniqueTaxpayerReference(UtrValue)
   val safeId: SafeId               = SafeId(SafeIdValue)
+
+  val subscriptionId: SubscriptionID = SubscriptionID(SubscriptionIdValue)
 
   val name: Name = Name(FirstName, LastName)
 

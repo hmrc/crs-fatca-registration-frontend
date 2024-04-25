@@ -28,6 +28,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
+import pages.changeContactDetails._
 import uk.gov.hmrc.domain.Nino
 
 import java.time.{Clock, LocalDate}
@@ -1070,6 +1071,90 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .nextPage(RegistrationInfoPage, CheckMode, emptyUserAnswers)
           .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode))
 
+      }
+
+      "must go from OrganisationContactNamePage to ChangeOrganisationContactDetailsPage" in {
+        navigator
+          .nextPage(OrganisationContactNamePage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+      }
+
+      "must go from OrganisationContactEmailPage to ChangeOrganisationContactDetailsPage" in {
+        navigator
+          .nextPage(OrganisationContactEmailPage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+      }
+
+      "must go from OrganisationContactHavePhonePage to ChangeOrganisationContactDetailsPage when user answers no" in {
+        navigator
+          .nextPage(OrganisationContactHavePhonePage, CheckMode, emptyUserAnswers.withPage(OrganisationContactHavePhonePage, false))
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+      }
+
+      "must go from OrganisationContactHavePhonePage to OrganisationContactPhonePage when user answers yes" in {
+        navigator
+          .nextPage(OrganisationContactHavePhonePage, CheckMode, emptyUserAnswers.withPage(OrganisationContactHavePhonePage, true))
+          .mustBe(controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(CheckMode))
+      }
+
+      "must go from OrganisationContactPhonePage to ChangeOrganisationContactDetailsPage" in {
+        navigator
+          .nextPage(OrganisationContactPhonePage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+      }
+
+      "must go from OrganisationHaveSecondContactPage to ChangeOrganisationContactDetailsPage when user answers no" in {
+        navigator
+          .nextPage(OrganisationHaveSecondContactPage, CheckMode, emptyUserAnswers.withPage(OrganisationHaveSecondContactPage, false))
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+      }
+
+      "must go from OrganisationHaveSecondContactPage to OrganisationSecondContactNamePage when user answers yes" in {
+        navigator
+          .nextPage(OrganisationHaveSecondContactPage, CheckMode, emptyUserAnswers.withPage(OrganisationHaveSecondContactPage, true))
+          .mustBe(controllers.changeContactDetails.routes.OrganisationSecondContactNameController.onPageLoad(CheckMode))
+      }
+
+      "must go from OrganisationSecondContactNamePage to OrganisationSecondContactEmailPage when no previous answers" in {
+        navigator
+          .nextPage(OrganisationSecondContactNamePage, CheckMode, emptyUserAnswers.withPage(OrganisationHaveSecondContactPage, true))
+          .mustBe(controllers.changeContactDetails.routes.OrganisationSecondContactEmailController.onPageLoad(CheckMode))
+      }
+
+      "must go from OrganisationSecondContactEmailPage to OrganisationSecondContactHavePhonePage when no previous answers" in {
+        navigator
+          .nextPage(OrganisationSecondContactEmailPage, CheckMode, emptyUserAnswers.withPage(OrganisationHaveSecondContactPage, true))
+          .mustBe(controllers.changeContactDetails.routes.OrganisationSecondContactHavePhoneController.onPageLoad(CheckMode))
+      }
+
+      "must go from OrganisationSecondContactHavePhonePage to ChangeOrganisationContactDetailsPage when user answers no" in {
+        navigator
+          .nextPage(OrganisationSecondContactHavePhonePage, CheckMode, emptyUserAnswers.withPage(OrganisationSecondContactHavePhonePage, false))
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+      }
+
+      "must go from OrganisationSecondContactHavePhonePage to OrganisationSecondContactPhonePage when user answers yes" in {
+        navigator
+          .nextPage(OrganisationSecondContactHavePhonePage, CheckMode, emptyUserAnswers.withPage(OrganisationSecondContactHavePhonePage, true))
+          .mustBe(controllers.changeContactDetails.routes.OrganisationSecondContactPhoneController.onPageLoad(CheckMode))
+      }
+
+      "must go from OrganisationSecondContactPhonePage to ChangeOrganisationContactDetailsPage" in {
+        navigator
+          .nextPage(OrganisationSecondContactPhonePage, CheckMode, emptyUserAnswers)
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
+      }
+
+      "must go from OrganisationSecondContactNamePage to ChangeOrganisationContactDetailsPage when there are previous answers" in {
+        val answers = emptyUserAnswers
+          .withPage(OrganisationHaveSecondContactPage, true)
+          .withPage(OrganisationSecondContactEmailPage, "some-email@email.com")
+          .withPage(OrganisationSecondContactHavePhonePage, true)
+          .withPage(OrganisationSecondContactPhonePage, "123445555")
+
+        navigator
+          .nextPage(OrganisationSecondContactNamePage, CheckMode, answers)
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
       }
     }
   }

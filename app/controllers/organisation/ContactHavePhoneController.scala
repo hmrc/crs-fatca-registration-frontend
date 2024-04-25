@@ -46,7 +46,7 @@ class ContactHavePhoneController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck() {
     implicit request =>
       val preparedForm = request.userAnswers.get(ContactHavePhonePage) match {
         case None        => form
@@ -56,7 +56,7 @@ class ContactHavePhoneController @Inject() (
       Ok(view(preparedForm, mode, getFirstContactName(request.userAnswers)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck().async {
     implicit request =>
       form
         .bindFromRequest()

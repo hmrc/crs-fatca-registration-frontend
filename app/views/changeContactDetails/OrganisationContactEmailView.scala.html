@@ -26,22 +26,22 @@
 
 @(form: Form[_], mode: Mode, contactName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("organisationEmail.title"))) {
+@layout(pageTitle = title(form, messages("organisationContactEmail.title"))) {
 
-    @formHelper(action = controllers.changeContactDetails.routes.OrganisationEmailController.onSubmit(mode)) {
+    @formHelper(action = controllers.changeContactDetails.routes.OrganisationContactEmailController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("organisationEmail.heading", contactName)</h1>
+        <h1 class="govuk-heading-l">@messages("organisationContactEmail.heading", contactName)</h1>
 
-        <p  class="govuk-body">@messages("organisationEmail.p1")</p>
+        <p  class="govuk-body">@messages("organisationContactEmail.p1")</p>
 
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("organisationEmail.heading", contactName)).withCssClass( "govuk-visually-hidden")
+                label = LabelViewModel(messages("organisationContactEmail.heading", contactName)).withCssClass( "govuk-visually-hidden")
             )
             .withWidth(Full)
         )

@@ -17,7 +17,7 @@
 package models.subscription
 
 import base.SpecBase
-import generators.Generators
+import generators.ModelGenerators
 import helpers.JsonFixtures._
 import models.subscription.request.{ContactInformation, CreateSubscriptionRequest, IndividualDetails, OrganisationDetails}
 import models.{Address, AddressLookup, Country, IdentifierType, ReporterType, UniqueTaxpayerReference, UserAnswers}
@@ -26,7 +26,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import uk.gov.hmrc.auth.core.AffinityGroup
 
-class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
+class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChecks with ModelGenerators {
 
   val nameGen: Gen[String] = stringsLongerThan(10)
 
@@ -62,8 +62,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
                 name = contactName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ),
             secondaryContact = None
           )
@@ -109,16 +108,14 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
                 name = primaryContactName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ),
             secondaryContact = Some(ContactInformation(
               contactInformation = OrganisationDetails(
                 name = secondaryContactName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ))
           )
         )
@@ -152,8 +149,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
                 name = contactName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ),
             secondaryContact = None
           )
@@ -162,11 +158,10 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
       }
 
       "for a business without id (individual affinity group)" in {
-        val businessName         = nameGen.sample.value
-        val tradingName          = nameGen.sample.value
-        val address              = Address("", None, "", None, None, Country("state", "GG", "Guernsey"))
-        val primaryContactName   = nameGen.sample.value
-        val secondaryContactName = nameGen.sample.value
+        val businessName       = nameGen.sample.value
+        val tradingName        = nameGen.sample.value
+        val address            = Address("", None, "", None, None, Country("state", "GG", "Guernsey"))
+        val primaryContactName = nameGen.sample.value
 
         val userAnswers = UserAnswers("")
           .set(ReporterTypePage, ReporterType.LimitedCompany).success.value
@@ -194,8 +189,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
                 name = primaryContactName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ),
             secondaryContact = None
           )
@@ -228,12 +222,10 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
             primaryContact = ContactInformation(
               contactInformation = IndividualDetails(
                 firstName = contactName.firstName,
-                middleName = None,
                 lastName = contactName.lastName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ),
             secondaryContact = None
           )
@@ -267,12 +259,10 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
             primaryContact = ContactInformation(
               contactInformation = IndividualDetails(
                 firstName = contactName.firstName,
-                middleName = None,
                 lastName = contactName.lastName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ),
             secondaryContact = None
           )
@@ -302,12 +292,10 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
             primaryContact = ContactInformation(
               contactInformation = IndividualDetails(
                 firstName = contactName.firstName,
-                middleName = None,
                 lastName = contactName.lastName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ),
             secondaryContact = None
           )
@@ -342,12 +330,10 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
             primaryContact = ContactInformation(
               contactInformation = IndividualDetails(
                 firstName = name.firstName,
-                middleName = None,
                 lastName = name.lastName
               ),
               email = TestEmail,
-              phone = Some(TestPhoneNumber),
-              mobile = None
+              phone = Some(TestPhoneNumber)
             ),
             secondaryContact = None
           )

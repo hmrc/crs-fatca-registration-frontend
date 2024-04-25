@@ -20,12 +20,13 @@ import base.SpecBase
 import cats.data.EitherT
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import generators.Generators
+import generators.ModelGenerators
 import helpers.WireMockServerHandler
 import models.SubscriptionID
 import models.error.ApiError
 import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
 import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
+import models.subscription.response.DisplaySubscriptionResponse
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -37,7 +38,7 @@ import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
+class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with ModelGenerators with ScalaCheckPropertyChecks {
 
   lazy val application: Application = new GuiceApplicationBuilder()
     .configure(
@@ -52,75 +53,14 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
   "SubscriptionConnector" - {
     "readSubscription" - {
-      "must return SubscriptionID for individual subscription" in {
+      "must return subscription" in {
         val request          = arbitrary[ReadSubscriptionRequest].sample.value
-        val expectedResponse = Some(SubscriptionID("Subscription 123"))
+        val expectedResponse = arbitrary[DisplaySubscriptionResponse].sample.value
 
-        val subscriptionResponse = Json.obj(
-          "success" -> Json.obj(
-            "processingDate" -> "2020-01-01T00:00:00Z",
-            "subscriptionId" -> "Subscription 123",
-            "gbUser"         -> true,
-            "primaryContact" -> Json.obj(
-              "individual" -> Json.obj(
-                "firstName" -> "Primary",
-                "lastName"  -> "Contact"
-              ),
-              "email"  -> "test1@example.com",
-              "phone"  -> "0191 498 0001",
-              "mobile" -> "0770 090 0001"
-            ),
-            "secondaryContact" -> Json.obj(
-              "individual" -> Json.obj(
-                "firstName" -> "Secondary",
-                "lastName"  -> "Contact"
-              ),
-              "email"  -> "test2@example.com",
-              "phone"  -> "0191 498 0002",
-              "mobile" -> "0770 090 0002"
-            )
-          )
-        )
+        stubPostResponse("/read-subscription", OK, Json.prettyPrint(Json.toJson(expectedResponse)))
 
-        stubPostResponse("/read-subscription", OK, subscriptionResponse.toString())
-
-        val result: Future[Option[SubscriptionID]] = connector.readSubscription(request)
-        result.futureValue mustBe expectedResponse
-      }
-
-      "must return SubscriptionID for organisation subscription" in {
-        val request          = arbitrary[ReadSubscriptionRequest].sample.value
-        val expectedResponse = Some(SubscriptionID("Subscription 123"))
-
-        val subscriptionResponse = Json.obj(
-          "success" -> Json.obj(
-            "processingDate" -> "2020-01-01T00:00:00Z",
-            "subscriptionId" -> "Subscription 123",
-            "tradingName"    -> "Test Business",
-            "gbUser"         -> true,
-            "primaryContact" -> Json.obj(
-              "organisation" -> Json.obj(
-                "name" -> "Department 1"
-              ),
-              "email"  -> "test1@example.com",
-              "phone"  -> "0191 498 0001",
-              "mobile" -> "0770 090 0001"
-            ),
-            "secondaryContact" -> Json.obj(
-              "organisation" -> Json.obj(
-                "name" -> "Department 1"
-              ),
-              "email"  -> "test2@example.com",
-              "phone"  -> "0191 498 0002",
-              "mobile" -> "0770 090 0002"
-            )
-          )
-        )
-
-        stubPostResponse("/read-subscription", OK, subscriptionResponse.toString())
-
-        val result: Future[Option[SubscriptionID]] = connector.readSubscription(request)
-        result.futureValue mustBe expectedResponse
+        val result: Future[Option[DisplaySubscriptionResponse]] = connector.readSubscription(request)
+        result.futureValue mustBe Option(expectedResponse)
       }
 
       "must return None when read subscription fails" in {

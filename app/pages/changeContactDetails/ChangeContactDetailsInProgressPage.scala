@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package pages.changeContactDetails
 
-import pages.QuestionPage
+import pages.Page
 import play.api.libs.json.JsPath
+import queries.{Gettable, Settable}
 
-case object OrganisationHavePhonePage extends QuestionPage[Boolean] {
+case object ChangeContactDetailsInProgressPage extends Page with Gettable[Boolean] with Settable[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "organisationHavePhone"
+  override def toString: String = "changeContactDetailsInProgress"
+
 }

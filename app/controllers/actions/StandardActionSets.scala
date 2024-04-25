@@ -16,10 +16,11 @@
 
 package controllers.actions
 
-import models.requests.{DataRequest, IdentifierRequest}
-import play.api.mvc.{ActionBuilder, AnyContent}
+import models.requests.{DataRequest, DataRequestWithUserAnswers, IdentifierRequest}
 import play.api.libs.json.Reads
+import play.api.mvc.{ActionBuilder, AnyContent}
 import queries.Gettable
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 import javax.inject.Inject
 
@@ -28,9 +29,14 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
                                     requireData: DataRequiredAction,
                                     initializeData: DataInitializeAction,
                                     retrieveCtUTR: CtUtrRetrievalAction,
+                                    retrieveSubscriptionId: SubscriptionIdRetrievalAction,
+                                    changeDetailsDataRetrieval: ChangeDetailsDataRetrievalAction,
+                                    changeDetailsDataRequired: ChangeDetailsDataRequiredAction,
                                     checkEnrolment: CheckEnrolledToServiceAction,
                                     dependantAnswer: DependantAnswerProvider
 ) {
+
+  private val nonIndividualAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
 
   def identifiedUserWithEnrolmentCheckAndCtUtrRetrieval(): ActionBuilder[IdentifierRequest, AnyContent] =
     identify() andThen checkEnrolment andThen retrieveCtUTR()
@@ -52,5 +58,11 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
 
   def identifiedUserWithDependantAnswer[T](answer: Gettable[T])(implicit reads: Reads[T]): ActionBuilder[DataRequest, AnyContent] =
     identifiedUserWithData() andThen dependantAnswer(answer)
+
+  def subscriptionIdWithChangeDetailsRetrievalForOrgOrAgent(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
+    retrieveSubscriptionId(nonIndividualAffinityGroups) andThen changeDetailsDataRetrieval()
+
+  def subscriptionIdWithChangeDetailsRequiredForOrgOrAgent(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
+    retrieveSubscriptionId(nonIndividualAffinityGroups) andThen changeDetailsDataRequired
 
 }

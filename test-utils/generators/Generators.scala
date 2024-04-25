@@ -23,9 +23,9 @@ import org.scalacheck.{Gen, Shrink}
 import utils.RegexConstants
 import wolfendale.scalacheck.regexp.RegexpGen
 
-trait Generators extends ModelGenerators with RegexConstants {
+trait Generators extends RegexConstants {
 
-  implicit val dontShrink: Shrink[String] = Shrink.shrinkAny
+  implicit def dontShrink[A]: Shrink[A] = Shrink.shrinkAny
 
   def genIntersperseString(gen: Gen[String], value: String, frequencyV: Int = 1, frequencyN: Int = 10): Gen[String] = {
 

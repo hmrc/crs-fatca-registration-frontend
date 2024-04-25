@@ -46,7 +46,7 @@ class OrganisationSecondContactEmailController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForOrgOrAgent() {
     implicit request =>
       val preparedForm = request.userAnswers.get(OrganisationSecondContactEmailPage) match {
         case None        => form
@@ -56,7 +56,7 @@ class OrganisationSecondContactEmailController @Inject() (
       Ok(view(preparedForm, mode, getOrganisationSecondContactName(request.userAnswers)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForOrgOrAgent().async {
     implicit request =>
       form
         .bindFromRequest()

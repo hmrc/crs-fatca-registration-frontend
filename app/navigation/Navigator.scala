@@ -31,15 +31,11 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject() () extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case IndividualEmailPage         => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(NormalMode)
-    case IndividualHavePhonePage     => _ => controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(NormalMode)
-    case IndividualPhonePage         => _ => controllers.changeContactDetails.routes.IndividualChangeContactDetailsController.onPageLoad()
-    case OrganisationContactNamePage => _ => controllers.changeContactDetails.routes.OrganisationEmailController.onPageLoad(NormalMode)
-    case OrganisationEmailPage       => _ => controllers.changeContactDetails.routes.OrganisationHavePhoneController.onPageLoad(NormalMode)
-    case OrganisationHavePhonePage   => _ => controllers.changeContactDetails.routes.OrganisationPhoneController.onPageLoad(NormalMode)
-    case OrganisationPhonePage       => _ => controllers.routes.IndexController.onPageLoad // TODO: Add this when next page in journey is added
-    case IsThisYourBusinessPage      => isThisYourBusiness(NormalMode)
-    case ReporterTypePage            => whatAreYouReportingAs(NormalMode)
+    case IndividualEmailPage     => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(NormalMode)
+    case IndividualHavePhonePage => _ => controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(NormalMode)
+    case IndividualPhonePage     => _ => controllers.changeContactDetails.routes.IndividualChangeContactDetailsController.onPageLoad()
+    case IsThisYourBusinessPage  => isThisYourBusiness(NormalMode)
+    case ReporterTypePage        => whatAreYouReportingAs(NormalMode)
     case RegisteredAddressInUKPage =>
       userAnswers =>
         yesNoPage(
@@ -236,7 +232,38 @@ class Navigator @Inject() () extends Logging {
           IndContactEmailPage,
           controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
         )
-    case _ => _ => routes.CheckYourAnswersController.onPageLoad()
+    case NonUKBusinessAddressWithoutIDPage => _ => routes.CheckYourAnswersController.onPageLoad()
+    case OrganisationContactNamePage       => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    case OrganisationContactEmailPage      => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    case OrganisationContactHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          OrganisationContactHavePhonePage,
+          controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(CheckMode),
+          controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+        )
+    case OrganisationContactPhonePage => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    case OrganisationHaveSecondContactPage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          OrganisationHaveSecondContactPage,
+          controllers.changeContactDetails.routes.OrganisationSecondContactNameController.onPageLoad(CheckMode),
+          controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+        )
+    case OrganisationSecondContactNamePage  => changeOrgSecondContactNameRoutes(CheckMode)
+    case OrganisationSecondContactEmailPage => changeOrgSecondContactEmailRoutes(CheckMode)
+    case OrganisationSecondContactHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          OrganisationSecondContactHavePhonePage,
+          controllers.changeContactDetails.routes.OrganisationSecondContactPhoneController.onPageLoad(CheckMode),
+          controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+        )
+    case OrganisationSecondContactPhonePage => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    case _                                  => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -245,19 +272,6 @@ class Navigator @Inject() () extends Logging {
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
-
-  def checkNextPageForValueThenRoute[A](mode: Mode, ua: UserAnswers, page: QuestionPage[A], call: Call)(implicit rds: Reads[A]): Call =
-    if (
-      mode.equals(CheckMode) && ua
-        .get(page)
-        .fold(false)(
-          _ => true
-        )
-    ) {
-      routes.CheckYourAnswersController.onPageLoad()
-    } else {
-      call
-    }
 
   private def addressLookupNavigation(mode: Mode)(ua: UserAnswers): Call =
     ua.get(AddressLookupPage) match {
@@ -409,5 +423,54 @@ class Navigator @Inject() () extends Logging {
         logger.warn("Have NI Number answer not found when routing from IndWhatIsYourNamePage")
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
+
+  private def changeOrgSecondContactNameRoutes(mode: Mode)(userAnswers: UserAnswers): Call =
+    changeOrgContactRoutes(
+      mode,
+      userAnswers,
+      OrganisationSecondContactEmailPage,
+      controllers.changeContactDetails.routes.OrganisationSecondContactEmailController.onPageLoad(mode)
+    )
+
+  private def changeOrgSecondContactEmailRoutes(mode: Mode)(userAnswers: UserAnswers): Call =
+    changeOrgContactRoutes(
+      mode,
+      userAnswers,
+      OrganisationSecondContactHavePhonePage,
+      controllers.changeContactDetails.routes.OrganisationSecondContactHavePhoneController.onPageLoad(mode)
+    )
+
+  private def changeOrgContactRoutes[T](
+    mode: Mode,
+    userAnswers: UserAnswers,
+    page: QuestionPage[T],
+    callWhenAnswered: Call
+  )(implicit reads: Reads[T]): Call = {
+    val changeOrgDetailsCall = controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    userAnswers.get(OrganisationHaveSecondContactPage) match {
+      case Some(true)  => checkNextPageForValueThenRoute(mode, userAnswers, page, callWhenAnswered, changeOrgDetailsCall)
+      case Some(false) => changeOrgDetailsCall
+      case _ =>
+        logger.warn(s"Organisation have second contact answer not found when navigating to $page")
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def checkNextPageForValueThenRoute[A](
+    mode: Mode,
+    userAnswers: UserAnswers,
+    page: QuestionPage[A],
+    callWhenNotAnswered: Call,
+    callWhenAlreadyAnswered: Call = routes.CheckYourAnswersController.onPageLoad()
+  )(implicit rds: Reads[A]): Call = {
+    val answerExists = mode.equals(CheckMode) && userAnswers.get(page).fold(false)(
+      _ => true
+    )
+    if (answerExists) {
+      callWhenAlreadyAnswered
+    } else {
+      callWhenNotAnswered
+    }
+  }
 
 }

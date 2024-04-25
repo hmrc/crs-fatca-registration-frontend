@@ -24,7 +24,8 @@ object AppDependencies {
     "org.scalacheck"          %% "scalacheck"              % "1.18.0",
     "org.pegdown"             %  "pegdown"                 % "1.6.0",
     "org.jsoup"               %  "jsoup"                   % "1.17.2",
-    "wolfendale"             %%  "scalacheck-gen-regexp"   % "0.1.2"
+    "wolfendale"             %%  "scalacheck-gen-regexp"   % "0.1.2",
+    "com.softwaremill.quicklens" %% "quicklens"               % "1.9.7"
   ).map(_ % Test)
 
   val itDependencies: Seq[ModuleID] = Seq(
