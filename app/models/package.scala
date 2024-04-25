@@ -146,6 +146,7 @@ package object models {
                     }
                   }
             }
+        case _ => JsError("This should not be reachable")
       }
 
   }

@@ -1,4 +1,4 @@
-import scala.collection.immutable.Seq
+
 
 resolvers += "HMRC-open-artefacts-maven" at "https://open.artefacts.tax.service.gov.uk/maven2"
 
