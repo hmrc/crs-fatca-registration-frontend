@@ -34,8 +34,7 @@ class YourContactDetailsController @Inject() (
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
   view: YourContactDetailsView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() {
