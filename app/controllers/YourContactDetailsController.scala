@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.YourContactDetailsView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class YourContactDetailsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -34,8 +34,7 @@ class YourContactDetailsController @Inject() (
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
   view: YourContactDetailsView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() {

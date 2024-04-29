@@ -58,7 +58,7 @@ object LookupAddressByPostcode {
 
 object AddressLookup {
 
-  implicit val addressLookupWrite = new Writes[AddressLookup] {
+  implicit val addressLookupWrite: Writes[AddressLookup] = new Writes[AddressLookup] {
 
     def writes(addressLookup: AddressLookup) = {
       def lines: List[String] = List(addressLookup.addressLine1, addressLookup.addressLine2, addressLookup.addressLine3, addressLookup.addressLine4).flatten

@@ -21,5 +21,5 @@ import play.api.libs.json._
 case class IndContactName(firstName: String, lastName: String)
 
 object IndContactName {
-  implicit val format = Json.format[IndContactName]
+  implicit val format: OFormat[IndContactName] = Json.format[IndContactName]
 }

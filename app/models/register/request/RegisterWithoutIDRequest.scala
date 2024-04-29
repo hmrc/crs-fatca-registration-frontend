@@ -16,10 +16,10 @@
 
 package models.register.request
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class RegisterWithoutIDRequest(requestCommon: RequestCommon, requestDetail: RequestWithoutIDDetails)
 
 object RegisterWithoutIDRequest {
-  implicit val format = Json.format[RegisterWithoutIDRequest]
+  implicit val format: OFormat[RegisterWithoutIDRequest] = Json.format[RegisterWithoutIDRequest]
 }

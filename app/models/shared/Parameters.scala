@@ -16,10 +16,10 @@
 
 package models.shared
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class Parameters(paramName: String, paramValue: String)
 
 object Parameters {
-  implicit val formats = Json.format[Parameters]
+  implicit val formats: OFormat[Parameters] = Json.format[Parameters]
 }
