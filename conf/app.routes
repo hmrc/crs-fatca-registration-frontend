@@ -298,3 +298,6 @@ GET         /organisationDetails                                                
 
 GET         /change-contact/organisation/details                                 controllers.changeContactDetails.ChangeOrganisationContactDetailsController.onPageLoad()
 POST        /change-contact/organisation/details                                 controllers.changeContactDetails.ChangeOrganisationContactDetailsController.onSubmit()
+
+GET         /change-contact/individual/details                                   controllers.changeContactDetails.ChangeIndividualContactDetailsController.onPageLoad()
+POST        /change-contact/individual/details                                   controllers.changeContactDetails.ChangeIndividualContactDetailsController.onSubmit()
