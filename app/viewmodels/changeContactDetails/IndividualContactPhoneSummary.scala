@@ -35,7 +35,7 @@ object IndividualContactPhoneSummary {
       actions = Seq(
         changeAction(
           IndividualPhonePage.toString,
-          controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode).url
+          controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(CheckMode).url
         )
       )
     )
