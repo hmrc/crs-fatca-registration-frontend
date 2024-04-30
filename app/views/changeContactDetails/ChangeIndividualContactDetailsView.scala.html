@@ -27,7 +27,7 @@
         link: Link
 )
 
-@(primary: SummaryList, frontendAppConfig: FrontendAppConfig, hasChanges: Boolean)(implicit request: Request[_], messages: Messages)
+@(contactDetails: SummaryList, frontendAppConfig: FrontendAppConfig, hasChanges: Boolean)(implicit request: Request[_], messages: Messages)
 
 @homepageLink = @{link(controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad.url, messages("site.backToReportPage"), classes = "govuk-link govuk-body")}
 
@@ -35,13 +35,7 @@
     @formHelper(action = controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onSubmit()) {
         @heading(messages(if(hasChanges) "checkIndividualContactDetails.heading" else "changeIndividualContactDetails.heading"))
 
-        @heading(messages("changeIndividualContactDetails.primary.heading"), "m")
-
-        @govukSummaryList(primary)
-
-        <h2 class="govuk-heading-m govuk-!-padding-top-5">@messages("changeIndividualContactDetails.secondary.heading")</h2>
-
-
+        @govukSummaryList(contactDetails)
 
         @if(hasChanges) {
             <h2 class="govuk-heading-m govuk-!-padding-top-5">@messages("changeContactDetails.nowSendContactDetails")</h2>

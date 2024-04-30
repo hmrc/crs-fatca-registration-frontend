@@ -652,6 +652,12 @@ changeOrganisationContactDetails.heading = Change your contact details for your 
 checkOrganisationContactDetails.heading = Check your contact details for your organisation
 changeOrganisationContactDetails.primary.heading = First contact
 changeOrganisationContactDetails.secondary.heading = Second contact
+
 changeContactDetails.nowSendContactDetails = Now send your updated contact details
 changeContactDetails.confirmingInformation = By sending these details, you are confirming that the information is correct and complete to the best of your knowledge.
 changeContactDetails.confirmAndSend = Confirm and send
+
+changeIndividualContactDetails.title = Change your contact details
+checkIndividualContactDetails.title = Check your contact details
+changeIndividualContactDetails.heading = Change your contact details
+checkIndividualContactDetails.heading = Check your contact details
