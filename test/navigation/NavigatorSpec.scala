@@ -875,6 +875,53 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
       }
 
+      "must go from IndContactHavePhonePage to IndContactPhonePage when user answers Yes" in {
+        val userAnswers = emptyUserAnswers
+          .set(IndContactHavePhonePage, true)
+          .success
+          .value
+
+        navigator
+          .nextPage(IndContactHavePhonePage, CheckMode, userAnswers)
+          .mustBe(controllers.individual.routes.IndContactPhoneController.onPageLoad(CheckMode))
+      }
+
+      "must go from IndContactHavePhonePage to CheckYourAnswersPage when user answers No" in {
+        val userAnswers = emptyUserAnswers.withPage(IndContactHavePhonePage, false)
+
+        navigator
+          .nextPage(IndContactHavePhonePage, CheckMode, userAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from ContactHavePhonePage to ContactPhonePage when user answers Yes" in {
+        val userAnswers = emptyUserAnswers.withPage(ContactHavePhonePage, true)
+
+        navigator
+          .nextPage(ContactHavePhonePage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.ContactPhoneController.onPageLoad(CheckMode))
+      }
+
+      "must go from ContactHavePhonePage to CheckYourAnswersPage when user answers No" in {
+        val userAnswers = emptyUserAnswers.withPage(ContactHavePhonePage, false)
+
+        navigator
+          .nextPage(ContactHavePhonePage, CheckMode, userAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from ContactPhonePage to CheckYourAnswersPage" in {
+        navigator
+          .nextPage(ContactPhonePage, CheckMode, emptyUserAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from SecondContactPhonePage to CheckYourAnswersPage" in {
+        navigator
+          .nextPage(SecondContactPhonePage, CheckMode, emptyUserAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
       "must go from IndWhatIsYourNINumberPage to IndContactNamePage when IndDoYouHaveNINumberPage is true but no IndContactNamePage" in {
         navigator
           .nextPage(IndWhatIsYourNINumberPage, CheckMode, emptyUserAnswers.withPage(IndDoYouHaveNINumberPage, true))
