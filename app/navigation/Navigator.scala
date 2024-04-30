@@ -290,7 +290,19 @@ class Navigator @Inject() () extends Logging {
           controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
         )
     case OrganisationSecondContactPhonePage => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
-    case _                                  => _ => routes.CheckYourAnswersController.onPageLoad()
+
+    case IndividualEmailPage => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(CheckMode)
+    case IndividualHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          IndividualHavePhonePage,
+          controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(CheckMode),
+          controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
+        )
+    case IndividualPhonePage => _ => controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
+
+    case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

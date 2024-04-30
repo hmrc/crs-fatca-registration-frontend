@@ -32,7 +32,9 @@
 @homepageLink = @{link(controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad.url, messages("site.backToReportPage"), classes = "govuk-link govuk-body")}
 
 @layout(pageTitle = titleNoForm(messages(if(hasChanges) "checkIndividualContactDetails.title" else "changeIndividualContactDetails.title"))) {
+
     @formHelper(action = controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onSubmit()) {
+
         @heading(messages(if(hasChanges) "checkIndividualContactDetails.heading" else "changeIndividualContactDetails.heading"))
 
         @govukSummaryList(contactDetails)
