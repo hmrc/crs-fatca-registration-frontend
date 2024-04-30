@@ -17,18 +17,21 @@
 package controllers.changeContactDetails
 
 import base.SpecBase
+import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.routes
 import forms.changeContactDetails.IndividualEmailFormProvider
+import helpers.JsonFixtures._
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.changeContactDetails.IndividualEmailPage
+import pages.changeContactDetails.{IndividualEmailPage, IndividualHavePhonePage, IndividualPhonePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.IndividualEmailView
 
 import scala.concurrent.Future
@@ -37,34 +40,27 @@ class IndividualEmailControllerSpec extends SpecBase with MockitoSugar {
 
   override def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new IndividualEmailFormProvider()
-  val form         = formProvider()
+  val formProvider                              = new IndividualEmailFormProvider()
+  val form                                      = formProvider()
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
   lazy val individualEmailRoute = controllers.changeContactDetails.routes.IndividualEmailController.onPageLoad(NormalMode).url
 
+  val userAnswers = emptyUserAnswers
+    .withPage(IndividualEmailPage, TestEmail)
+    .withPage(IndividualHavePhonePage, true)
+    .withPage(IndividualPhonePage, TestMobilePhoneNumber)
+
   "IndividualEmail Controller" - {
+    when(mockSubscriptionIdRetrievalAction.apply(Set(AffinityGroup.Individual)))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
-    "must return OK and the correct view for a GET" in {
+    "must populate the view correctly on a GET with existing answer" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, individualEmailRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[IndividualEmailView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(IndividualEmailPage, "answer").success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
       running(application) {
         val request = FakeRequest(GET, individualEmailRoute)
@@ -74,7 +70,7 @@ class IndividualEmailControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("test@test.com"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -84,6 +80,7 @@ class IndividualEmailControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -102,8 +99,11 @@ class IndividualEmailControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request =
@@ -122,8 +122,11 @@ class IndividualEmailControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, individualEmailRoute)
@@ -136,8 +139,11 @@ class IndividualEmailControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request =

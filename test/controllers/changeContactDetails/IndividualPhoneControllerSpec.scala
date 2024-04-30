@@ -18,16 +18,15 @@ package controllers.changeContactDetails
 
 import base.SpecBase
 import controllers.actions._
-import controllers.routes
 import forms.changeContactDetails.IndividualPhoneFormProvider
+import helpers.JsonFixtures.{subscriptionId, TestEmail, TestMobilePhoneNumber}
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.changeContactDetails.IndividualPhonePage
+import pages.changeContactDetails.{IndividualEmailPage, IndividualHavePhonePage, IndividualPhonePage}
 import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -40,23 +39,35 @@ class IndividualPhoneControllerSpec extends SpecBase with MockitoSugar {
 
   override def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new IndividualPhoneFormProvider()
-  val form         = formProvider()
+  val formProvider                              = new IndividualPhoneFormProvider()
+  val form                                      = formProvider()
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
   lazy val individualPhoneRoute = controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(NormalMode).url
 
+  val userAnswers = emptyUserAnswers
+    .withPage(IndividualEmailPage, TestEmail)
+    .withPage(IndividualHavePhonePage, true)
+    .withPage(IndividualPhonePage, TestMobilePhoneNumber)
+
   "IndividualPhone Controller" - {
+    when(mockSubscriptionIdRetrievalAction.apply(Set(AffinityGroup.Individual)))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {
+      val userAnswers = emptyUserAnswers
+        .withPage(IndividualEmailPage, TestEmail)
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, individualPhoneRoute)
+        val view    = application.injector.instanceOf[IndividualPhoneView]
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[IndividualPhoneView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -65,14 +76,18 @@ class IndividualPhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndividualPhonePage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .withPage(IndividualPhonePage, "answer")
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, individualPhoneRoute)
-
-        val view = application.injector.instanceOf[IndividualPhoneView]
+        val view    = application.injector.instanceOf[IndividualPhoneView]
 
         val result = route(application, request).value
 
@@ -81,24 +96,19 @@ class IndividualPhoneControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted and affinityGroup is Organisation" in {
+    "must redirect to the next page when valid data is submitted and affinityGroup is Individual" in {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      retrieveUserAnswersData(emptyUserAnswers)
 
-      val application = new GuiceApplicationBuilder()
+      val application = applicationBuilder(Some(emptyUserAnswers))
         .overrides(
-          bind[DataRequiredAction].to[DataRequiredActionImpl],
           bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, AffinityGroup.Organisation)),
-          bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
+          bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction)
         )
         .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, controllers.changeContactDetails.routes.IndividualPhoneController.onSubmit(NormalMode).url)
-            .withFormUrlEncodedBody(("value", "07 777 777"))
+        val request = FakeRequest(POST, individualPhoneRoute).withFormUrlEncodedBody(("value", "07 777 777"))
 
         val result = route(application, request).value
 
@@ -109,16 +119,16 @@ class IndividualPhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, individualPhoneRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
+        val request   = FakeRequest(POST, individualPhoneRoute).withFormUrlEncodedBody(("value", ""))
         val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[IndividualPhoneView]
+        val view      = application.injector.instanceOf[IndividualPhoneView]
 
         val result = route(application, request).value
 
@@ -129,7 +139,11 @@ class IndividualPhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, individualPhoneRoute)
@@ -137,23 +151,25 @@ class IndividualPhoneControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, individualPhoneRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+        val request = FakeRequest(POST, individualPhoneRoute).withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

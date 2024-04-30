@@ -28,10 +28,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{ChangeIndividualContactDetailsHelper, CountryListFactory}
-import views.html.ThereIsAProblemView
+import utils.ChangeIndividualContactDetailsHelper
 import viewmodels.govuk.summarylist._
-
+import views.html.ThereIsAProblemView
 import views.html.changeContactDetails.ChangeIndividualContactDetailsView
 
 import javax.inject.Inject
@@ -42,7 +41,6 @@ class ChangeIndividualContactDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   frontendAppConfig: FrontendAppConfig,
   standardActionSets: StandardActionSets,
-  countryFactory: CountryListFactory,
   subscriptionService: SubscriptionService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,

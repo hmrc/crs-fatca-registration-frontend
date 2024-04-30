@@ -16,39 +16,55 @@
 
 package controllers.changeContactDetails
 
-import base.SpecBase
+import base.{SpecBase, TestValues}
+import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.routes
 import forms.changeContactDetails.IndividualHavePhoneFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.when
 import org.scalacheck.Arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import pages.changeContactDetails.IndividualHavePhonePage
+import pages.changeContactDetails._
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.IndividualHavePhoneView
 
 import scala.concurrent.Future
 
-class IndividualHavePhoneControllerSpec extends SpecBase with MockitoSugar {
+class IndividualHavePhoneControllerSpec extends SpecBase with TestValues with MockitoSugar {
 
   override def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new IndividualHavePhoneFormProvider()
   val form         = formProvider()
 
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
+
   lazy val individualHavePhoneRoute = controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(NormalMode).url
 
+  val userAnswers = emptyUserAnswers
+    .withPage(IndividualEmailPage, TestEmail)
+    .withPage(IndividualHavePhonePage, true)
+    .withPage(IndividualPhonePage, TestMobilePhoneNumber)
+
   "IndividualHavePhone Controller" - {
+    when(mockSubscriptionIdRetrievalAction.apply(Set(AffinityGroup.Individual)))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {
+      val userAnswers = emptyUserAnswers
+        .withPage(IndividualEmailPage, TestEmail)
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, individualHavePhoneRoute)
@@ -63,10 +79,16 @@ class IndividualHavePhoneControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+      val userAnswers = emptyUserAnswers
+        .withPage(IndividualEmailPage, TestEmail)
+        .withPage(IndividualHavePhonePage, true)
+        .withPage(IndividualPhonePage, TestMobilePhoneNumber)
 
-      val userAnswers = UserAnswers(userAnswersId).set(IndividualHavePhonePage, true).success.value
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, individualHavePhoneRoute)
@@ -86,14 +108,15 @@ class IndividualHavePhoneControllerSpec extends SpecBase with MockitoSugar {
         booleanAnswer =>
           val booleanAnswerAsString = booleanAnswer.toString
 
+          when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-          val userAnswers = UserAnswers(userAnswersId).set(IndividualHavePhonePage, true).success.value
           val application =
             applicationBuilder(userAnswers = Some(userAnswers))
               .overrides(
                 bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
               )
+              .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
               .build()
 
           running(application) {
@@ -111,7 +134,9 @@ class IndividualHavePhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request =
@@ -131,7 +156,11 @@ class IndividualHavePhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, individualHavePhoneRoute)
@@ -145,7 +174,11 @@ class IndividualHavePhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      when(mockSessionRepository.get(any())).thenReturn(Future.successful(None))
+
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request =

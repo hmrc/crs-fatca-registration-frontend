@@ -47,7 +47,7 @@ class IndividualHavePhoneController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForIndividual() {
     implicit request =>
       val preparedForm = request.userAnswers.get(IndividualHavePhonePage) match {
         case None        => form
@@ -57,7 +57,7 @@ class IndividualHavePhoneController @Inject() (
       Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForIndividual().async {
     implicit request =>
       form
         .bindFromRequest()

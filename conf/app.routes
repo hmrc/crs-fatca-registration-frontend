@@ -228,8 +228,6 @@ POST       /register/without-id/change-where-do-you-live              controller
 
 GET        /register/confirm-registration                             controllers.RegistrationConfirmationController.onPageLoad()
 
-GET        /individualChangeContactDetails                       controllers.changeContactDetails.IndividualChangeContactDetailsController.onPageLoad()
-
 GET        /change-contact/individual/email                        controllers.changeContactDetails.IndividualEmailController.onPageLoad(mode: Mode = NormalMode)
 POST       /change-contact/individual/email                        controllers.changeContactDetails.IndividualEmailController.onSubmit(mode: Mode = NormalMode)
 GET        /change-contact/individual/change-email                  controllers.changeContactDetails.IndividualEmailController.onPageLoad(mode: Mode = CheckMode)

@@ -33,7 +33,7 @@ class Navigator @Inject() () extends Logging {
   private val normalRoutes: Page => UserAnswers => Call = {
     case IndividualEmailPage     => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(NormalMode)
     case IndividualHavePhonePage => _ => controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(NormalMode)
-    case IndividualPhonePage     => _ => controllers.changeContactDetails.routes.IndividualChangeContactDetailsController.onPageLoad()
+    case IndividualPhonePage     => _ => controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
     case IsThisYourBusinessPage  => isThisYourBusiness(NormalMode)
     case ReporterTypePage        => whatAreYouReportingAs(NormalMode)
     case RegisteredAddressInUKPage =>
