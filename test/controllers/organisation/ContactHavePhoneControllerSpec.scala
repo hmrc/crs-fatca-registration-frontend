@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.ContactHavePhoneFormProvider
 import generators.Generators
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -43,8 +43,6 @@ class ContactHavePhoneControllerSpec extends SpecBase with MockitoSugar with Gen
   private val contactName = "test name"
 
   private lazy val contactHavePhoneRoute = controllers.organisation.routes.ContactHavePhoneController.onPageLoad(NormalMode).url
-
-  private lazy val contactHavePhoneRouteCheckMode = controllers.organisation.routes.ContactHavePhoneController.onPageLoad(CheckMode).url
 
   "ContactHavePhone Controller" - {
 
@@ -135,30 +133,6 @@ class ContactHavePhoneControllerSpec extends SpecBase with MockitoSugar with Gen
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-          }
-      }
-    }
-
-    "must redirect to CheckYourAnswersPage when valid data is submitted in CheckMode" in {
-
-      forAll(Arbitrary.arbitrary[Boolean]) {
-        booleanAnswer =>
-          val booleanAnswerAsString = booleanAnswer.toString
-
-          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-          val userAnswers = UserAnswers(userAnswersId).set(ContactNamePage, contactName).success.value
-          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-          running(application) {
-            val request =
-              FakeRequest(POST, contactHavePhoneRouteCheckMode)
-                .withFormUrlEncodedBody(("value", booleanAnswerAsString))
-
-            val result = route(application, request).value
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad.url
           }
       }
     }

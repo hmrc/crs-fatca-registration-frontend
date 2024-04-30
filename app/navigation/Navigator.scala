@@ -232,6 +232,33 @@ class Navigator @Inject() () extends Logging {
           IndContactEmailPage,
           controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
         )
+    case IndContactHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          IndContactHavePhonePage,
+          controllers.individual.routes.IndContactPhoneController.onPageLoad(CheckMode),
+          controllers.routes.CheckYourAnswersController.onPageLoad()
+        )
+    case IndContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
+    case ContactHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          ContactHavePhonePage,
+          controllers.organisation.routes.ContactPhoneController.onPageLoad(CheckMode),
+          controllers.routes.CheckYourAnswersController.onPageLoad()
+        )
+    case ContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
+    case SecondContactHavePhonePage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          SecondContactHavePhonePage,
+          controllers.organisation.routes.SecondContactPhoneController.onPageLoad(CheckMode),
+          controllers.routes.CheckYourAnswersController.onPageLoad()
+        )
+    case SecondContactPhonePage            => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
     case NonUKBusinessAddressWithoutIDPage => _ => routes.CheckYourAnswersController.onPageLoad()
     case OrganisationContactNamePage       => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
     case OrganisationContactEmailPage      => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
