@@ -33,15 +33,20 @@ class CountryListFactorySpec extends SpecBase {
   private val ukCountryCodes = Set("GB", "UK", "GG", "JE", "IM")
 
   "Factory  must " - {
-    "return option of country sequence when given a valid json file" in {
+    "return countries ordered by description when given a valid json file" in {
 
       val conf: FrontendAppConfig = mock[FrontendAppConfig]
       val env                     = mock[Environment]
 
       val countries = Json.arr(
-        Json.obj("state" -> "valid", "code" -> "AB", "description" -> "Country_1"),
-        Json.obj("state" -> "valid", "code" -> "AB", "description" -> "Country_1", "alternativeName" -> "Country_1_2"),
-        Json.obj("state" -> "valid", "code" -> "BC", "description" -> "Country_2")
+        Json.obj("state" -> "valid", "code" -> "XX", "description" -> "US Minor Outlying Islands"),
+        Json.obj("state" -> "valid", "code" -> "XX", "description" -> "Uruguay"),
+        Json.obj("state" -> "valid", "code" -> "XX", "description" -> "Andorra"),
+        Json.obj("state" -> "valid", "code" -> "XX", "description" -> "United Arab Emirates"),
+        Json.obj("state" -> "valid", "code" -> "XX", "description" -> "Åland Islands"),
+        Json.obj("state" -> "valid", "code" -> "XX", "description" -> "Bonaire, Saint Eustatius and Saba"),
+        Json.obj("state" -> "valid", "code" -> "XX", "description" -> "Zimbabwe"),
+        Json.obj("state" -> "valid", "code" -> "XX", "description" -> "Yemen")
       )
 
       when(conf.countryCodeJson).thenReturn("countries.json")
@@ -51,12 +56,15 @@ class CountryListFactorySpec extends SpecBase {
 
       val factory = sut(env, conf)
 
-      factory.countryList mustBe Some(
-        Seq(
-          Country("valid", "AB", "Country_1", Some("Country_1")),
-          Country("valid", "AB", "Country_1", Some("Country_1_2")),
-          Country("valid", "BC", "Country_2", Some("Country_2"))
-        )
+      factory.countryList.value must contain theSameElementsInOrderAs Seq(
+        Country("valid", "XX", "Andorra", Some("Andorra")),
+        Country("valid", "XX", "Bonaire, Saint Eustatius and Saba", Some("Bonaire, Saint Eustatius and Saba")),
+        Country("valid", "XX", "United Arab Emirates", Some("United Arab Emirates")),
+        Country("valid", "XX", "Uruguay", Some("Uruguay")),
+        Country("valid", "XX", "US Minor Outlying Islands", Some("US Minor Outlying Islands")),
+        Country("valid", "XX", "Yemen", Some("Yemen")),
+        Country("valid", "XX", "Zimbabwe", Some("Zimbabwe")),
+        Country("valid", "XX", "Åland Islands", Some("Åland Islands"))
       )
     }
 
@@ -151,7 +159,7 @@ class CountryListFactorySpec extends SpecBase {
       )
 
       factory.countrySelectList(Map.empty, countries) must contain theSameElementsAs Seq(
-        SelectItem(None, "&nbsp"),
+        SelectItem(None, ""),
         SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
         SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = false),
         SelectItem(value = Some("Country_2"), text = "Country_2", selected = false)
@@ -168,7 +176,7 @@ class CountryListFactorySpec extends SpecBase {
       val selectedCountry = Map("country" -> "Country_2")
 
       factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
-        SelectItem(value = None, text = "&nbsp"),
+        SelectItem(value = None, text = ""),
         SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
         SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = false),
         SelectItem(value = Some("Country_2"), text = "Country_2", selected = true)
@@ -185,7 +193,7 @@ class CountryListFactorySpec extends SpecBase {
       val selectedCountry = Map("country" -> "Country_1_2")
 
       factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
-        SelectItem(value = None, text = "&nbsp"),
+        SelectItem(value = None, text = ""),
         SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
         SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = true),
         SelectItem(value = Some("Country_2"), text = "Country_2", selected = false)
