@@ -239,7 +239,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
               .withPage(OrganisationContactPhonePage, phoneNumber)
               .withPage(OrganisationHaveSecondContactPage, false)
 
-            val result = service.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers)
+            val result = service.checkIfOrgContactDetailsHasChanged(subscriptionResponse, userAnswers)
 
             result mustBe Some(false)
         }
@@ -270,7 +270,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
               .withPage(OrganisationSecondContactHavePhonePage, true)
               .withPage(OrganisationSecondContactPhonePage, secondContactPhoneNumber)
 
-            val result = service.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers)
+            val result = service.checkIfOrgContactDetailsHasChanged(subscriptionResponse, userAnswers)
 
             result mustBe Some(true)
         }
@@ -304,7 +304,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
               .withPage(OrganisationSecondContactHavePhonePage, true)
               .withPage(OrganisationSecondContactPhonePage, secondContactPhoneNumber)
 
-            val result = service.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers)
+            val result = service.checkIfOrgContactDetailsHasChanged(subscriptionResponse, userAnswers)
 
             result mustBe Some(true)
         }
@@ -335,7 +335,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
               .withPage(OrganisationContactPhonePage, contactPhoneNumber)
               .withPage(OrganisationHaveSecondContactPage, false)
 
-            val result = service.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers)
+            val result = service.checkIfOrgContactDetailsHasChanged(subscriptionResponse, userAnswers)
 
             result mustBe Some(true)
         }

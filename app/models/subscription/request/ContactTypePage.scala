@@ -26,11 +26,16 @@ sealed trait ContactTypePage {
   def havePhoneNumberPage: QuestionPage[Boolean]
 }
 
-case class ChangeOrganisationPrimaryContactDetailsPages(
-  contactNamePage: QuestionPage[String],
-  contactEmailPage: QuestionPage[String],
-  contactPhoneNumberPage: QuestionPage[String],
-  havePhoneNumberPage: QuestionPage[Boolean]
+case class ChangeOrganisationPrimaryContactDetailsPages(contactNamePage: QuestionPage[String],
+                                                        contactEmailPage: QuestionPage[String],
+                                                        contactPhoneNumberPage: QuestionPage[String],
+                                                        havePhoneNumberPage: QuestionPage[Boolean]
+) extends ContactTypePage
+
+case class ChangeIndividualContactDetailsPages(contactNamePage: QuestionPage[String],
+                                               contactEmailPage: QuestionPage[String],
+                                               contactPhoneNumberPage: QuestionPage[String],
+                                               havePhoneNumberPage: QuestionPage[Boolean]
 ) extends ContactTypePage
 
 case class ChangeOrganisationSecondaryContactDetailsPages(
@@ -41,6 +46,14 @@ case class ChangeOrganisationSecondaryContactDetailsPages(
 ) extends ContactTypePage
 
 object ContactTypePage {
+
+  implicit val individualContactDetailsPages: ChangeIndividualContactDetailsPages =
+    ChangeIndividualContactDetailsPages(
+      ContactNamePage,
+      IndividualEmailPage,
+      IndividualPhonePage,
+      IndividualHavePhonePage
+    )
 
   implicit val primaryContactDetailsPages: ChangeOrganisationPrimaryContactDetailsPages =
     ChangeOrganisationPrimaryContactDetailsPages(

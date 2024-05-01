@@ -82,29 +82,71 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
   ): Future[Option[DisplaySubscriptionResponse]] =
     subscriptionConnector.readSubscription(ReadSubscriptionRequest(IdentifierType.FATCAID, subscriptionId.value))
 
-  def checkIfContactDetailsHasChanged(
+  // INDIVIDUAL
+  def checkIfIndContactDetailsHasChanged(
+    subscriptionResponseFromBackend: DisplaySubscriptionResponse,
+    userAnswers: UserAnswers
+  ): Option[Boolean] = {
+    val subscriptionDetailFromBackend = subscriptionResponseFromBackend.success
+    for {
+      primaryContactDetailsFromUserAnswers <- getIndividualContactDetailsFromUserAnswers(userAnswers, subscriptionDetailFromBackend)
+      primaryContactHasChanged = !primaryContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.primaryContact)
+    } yield primaryContactHasChanged
+  }
+
+  def populateUserAnswersFromIndSubscription(userAnswers: UserAnswers, responseDetail: DisplayResponseDetail): Option[UserAnswers] =
+    for {
+      contactSet: UserAnswers <-
+        populateUserAnswersFromIndContactInfo[ChangeIndividualContactDetailsPages](userAnswers, responseDetail.primaryContact)
+    } yield contactSet
+
+  private def populateUserAnswersFromIndContactInfo[T <: ContactTypePage](
+    userAnswers: UserAnswers,
+    contactInfo: ContactInformation
+  )(implicit contactTypePage: T): Option[UserAnswers] = {
+    val userAnswersWithContactInfoPopulated = for {
+      emailSet       <- userAnswers.set(contactTypePage.contactEmailPage, contactInfo.email)
+      phoneNumberSet <- emailSet.set(contactTypePage.contactPhoneNumberPage, contactInfo.phone.getOrElse("Not providedd"))
+      updatedAnswers <- phoneNumberSet.set(contactTypePage.havePhoneNumberPage, contactInfo.phone.exists(_.nonEmpty))
+    } yield updatedAnswers
+
+    userAnswersWithContactInfoPopulated.toOption
+  }
+
+  private def getIndividualContactDetailsFromUserAnswers(
+    userAnswers: UserAnswers,
+    subscriptionDetailFromBackend: DisplayResponseDetail
+  ): Option[ContactInformation] =
+    getContactDetailsFromUserAnswers[ChangeIndividualContactDetailsPages](
+      userAnswers,
+      subscriptionDetailFromBackend.primaryContact.contactInformation
+    )
+
+  // ORGANISATION
+
+  def checkIfOrgContactDetailsHasChanged(
     subscriptionResponseFromBackend: DisplaySubscriptionResponse,
     userAnswers: UserAnswers
   ): Option[Boolean] = {
     val subscriptionDetailFromBackend = subscriptionResponseFromBackend.success
 
     for {
-      primaryContactDetailsFromUserAnswers <- getPrimaryContactDetailsFromUserAnswers(userAnswers, subscriptionDetailFromBackend)
-      secondContactDetailsFromUserAnswers = getSecondContactDetailsFromUserAnswers(userAnswers, subscriptionDetailFromBackend)
+      primaryContactDetailsFromUserAnswers <- getOrgPrimaryContactDetailsFromUserAnswers(userAnswers, subscriptionDetailFromBackend)
+      secondContactDetailsFromUserAnswers = getOrgSecondContactDetailsFromUserAnswers(userAnswers, subscriptionDetailFromBackend)
       primaryContactHasChanged            = !primaryContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.primaryContact)
       secondContactHasChanged             = !secondContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.secondaryContact)
     } yield primaryContactHasChanged || secondContactHasChanged
   }
 
-  def populateUserAnswersFromSubscription(userAnswers: UserAnswers, responseDetail: DisplayResponseDetail): Option[UserAnswers] =
+  def populateUserAnswersFromOrgSubscription(userAnswers: UserAnswers, responseDetail: DisplayResponseDetail): Option[UserAnswers] =
     for {
-      primaryContactSet <- populateUserAnswersFromContactInfo[ChangeOrganisationPrimaryContactDetailsPages](userAnswers, responseDetail.primaryContact)
+      primaryContactSet <- populateUserAnswersFromOrgContactInfo[ChangeOrganisationPrimaryContactDetailsPages](userAnswers, responseDetail.primaryContact)
       hasSecondContact = responseDetail.secondaryContact.nonEmpty
       haveSecondContactSet <- primaryContactSet.set(OrganisationHaveSecondContactPage, hasSecondContact).toOption
       secondaryContactSet <- responseDetail.secondaryContact
         .flatMap(
           secondContact =>
-            populateUserAnswersFromContactInfo[ChangeOrganisationSecondaryContactDetailsPages](
+            populateUserAnswersFromOrgContactInfo[ChangeOrganisationSecondaryContactDetailsPages](
               haveSecondContactSet,
               secondContact
             )
@@ -112,7 +154,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
         .orElse(Option(haveSecondContactSet))
     } yield secondaryContactSet
 
-  private def populateUserAnswersFromContactInfo[T <: ContactTypePage](
+  private def populateUserAnswersFromOrgContactInfo[T <: ContactTypePage](
     userAnswers: UserAnswers,
     contactInfo: ContactInformation
   )(implicit contactTypePage: T): Option[UserAnswers] = {
@@ -127,7 +169,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
     userAnswersWithContactInfoPopulated.toOption
   }
 
-  private def getPrimaryContactDetailsFromUserAnswers(
+  private def getOrgPrimaryContactDetailsFromUserAnswers(
     userAnswers: UserAnswers,
     subscriptionDetailFromBackend: DisplayResponseDetail
   ): Option[ContactInformation] =
@@ -136,7 +178,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
       subscriptionDetailFromBackend.primaryContact.contactInformation
     )
 
-  private def getSecondContactDetailsFromUserAnswers(
+  private def getOrgSecondContactDetailsFromUserAnswers(
     userAnswers: UserAnswers,
     subscription: DisplayResponseDetail
   ): Option[ContactInformation] =

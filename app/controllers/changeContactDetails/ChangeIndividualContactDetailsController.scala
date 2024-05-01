@@ -55,7 +55,7 @@ class ChangeIndividualContactDetailsController @Inject() (
       subscriptionService.getSubscription(request.subscriptionId).flatMap {
         case Some(subscriptionResponse) =>
           if (request.userAnswers.get(ChangeContactDetailsInProgressPage).isEmpty) {
-            subscriptionService.populateUserAnswersFromSubscription(request.userAnswers, subscriptionResponse.success) match {
+            subscriptionService.populateUserAnswersFromIndSubscription(request.userAnswers, subscriptionResponse.success) match {
               case Some(userAnswers) =>
                 val response = for {
                   updatedUserAnswers <- Future.fromTry(userAnswers.set(ChangeContactDetailsInProgressPage, true))
@@ -97,7 +97,7 @@ class ChangeIndividualContactDetailsController @Inject() (
     val helper      = new ChangeIndividualContactDetailsHelper(userAnswers)
     val contactList = SummaryListViewModel(helper.changeIndividualContactDetails)
 
-    subscriptionService.checkIfContactDetailsHasChanged(subscriptionResponse, userAnswers) match {
+    subscriptionService.checkIfIndContactDetailsHasChanged(subscriptionResponse, userAnswers) match {
       case Some(hasChanges) => Future.successful(Ok(view(contactList, frontendAppConfig, hasChanges)))
       case _                => Future.successful(InternalServerError(errorView()))
     }

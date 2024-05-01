@@ -65,9 +65,9 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
 
             when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(Option(subscription)))
-            when(mockSubscriptionService.populateUserAnswersFromSubscription(any[UserAnswers](), any[DisplayResponseDetail]()))
+            when(mockSubscriptionService.populateUserAnswersFromIndSubscription(any[UserAnswers](), any[DisplayResponseDetail]()))
               .thenReturn(userAnswers)
-            when(mockSubscriptionService.checkIfContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
+            when(mockSubscriptionService.checkIfIndContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
               .thenReturn(Some(true))
             when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
             when(mockSessionRepository.set(userAnswers.value.withPage(ChangeContactDetailsInProgressPage, true)))
@@ -97,7 +97,7 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
 
             when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(Option(subscription)))
-            when(mockSubscriptionService.checkIfContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
+            when(mockSubscriptionService.checkIfIndContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
               .thenReturn(Some(true))
             when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
 
@@ -125,9 +125,9 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
 
             when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(Option(subscription)))
-            when(mockSubscriptionService.populateUserAnswersFromSubscription(any[UserAnswers](), any[DisplayResponseDetail]()))
+            when(mockSubscriptionService.populateUserAnswersFromIndSubscription(any[UserAnswers](), any[DisplayResponseDetail]()))
               .thenReturn(userAnswers)
-            when(mockSubscriptionService.checkIfContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
+            when(mockSubscriptionService.checkIfIndContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
               .thenReturn(Some(false))
             when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
 
