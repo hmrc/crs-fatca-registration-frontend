@@ -175,7 +175,7 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
       "redirect to confirmation page on updating ContactDetails" in {
         val userAnswers = Some(emptyUserAnswers)
 
-        when(mockSubscriptionService.updateContactDetails(mEq(subscriptionId), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
+        when(mockSubscriptionService.updateIndContactDetails(mEq(subscriptionId), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(true))
         when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
 
@@ -197,7 +197,7 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
       "return 'technical difficulties' page on failing to update ContactDetails" in {
         val userAnswers = Some(emptyUserAnswers)
 
-        when(mockSubscriptionService.updateContactDetails(any[SubscriptionID](), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
+        when(mockSubscriptionService.updateIndContactDetails(any[SubscriptionID](), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(false))
         when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
 

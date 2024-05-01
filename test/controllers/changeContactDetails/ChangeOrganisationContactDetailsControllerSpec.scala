@@ -175,7 +175,7 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
       "redirect to confirmation page on updating ContactDetails" in {
         val userAnswers = Some(emptyUserAnswers)
 
-        when(mockSubscriptionService.updateContactDetails(mEq(subscriptionId), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
+        when(mockSubscriptionService.updateOrgContactDetails(mEq(subscriptionId), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(true))
         when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
 
@@ -197,7 +197,7 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
       "return 'technical difficulties' page on failing to update ContactDetails" in {
         val userAnswers = Some(emptyUserAnswers)
 
-        when(mockSubscriptionService.updateContactDetails(any[SubscriptionID](), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
+        when(mockSubscriptionService.updateOrgContactDetails(any[SubscriptionID](), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(false))
         when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
 

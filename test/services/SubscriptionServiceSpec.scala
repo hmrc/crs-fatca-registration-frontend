@@ -184,7 +184,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
             when(mockSubscriptionConnector.updateSubscription(any())(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(true))
 
-            service.updateContactDetails(subscriptionId, userAnswers).futureValue mustBe true
+            service.updateOrgContactDetails(subscriptionId, userAnswers).futureValue mustBe true
         }
 
       }
@@ -207,7 +207,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
             when(mockSubscriptionConnector.updateSubscription(any())(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(false))
 
-            service.updateContactDetails(subscriptionId, userAnswers).futureValue mustBe false
+            service.updateOrgContactDetails(subscriptionId, userAnswers).futureValue mustBe false
         }
       }
 
@@ -215,7 +215,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
         when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(None))
 
-        service.updateContactDetails(subscriptionId, emptyUserAnswers).futureValue mustBe false
+        service.updateOrgContactDetails(subscriptionId, emptyUserAnswers).futureValue mustBe false
       }
     }
 

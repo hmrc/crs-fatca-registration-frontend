@@ -16,8 +16,8 @@
 
 package models.subscription.request
 
-import models.{IdentifierType, UserAnswers}
 import models.subscription.response.DisplaySubscriptionResponse
+import models.{IdentifierType, UserAnswers}
 import pages.changeContactDetails.{OrganisationHaveSecondContactPage, OrganisationSecondContactNamePage}
 import play.api.Logging
 import play.api.libs.json.{Json, Writes}
@@ -35,10 +35,11 @@ case class UpdateSubscriptionRequest(
 object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
   implicit lazy val writes: Writes[UpdateSubscriptionRequest] = Json.writes[UpdateSubscriptionRequest]
 
-  def convertToRequest(displaySubscriptionResponse: DisplaySubscriptionResponse, userAnswers: UserAnswers): Option[UpdateSubscriptionRequest] = {
+  //ORGANISATION
+  def convertToRequestOrg(displaySubscriptionResponse: DisplaySubscriptionResponse, userAnswers: UserAnswers): Option[UpdateSubscriptionRequest] = {
     val response = displaySubscriptionResponse.success
 
-    val primaryContact = getContactInformation[ChangeOrganisationPrimaryContactDetailsPages](
+    val primaryContact = getOrgContactInformation[ChangeOrganisationPrimaryContactDetailsPages](
       response.primaryContact.contactInformation,
       userAnswers
     )
@@ -49,7 +50,7 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
       case (Some(true), Some(contactDetails), Some(secondContactName)) =>
         contactDetails.contactInformation match {
           case _: OrganisationDetails =>
-            getContactInformation[ChangeOrganisationSecondaryContactDetailsPages](
+            getOrgContactInformation[ChangeOrganisationSecondaryContactDetailsPages](
               OrganisationDetails(secondContactName),
               userAnswers
             )
@@ -71,11 +72,10 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
     }
   }
 
-  def getContactInformation[T <: ContactTypePage](
-    contactType: ContactType,
-    userAnswers: UserAnswers
-  )(implicit contactTypePage: T): Option[ContactInformation] = {
-
+  def getOrgContactInformation[T <: ContactTypePage](
+                                                      contactType: ContactType,
+                                                      userAnswers: UserAnswers
+                                                    )(implicit contactTypePage: T): Option[ContactInformation] = {
     val contactTypeInfo = (contactType, userAnswers.get(contactTypePage.contactNamePage)) match {
       case (_: OrganisationDetails, Some(organisationContactName)) =>
         OrganisationDetails(organisationContactName)
@@ -86,12 +86,47 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
     }
 
     for {
-      email           <- userAnswers.get(contactTypePage.contactEmailPage)
+      email <- userAnswers.get(contactTypePage.contactEmailPage)
       havePhoneNumber <- userAnswers.get(contactTypePage.havePhoneNumberPage)
     } yield {
       val phoneNumber = if (havePhoneNumber) userAnswers.get(contactTypePage.contactPhoneNumberPage) else None
       ContactInformation(contactTypeInfo, email, phoneNumber)
     }
   }
+
+  //INDIVIDUAL
+  def convertToRequestInd(displaySubscriptionResponse: DisplaySubscriptionResponse, userAnswers: UserAnswers): Option[UpdateSubscriptionRequest] = {
+    val response = displaySubscriptionResponse.success
+
+    val individualContact = getIndContactInformation[ChangeIndividualContactDetailsPages](
+      response.primaryContact.contactInformation,
+      userAnswers
+    )
+
+    individualContact map {
+      contact =>
+        UpdateSubscriptionRequest(
+          IdentifierType.FATCAID,
+          displaySubscriptionResponse.subscriptionId.value,
+          response.tradingName,
+          response.gbUser,
+          contact,
+          None
+        )
+    }
+  }
+
+
+  def getIndContactInformation[T <: ContactTypePage](
+    contactType: ContactType,
+    userAnswers: UserAnswers
+  )(implicit contactTypePage: T): Option[ContactInformation] =
+    for {
+      email           <- userAnswers.get(contactTypePage.contactEmailPage)
+      havePhoneNumber <- userAnswers.get(contactTypePage.havePhoneNumberPage)
+    } yield {
+      val phoneNumber = if (havePhoneNumber) userAnswers.get(contactTypePage.contactPhoneNumberPage) else None
+      ContactInformation(contactType, email, phoneNumber)
+    }
 
 }

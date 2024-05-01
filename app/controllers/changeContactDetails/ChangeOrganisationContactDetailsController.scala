@@ -78,7 +78,7 @@ class ChangeOrganisationContactDetailsController @Inject() (
 
   def onSubmit: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRetrievalForOrgOrAgent().async {
     implicit request =>
-      subscriptionService.updateContactDetails(request.subscriptionId, request.userAnswers) map {
+      subscriptionService.updateOrgContactDetails(request.subscriptionId, request.userAnswers) map {
         case true =>
           request.userAnswers.remove(ChangeContactDetailsInProgressPage) match {
             case Success(_) =>

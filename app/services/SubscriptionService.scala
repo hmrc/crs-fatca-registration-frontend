@@ -36,13 +36,30 @@ import scala.util.Try
 
 class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConnector) extends Logging {
 
-  def updateContactDetails(
+  def updateOrgContactDetails(
     subscriptionId: SubscriptionID,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
     getSubscription(subscriptionId).flatMap {
       case Some(displaySubscriptionResponse) =>
-        UpdateSubscriptionRequest.convertToRequest(displaySubscriptionResponse, userAnswers) match {
+        UpdateSubscriptionRequest.convertToRequestOrg(displaySubscriptionResponse, userAnswers) match {
+          case Some(updateSubscriptionRequest) => subscriptionConnector.updateSubscription(updateSubscriptionRequest)
+          case _ =>
+            logger.warn("updateContactDetails: failed to convert userAnswers to RequestDetailForUpdate")
+            Future.successful(false)
+        }
+      case _ =>
+        logger.warn("updateContactDetails: readSubscription call failed to fetch data")
+        Future.successful(false)
+    }
+
+  def updateIndContactDetails(
+    subscriptionId: SubscriptionID,
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+    getSubscription(subscriptionId).flatMap {
+      case Some(displaySubscriptionResponse) =>
+        UpdateSubscriptionRequest.convertToRequestInd(displaySubscriptionResponse, userAnswers) match {
           case Some(updateSubscriptionRequest) => subscriptionConnector.updateSubscription(updateSubscriptionRequest)
           case _ =>
             logger.warn("updateContactDetails: failed to convert userAnswers to RequestDetailForUpdate")

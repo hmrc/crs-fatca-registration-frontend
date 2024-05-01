@@ -77,7 +77,7 @@ class ChangeIndividualContactDetailsController @Inject() (
 
   def onSubmit: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRetrievalForIndividual().async {
     implicit request =>
-      subscriptionService.updateContactDetails(request.subscriptionId, request.userAnswers) map {
+      subscriptionService.updateIndContactDetails(request.subscriptionId, request.userAnswers) map {
         case true =>
           request.userAnswers.remove(ChangeContactDetailsInProgressPage) match {
             case Success(_) =>
