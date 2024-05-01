@@ -35,7 +35,7 @@ case class UpdateSubscriptionRequest(
 object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
   implicit lazy val writes: Writes[UpdateSubscriptionRequest] = Json.writes[UpdateSubscriptionRequest]
 
-  //ORGANISATION
+  // ORGANISATION
   def convertToRequestOrg(displaySubscriptionResponse: DisplaySubscriptionResponse, userAnswers: UserAnswers): Option[UpdateSubscriptionRequest] = {
     val response = displaySubscriptionResponse.success
 
@@ -73,9 +73,9 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
   }
 
   def getOrgContactInformation[T <: ContactTypePage](
-                                                      contactType: ContactType,
-                                                      userAnswers: UserAnswers
-                                                    )(implicit contactTypePage: T): Option[ContactInformation] = {
+    contactType: ContactType,
+    userAnswers: UserAnswers
+  )(implicit contactTypePage: T): Option[ContactInformation] = {
     val contactTypeInfo = (contactType, userAnswers.get(contactTypePage.contactNamePage)) match {
       case (_: OrganisationDetails, Some(organisationContactName)) =>
         OrganisationDetails(organisationContactName)
@@ -86,7 +86,7 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
     }
 
     for {
-      email <- userAnswers.get(contactTypePage.contactEmailPage)
+      email           <- userAnswers.get(contactTypePage.contactEmailPage)
       havePhoneNumber <- userAnswers.get(contactTypePage.havePhoneNumberPage)
     } yield {
       val phoneNumber = if (havePhoneNumber) userAnswers.get(contactTypePage.contactPhoneNumberPage) else None
@@ -94,7 +94,7 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
     }
   }
 
-  //INDIVIDUAL
+  // INDIVIDUAL
   def convertToRequestInd(displaySubscriptionResponse: DisplaySubscriptionResponse, userAnswers: UserAnswers): Option[UpdateSubscriptionRequest] = {
     val response = displaySubscriptionResponse.success
 
@@ -115,7 +115,6 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
         )
     }
   }
-
 
   def getIndContactInformation[T <: ContactTypePage](
     contactType: ContactType,
