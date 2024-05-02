@@ -39,7 +39,7 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
           country => if (country.alternativeName.isEmpty) country.copy(alternativeName = Option(country.description)) else country
         )
         .sortWith(
-          (country, country2) => country.description < country2.description
+          (country, country2) => country.description.toLowerCase < country2.description.toLowerCase
         )
     }
 
@@ -79,7 +79,7 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
         alternativeName,
         value.get("country") == country.alternativeName
       )
-    SelectItem(None, "&nbsp") +: countryJsonList
+    SelectItem(None, "") +: countryJsonList
   }
 
 }
