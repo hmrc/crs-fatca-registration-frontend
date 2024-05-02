@@ -534,7 +534,7 @@ individualChangeContactDetails.heading = individualChangeContactDetails
 individualEmail.title = What is your email address?
 individualEmail.heading = What is your email address?
 individualEmail.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
-individualEmail.checkYourAnswersLabel = Email address
+individualEmail.checkYourAnswersLabel = Change email address
 individualEmail.error.required = Enter your email address
 individualEmail.error.length = The email address must be 132 characters or less
 individualEmail.error.invalid = Enter an email address in the right format, like yourname@example.com
@@ -548,7 +548,7 @@ individualHavePhone.error.required = Select yes if we can contact you by telepho
 
 individualPhone.title = What is your telephone number?
 individualPhone.heading = What is your telephone number?
-individualPhone.checkYourAnswersLabel = Telephone number
+individualPhone.checkYourAnswersLabel = Change telephone number
 individualPhone.hint = For international numbers, include the country code.
 individualPhone.error.required = Enter your telephone number
 individualPhone.error.length = The telephone number must be 24 characters or less
