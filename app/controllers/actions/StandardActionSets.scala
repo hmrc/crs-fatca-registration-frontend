@@ -62,7 +62,13 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
   def subscriptionIdWithChangeDetailsRetrievalForOrgOrAgent(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
     retrieveSubscriptionId(nonIndividualAffinityGroups) andThen changeDetailsDataRetrieval()
 
+  def subscriptionIdWithChangeDetailsRetrievalForIndividual(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
+    retrieveSubscriptionId(Set(AffinityGroup.Individual)) andThen changeDetailsDataRetrieval()
+
   def subscriptionIdWithChangeDetailsRequiredForOrgOrAgent(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
     retrieveSubscriptionId(nonIndividualAffinityGroups) andThen changeDetailsDataRequired
+
+  def subscriptionIdWithChangeDetailsRequiredForIndividual(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
+    retrieveSubscriptionId(Set(AffinityGroup.Individual)) andThen changeDetailsDataRequired
 
 }

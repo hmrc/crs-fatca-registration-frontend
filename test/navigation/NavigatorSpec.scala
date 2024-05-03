@@ -1191,6 +1191,33 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .nextPage(OrganisationSecondContactPhonePage, CheckMode, emptyUserAnswers)
           .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
       }
+
+      "while changing Individual contact's details" - {
+        "must go from IndividualEmailPage to IndividualHavePhonePage" in {
+          navigator
+            .nextPage(IndividualEmailPage, CheckMode, emptyUserAnswers)
+            .mustBe(controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(CheckMode))
+        }
+
+        "must go from IndividualHavePhonePage to ChangeIndividualContactDetailsPage when user answers no" in {
+          navigator
+            .nextPage(IndividualHavePhonePage, CheckMode, emptyUserAnswers.withPage(IndividualHavePhonePage, false))
+            .mustBe(controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad())
+        }
+
+        "must go from IndividualHavePhonePage to IndividualPhonePage when user answers yes" in {
+          navigator
+            .nextPage(IndividualHavePhonePage, CheckMode, emptyUserAnswers.withPage(IndividualHavePhonePage, true))
+            .mustBe(controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(CheckMode))
+        }
+
+        "must go from IndividualPhonePage to ChangeIndividualContactDetailsPage" in {
+          navigator
+            .nextPage(IndividualPhonePage, CheckMode, emptyUserAnswers)
+            .mustBe(controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad())
+        }
+      }
+
     }
   }
 

@@ -28,35 +28,34 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{ChangeOrganisationContactDetailsHelper, CountryListFactory}
+import utils.ChangeIndividualContactDetailsHelper
 import viewmodels.govuk.summarylist._
 import views.html.ThereIsAProblemView
-import views.html.changeContactDetails.ChangeOrganisationContactDetailsView
+import views.html.changeContactDetails.ChangeIndividualContactDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class ChangeOrganisationContactDetailsController @Inject() (
+class ChangeIndividualContactDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   frontendAppConfig: FrontendAppConfig,
   standardActionSets: StandardActionSets,
-  countryFactory: CountryListFactory,
   subscriptionService: SubscriptionService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
-  view: ChangeOrganisationContactDetailsView,
+  view: ChangeIndividualContactDetailsView,
   errorView: ThereIsAProblemView
 )(implicit executionContext: ExecutionContext) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRetrievalForOrgOrAgent().async {
+  def onPageLoad: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRetrievalForIndividual().async {
     implicit request =>
       subscriptionService.getSubscription(request.subscriptionId).flatMap {
         case Some(subscriptionResponse) =>
           if (request.userAnswers.get(ChangeContactDetailsInProgressPage).isEmpty) {
-            subscriptionService.populateUserAnswersFromOrgSubscription(request.userAnswers, subscriptionResponse.success) match {
+            subscriptionService.populateUserAnswersFromIndSubscription(request.userAnswers, subscriptionResponse.success) match {
               case Some(userAnswers) =>
                 val response = for {
                   updatedUserAnswers <- Future.fromTry(userAnswers.set(ChangeContactDetailsInProgressPage, true))
@@ -76,9 +75,9 @@ class ChangeOrganisationContactDetailsController @Inject() (
       }
   }
 
-  def onSubmit: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRetrievalForOrgOrAgent().async {
+  def onSubmit: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRetrievalForIndividual().async {
     implicit request =>
-      subscriptionService.updateOrgContactDetails(request.subscriptionId, request.userAnswers) map {
+      subscriptionService.updateIndContactDetails(request.subscriptionId, request.userAnswers) map {
         case true =>
           request.userAnswers.remove(ChangeContactDetailsInProgressPage) match {
             case Success(_) =>
@@ -95,12 +94,11 @@ class ChangeOrganisationContactDetailsController @Inject() (
     userAnswers: UserAnswers,
     subscriptionResponse: DisplaySubscriptionResponse
   )(implicit request: DataRequestWithUserAnswers[AnyContent]): Future[Result] = {
-    val helper               = new ChangeOrganisationContactDetailsHelper(userAnswers, countryFactory)
-    val primaryContactList   = SummaryListViewModel(helper.changeOrganisationPrimaryContactDetails)
-    val secondaryContactList = SummaryListViewModel(helper.changeOrganisationSecondaryContactDetails)
+    val helper      = new ChangeIndividualContactDetailsHelper(userAnswers)
+    val contactList = SummaryListViewModel(helper.changeIndividualContactDetails)
 
-    subscriptionService.checkIfOrgContactDetailsHasChanged(subscriptionResponse, userAnswers) match {
-      case Some(hasChanges) => Future.successful(Ok(view(primaryContactList, secondaryContactList, frontendAppConfig, hasChanges)))
+    subscriptionService.checkIfIndContactDetailsHasChanged(subscriptionResponse, userAnswers) match {
+      case Some(hasChanges) => Future.successful(Ok(view(contactList, frontendAppConfig, hasChanges)))
       case _                => Future.successful(InternalServerError(errorView()))
     }
   }
