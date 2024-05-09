@@ -42,6 +42,7 @@
 
         @govukSummaryList(contactDetails)
 
+    <div class="govuk-!-margin-bottom-2">
         @if(hasChanges) {
             <h2 class="govuk-heading-m govuk-!-padding-top-5">@messages("changeContactDetails.nowSendContactDetails")</h2>
 
@@ -49,6 +50,6 @@
             @govukButton(ButtonViewModel(Text(messages("changeContactDetails.confirmAndSend"))).withAttribute( "id" -> "submit"))
         }
     }
-
+    </div>
     @homepageLink
 }
