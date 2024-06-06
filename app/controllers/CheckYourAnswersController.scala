@@ -58,7 +58,7 @@ class CheckYourAnswersController @Inject() (
   def onPageLoad(): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) {
     implicit request =>
       val viewModel: Seq[Section] =
-        CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory, request.affinityGroup)
+        CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)
       Ok(view(viewModel))
   }
 

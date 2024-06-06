@@ -44,7 +44,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Ta
 
   "HaveSecondContact Controller" - {
 
-    forAll(Table("nonIndividualAffinityGroup", Seq(AffinityGroup.Organisation, AffinityGroup.Agent): _*)) {
+    forAll(Table("affinityGroup", Seq(AffinityGroup.Individual, AffinityGroup.Organisation, AffinityGroup.Agent): _*)) {
       affinityGroup =>
         s"must return OK and the correct view for a GET when affinity group is $affinityGroup" in {
 
@@ -62,21 +62,6 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Ta
             contentAsString(result) mustEqual view(form, contactName, NormalMode)(request, messages(application)).toString
           }
         }
-    }
-
-    "must redirect to CheckYourAnswersPage for a GET when affinity group is Individual" in {
-
-      val userAnswers = emptyUserAnswers.withPage(ContactNamePage, contactName)
-      val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Individual).build()
-
-      running(application) {
-        val request = FakeRequest(GET, haveSecondContactRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.CheckYourAnswersController.onPageLoad().url
-      }
     }
 
     "must redirect to the next page when valid data is submitted" in {

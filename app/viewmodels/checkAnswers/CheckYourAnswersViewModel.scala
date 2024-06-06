@@ -20,14 +20,13 @@ import models.{ReporterType, UserAnswers}
 import models.subscription.request.ContactInformation.isRegisteringAsBusiness
 import pages.{AutoMatchedUTRPage, IsThisYourBusinessPage, ReporterTypePage}
 import play.api.i18n.Messages
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import utils.{CheckYourAnswersHelper, CountryListFactory}
 import viewmodels.Section
 
 object CheckYourAnswersViewModel {
 
-  def buildPages(userAnswers: UserAnswers, countryFactory: CountryListFactory, affinityGroup: AffinityGroup)(implicit
+  def buildPages(userAnswers: UserAnswers, countryFactory: CountryListFactory)(implicit
     messages: Messages
   ): Seq[Section] = {
 
@@ -46,7 +45,7 @@ object CheckYourAnswersViewModel {
 
     val regDetails     = messages(s"checkYourAnswers.$header.h2")
     val contactHeading = messages(s"checkYourAnswers.$contact.h2")
-    val secondContact = if (isBusiness && affinityGroup != AffinityGroup.Individual) {
+    val secondContact = if (isBusiness) {
       Seq(Section(messages("checkYourAnswers.secondContact.h2"), buildSecondContact(helper)))
     } else {
       Nil

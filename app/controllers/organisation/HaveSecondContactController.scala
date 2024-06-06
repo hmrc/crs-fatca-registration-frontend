@@ -26,7 +26,6 @@ import pages.HaveSecondContactPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.ContactHelper
 import views.html.organisation.HaveSecondContactView
@@ -55,11 +54,7 @@ class HaveSecondContactController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      if (request.affinityGroup == AffinityGroup.Individual) {
-        Redirect(controllers.routes.CheckYourAnswersController.onPageLoad())
-      } else {
-        Ok(view(preparedForm, getFirstContactName(request.userAnswers), mode))
-      }
+      Ok(view(preparedForm, getFirstContactName(request.userAnswers), mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
