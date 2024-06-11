@@ -916,6 +916,41 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 
+      "must go from HaveSecondContactPage to SecondContactNamePage when user answers yes" in {
+
+        val userAnswers = emptyUserAnswers.withPage(HaveSecondContactPage, true)
+        navigator.nextPage(HaveSecondContactPage, CheckMode, userAnswers) mustBe SecondContactNameController.onPageLoad(CheckMode)
+      }
+
+      "must go from HaveSecondContactPage to CheckYourAnswersPage when user answers no" in {
+
+        val userAnswers = emptyUserAnswers.withPage(HaveSecondContactPage, false)
+        navigator.nextPage(HaveSecondContactPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from SecondContactNamePage to SecondContactEmailPage" in {
+
+        val userAnswers = emptyUserAnswers.withPage(SecondContactNamePage, "value")
+        navigator.nextPage(SecondContactNamePage, CheckMode, userAnswers) mustBe SecondContactEmailController.onPageLoad(CheckMode)
+      }
+
+      "must go from SecondContactEmailPage to SecondContactHavePhonePage" in {
+
+        navigator.nextPage(SecondContactEmailPage, CheckMode, emptyUserAnswers) mustBe SecondContactHavePhoneController.onPageLoad(CheckMode)
+      }
+
+      "must go from SecondContactHavePhonePage to SecondContactPhonePage when user answers yes" in {
+
+        val userAnswers = emptyUserAnswers.withPage(SecondContactHavePhonePage, true)
+        navigator.nextPage(SecondContactHavePhonePage, CheckMode, userAnswers) mustBe SecondContactPhoneController.onPageLoad(CheckMode)
+      }
+
+      "must go from SecondContactHavePhonePage to CheckYourAnswersPage when user answers no" in {
+
+        val userAnswers = emptyUserAnswers.withPage(SecondContactHavePhonePage, false)
+        navigator.nextPage(SecondContactHavePhonePage, CheckMode, userAnswers) mustBe controllers.routes.CheckYourAnswersController.onPageLoad()
+      }
+
       "must go from SecondContactPhonePage to CheckYourAnswersPage" in {
         navigator
           .nextPage(SecondContactPhonePage, CheckMode, emptyUserAnswers)
