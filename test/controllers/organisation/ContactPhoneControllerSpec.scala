@@ -23,6 +23,7 @@ import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{ContactNamePage, ContactPhonePage}
 import play.api.inject.bind
@@ -34,7 +35,7 @@ import views.html.organisation.ContactPhoneView
 
 import scala.concurrent.Future
 
-class ContactPhoneControllerSpec extends SpecBase with MockitoSugar {
+class ContactPhoneControllerSpec extends SpecBase with MockitoSugar with TableDrivenPropertyChecks {
 
   val formProvider = new ContactPhoneFormProvider()
   val form         = formProvider()
@@ -86,82 +87,33 @@ class ContactPhoneControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the CheckYourAnswers page when valid data is submitted and affinityGroup is Individual" in {
+    forAll(Table("affinityGroup", Seq(AffinityGroup.Individual, AffinityGroup.Organisation, AffinityGroup.Agent): _*)) {
+      affinityGroup =>
+        s"must redirect to the next page when valid data is submitted and affinityGroup is $affinityGroup" in {
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      retrieveUserAnswersData(emptyUserAnswers)
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+          retrieveUserAnswersData(emptyUserAnswers)
 
-      val application = new GuiceApplicationBuilder()
-        .overrides(
-          bind[DataRequiredAction].to[DataRequiredActionImpl],
-          bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, AffinityGroup.Individual)),
-          bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
-        )
-        .build()
+          val application = new GuiceApplicationBuilder()
+            .overrides(
+              bind[DataRequiredAction].to[DataRequiredActionImpl],
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, affinityGroup)),
+              bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
+            )
+            .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, routes.ContactPhoneController.onSubmit(NormalMode).url)
-            .withFormUrlEncodedBody(("value", "07 777 777"))
+          running(application) {
+            val request =
+              FakeRequest(POST, routes.ContactPhoneController.onSubmit(NormalMode).url)
+                .withFormUrlEncodedBody(("value", "07 777 777"))
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.CheckYourAnswersController.onPageLoad.url
-      }
-    }
-
-    "must redirect to the next page when valid data is submitted and affinityGroup is Organisation" in {
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      retrieveUserAnswersData(emptyUserAnswers)
-
-      val application = new GuiceApplicationBuilder()
-        .overrides(
-          bind[DataRequiredAction].to[DataRequiredActionImpl],
-          bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, AffinityGroup.Organisation)),
-          bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
-        )
-        .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, routes.ContactPhoneController.onSubmit(NormalMode).url)
-            .withFormUrlEncodedBody(("value", "07 777 777"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
-    "must redirect to the next page when valid data is submitted and affinityGroup is Agent" in {
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      retrieveUserAnswersData(emptyUserAnswers)
-
-      val application = new GuiceApplicationBuilder()
-        .overrides(
-          bind[DataRequiredAction].to[DataRequiredActionImpl],
-          bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, AffinityGroup.Agent)),
-          bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
-        )
-        .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, routes.ContactPhoneController.onSubmit(NormalMode).url)
-            .withFormUrlEncodedBody(("value", "07 777 777"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual onwardRoute.url
+          }
+        }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
