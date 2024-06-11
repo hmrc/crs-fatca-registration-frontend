@@ -20,6 +20,7 @@ import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import forms.changeContactDetails.OrganisationEmailFormProvider
 import models.NormalMode
+import models.subscription.response.OrganisationRegistrationType
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
@@ -28,7 +29,6 @@ import pages.changeContactDetails.{OrganisationContactEmailPage, OrganisationCon
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.OrganisationContactEmailView
 
 import scala.concurrent.Future
@@ -38,13 +38,12 @@ class OrganisationContactEmailControllerSpec extends SpecBase with TestValues wi
   val formProvider = new OrganisationEmailFormProvider()
   val form         = formProvider()
 
-  private val mockSubscriptionIdRetrievalAction         = mock[SubscriptionIdRetrievalAction]
-  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
   lazy val organisationEmailRoute = controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(NormalMode).url
 
   "organisationEmail Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(OrganisationRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {

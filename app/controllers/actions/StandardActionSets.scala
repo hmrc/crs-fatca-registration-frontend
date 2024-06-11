@@ -17,10 +17,12 @@
 package controllers.actions
 
 import models.requests.{DataRequest, DataRequestWithUserAnswers, IdentifierRequest}
+import models.subscription.response.{IndividualRegistrationType, OrganisationRegistrationType}
 import play.api.libs.json.Reads
 import play.api.mvc.{ActionBuilder, AnyContent}
 import queries.Gettable
 import uk.gov.hmrc.auth.core.AffinityGroup
+import utils.UserAnswersHelper
 
 import javax.inject.Inject
 
@@ -34,9 +36,7 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
                                     changeDetailsDataRequired: ChangeDetailsDataRequiredAction,
                                     checkEnrolment: CheckEnrolledToServiceAction,
                                     dependantAnswer: DependantAnswerProvider
-) {
-
-  private val nonIndividualAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
+) extends UserAnswersHelper {
 
   def identifiedUserWithEnrolmentCheckAndCtUtrRetrieval(): ActionBuilder[IdentifierRequest, AnyContent] =
     identify() andThen checkEnrolment andThen retrieveCtUTR()
@@ -60,15 +60,15 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
     identifiedUserWithData() andThen dependantAnswer(answer)
 
   def subscriptionIdWithChangeDetailsRetrievalForOrgOrAgent(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
-    retrieveSubscriptionId(nonIndividualAffinityGroups) andThen changeDetailsDataRetrieval()
+    retrieveSubscriptionId(Some(OrganisationRegistrationType)) andThen changeDetailsDataRetrieval()
 
   def subscriptionIdWithChangeDetailsRetrievalForIndividual(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
-    retrieveSubscriptionId(Set(AffinityGroup.Individual)) andThen changeDetailsDataRetrieval()
+    retrieveSubscriptionId(Some(IndividualRegistrationType)) andThen changeDetailsDataRetrieval()
 
   def subscriptionIdWithChangeDetailsRequiredForOrgOrAgent(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
-    retrieveSubscriptionId(nonIndividualAffinityGroups) andThen changeDetailsDataRequired
+    retrieveSubscriptionId(Some(OrganisationRegistrationType)) andThen changeDetailsDataRequired
 
   def subscriptionIdWithChangeDetailsRequiredForIndividual(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
-    retrieveSubscriptionId(Set(AffinityGroup.Individual)) andThen changeDetailsDataRequired
+    retrieveSubscriptionId(Some(IndividualRegistrationType)) andThen changeDetailsDataRequired
 
 }

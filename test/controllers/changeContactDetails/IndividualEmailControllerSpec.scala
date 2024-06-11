@@ -21,7 +21,8 @@ import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRet
 import controllers.routes
 import forms.changeContactDetails.IndividualEmailFormProvider
 import helpers.JsonFixtures._
-import models.{NormalMode, UserAnswers}
+import models.NormalMode
+import models.subscription.response.IndividualRegistrationType
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
@@ -31,7 +32,6 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.IndividualEmailView
 
 import scala.concurrent.Future
@@ -52,7 +52,7 @@ class IndividualEmailControllerSpec extends SpecBase with MockitoSugar {
     .withPage(IndividualPhonePage, TestMobilePhoneNumber)
 
   "IndividualEmail Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(Set(AffinityGroup.Individual)))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(IndividualRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must populate the view correctly on a GET with existing answer" in {

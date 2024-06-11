@@ -22,6 +22,7 @@ import controllers.routes
 import forms.changeContactDetails.OrganisationContactNameFormProvider
 import helpers.JsonFixtures.subscriptionId
 import models.NormalMode
+import models.subscription.response.OrganisationRegistrationType
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
@@ -30,7 +31,6 @@ import pages.changeContactDetails.OrganisationContactNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.OrganisationContactNameView
 
 import scala.concurrent.Future
@@ -40,13 +40,12 @@ class OrganisationContactNameControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new OrganisationContactNameFormProvider()
   val form         = formProvider()
 
-  private val mockSubscriptionIdRetrievalAction         = mock[SubscriptionIdRetrievalAction]
-  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
   lazy val organisationContactNameRoute = controllers.changeContactDetails.routes.OrganisationContactNameController.onPageLoad(NormalMode).url
 
   "OrganisationContactName Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(OrganisationRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {

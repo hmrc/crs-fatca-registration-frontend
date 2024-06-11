@@ -23,22 +23,15 @@ import org.mockito.MockitoSugar.when
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.DetailsUpdatedView
 
 class DetailsUpdatedControllerSpec extends SpecBase {
 
   private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
-  private val allowedAffinityGroups: Set[AffinityGroup] = Set(
-    AffinityGroup.Organisation,
-    AffinityGroup.Agent,
-    AffinityGroup.Individual
-  )
-
   "detailsUpdated Controller" - {
 
-    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+    when(mockSubscriptionIdRetrievalAction.apply())
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {

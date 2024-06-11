@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.actions._
 import forms.changeContactDetails.IndividualPhoneFormProvider
 import helpers.JsonFixtures.{subscriptionId, TestEmail, TestMobilePhoneNumber}
+import models.subscription.response.IndividualRegistrationType
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -30,7 +31,6 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.IndividualPhoneView
 
 import scala.concurrent.Future
@@ -51,7 +51,7 @@ class IndividualPhoneControllerSpec extends SpecBase with MockitoSugar {
     .withPage(IndividualPhonePage, TestMobilePhoneNumber)
 
   "IndividualPhone Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(Set(AffinityGroup.Individual)))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(IndividualRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {

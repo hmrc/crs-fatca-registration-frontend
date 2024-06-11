@@ -33,13 +33,7 @@ class DetailsUpdatedController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  private val allowedAffinityGroups: Set[AffinityGroup] = Set(
-    AffinityGroup.Organisation,
-    AffinityGroup.Agent,
-    AffinityGroup.Individual
-  )
-
-  def onPageLoad: Action[AnyContent] = retrieveSubscriptionId(allowedAffinityGroups) {
+  def onPageLoad: Action[AnyContent] = retrieveSubscriptionId() {
     implicit request =>
       Ok(view())
   }
