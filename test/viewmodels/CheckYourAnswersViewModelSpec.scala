@@ -28,7 +28,6 @@ import pages._
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.domain.Nino
 import utils.CountryListFactory
 import viewmodels.checkAnswers.CheckYourAnswersViewModel
@@ -45,96 +44,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
 
   "CheckYourAnswersViewModel" - {
 
-    forAll(Table("nonIndividualAffinityGroup", Seq(AffinityGroup.Organisation, AffinityGroup.Agent): _*)) {
-      affinityGroup =>
-        s"must return required rows for 'business-with-id' flow with $affinityGroup affinity group" in {
-          val userAnswers = emptyUserAnswers
-            .withPage(ReporterTypePage, ReporterType.LimitedCompany)
-            .withPage(RegisteredAddressInUKPage, true)
-            .withPage(WhatIsYourUTRPage, utr)
-            .withPage(BusinessNamePage, OrgName)
-            .withPage(RegistrationInfoPage, orgRegistrationInfo)
-            .withPage(IsThisYourBusinessPage, true)
-            .withPage(ContactNamePage, name.fullName)
-            .withPage(ContactEmailPage, TestEmail)
-            .withPage(ContactHavePhonePage, false)
-            .withPage(HaveSecondContactPage, true)
-            .withPage(SecondContactNamePage, TestPhoneNumber)
-            .withPage(SecondContactEmailPage, TestEmail)
-            .withPage(SecondContactHavePhonePage, true)
-            .withPage(SecondContactPhonePage, TestMobilePhoneNumber)
-
-          val result: Seq[Section] = CheckYourAnswersViewModel
-            .buildPages(userAnswers, countryListFactory, affinityGroup)
-
-          result.size mustBe 3
-          result.head.rows.size mustBe 1
-          result.head.sectionName mustBe "Business details"
-
-          result(1).sectionName mustBe "First contact"
-          result(1).rows.size mustBe 3
-
-          result(2).sectionName mustBe "Second contact"
-          result(2).rows.size mustBe 4
-        }
-
-        s"must return required rows for 'business-without-id' flow with $affinityGroup affinity group" in {
-          val businessAddress = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
-          val userAnswers = emptyUserAnswers
-            .withPage(ReporterTypePage, ReporterType.LimitedCompany)
-            .withPage(RegisteredAddressInUKPage, false)
-            .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
-            .withPage(BusinessNameWithoutIDPage, OrgName)
-            .withPage(HaveTradingNamePage, true)
-            .withPage(BusinessTradingNameWithoutIDPage, OrgName)
-            .withPage(NonUKBusinessAddressWithoutIDPage, businessAddress)
-            .withPage(ContactNamePage, name.fullName)
-            .withPage(ContactEmailPage, TestEmail)
-            .withPage(ContactHavePhonePage, false)
-            .withPage(HaveSecondContactPage, false)
-
-          val result: Seq[Section] = CheckYourAnswersViewModel
-            .buildPages(userAnswers, countryListFactory, affinityGroup)
-
-          result.size mustBe 3
-          result.head.rows.size mustBe 6
-          result.head.sectionName mustBe "Business details"
-
-          result(1).sectionName mustBe "First contact"
-          result(1).rows.size mustBe 3
-
-          result(2).sectionName mustBe "Second contact"
-          result(2).rows.size mustBe 1
-        }
-
-        s"must return required rows for auto-matched business with $affinityGroup affinity group" in {
-          val userAnswers = emptyUserAnswers
-            .withPage(AutoMatchedUTRPage, utr)
-            .withPage(WhatIsYourUTRPage, utr)
-            .withPage(RegisteredAddressInUKPage, false)
-            .withPage(RegistrationInfoPage, orgRegistrationInfo)
-            .withPage(IsThisYourBusinessPage, true)
-            .withPage(ContactNamePage, name.fullName)
-            .withPage(ContactEmailPage, TestEmail)
-            .withPage(ContactHavePhonePage, false)
-            .withPage(HaveSecondContactPage, false)
-
-          val result: Seq[Section] = CheckYourAnswersViewModel
-            .buildPages(userAnswers, countryListFactory, affinityGroup)
-
-          result.size mustBe 3
-          result.head.rows.size mustBe 1
-          result.head.sectionName mustBe "Business details"
-
-          result(1).sectionName mustBe "First contact"
-          result(1).rows.size mustBe 3
-
-          result(2).sectionName mustBe "Second contact"
-          result(2).rows.size mustBe 1
-        }
-    }
-
-    "must return required rows without second contact for 'business-with-id' flow with individual affinity group" in {
+    "must return required rows including second contact details for 'business-with-id' registration" in {
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.LimitedCompany)
         .withPage(RegisteredAddressInUKPage, true)
@@ -152,17 +62,20 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
         .withPage(SecondContactPhonePage, TestMobilePhoneNumber)
 
       val result: Seq[Section] = CheckYourAnswersViewModel
-        .buildPages(userAnswers, countryListFactory, AffinityGroup.Individual)
+        .buildPages(userAnswers, countryListFactory)
 
-      result.size mustBe 2
+      result.size mustBe 3
       result.head.rows.size mustBe 1
       result.head.sectionName mustBe "Business details"
 
       result(1).sectionName mustBe "First contact"
       result(1).rows.size mustBe 3
+
+      result(2).sectionName mustBe "Second contact"
+      result(2).rows.size mustBe 4
     }
 
-    "must return required rows without second contact for 'business-without-id' flow with Individual affinity group" in {
+    "must return required rows including second contact details for 'business-without-id' registration" in {
       val businessAddress = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.LimitedCompany)
@@ -175,20 +88,57 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
         .withPage(ContactNamePage, name.fullName)
         .withPage(ContactEmailPage, TestEmail)
         .withPage(ContactHavePhonePage, false)
-        .withPage(HaveSecondContactPage, false)
+        .withPage(HaveSecondContactPage, true)
+        .withPage(SecondContactNamePage, TestPhoneNumber)
+        .withPage(SecondContactEmailPage, TestEmail)
+        .withPage(SecondContactHavePhonePage, true)
+        .withPage(SecondContactPhonePage, TestMobilePhoneNumber)
 
       val result: Seq[Section] = CheckYourAnswersViewModel
-        .buildPages(userAnswers, countryListFactory, AffinityGroup.Individual)
+        .buildPages(userAnswers, countryListFactory)
 
-      result.size mustBe 2
+      result.size mustBe 3
       result.head.rows.size mustBe 6
       result.head.sectionName mustBe "Business details"
 
       result(1).sectionName mustBe "First contact"
       result(1).rows.size mustBe 3
+
+      result(2).sectionName mustBe "Second contact"
+      result(2).rows.size mustBe 4
     }
 
-    "must return required rows for 'individual-with-id' flow" in {
+    "must return required rows including second contact details for auto-matched business" in {
+      val userAnswers = emptyUserAnswers
+        .withPage(AutoMatchedUTRPage, utr)
+        .withPage(WhatIsYourUTRPage, utr)
+        .withPage(RegisteredAddressInUKPage, false)
+        .withPage(RegistrationInfoPage, orgRegistrationInfo)
+        .withPage(IsThisYourBusinessPage, true)
+        .withPage(ContactNamePage, name.fullName)
+        .withPage(ContactEmailPage, TestEmail)
+        .withPage(ContactHavePhonePage, false)
+        .withPage(HaveSecondContactPage, true)
+        .withPage(SecondContactNamePage, TestPhoneNumber)
+        .withPage(SecondContactEmailPage, TestEmail)
+        .withPage(SecondContactHavePhonePage, true)
+        .withPage(SecondContactPhonePage, TestMobilePhoneNumber)
+
+      val result: Seq[Section] = CheckYourAnswersViewModel
+        .buildPages(userAnswers, countryListFactory)
+
+      result.size mustBe 3
+      result.head.rows.size mustBe 1
+      result.head.sectionName mustBe "Business details"
+
+      result(1).sectionName mustBe "First contact"
+      result(1).rows.size mustBe 3
+
+      result(2).sectionName mustBe "Second contact"
+      result(2).rows.size mustBe 4
+    }
+
+    "must return required rows without second contact details for 'individual-with-id' registration" in {
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.Individual)
         .withPage(IndDoYouHaveNINumberPage, true)
@@ -199,7 +149,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
         .withPage(IndContactHavePhonePage, false)
 
       val result: Seq[Section] = CheckYourAnswersViewModel
-        .buildPages(userAnswers, countryListFactory, AffinityGroup.Individual)
+        .buildPages(userAnswers, countryListFactory)
 
       result.size mustBe 2
 
@@ -208,9 +158,11 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
 
       result(1).sectionName mustBe "Contact details"
       result(1).rows.size mustBe 2
+
+      result.map(_.sectionName) must not contain "Second contact"
     }
 
-    "must return required rows for 'individual-without-id' flow" in {
+    "must return required rows without second contact details for 'individual-without-id' registration" in {
       val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.Individual)
@@ -223,7 +175,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
         .withPage(IndContactHavePhonePage, false)
 
       val result: Seq[Section] = CheckYourAnswersViewModel
-        .buildPages(userAnswers, countryListFactory, AffinityGroup.Individual)
+        .buildPages(userAnswers, countryListFactory)
 
       result.size mustBe 2
 
@@ -232,9 +184,11 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
 
       result(1).sectionName mustBe "Contact details"
       result(1).rows.size mustBe 2
+
+      result.map(_.sectionName) must not contain "Second contact"
     }
 
-    "must return required rows for 'sole-trader-with-id'" in {
+    "must return required rows without second contact details for 'sole-trader-with-id'" in {
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.Sole)
         .withPage(IndWhereDoYouLivePage, true)
@@ -246,7 +200,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
         .withPage(IndContactHavePhonePage, false)
 
       val result: Seq[Section] = CheckYourAnswersViewModel
-        .buildPages(userAnswers, countryListFactory, AffinityGroup.Individual)
+        .buildPages(userAnswers, countryListFactory)
 
       result.size mustBe 2
 
@@ -255,9 +209,11 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
 
       result(1).sectionName mustBe "Contact details"
       result(1).rows.size mustBe 2
+
+      result.map(_.sectionName) must not contain "Second contact"
     }
 
-    "must return required rows for 'sole-without-id'" in {
+    "must return required rows without second contact details for 'sole-without-id'" in {
       val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.Sole)
@@ -272,7 +228,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
         .withPage(IndContactHavePhonePage, false)
 
       val result: Seq[Section] = CheckYourAnswersViewModel
-        .buildPages(userAnswers, countryListFactory, AffinityGroup.Individual)
+        .buildPages(userAnswers, countryListFactory)
 
       result.size mustBe 2
 
@@ -281,6 +237,8 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
 
       result(1).sectionName mustBe "Contact details"
       result(1).rows.size mustBe 2
+
+      result.map(_.sectionName) must not contain "Second contact"
     }
   }
 

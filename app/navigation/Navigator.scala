@@ -250,6 +250,16 @@ class Navigator @Inject() () extends Logging {
           controllers.routes.CheckYourAnswersController.onPageLoad()
         )
     case ContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
+    case HaveSecondContactPage =>
+      userAnswers =>
+        yesNoPage(
+          userAnswers,
+          HaveSecondContactPage,
+          controllers.organisation.routes.SecondContactNameController.onPageLoad(CheckMode),
+          controllers.routes.CheckYourAnswersController.onPageLoad()
+        )
+    case SecondContactNamePage  => _ => controllers.organisation.routes.SecondContactEmailController.onPageLoad(CheckMode)
+    case SecondContactEmailPage => _ => controllers.organisation.routes.SecondContactHavePhoneController.onPageLoad(CheckMode)
     case SecondContactHavePhonePage =>
       userAnswers =>
         yesNoPage(
@@ -258,10 +268,9 @@ class Navigator @Inject() () extends Logging {
           controllers.organisation.routes.SecondContactPhoneController.onPageLoad(CheckMode),
           controllers.routes.CheckYourAnswersController.onPageLoad()
         )
-    case SecondContactPhonePage            => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
-    case NonUKBusinessAddressWithoutIDPage => _ => routes.CheckYourAnswersController.onPageLoad()
-    case OrganisationContactNamePage       => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
-    case OrganisationContactEmailPage      => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
+    case SecondContactPhonePage       => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
+    case OrganisationContactNamePage  => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
+    case OrganisationContactEmailPage => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
     case OrganisationContactHavePhonePage =>
       userAnswers =>
         yesNoPage(

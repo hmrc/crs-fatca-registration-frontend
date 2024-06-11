@@ -26,7 +26,6 @@ import pages.ContactPhonePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import uk.gov.hmrc.auth.core.AffinityGroup
 import utils.ContactHelper
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.organisation.ContactPhoneView
@@ -68,12 +67,7 @@ class ContactPhoneController @Inject() (
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactPhonePage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield
-              if (request.affinityGroup == AffinityGroup.Individual) {
-                Redirect(controllers.routes.CheckYourAnswersController.onPageLoad)
-              } else {
-                Redirect(navigator.nextPage(ContactPhonePage, mode, updatedAnswers))
-              }
+            } yield Redirect(navigator.nextPage(ContactPhonePage, mode, updatedAnswers))
         )
   }
 
