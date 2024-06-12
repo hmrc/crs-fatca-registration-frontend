@@ -1,22 +1,46 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package repositories
 
 import config.FrontendAppConfig
 import models.UserAnswers
+import models.crypto.SensitiveJsObject
 import org.mockito.Mockito.when
+import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.Json
+import play.api.Configuration
+import play.api.libs.json.Format.GenericFormat
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, SymmetricCryptoFactory}
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-import java.time.{Clock, Instant, ZoneId}
+import java.security.SecureRandom
 import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant, ZoneId}
+import java.util.Base64
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SessionRepositorySpec
+class EncryptedSessionRepositorySpec
     extends AnyFreeSpec
     with Matchers
     with DefaultPlayMongoRepositorySupport[UserAnswers]
@@ -32,6 +56,22 @@ class SessionRepositorySpec
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
+  when(mockAppConfig.userAnswersEncryptionEnabled) thenReturn true
+
+  private val aesKey = {
+    val keyLength = 32
+    val aesKey    = new Array[Byte](keyLength)
+    new SecureRandom().nextBytes(aesKey)
+    Base64.getEncoder.encodeToString(aesKey)
+  }
+
+  private val configuration = Configuration("crypto.key" -> aesKey)
+
+  implicit private val crypto: Encrypter with Decrypter =
+    SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
+
+  implicit val sensitiveFormat: Format[SensitiveJsObject] =
+    JsonEncryption.sensitiveEncrypterDecrypter(SensitiveJsObject.apply)
 
   override protected val repository = new SessionRepository(
     mongoComponent = mongoComponent,
@@ -42,7 +82,6 @@ class SessionRepositorySpec
   ".set" - {
 
     "must set the last updated time on the supplied user answers to `now`, and save them" in {
-
       val expectedResult = userAnswers copy (lastUpdated = instant)
 
       val setResult     = repository.set(userAnswers).futureValue
@@ -50,6 +89,22 @@ class SessionRepositorySpec
 
       setResult mustEqual true
       updatedRecord mustEqual expectedResult
+    }
+
+    "must persist the data in encrypted format" in {
+      val setResult = repository.set(userAnswers).futureValue
+
+      setResult mustEqual true
+
+      val retrievedRecord = repository.collection
+        .find[BsonDocument](Filters.and(Filters.equal("_id", userAnswers.id)))
+        .headOption()
+        .futureValue
+        .value
+
+      val rawData       = retrievedRecord.get("data").asString().getValue
+      val decryptedData = crypto.decrypt(Crypted(rawData)).value
+      Json.parse(decryptedData) mustBe userAnswers.data
     }
   }
 

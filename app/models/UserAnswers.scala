@@ -16,8 +16,12 @@
 
 package models
 
+import models.crypto.SensitiveJsObject
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import queries.{Gettable, Settable}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -68,27 +72,51 @@ final case class UserAnswers(
 
 object UserAnswers {
 
-  val reads: Reads[UserAnswers] = {
+  implicit def format(encryptionEnabled: Boolean)(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] =
+    if (encryptionEnabled) UserAnswers.encryptedFormat else UserAnswers.plainFormat
 
-    import play.api.libs.functional.syntax._
+  private def plainFormat: OFormat[UserAnswers] = {
+    val reads: Reads[UserAnswers] =
+      (
+        (__ \ "_id").read[String] and
+          (__ \ "data").read[JsObject] and
+          (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
+      )(UserAnswers.apply _)
 
-    (
-      (__ \ "_id").read[String] and
-        (__ \ "data").read[JsObject] and
-        (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-    )(UserAnswers.apply _)
+    val writes: OWrites[UserAnswers] =
+      (
+        (__ \ "_id").write[String] and
+          (__ \ "data").write[JsObject] and
+          (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
+      )(unlift(UserAnswers.unapply))
+
+    OFormat(reads, writes)
   }
 
-  val writes: OWrites[UserAnswers] = {
+  private def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = {
 
-    import play.api.libs.functional.syntax._
+    implicit val sensitiveFormat: Format[SensitiveJsObject] =
+      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveJsObject.apply)
 
-    (
-      (__ \ "_id").write[String] and
-        (__ \ "data").write[JsObject] and
-        (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    )(unlift(UserAnswers.unapply))
+    val encryptedReads: Reads[UserAnswers] =
+      (
+        (__ \ "_id").read[String] and
+          (__ \ "data").read[SensitiveJsObject] and
+          (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
+      )(
+        (id, data, lastUpdated) => UserAnswers(id, data.decryptedValue, lastUpdated)
+      )
+
+    val encryptedWrites: OWrites[UserAnswers] =
+      (
+        (__ \ "_id").write[String] and
+          (__ \ "data").write[SensitiveJsObject] and
+          (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
+      )(
+        userAnswers => (userAnswers.id, SensitiveJsObject(userAnswers.data), userAnswers.lastUpdated)
+      )
+
+    OFormat(encryptedReads, encryptedWrites)
   }
 
-  implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
 }
