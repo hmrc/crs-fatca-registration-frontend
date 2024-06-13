@@ -19,6 +19,7 @@ package controllers.changeContactDetails
 import base.{SpecBase, TestValues}
 import controllers.actions._
 import forms.changeContactDetails.OrganisationPhoneFormProvider
+import models.subscription.response.OrganisationRegistrationType
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -28,7 +29,6 @@ import pages.changeContactDetails.{OrganisationContactNamePage, OrganisationCont
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.OrganisationContactPhoneView
 
 import scala.concurrent.Future
@@ -38,13 +38,12 @@ class OrganisationContactPhoneControllerSpec extends SpecBase with TestValues wi
   private val formProvider = new OrganisationPhoneFormProvider()
   private val form         = formProvider()
 
-  private val mockSubscriptionIdRetrievalAction         = mock[SubscriptionIdRetrievalAction]
-  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
   lazy val organisationPhoneRoute: String = controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(NormalMode).url
 
   "OrganisationPhone Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(OrganisationRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {

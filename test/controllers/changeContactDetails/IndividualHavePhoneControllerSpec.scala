@@ -20,6 +20,7 @@ import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.routes
 import forms.changeContactDetails.IndividualHavePhoneFormProvider
+import models.subscription.response.IndividualRegistrationType
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -54,7 +55,7 @@ class IndividualHavePhoneControllerSpec extends SpecBase with TestValues with Mo
     .withPage(IndividualPhonePage, TestMobilePhoneNumber)
 
   "IndividualHavePhone Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(Set(AffinityGroup.Individual)))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(IndividualRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {

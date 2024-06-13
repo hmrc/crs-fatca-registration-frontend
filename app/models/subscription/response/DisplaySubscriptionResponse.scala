@@ -17,10 +17,18 @@
 package models.subscription.response
 
 import models.SubscriptionID
+import models.subscription.request.OrganisationDetails
 import play.api.libs.json.{Json, OFormat}
 
 case class DisplaySubscriptionResponse(success: DisplayResponseDetail) {
   def subscriptionId: SubscriptionID = SubscriptionID(success.subscriptionId)
+
+  val registrationType: RegistrationType =
+    success.primaryContact.contactInformation match {
+      case OrganisationDetails(_) => OrganisationRegistrationType
+      case _                      => IndividualRegistrationType
+    }
+
 }
 
 object DisplaySubscriptionResponse {

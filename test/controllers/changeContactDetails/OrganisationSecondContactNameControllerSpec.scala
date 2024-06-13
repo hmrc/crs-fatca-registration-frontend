@@ -21,6 +21,7 @@ import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRet
 import forms.changeContactDetails.OrganisationSecondContactNameFormProvider
 import helpers.JsonFixtures.subscriptionId
 import models.NormalMode
+import models.subscription.response.OrganisationRegistrationType
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
@@ -29,7 +30,6 @@ import pages.changeContactDetails.OrganisationSecondContactNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.OrganisationSecondContactNameView
 
 import scala.concurrent.Future
@@ -39,13 +39,12 @@ class OrganisationSecondContactNameControllerSpec extends SpecBase with MockitoS
   val formProvider = new OrganisationSecondContactNameFormProvider()
   private val form = formProvider()
 
-  private val mockSubscriptionIdRetrievalAction         = mock[SubscriptionIdRetrievalAction]
-  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
   private lazy val secondContactNameRoute = routes.OrganisationSecondContactNameController.onPageLoad(NormalMode).url
 
   "Change Organisation SecondContactName Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(OrganisationRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "must return OK and the correct view for a GET" in {

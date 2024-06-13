@@ -21,7 +21,7 @@ import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRet
 import controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController
 import generators.ModelGenerators
 import helpers.JsonFixtures.subscriptionId
-import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse}
+import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse, IndividualRegistrationType}
 import models.{SubscriptionID, UserAnswers}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq => mEq}
@@ -35,7 +35,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.SubscriptionService
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.ThereIsAProblemView
 
@@ -46,15 +45,13 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
   private val mockSubscriptionService           = mock[SubscriptionService]
   private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
-  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Individual)
-
   override def beforeEach(): Unit = {
     reset(mockSubscriptionService)
     super.beforeEach
   }
 
   "ChangeIndividualContactDetails Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(IndividualRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "onPageLoad" - {

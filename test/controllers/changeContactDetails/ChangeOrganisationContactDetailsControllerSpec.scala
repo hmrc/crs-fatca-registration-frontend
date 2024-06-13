@@ -21,7 +21,7 @@ import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRet
 import controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController
 import generators.ModelGenerators
 import helpers.JsonFixtures.subscriptionId
-import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse}
+import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse, OrganisationRegistrationType}
 import models.{SubscriptionID, UserAnswers}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq => mEq}
@@ -46,15 +46,13 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
   private val mockSubscriptionService           = mock[SubscriptionService]
   private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
-  private val allowedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Organisation, AffinityGroup.Agent)
-
   override def beforeEach(): Unit = {
     reset(mockSubscriptionService)
     super.beforeEach
   }
 
   "ChangeOrganisationContactDetails Controller" - {
-    when(mockSubscriptionIdRetrievalAction.apply(allowedAffinityGroups))
+    when(mockSubscriptionIdRetrievalAction.apply(Some(OrganisationRegistrationType)))
       .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
 
     "onPageLoad" - {

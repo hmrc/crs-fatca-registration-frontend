@@ -19,6 +19,7 @@ package controllers.actions
 import helpers.JsonFixtures.UserAnswersId
 import models.SubscriptionID
 import models.requests.DataRequestWithSubscriptionId
+import models.subscription.response.RegistrationType
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AffinityGroup
 
@@ -46,7 +47,7 @@ class FakeSubscriptionIdRetrievalAction @Inject() (
   override protected def executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
 
-  override def apply(allowedAffinityGroups: Set[AffinityGroup]): ActionBuilder[DataRequestWithSubscriptionId, AnyContent]
-    with ActionFunction[Request, DataRequestWithSubscriptionId] = this
+  override def apply(requiredRegistrationType: Option[RegistrationType])
+    : ActionBuilder[DataRequestWithSubscriptionId, AnyContent] with ActionFunction[Request, DataRequestWithSubscriptionId] = this
 
 }
