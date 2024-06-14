@@ -19,6 +19,7 @@ package config
 import com.google.inject.AbstractModule
 import controllers.actions._
 import models.{UUIDGen, UUIDGenImpl}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 import java.time.{Clock, ZoneOffset}
 
@@ -38,6 +39,8 @@ class Module extends AbstractModule {
     bind(classOf[ChangeDetailsDataRetrievalAction]).to(classOf[ChangeDetailsDataRetrievalActionImpl]).asEagerSingleton()
     bind(classOf[ChangeDetailsDataRequiredAction]).to(classOf[ChangeDetailsDataRequiredActionImpl]).asEagerSingleton()
     bind(classOf[UUIDGen]).to(classOf[UUIDGenImpl])
+    bind(classOf[Encrypter]).toProvider(classOf[CryptoProvider])
+    bind(classOf[Decrypter]).toProvider(classOf[CryptoProvider])
   }
 
 }
