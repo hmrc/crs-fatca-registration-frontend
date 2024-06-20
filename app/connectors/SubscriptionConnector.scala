@@ -26,7 +26,7 @@ import models.subscription.response.{CreateSubscriptionResponse, DisplaySubscrip
 import play.api.Logging
 import play.api.http.Status.{BAD_REQUEST, CONFLICT, NOT_FOUND, SERVICE_UNAVAILABLE}
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
-import uk.gov.hmrc.http.HttpReads.is2xx
+import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import javax.inject.Inject
