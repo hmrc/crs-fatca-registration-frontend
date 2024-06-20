@@ -29,7 +29,7 @@
 
 @(userId: String = "ABCD123456")(implicit request: Request[_], messages: Messages)
 
-@addFILink = {@link(routes.RegistrationConfirmationController.onPageLoad.url, messages("registrationConfirmation.link.addFI"))}
+@addFILink = {@link(appConfig.addFinancialInstitutionUrl, messages("registrationConfirmation.link.addFI"))}
 @surveyLink = {@link(appConfig.exitSurveyUrl, messages("registrationConfirmation.link.survey"))}
 
 @layout(pageTitle = titleNoForm(messages("registrationConfirmation.title")), showBackLink = false) {
