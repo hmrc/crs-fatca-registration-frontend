@@ -21,7 +21,6 @@ import models.subscription.response.{IndividualRegistrationType, OrganisationReg
 import play.api.libs.json.Reads
 import play.api.mvc.{ActionBuilder, AnyContent}
 import queries.Gettable
-import uk.gov.hmrc.auth.core.AffinityGroup
 import utils.UserAnswersHelper
 
 import javax.inject.Inject

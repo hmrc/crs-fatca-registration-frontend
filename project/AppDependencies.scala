@@ -3,7 +3,7 @@ import sbt._
 object AppDependencies {
 
   private val bootstrapVersion = "8.6.0"
-  private val hmrcMongoVersion = "1.9.0"
+  private val hmrcMongoVersion = "2.1.0"
 
   val compile = Seq[ModuleID](
     play.sbt.PlayImport.ws,
@@ -11,7 +11,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "play-conditional-form-mapping-play-30"  % "2.0.0",
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-30"     % bootstrapVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"             % hmrcMongoVersion,
-    "uk.gov.hmrc"       %% "domain-play-30"                 % "9.0.0",
+    "uk.gov.hmrc"       %% "domain-play-30"                 % "10.0.0",
     "org.typelevel"     %% "cats-core"                      % "2.10.0",
     "uk.gov.hmrc"       %% "crypto-json-play-30"            % "8.0.0"
   )
