@@ -704,7 +704,18 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           controller.getPagesMissingAnswers(userAnswers).contains(IndContactPhonePage) mustBe true
         }
 
+        "if reporter type is individual and they do not have a phone, do not require it is entered" in {
+          val userAnswers: UserAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, ReporterType.Individual)
+            .withPage(IndContactHavePhonePage, false)
+
+          controller.getPagesMissingAnswers(userAnswers).contains(IndContactHavePhonePage) mustBe false
+          controller.getPagesMissingAnswers(userAnswers).contains(IndContactPhonePage) mustBe false
+        }
+
         "individual without id journey" - {
+
+          // this is where we got up to
 
           "return any missing answers for this journey" in {
             val userAnswers: UserAnswers = emptyUserAnswers

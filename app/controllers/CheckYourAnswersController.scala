@@ -103,12 +103,12 @@ class CheckYourAnswersController @Inject() (
     val reporterType = userAnswers.get(ReporterTypePage)
 
     if (reporterType.contains(ReporterType.Individual)) {
-      val businessDetails = userAnswers.get(IndDoYouHaveNINumberPage) match {
+      val businessDetails: Seq[Option[Page]] = userAnswers.get(IndDoYouHaveNINumberPage) match {
         case Some(false) => getIndividualWithoutIdMissingAnswers(userAnswers)
-        case _           => Seq(IndDoYouHaveNINumberPage)
+        case _           => Seq(Some(IndDoYouHaveNINumberPage))
       }
 
-      businessDetails ++ Seq(
+      val contactDetails = Seq(
         if (userAnswers.get(IndContactEmailPage).nonEmpty) None else Some(IndContactEmailPage),
         userAnswers.get(IndContactHavePhonePage) match {
           case None        => Some(IndContactHavePhonePage)
@@ -116,15 +116,19 @@ class CheckYourAnswersController @Inject() (
           case Some(true) =>
             if (userAnswers.get(IndContactPhonePage).nonEmpty) None else Some(IndContactPhonePage)
         }
-      ).filter(_.nonEmpty).map(_.get)
+      )
+
+      (businessDetails ++ contactDetails)
+        .filter(_.nonEmpty)
+        .flatten
     } else {
       Seq(ReporterTypePage)
     }
   }
 
-  private def getIndividualWithoutIdMissingAnswers(userAnswers: UserAnswers): Seq[Page] =
+  private def getIndividualWithoutIdMissingAnswers(userAnswers: UserAnswers): Seq[Option[Page]] =
     Seq(
       if (userAnswers.get(IndWhatIsYourNamePage).nonEmpty) None else Some(IndWhatIsYourNamePage)
-    ).filter(_.nonEmpty).map(_.get)
+    )
 
 }
