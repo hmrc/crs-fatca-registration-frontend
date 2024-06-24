@@ -20,11 +20,11 @@ import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
-import models.{ReporterType, UserAnswers}
 import models.error.ApiError
 import models.error.ApiError.{MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, SafeId}
 import models.requests.DataRequest
+import models.{ReporterType, UserAnswers}
 import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -103,16 +103,28 @@ class CheckYourAnswersController @Inject() (
     val reporterType = userAnswers.get(ReporterTypePage)
 
     if (reporterType.contains(ReporterType.Individual)) {
-      Seq(
-        if (userAnswers.get(IndDoYouHaveNINumberPage).contains(false)) None else Some(IndDoYouHaveNINumberPage),
+      val businessDetails = userAnswers.get(IndDoYouHaveNINumberPage) match {
+        case Some(false) => getIndividualWithoutIdMissingAnswers(userAnswers)
+        case _           => Seq(IndDoYouHaveNINumberPage)
+      }
+
+      businessDetails ++ Seq(
+        if (userAnswers.get(IndContactEmailPage).nonEmpty) None else Some(IndContactEmailPage),
         userAnswers.get(IndContactHavePhonePage) match {
-          case Some(false) => None
           case None        => Some(IndContactHavePhonePage)
+          case Some(false) => None
+          case Some(true) =>
+            if (userAnswers.get(IndContactPhonePage).nonEmpty) None else Some(IndContactPhonePage)
         }
       ).filter(_.nonEmpty).map(_.get)
     } else {
       Seq(ReporterTypePage)
     }
   }
+
+  private def getIndividualWithoutIdMissingAnswers(userAnswers: UserAnswers): Seq[Page] =
+    Seq(
+      if (userAnswers.get(IndWhatIsYourNamePage).nonEmpty) None else Some(IndWhatIsYourNamePage)
+    ).filter(_.nonEmpty).map(_.get)
 
 }

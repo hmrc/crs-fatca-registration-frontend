@@ -679,34 +679,47 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
     "getPagesMissingAnswers" - {
 
-      "if reporter type is missing, return that it is missing" in {
-        val userAnswers: UserAnswers = emptyUserAnswers
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), AffinityGroup.Individual)
+        .build()
 
-        val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Individual)
-          .build()
+      running(application) {
+        val controller = application.injector.instanceOf[CheckYourAnswersController]
 
-        running(application) {
-          val controller = application.injector.instanceOf[CheckYourAnswersController]
-
-          controller.getPagesMissingAnswers(userAnswers) mustBe List(ReporterTypePage)
+        "if reporter type is missing, return that it is missing" in {
+          controller.getPagesMissingAnswers(emptyUserAnswers) mustBe List(ReporterTypePage)
         }
-      }
 
-      "if reporter type is individual, return all missing individual answers" in {
-        val userAnswers: UserAnswers = emptyUserAnswers
-          .withPage(ReporterTypePage, ReporterType.Individual)
+        "if reporter type is individual, return all missing individual answers" in {
+          val userAnswers: UserAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, ReporterType.Individual)
 
-        val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Individual)
-          .build()
-
-        running(application) {
-          val controller = application.injector.instanceOf[CheckYourAnswersController]
-
-          controller.getPagesMissingAnswers(userAnswers) mustBe List(IndDoYouHaveNINumberPage, IndContactHavePhonePage)
+          controller.getPagesMissingAnswers(userAnswers) mustBe List(IndDoYouHaveNINumberPage, IndContactEmailPage, IndContactHavePhonePage)
         }
+
+        "if reporter type is individual and they have a phone, require it is entered" in {
+          val userAnswers: UserAnswers = emptyUserAnswers
+            .withPage(ReporterTypePage, ReporterType.Individual)
+            .withPage(IndContactHavePhonePage, true)
+
+          controller.getPagesMissingAnswers(userAnswers).contains(IndContactPhonePage) mustBe true
+        }
+
+        "individual without id journey" - {
+
+          "return any missing answers for this journey" in {
+            val userAnswers: UserAnswers = emptyUserAnswers
+              .withPage(ReporterTypePage, ReporterType.Individual)
+              .withPage(IndDoYouHaveNINumberPage, false)
+
+            controller.getPagesMissingAnswers(userAnswers).contains(IndWhatIsYourNamePage) mustBe true
+          }
+
+        }
+
       }
 
     }
+
   }
 
 }
