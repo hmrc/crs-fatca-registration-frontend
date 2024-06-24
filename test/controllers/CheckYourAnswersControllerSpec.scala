@@ -18,6 +18,7 @@ package controllers
 
 import base.{ControllerMockFixtures, SpecBase}
 import connectors.AddressLookupConnector
+import generators.ModelGenerators
 import helpers.JsonFixtures._
 import models.enrolment.GroupIds
 import models.error.ApiError._
@@ -38,7 +39,7 @@ import views.html.ThereIsAProblemView
 
 import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach with TableDrivenPropertyChecks {
+class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach with TableDrivenPropertyChecks with ModelGenerators {
 
   final val mockRegistrationService: BusinessMatchingWithoutIdService = mock[BusinessMatchingWithoutIdService]
 
@@ -686,14 +687,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         val controller = application.injector.instanceOf[CheckYourAnswersController]
 
         "if reporter type is missing, return that it is missing" in {
-          controller.getPagesMissingAnswers(emptyUserAnswers) mustBe List(ReporterTypePage)
+          controller.getMissingAnswers(emptyUserAnswers) mustBe List(ReporterTypePage)
         }
 
         "if reporter type is individual, return all missing individual answers" in {
           val userAnswers: UserAnswers = emptyUserAnswers
             .withPage(ReporterTypePage, ReporterType.Individual)
 
-          controller.getPagesMissingAnswers(userAnswers) mustBe List(IndDoYouHaveNINumberPage, IndContactEmailPage, IndContactHavePhonePage)
+          controller.getMissingAnswers(userAnswers) mustBe List(IndDoYouHaveNINumberPage, IndContactEmailPage, IndContactHavePhonePage)
         }
 
         "if reporter type is individual and they have a phone, require it is entered" in {
@@ -701,7 +702,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             .withPage(ReporterTypePage, ReporterType.Individual)
             .withPage(IndContactHavePhonePage, true)
 
-          controller.getPagesMissingAnswers(userAnswers).contains(IndContactPhonePage) mustBe true
+          controller.getMissingAnswers(userAnswers).contains(IndContactPhonePage) mustBe true
         }
 
         "if reporter type is individual and they do not have a phone, do not require it is entered" in {
@@ -709,20 +710,57 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             .withPage(ReporterTypePage, ReporterType.Individual)
             .withPage(IndContactHavePhonePage, false)
 
-          controller.getPagesMissingAnswers(userAnswers).contains(IndContactHavePhonePage) mustBe false
-          controller.getPagesMissingAnswers(userAnswers).contains(IndContactPhonePage) mustBe false
+          controller.getMissingAnswers(userAnswers).contains(IndContactHavePhonePage) mustBe false
+          controller.getMissingAnswers(userAnswers).contains(IndContactPhonePage) mustBe false
         }
 
         "individual without id journey" - {
 
-          // this is where we got up to
+          "return an empty list if no answers are missing" in {
+            val userAnswers: UserAnswers = emptyUserAnswers
+              .withPage(ReporterTypePage, ReporterType.Individual)
+              .withPage(IndDoYouHaveNINumberPage, false)
+              .withPage(IndWhatIsYourNamePage, arbitraryName.arbitrary.sample.value)
+              .withPage(DateOfBirthWithoutIdPage, validDateOfBirth().sample.value)
+              .withPage(IndWhereDoYouLivePage, false)
+              .withPage(IndNonUKAddressWithoutIdPage, arbitraryAddressWithoutId.arbitrary.sample.value)
+              .withPage(IndContactEmailPage, validEmailAddressToLong(10).sample.value)
+              .withPage(IndContactHavePhonePage, false)
+
+            controller.getMissingAnswers(userAnswers) mustBe Nil
+          }
 
           "return any missing answers for this journey" in {
             val userAnswers: UserAnswers = emptyUserAnswers
               .withPage(ReporterTypePage, ReporterType.Individual)
               .withPage(IndDoYouHaveNINumberPage, false)
 
-            controller.getPagesMissingAnswers(userAnswers).contains(IndWhatIsYourNamePage) mustBe true
+            controller.getMissingAnswers(userAnswers) mustBe List(
+              IndWhatIsYourNamePage,
+              DateOfBirthWithoutIdPage,
+              IndWhereDoYouLivePage,
+              IndContactEmailPage,
+              IndContactHavePhonePage
+            )
+          }
+
+          "return any missing answers for the non-uk address journey" in {
+            val userAnswers: UserAnswers = emptyUserAnswers
+              .withPage(ReporterTypePage, ReporterType.Individual)
+              .withPage(IndDoYouHaveNINumberPage, false)
+              .withPage(IndWhereDoYouLivePage, false)
+
+            controller.getMissingAnswers(userAnswers).contains(IndNonUKAddressWithoutIdPage) mustBe true
+          }
+
+          "return any missing answers for the uk address journey" in {
+            val userAnswers: UserAnswers = emptyUserAnswers
+              .withPage(ReporterTypePage, ReporterType.Individual)
+              .withPage(IndDoYouHaveNINumberPage, false)
+              .withPage(IndWhereDoYouLivePage, true)
+
+            // TODO: what do we do here? how do we validate the uk address pages?
+            ???
           }
 
         }
