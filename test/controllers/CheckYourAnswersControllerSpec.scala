@@ -676,6 +676,37 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         }
       }
     }
+
+    "getPagesMissingAnswers" - {
+
+      "if reporter type is missing, return that it is missing" in {
+        val userAnswers: UserAnswers = emptyUserAnswers
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Individual)
+          .build()
+
+        running(application) {
+          val controller = application.injector.instanceOf[CheckYourAnswersController]
+
+          controller.getPagesMissingAnswers(userAnswers) mustBe List(ReporterTypePage)
+        }
+      }
+
+      "if reporter type is individual, return all missing individual answers" in {
+        val userAnswers: UserAnswers = emptyUserAnswers
+          .withPage(ReporterTypePage, ReporterType.Individual)
+
+        val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Individual)
+          .build()
+
+        running(application) {
+          val controller = application.injector.instanceOf[CheckYourAnswersController]
+
+          controller.getPagesMissingAnswers(userAnswers) mustBe List(IndDoYouHaveNINumberPage, IndContactHavePhonePage)
+        }
+      }
+
+    }
   }
 
 }

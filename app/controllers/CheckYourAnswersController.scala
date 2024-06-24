@@ -16,7 +16,7 @@
 
 package controllers
 
-import cats.data.{EitherT, ValidatedNec}
+import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
@@ -25,17 +25,7 @@ import models.error.ApiError
 import models.error.ApiError.{MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, SafeId}
 import models.requests.DataRequest
-import pages.{
-  DateOfBirthWithoutIdPage,
-  IndContactEmailPage,
-  IndContactHavePhonePage,
-  IndDoYouHaveNINumberPage,
-  IndUKAddressWithoutIdPage,
-  IndWhatIsYourNamePage,
-  Page,
-  RegistrationInfoPage,
-  ReporterTypePage
-}
+import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -68,7 +58,6 @@ class CheckYourAnswersController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) {
     implicit request =>
-      validateAnswers(request.userAnswers)
       val viewModel: Seq[Section] =
         CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)
       Ok(view(viewModel))
@@ -110,23 +99,20 @@ class CheckYourAnswersController @Inject() (
         registrationService.registerWithoutId()
     }
 
-  private def validateAnswers(userAnswers: UserAnswers): Seq[Option[Page]] =
-//    - Scenario: Individual without ID
-    Seq(
-      if (userAnswers.get(ReporterTypePage).contains(ReporterType.Individual)) None else Option(ReporterTypePage),
-      if (userAnswers.get(IndDoYouHaveNINumberPage).contains(false)) None else Some(IndDoYouHaveNINumberPage),
-      validate(userAnswers, IndWhatIsYourNamePage),
-      validate(userAnswers, DateOfBirthWithoutIdPage),
-      validate(userAnswers, IndUKAddressWithoutIdPage),
-      validate(userAnswers, IndContactEmailPage),
-      userAnswers.get(IndContactHavePhonePage) match {
-        case Some(true) => validate(userAnswers, IndContactHavePhonePage)
-        case Some(false) => None
-        case None => Option(IndContactHavePhonePage)
-      }
-    )
+  def getPagesMissingAnswers(userAnswers: UserAnswers): Seq[Page] = {
+    val reporterType = userAnswers.get(ReporterTypePage)
 
-  private def validate(userAnswers: UserAnswers, page: Page) =
-    Option.unless(userAnswers.get(page).nonEmpty)(page)
+    if (reporterType.contains(ReporterType.Individual)) {
+      Seq(
+        if (userAnswers.get(IndDoYouHaveNINumberPage).contains(false)) None else Some(IndDoYouHaveNINumberPage),
+        userAnswers.get(IndContactHavePhonePage) match {
+          case Some(false) => None
+          case None        => Some(IndContactHavePhonePage)
+        }
+      ).filter(_.nonEmpty).map(_.get)
+    } else {
+      Seq(ReporterTypePage)
+    }
+  }
 
 }
