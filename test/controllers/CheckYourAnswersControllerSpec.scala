@@ -759,12 +759,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
               .withPage(IndDoYouHaveNINumberPage, false)
               .withPage(IndWhereDoYouLivePage, true)
 
-            // TODO: what do we do here? how do we validate the uk address pages?
-            ???
+            controller.getMissingAnswers(userAnswers).contains(IndWhatIsYourPostcodePage) mustBe true
+
           }
 
         }
 
+        "individual with id journey" - {
+
+        }
       }
 
     }

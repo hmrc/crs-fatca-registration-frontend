@@ -127,7 +127,11 @@ class CheckYourAnswersController @Inject() (
         case Some(false) =>
           if (userAnswers.get(IndNonUKAddressWithoutIdPage).nonEmpty) None else Some(IndNonUKAddressWithoutIdPage)
         case Some(true) =>
-          None // TODO: what do we do here? how do we validate the uk address pages?
+          if (
+            userAnswers.get(IndSelectedAddressLookupPage).nonEmpty ||
+            userAnswers.get(IndUKAddressWithoutIdPage).nonEmpty
+          ) { None }
+          else { Some(IndWhatIsYourPostcodePage) }
       }
     )
 
