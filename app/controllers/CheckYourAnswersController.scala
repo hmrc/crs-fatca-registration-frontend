@@ -99,7 +99,7 @@ class CheckYourAnswersController @Inject() (
         registrationService.registerWithoutId()
     }
 
-  def getPagesMissingAnswers(userAnswers: UserAnswers): Seq[Page] = {
+  def getMissingAnswers(userAnswers: UserAnswers): Seq[Page] = {
     val reporterType = userAnswers.get(ReporterTypePage)
 
     if (reporterType.contains(ReporterType.Individual)) {
@@ -108,15 +108,7 @@ class CheckYourAnswersController @Inject() (
         case _           => Seq(Some(IndDoYouHaveNINumberPage))
       }
 
-      val contactDetails = Seq(
-        if (userAnswers.get(IndContactEmailPage).nonEmpty) None else Some(IndContactEmailPage),
-        userAnswers.get(IndContactHavePhonePage) match {
-          case None        => Some(IndContactHavePhonePage)
-          case Some(false) => None
-          case Some(true) =>
-            if (userAnswers.get(IndContactPhonePage).nonEmpty) None else Some(IndContactPhonePage)
-        }
-      )
+      val contactDetails = getIndividualContactDetailsMissingAnswers(userAnswers)
 
       (businessDetails ++ contactDetails)
         .filter(_.nonEmpty)
@@ -128,7 +120,26 @@ class CheckYourAnswersController @Inject() (
 
   private def getIndividualWithoutIdMissingAnswers(userAnswers: UserAnswers): Seq[Option[Page]] =
     Seq(
-      if (userAnswers.get(IndWhatIsYourNamePage).nonEmpty) None else Some(IndWhatIsYourNamePage)
+      if (userAnswers.get(IndWhatIsYourNamePage).nonEmpty) None else Some(IndWhatIsYourNamePage),
+      if (userAnswers.get(DateOfBirthWithoutIdPage).nonEmpty) None else Some(DateOfBirthWithoutIdPage),
+      userAnswers.get(IndWhereDoYouLivePage) match {
+        case None => Some(IndWhereDoYouLivePage)
+        case Some(false) =>
+          if (userAnswers.get(IndNonUKAddressWithoutIdPage).nonEmpty) None else Some(IndNonUKAddressWithoutIdPage)
+        case Some(true) =>
+          None // TODO: what do we do here? how do we validate the uk address pages?
+      }
+    )
+
+  private def getIndividualContactDetailsMissingAnswers(userAnswers: UserAnswers): Seq[Option[Page]] =
+    Seq(
+      if (userAnswers.get(IndContactEmailPage).nonEmpty) None else Some(IndContactEmailPage),
+      userAnswers.get(IndContactHavePhonePage) match {
+        case None        => Some(IndContactHavePhonePage)
+        case Some(false) => None
+        case Some(true) =>
+          if (userAnswers.get(IndContactPhonePage).nonEmpty) None else Some(IndContactPhonePage)
+      }
     )
 
 }
