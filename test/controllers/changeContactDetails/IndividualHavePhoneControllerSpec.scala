@@ -20,8 +20,8 @@ import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.routes
 import forms.changeContactDetails.IndividualHavePhoneFormProvider
+import models.NormalMode
 import models.subscription.response.IndividualRegistrationType
-import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
@@ -33,7 +33,6 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.IndividualHavePhoneView
 
 import scala.concurrent.Future

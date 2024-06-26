@@ -21,7 +21,6 @@ import models.SubscriptionID
 import models.requests.DataRequestWithSubscriptionId
 import models.subscription.response.RegistrationType
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.AffinityGroup
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

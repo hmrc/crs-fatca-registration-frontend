@@ -24,7 +24,7 @@ import models.error.ApiError.{ServiceUnavailableError, UnableToCreateEnrolmentEr
 import play.api.Logging
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HttpReads.{is2xx, is4xx}
+import uk.gov.hmrc.http.HttpErrorFunctions.{is2xx, is4xx}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import javax.inject.Inject

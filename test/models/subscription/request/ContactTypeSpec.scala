@@ -327,8 +327,7 @@ class ContactTypeSpec extends SpecBase with ScalaCheckPropertyChecks with ModelG
           "error scenarios" - {
 
             "return MandatoryInformationMissingError if a required field is missing" in {
-              val contactName  = arbitraryName.arbitrary.sample.value.fullName
-              val contactEmail = validEmailAddressToLong(3).sample.value
+              val contactName = arbitraryName.arbitrary.sample.value.fullName
 
               val userAnswers = UserAnswers("")
                 .set(ReporterTypePage, ReporterType.LimitedCompany).success.value
