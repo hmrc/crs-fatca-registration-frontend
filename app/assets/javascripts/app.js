@@ -1,6 +1,3 @@
-// initialise GovUK lib
-GOVUKFrontend.initAll();
-
 // =====================================================
 // Back link mimics browser back functionality
 // =====================================================
