@@ -24,7 +24,7 @@ import models.error.ApiError.MandatoryInformationMissingError
 import models.matching.SafeId
 import models.subscription.request._
 import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse}
-import models.{IdentifierType, Name, SubscriptionID, UserAnswers}
+import models.{Name, SubscriptionID, UserAnswers}
 import pages.changeContactDetails.{OrganisationHaveSecondContactPage, OrganisationSecondContactNamePage}
 import play.api.Logging
 import uk.gov.hmrc.auth.core.AffinityGroup
@@ -91,13 +91,13 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[DisplaySubscriptionResponse]] =
-    subscriptionConnector.readSubscription(ReadSubscriptionRequest(IdentifierType.SAFEID, safeId.value))
+    subscriptionConnector.readSubscription(ReadSubscriptionRequest(safeId.value))
 
   def getSubscription(subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[DisplaySubscriptionResponse]] =
-    subscriptionConnector.readSubscription(ReadSubscriptionRequest(IdentifierType.FATCAID, subscriptionId.value))
+    subscriptionConnector.readSubscription(ReadSubscriptionRequest(subscriptionId.value))
 
   // INDIVIDUAL
   def checkIfIndContactDetailsHasChanged(

@@ -95,9 +95,8 @@ trait ModelGenerators extends RegexConstants with Generators {
 
   implicit val arbitraryRequestDetail: Arbitrary[ReadSubscriptionRequest] = Arbitrary {
     for {
-      idType   <- arbitrary[String]
       idNumber <- arbitrary[String]
-    } yield ReadSubscriptionRequest(idType, idNumber)
+    } yield ReadSubscriptionRequest(idNumber)
   }
 
   implicit lazy val arbitraryCountry: Arbitrary[Country] =

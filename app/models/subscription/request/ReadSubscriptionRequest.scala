@@ -18,7 +18,7 @@ package models.subscription.request
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ReadSubscriptionRequest(idType: String, idNumber: String)
+case class ReadSubscriptionRequest(idNumber: String)
 
 object ReadSubscriptionRequest {
   implicit val format: OFormat[ReadSubscriptionRequest] = Json.format[ReadSubscriptionRequest]

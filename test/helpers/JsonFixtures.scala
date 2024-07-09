@@ -256,7 +256,7 @@ object JsonFixtures extends TestValues {
       |    "correlationId": "36147652-e594-94a4-a229-23f28e20e841",
       |    "sourceFaultDetail": {
       |      "detail": [
-      |        "001 - Request could not be processed"
+      |        "003 - Request could not be processed"
       |      ]
       |    }
       |  }
@@ -268,7 +268,7 @@ object JsonFixtures extends TestValues {
       |  "errorDetail": {
       |    "timestamp" : "2017-02-14T12:58:44Z",
       |    "correlationId": "c181e730-2386-4359-8ee0-f911d6e5f3bc",
-      |    "errorCode": "400",
+      |    "errorCode": "016",
       |    "errorMessage": "Invalid ID",
       |    "source": "Back End",
       |    "sourceFaultDetail":{
