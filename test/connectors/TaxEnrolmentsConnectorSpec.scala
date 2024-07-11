@@ -54,9 +54,9 @@ class TaxEnrolmentsConnectorSpec extends SpecBase with WireMockServerHandler wit
     "createEnrolment" - {
 
       "must return status as 204 for successful Tax Enrolment call" in {
-        forAll(validSafeID, validSubscriptionID, validUtr) {
-          (safeID, subID, utr) =>
-            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), id = subID)
+        forAll(validPostCodes, validSubscriptionID, validAbroadFlag) {
+          (postCode, subID, abroadFlag) =>
+            val enrolmentInfo = SubscriptionInfo(postCode = Some(postCode), abroadFlag = Some(abroadFlag), id = subID)
 
             stubResponseForPutRequest(s"/tax-enrolments/service/$enrolmentKey/enrolment", NO_CONTENT)
 
@@ -66,9 +66,9 @@ class TaxEnrolmentsConnectorSpec extends SpecBase with WireMockServerHandler wit
       }
 
       "must return status as 400 and BadRequest error" in {
-        forAll(validSafeID, validSubscriptionID, validUtr) {
-          (safeID, subID, utr) =>
-            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), id = subID)
+        forAll(validPostCodes, validSubscriptionID, validAbroadFlag) {
+          (postCode, subID, abroadFlag) =>
+            val enrolmentInfo = SubscriptionInfo(postCode = Some(postCode), abroadFlag = Some(abroadFlag), id = subID)
             stubResponseForPutRequest(s"/tax-enrolments/service/$enrolmentKey/enrolment", BAD_REQUEST)
 
             val result = connector.createEnrolment(enrolmentInfo)
@@ -77,9 +77,9 @@ class TaxEnrolmentsConnectorSpec extends SpecBase with WireMockServerHandler wit
       }
 
       "must return status ServiceUnavailable Error" in {
-        forAll(validSafeID, validSubscriptionID, validUtr) {
-          (safeID, subID, utr) =>
-            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), id = subID)
+        forAll(validPostCodes, validSubscriptionID, validAbroadFlag) {
+          (postCode, subID, abroadFlag) =>
+            val enrolmentInfo = SubscriptionInfo(postCode = Some(postCode), abroadFlag = Some(abroadFlag), id = subID)
             stubResponseForPutRequest(s"/tax-enrolments/service/$enrolmentKey/enrolment", INTERNAL_SERVER_ERROR)
 
             val result = connector.createEnrolment(enrolmentInfo)
@@ -89,37 +89,23 @@ class TaxEnrolmentsConnectorSpec extends SpecBase with WireMockServerHandler wit
     }
 
     "createEnrolmentRequest" - {
+      "must return correct EnrolmentRequest when abroadFlag provided as verifier" in {
+        forAll(validSubscriptionID, validAbroadFlag) {
+          (subID, abroadFlag) =>
+            val enrolmentInfo = SubscriptionInfo(abroadFlag = Some(abroadFlag), id = subID)
 
-      "must return correct EnrolmentRequest nino provided" in {
-        forAll(validSafeID, validSubscriptionID, validNino) {
-          (safeID, subID, nino) =>
-            val enrolmentInfo = SubscriptionInfo(safeID = safeID, nino = Some(nino), id = subID)
-
-            val expectedVerifiers = Seq(Verifier(SAFEID, enrolmentInfo.safeID), Verifier(NINO, enrolmentInfo.nino.get))
-
-            enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
-
-        }
-      }
-      "must return correct EnrolmentRequest when saUtr provided as verifier" in {
-
-        forAll(validSafeID, validSubscriptionID, validUtr) {
-          (safeID, subID, utr) =>
-            val enrolmentInfo = SubscriptionInfo(safeID = safeID, saUtr = Some(utr), id = subID)
-
-            val expectedVerifiers = Seq(Verifier(SAFEID, enrolmentInfo.safeID), Verifier(SAUTR, enrolmentInfo.saUtr.get))
+            val expectedVerifiers = Seq(Verifier(ABROADFLAG, enrolmentInfo.abroadFlag.get))
 
             enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
         }
       }
 
-      "must return correct EnrolmentRequest when ctUtr provided as verifier" in {
+      "must return correct EnrolmentRequest when postCode provided as verifier" in {
+        forAll(validPostCodes, validSubscriptionID) {
+          (postCode, subID) =>
+            val enrolmentInfo = SubscriptionInfo(postCode = Some(postCode), id = subID)
 
-        forAll(validSafeID, validSubscriptionID, validUtr) {
-          (safeID, subID, utr) =>
-            val enrolmentInfo = SubscriptionInfo(safeID = safeID, ctUtr = Some(utr), id = subID)
-
-            val expectedVerifiers = Seq(Verifier(SAFEID, enrolmentInfo.safeID), Verifier(CTUTR, enrolmentInfo.ctUtr.get))
+            val expectedVerifiers = Seq(Verifier(POSTCODE, enrolmentInfo.postCode.get))
 
             enrolmentInfo.convertToEnrolmentRequest.verifiers mustBe expectedVerifiers
         }

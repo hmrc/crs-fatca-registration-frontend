@@ -36,7 +36,7 @@ class TaxEnrolmentService @Inject() (taxEnrolmentsConnector: TaxEnrolmentsConnec
   ): Future[Either[ApiError, Int]] =
     enrolmentStoreProxyConnector.enrolmentStatus(subscriptionId).value flatMap {
       case Right(_) =>
-        SubscriptionInfo.createSubscriptionInfo(safeId, userAnswers, subscriptionId) match {
+        SubscriptionInfo.createSubscriptionInfo(userAnswers, subscriptionId) match {
           case Right(subscriptionInfo: SubscriptionInfo) =>
             taxEnrolmentsConnector.createEnrolment(subscriptionInfo).value
           case Left(apiError: ApiError) =>

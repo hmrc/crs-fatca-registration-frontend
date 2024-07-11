@@ -17,35 +17,19 @@
 package models.enrolment
 
 import models.IdentifierType._
-import models.ReporterType.{LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models.error.ApiError
-import models.matching.SafeId
 import models.{SubscriptionID, UserAnswers}
 import pages._
 import play.api.libs.json.{Json, OFormat}
 
-case class SubscriptionInfo(safeID: String,
-                            saUtr: Option[String] = None,
-                            ctUtr: Option[String] = None,
-                            nino: Option[String] = None,
-                            nonUkPostcode: Option[String] = None,
-                            id: String
-) {
+case class SubscriptionInfo(postCode: Option[String] = None, abroadFlag: Option[String] = None, id: String) {
 
   def convertToEnrolmentRequest: EnrolmentRequest =
     EnrolmentRequest(identifiers = Seq(Identifier(FATCAID, id)), verifiers = buildVerifiers)
 
-  def buildVerifiers: Seq[Verifier] = {
-
-    val mandatoryVerifiers = Seq(Verifier(SAFEID, safeID))
-
-    mandatoryVerifiers ++
-      buildOptionalVerifier(saUtr, SAUTR) ++
-      buildOptionalVerifier(ctUtr, CTUTR) ++
-      buildOptionalVerifier(nino, NINO) ++
-      buildOptionalVerifier(nonUkPostcode, NonUKPostalCode)
-
-  }
+  def buildVerifiers: Seq[Verifier] =
+    buildOptionalVerifier(postCode, POSTCODE) ++
+      buildOptionalVerifier(abroadFlag, ABROADFLAG)
 
   def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] =
     optionalInfo
@@ -59,40 +43,26 @@ case class SubscriptionInfo(safeID: String,
 object SubscriptionInfo {
   implicit val format: OFormat[SubscriptionInfo] = Json.format[SubscriptionInfo]
 
-  def createSubscriptionInfo(safeId: SafeId, userAnswers: UserAnswers, subscriptionId: SubscriptionID): Either[ApiError, SubscriptionInfo] =
+  def createSubscriptionInfo(userAnswers: UserAnswers, subscriptionId: SubscriptionID): Either[ApiError, SubscriptionInfo] =
     Right(
       SubscriptionInfo(
-        safeID = safeId.value,
-        saUtr = getSaUtrIfProvided(userAnswers),
-        ctUtr = getCtUtrIfProvided(userAnswers),
-        nino = getNinoIfProvided(userAnswers),
-        nonUkPostcode = getNonUkPostCodeIfProvided(userAnswers),
+        postCode = getNonUkPostCodeIfProvided(userAnswers),
+        abroadFlag = getAbroadFlagIfProvided(userAnswers),
         id = subscriptionId.value
       )
     )
-
-  private def getNinoIfProvided(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(IndWhatIsYourNINumberPage) match {
-      case Some(nino) => Some(nino.nino)
-      case _          => None
-    }
-
-  private def getSaUtrIfProvided(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(ReporterTypePage) match {
-      case Some(Partnership) | Some(Sole) | Some(LimitedPartnership) => userAnswers.get(WhatIsYourUTRPage).map(_.uniqueTaxPayerReference)
-      case _                                                         => None
-    }
-
-  private def getCtUtrIfProvided(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(ReporterTypePage) match {
-      case Some(LimitedCompany) | Some(UnincorporatedAssociation) => userAnswers.get(WhatIsYourUTRPage).map(_.uniqueTaxPayerReference)
-      case _                                                      => None
-    }
 
   private def getNonUkPostCodeIfProvided(userAnswers: UserAnswers): Option[String] =
     userAnswers.get(NonUKBusinessAddressWithoutIDPage) match {
       case Some(address) => address.postCode
       case _             => None
+    }
+
+  private def getAbroadFlagIfProvided(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(RegisteredAddressInUKPage) match {
+      case Some(true)  => Some("Y")
+      case Some(false) => Some("N")
+      case None        => None
     }
 
 }
