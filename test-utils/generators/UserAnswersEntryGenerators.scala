@@ -78,6 +78,38 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
+  implicit lazy val arbitraryIndNameUserAnswersEntry: Arbitrary[(pages.IndWhatIsYourNamePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndWhatIsYourNamePage.type]
+        value <- arbitrary[models.Name].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryIndWhereDoYouLivePageEntry: Arbitrary[(pages.IndWhereDoYouLivePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndWhereDoYouLivePage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryIndNonUKAddressWithoutIdPageEntry: Arbitrary[(pages.IndNonUKAddressWithoutIdPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndNonUKAddressWithoutIdPage.type]
+        value <- arbitrary[models.Address].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryIndUKAddressWithoutIdPageEntry: Arbitrary[(pages.IndUKAddressWithoutIdPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndUKAddressWithoutIdPage.type]
+        value <- arbitrary[models.Address].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
   implicit lazy val arbitrarySoleNameUserAnswersEntry: Arbitrary[(pages.IndContactNamePage.type, JsValue)] =
     Arbitrary {
       for {

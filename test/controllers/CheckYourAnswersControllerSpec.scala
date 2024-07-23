@@ -18,7 +18,7 @@ package controllers
 
 import base.{ControllerMockFixtures, SpecBase}
 import connectors.AddressLookupConnector
-import generators.ModelGenerators
+import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures._
 import models.enrolment.GroupIds
 import models.error.ApiError._
@@ -29,6 +29,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks.{forAll => arbForAll}
 import pages._
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -39,7 +40,8 @@ import views.html.ThereIsAProblemView
 
 import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach with TableDrivenPropertyChecks with ModelGenerators {
+class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach with TableDrivenPropertyChecks
+    with ModelGenerators with UserAnswersGenerator {
 
   final val mockRegistrationService: BusinessMatchingWithoutIdService = mock[BusinessMatchingWithoutIdService]
 
@@ -717,57 +719,41 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         "individual without id journey" - {
 
           "return an empty list if no answers are missing" in {
-            val userAnswers: UserAnswers = emptyUserAnswers
-              .withPage(ReporterTypePage, ReporterType.Individual)
-              .withPage(IndDoYouHaveNINumberPage, false)
-              .withPage(IndWhatIsYourNamePage, arbitraryName.arbitrary.sample.value)
-              .withPage(DateOfBirthWithoutIdPage, validDateOfBirth().sample.value)
-              .withPage(IndWhereDoYouLivePage, false)
-              .withPage(IndNonUKAddressWithoutIdPage, arbitraryAddressWithoutId.arbitrary.sample.value)
-              .withPage(IndContactEmailPage, validEmailAddressToLong(10).sample.value)
-              .withPage(IndContactHavePhonePage, false)
+            arbForAll(indWithoutId.arbitrary) {
+              (userAnswers: UserAnswers) =>
+                userAnswers.get(ReporterTypePage) mustBe Some(ReporterType.Individual)
+                userAnswers.get(IndDoYouHaveNINumberPage) mustBe Some(false)
 
-            controller.getMissingAnswers(userAnswers) mustBe Nil
+                val result = controller.getMissingAnswers(userAnswers)
+                result mustBe Nil
+            }
           }
 
-          "return any missing answers for this journey" in {
-            val userAnswers: UserAnswers = emptyUserAnswers
-              .withPage(ReporterTypePage, ReporterType.Individual)
-              .withPage(IndDoYouHaveNINumberPage, false)
+          "return missing answers" in {
+            arbForAll(indWithoutIdMissingAnswers.arbitrary) {
+              (userAnswers: UserAnswers) =>
+                userAnswers.get(ReporterTypePage) mustBe Some(ReporterType.Individual)
+                userAnswers.get(IndDoYouHaveNINumberPage) mustBe Some(false)
 
-            controller.getMissingAnswers(userAnswers) mustBe List(
-              IndWhatIsYourNamePage,
-              DateOfBirthWithoutIdPage,
-              IndWhereDoYouLivePage,
-              IndContactEmailPage,
-              IndContactHavePhonePage
-            )
-          }
-
-          "return any missing answers for the non-uk address journey" in {
-            val userAnswers: UserAnswers = emptyUserAnswers
-              .withPage(ReporterTypePage, ReporterType.Individual)
-              .withPage(IndDoYouHaveNINumberPage, false)
-              .withPage(IndWhereDoYouLivePage, false)
-
-            controller.getMissingAnswers(userAnswers).contains(IndNonUKAddressWithoutIdPage) mustBe true
-          }
-
-          "return any missing answers for the uk address journey" in {
-            val userAnswers: UserAnswers = emptyUserAnswers
-              .withPage(ReporterTypePage, ReporterType.Individual)
-              .withPage(IndDoYouHaveNINumberPage, false)
-              .withPage(IndWhereDoYouLivePage, true)
-
-            controller.getMissingAnswers(userAnswers).contains(IndWhatIsYourPostcodePage) mustBe true
-
+                val result = controller.getMissingAnswers(userAnswers)
+                result mustNot be(empty)
+                Set(
+                  IndWhereDoYouLivePage,
+                  IndWhatIsYourPostcodePage,
+                  IndUKAddressWithoutIdPage,
+                  IndNonUKAddressWithoutIdPage,
+                  IndContactHavePhonePage,
+                  IndContactPhonePage,
+                  IndWhatIsYourNamePage,
+                  DateOfBirthWithoutIdPage,
+                  IndContactEmailPage
+                ) must contain allElementsOf result
+            }
           }
 
         }
 
-        "individual with id journey" - {
-
-        }
+        "individual with id journey" - {}
       }
 
     }
