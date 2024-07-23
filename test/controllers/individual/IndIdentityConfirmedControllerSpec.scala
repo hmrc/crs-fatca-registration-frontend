@@ -74,7 +74,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
 
   override def beforeEach(): Unit = {
     reset(mockMatchingService, mockSubscriptionService, mockTaxEnrolmentService)
-    super.beforeEach
+    super.beforeEach()
   }
 
   "WeHaveConfirmedYourIdentity Controller" - {

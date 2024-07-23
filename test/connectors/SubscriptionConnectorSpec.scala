@@ -93,8 +93,8 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         val subscriptionResponse = Json.obj(
           "success" -> Json.obj(
-            "processingDate" -> "2020-01-01T00:00:00Z",
-            "subscriptionId" -> "Subscription 123"
+            "processingDate"    -> "2020-01-01T00:00:00Z",
+            "crsFatcaReference" -> "Subscription 123"
           )
         )
 
@@ -109,8 +109,8 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         val subscriptionResponse = Json.obj(
           "failure" -> Json.obj(
-            "processingDate" -> "2020-01-01T00:00:00Z",
-            "subscriptionId" -> "Subscription 123"
+            "processingDate"    -> "2020-01-01T00:00:00Z",
+            "crsFatcaReference" -> "Subscription 123"
           )
         )
 
@@ -156,7 +156,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
              | "errorDetail": {
              |    "timestamp" : "2021-03-11T08:20:44Z",
              |    "correlationId": "c181e730-2386-4359-8ee0-f911d6e5f3bc",
-             |    "errorCode": "409",
+             |    "errorCode": "004",
              |    "errorMessage": "Duplicate submission",
              |    "source": "Back End",
              |    "sourceFaultDetail": {
