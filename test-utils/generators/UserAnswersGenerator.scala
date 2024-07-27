@@ -79,7 +79,7 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
     }
   }
 
-  private def generateJsObject(gens: List[Gen[(QuestionPage[_], JsValue)]]): Gen[JsObject] =
+  private def genJsObj(gens: Gen[(QuestionPage[_], JsValue)]*): Gen[JsObject] =
     Gen.sequence[Seq[(QuestionPage[_], JsValue)], (QuestionPage[_], JsValue)](gens).map {
       seq =>
         seq.foldLeft(Json.obj()) {
@@ -93,16 +93,28 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       case (acc, (path, value)) => acc.setObject(path, value).get
     }
 
+  private lazy val indUkAddress =
+    Arbitrary {
+      for {
+        postCode          <- genJsObj(arbitrary[(IndWhatIsYourPostcodePage.type, JsValue)])
+        isThisYourAddress <- arbitrary[Boolean]
+        data <- if (isThisYourAddress) {
+          genJsObj(arbitrary[(IndSelectAddressPage.type, JsValue)])
+        } else {
+          genJsObj(arbitrary[(IndUKAddressWithoutIdPage.type, JsValue)])
+        }
+      } yield postCode ++ data
+    }
+
   private lazy val indAddress =
     Arbitrary {
       for {
         whereDoYouLive <- arbitrary[Boolean]
-        gens = if (whereDoYouLive) {
-          arbitrary[(IndWhatIsYourPostcodePage.type, JsValue)] :: arbitrary[(IndUKAddressWithoutIdPage.type, JsValue)] :: Nil
+        data <- if (whereDoYouLive) {
+          indUkAddress.arbitrary
         } else {
-          arbitrary[(IndNonUKAddressWithoutIdPage.type, JsValue)] :: Nil
+          genJsObj(arbitrary[(IndNonUKAddressWithoutIdPage.type, JsValue)])
         }
-        data <- generateJsObject(gens)
         obj = setFields(
           Json.obj(),
           IndWhereDoYouLivePage.path -> Json.toJson(whereDoYouLive)
@@ -114,13 +126,11 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
     Arbitrary {
       for {
         havePhone <- arbitrary[Boolean]
-        gens = if (havePhone) {
-          arbitrary[(IndContactPhonePage.type, JsValue)] ::
-            Nil
+        data <- if (havePhone) {
+          genJsObj(arbitrary[(IndContactPhonePage.type, JsValue)])
         } else {
-          Nil
+          Gen.const(Json.obj())
         }
-        data <- generateJsObject(gens)
         obj = setFields(
           Json.obj(),
           IndContactHavePhonePage.path -> Json.toJson(havePhone)
@@ -137,11 +147,10 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
         id      <- nonEmptyString
         address <- indAddress.arbitrary
         phone   <- indPhone.arbitrary
-        gens = arbitrary[(IndWhatIsYourNamePage.type, JsValue)] ::
-          arbitrary[(DateOfBirthWithoutIdPage.type, JsValue)] ::
-          arbitrary[(IndContactEmailPage.type, JsValue)] ::
-          Nil
-        additionalData <- generateJsObject(gens)
+        additionalData <- genJsObj(arbitrary[(IndWhatIsYourNamePage.type, JsValue)],
+                                   arbitrary[(DateOfBirthWithoutIdPage.type, JsValue)],
+                                   arbitrary[(IndContactEmailPage.type, JsValue)]
+        )
         obj =
           setFields(
             Json.obj(),
@@ -155,13 +164,40 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
     }
   }
 
+  lazy val indWithId: Arbitrary[UserAnswers] = {
+    import models._
+
+    Arbitrary {
+      for {
+        id    <- nonEmptyString
+        phone <- indPhone.arbitrary
+        additionalData <- genJsObj(
+          arbitrary[(IndWhatIsYourNINumberPage.type, JsValue)],
+          arbitrary[(IndContactNamePage.type, JsValue)],
+          arbitrary[(IndDateOfBirthPage.type, JsValue)],
+          arbitrary[(RegistrationInfoPage.type, JsValue)],
+          arbitrary[(IndContactEmailPage.type, JsValue)]
+        )
+        obj =
+          setFields(
+            Json.obj(),
+            ReporterTypePage.path         -> Json.toJson(ReporterType.Individual.asInstanceOf[ReporterType]),
+            IndDoYouHaveNINumberPage.path -> Json.toJson(true)
+          ) ++ additionalData ++ phone
+      } yield UserAnswers(
+        id = id,
+        data = obj
+      )
+    }
+  }
+
   lazy val indWithoutIdMissingAnswers: Arbitrary[UserAnswers] =
     Arbitrary {
       for {
         answers <- indWithoutId.arbitrary
         basicQuestions = Seq(IndWhatIsYourNamePage, DateOfBirthWithoutIdPage, IndContactEmailPage, IndWhereDoYouLivePage, IndContactHavePhonePage)
         addressQuestions = answers.get(IndWhereDoYouLivePage) match {
-          case Some(true) => Seq(IndWhatIsYourPostcodePage, IndUKAddressWithoutIdPage)
+          case Some(true) => Seq(IndWhatIsYourPostcodePage)
           case _          => Seq(IndNonUKAddressWithoutIdPage)
         }
         phoneQuestions = answers.get(IndContactHavePhonePage) match {
@@ -169,7 +205,7 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
           case _          => Nil
         }
         allQuestions = basicQuestions ++ addressQuestions ++ phoneQuestions
-        n                <- Gen.choose(1, allQuestions.length)
+        n                <- Gen.oneOf(1, allQuestions.length)
         missingQuestions <- Gen.pick(n, allQuestions)
         updatedAnswers = missingQuestions.foldLeft(answers) {
           case (acc, page) => acc.remove(page.asInstanceOf[QuestionPage[_]]).success.value

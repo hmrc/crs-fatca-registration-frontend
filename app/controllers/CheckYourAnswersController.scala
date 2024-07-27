@@ -32,7 +32,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{BusinessMatchingWithoutIdService, SubscriptionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{CountryListFactory, UserAnswersHelper}
+import utils.{CheckAnswersHelper, CountryListFactory, UserAnswersHelper}
 import viewmodels.Section
 import viewmodels.checkAnswers.CheckYourAnswersViewModel
 import views.html.{CheckYourAnswersView, ThereIsAProblemView}
@@ -99,51 +99,61 @@ class CheckYourAnswersController @Inject() (
         registrationService.registerWithoutId()
     }
 
-  def getMissingAnswers(userAnswers: UserAnswers): Seq[Page] = {
-    val reporterType = userAnswers.get(ReporterTypePage)
+  def getMissingAnswers(userAnswers: UserAnswers): Seq[Page] = checkAnswers(userAnswers) {
+    helper =>
+      import helper._
+      val reporterType = userAnswers.get(ReporterTypePage)
 
-    if (reporterType.contains(ReporterType.Individual)) {
-      val businessDetails: Seq[Option[Page]] = userAnswers.get(IndDoYouHaveNINumberPage) match {
-        case Some(false) => getIndividualWithoutIdMissingAnswers(userAnswers)
-        case _           => Seq(Some(IndDoYouHaveNINumberPage))
+      def checkIndPhoneAnswers: Seq[Page] = (userAnswers.get(IndContactHavePhonePage) match {
+        case Some(true)  => checkPage(IndContactPhonePage)
+        case Some(false) => None
+        case _           => Some(IndContactHavePhonePage)
+      }).toSeq
+
+      def checkIndividualContactDetailsMissingAnswers: Seq[Page] = checkPage(IndContactEmailPage).toSeq ++ checkIndPhoneAnswers
+
+      def checkIndividualAddressMissingAnswers: Seq[Page] = (userAnswers.get(IndWhereDoYouLivePage) match {
+        case Some(true) => checkPage(IndWhatIsYourPostcodePage)
+            .orElse(
+              any(
+                checkPage(IndSelectAddressPage),
+                checkPage(IndUKAddressWithoutIdPage)
+              ).map(
+                _ => IndWhatIsYourPostcodePage
+              )
+            )
+        case Some(false) => checkPage(IndNonUKAddressWithoutIdPage)
+        case _           => Some(IndWhereDoYouLivePage)
+      }).toSeq
+
+      def checkIndividualWithoutIdMissingAnswers: Seq[Page] = Seq(
+        checkPage(IndWhatIsYourNamePage),
+        checkPage(DateOfBirthWithoutIdPage),
+        checkIndividualContactDetailsMissingAnswers
+      ).flatten ++ checkIndividualAddressMissingAnswers
+
+      def checkIndividualWithIdMissingAnswers: Seq[Page] = Seq(
+        checkPage(IndWhatIsYourNINumberPage),
+        checkPage(IndContactNamePage),
+        checkPage(IndDateOfBirthPage),
+        checkPage(RegistrationInfoPage)
+      ).flatten ++ checkIndividualContactDetailsMissingAnswers
+
+      def checkIndividualMissingAnswers: Seq[Page] = userAnswers.get(IndDoYouHaveNINumberPage) match {
+        case Some(false) => checkIndividualWithoutIdMissingAnswers
+        case Some(true)  => checkIndividualWithIdMissingAnswers
+        case _           => Seq(IndDoYouHaveNINumberPage) ++ checkIndividualContactDetailsMissingAnswers
       }
 
-      val contactDetails = getIndividualContactDetailsMissingAnswers(userAnswers)
-
-      (businessDetails ++ contactDetails)
-        .filter(_.nonEmpty)
-        .flatten
-    } else {
-      Seq(ReporterTypePage)
-    }
+      reporterType match {
+        case Some(ReporterType.Individual) => checkIndividualMissingAnswers
+        case _                             => Seq(ReporterTypePage)
+      }
   }
 
-  private def getIndividualWithoutIdMissingAnswers(userAnswers: UserAnswers): Seq[Option[Page]] =
-    Seq(
-      if (userAnswers.get(IndWhatIsYourNamePage).nonEmpty) None else Some(IndWhatIsYourNamePage),
-      if (userAnswers.get(DateOfBirthWithoutIdPage).nonEmpty) None else Some(DateOfBirthWithoutIdPage),
-      userAnswers.get(IndWhereDoYouLivePage) match {
-        case None => Some(IndWhereDoYouLivePage)
-        case Some(false) =>
-          if (userAnswers.get(IndNonUKAddressWithoutIdPage).nonEmpty) None else Some(IndNonUKAddressWithoutIdPage)
-        case Some(true) =>
-          if (
-            userAnswers.get(IndSelectedAddressLookupPage).nonEmpty ||
-            userAnswers.get(IndUKAddressWithoutIdPage).nonEmpty
-          ) { None }
-          else { Some(IndWhatIsYourPostcodePage) }
-      }
-    )
-
-  private def getIndividualContactDetailsMissingAnswers(userAnswers: UserAnswers): Seq[Option[Page]] =
-    Seq(
-      if (userAnswers.get(IndContactEmailPage).nonEmpty) None else Some(IndContactEmailPage),
-      userAnswers.get(IndContactHavePhonePage) match {
-        case None        => Some(IndContactHavePhonePage)
-        case Some(false) => None
-        case Some(true) =>
-          if (userAnswers.get(IndContactPhonePage).nonEmpty) None else Some(IndContactPhonePage)
-      }
-    )
+  private def checkAnswers(userAnswers: UserAnswers)(fn: CheckAnswersHelper => Seq[Page]): Seq[Page] = {
+    val answersHelper = CheckAnswersHelper(userAnswers)
+    fn(answersHelper)
+  }
 
 }

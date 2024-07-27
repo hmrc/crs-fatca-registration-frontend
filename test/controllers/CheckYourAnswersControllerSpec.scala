@@ -753,7 +753,17 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
         }
 
-        "individual with id journey" - {}
+        "individual with id journey" - {
+          "return an empty list if no answers are missing" in {
+            arbForAll(indWithId.arbitrary) {
+              (userAnswers: UserAnswers) =>
+                userAnswers.get(ReporterTypePage) mustBe Some(ReporterType.Individual)
+                userAnswers.get(IndDoYouHaveNINumberPage) mustBe Some(true)
+                val result = controller.getMissingAnswers(userAnswers)
+                result mustBe Nil
+            }
+          }
+        }
       }
 
     }
