@@ -38,7 +38,7 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
   )
 
   "SubscriptionInfo" - {
-    "contain postCode for org registration info" in {
+    "contains postCode for org registration info" in {
       forAll {
         (registrationInfo: OrgRegistrationInfo, subscriptionId: SubscriptionID) =>
           val userAnswers      = emptyUserAnswers.set(RegistrationInfoPage, registrationInfo).success.value
@@ -48,7 +48,7 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
       }
     }
 
-    "contain postCode for org non-uk business address" in {
+    "contains postCode for org non-uk business address" in {
       forAll {
         (address: Address, subscriptionId: SubscriptionID) =>
           val userAnswers      = emptyUserAnswers.set(NonUKBusinessAddressWithoutIDPage, address).success.value
@@ -58,7 +58,7 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
       }
     }
 
-    "contain abroadFlag as N for org registration info" in {
+    "contains abroadFlag as N for org registration info" in {
       forAll {
         (registrationInfo: OrgRegistrationInfo, subscriptionId: SubscriptionID) =>
           val userAnswers      = emptyUserAnswers.set(RegistrationInfoPage, registrationInfo).success.value
@@ -68,7 +68,7 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
       }
     }
 
-    "contain abroadFlag as Y for org non-uk business address" in {
+    "contains abroadFlag as Y for org non-uk business address" in {
       forAll {
         (address: Address, subscriptionId: SubscriptionID) =>
           val userAnswers      = emptyUserAnswers.set(NonUKBusinessAddressWithoutIDPage, address).success.value
