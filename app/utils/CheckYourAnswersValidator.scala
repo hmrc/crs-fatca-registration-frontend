@@ -47,9 +47,8 @@ sealed trait IndividualAnswersValidator {
 
   private def checkIndividualWithoutIdMissingAnswers: Seq[Page] = Seq(
     checkPage(IndWhatIsYourNamePage),
-    checkPage(DateOfBirthWithoutIdPage),
-    checkIndividualContactDetailsMissingAnswers
-  ).flatten ++ checkIndividualAddressMissingAnswers
+    checkPage(DateOfBirthWithoutIdPage)
+  ).flatten ++ checkIndividualAddressMissingAnswers ++ checkIndividualContactDetailsMissingAnswers
 
   private def checkIndividualWithIdMissingAnswers: Seq[Page] = Seq(
     checkPage(IndWhatIsYourNINumberPage),
