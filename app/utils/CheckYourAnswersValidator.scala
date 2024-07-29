@@ -66,7 +66,7 @@ sealed trait IndividualAnswersValidator {
 
 }
 
-trait OrgAnswersValidator {
+sealed trait OrgAnswersValidator {
   self: CheckYourAnswersValidator with IndividualAnswersValidator =>
 
   private def checkOrgPhoneMissingAnswers: Seq[Page] = (userAnswers.get(ContactHavePhonePage) match {
