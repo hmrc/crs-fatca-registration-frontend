@@ -20,11 +20,11 @@ import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
+import models.UserAnswers
 import models.error.ApiError
 import models.error.ApiError.{MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, SafeId}
 import models.requests.DataRequest
-import models.{ReporterType, UserAnswers}
 import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -32,8 +32,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{BusinessMatchingWithoutIdService, SubscriptionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{CheckAnswersHelper, CountryListFactory, UserAnswersHelper}
-import viewmodels.Section
+import utils.{CheckYourAnswersValidator, CountryListFactory, UserAnswersHelper}
 import viewmodels.checkAnswers.CheckYourAnswersViewModel
 import views.html.{CheckYourAnswersView, ThereIsAProblemView}
 
@@ -58,9 +57,10 @@ class CheckYourAnswersController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) {
     implicit request =>
-      val viewModel: Seq[Section] =
-        CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)
-      Ok(view(viewModel))
+      getMissingAnswers(request.userAnswers) match {
+        case Nil => Ok(view(CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)))
+        case _   => Redirect(routes.InformationMissingController.onPageLoad())
+      }
   }
 
   def onSubmit(): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
@@ -99,61 +99,6 @@ class CheckYourAnswersController @Inject() (
         registrationService.registerWithoutId()
     }
 
-  def getMissingAnswers(userAnswers: UserAnswers): Seq[Page] = checkAnswers(userAnswers) {
-    helper =>
-      import helper._
-      val reporterType = userAnswers.get(ReporterTypePage)
-
-      def checkIndPhoneAnswers: Seq[Page] = (userAnswers.get(IndContactHavePhonePage) match {
-        case Some(true)  => checkPage(IndContactPhonePage)
-        case Some(false) => None
-        case _           => Some(IndContactHavePhonePage)
-      }).toSeq
-
-      def checkIndividualContactDetailsMissingAnswers: Seq[Page] = checkPage(IndContactEmailPage).toSeq ++ checkIndPhoneAnswers
-
-      def checkIndividualAddressMissingAnswers: Seq[Page] = (userAnswers.get(IndWhereDoYouLivePage) match {
-        case Some(true) => checkPage(IndWhatIsYourPostcodePage)
-            .orElse(
-              any(
-                checkPage(IndSelectAddressPage),
-                checkPage(IndUKAddressWithoutIdPage)
-              ).map(
-                _ => IndWhatIsYourPostcodePage
-              )
-            )
-        case Some(false) => checkPage(IndNonUKAddressWithoutIdPage)
-        case _           => Some(IndWhereDoYouLivePage)
-      }).toSeq
-
-      def checkIndividualWithoutIdMissingAnswers: Seq[Page] = Seq(
-        checkPage(IndWhatIsYourNamePage),
-        checkPage(DateOfBirthWithoutIdPage),
-        checkIndividualContactDetailsMissingAnswers
-      ).flatten ++ checkIndividualAddressMissingAnswers
-
-      def checkIndividualWithIdMissingAnswers: Seq[Page] = Seq(
-        checkPage(IndWhatIsYourNINumberPage),
-        checkPage(IndContactNamePage),
-        checkPage(IndDateOfBirthPage),
-        checkPage(RegistrationInfoPage)
-      ).flatten ++ checkIndividualContactDetailsMissingAnswers
-
-      def checkIndividualMissingAnswers: Seq[Page] = userAnswers.get(IndDoYouHaveNINumberPage) match {
-        case Some(false) => checkIndividualWithoutIdMissingAnswers
-        case Some(true)  => checkIndividualWithIdMissingAnswers
-        case _           => Seq(IndDoYouHaveNINumberPage) ++ checkIndividualContactDetailsMissingAnswers
-      }
-
-      reporterType match {
-        case Some(ReporterType.Individual) => checkIndividualMissingAnswers
-        case _                             => Seq(ReporterTypePage)
-      }
-  }
-
-  private def checkAnswers(userAnswers: UserAnswers)(fn: CheckAnswersHelper => Seq[Page]): Seq[Page] = {
-    val answersHelper = CheckAnswersHelper(userAnswers)
-    fn(answersHelper)
-  }
+  private def getMissingAnswers(userAnswers: UserAnswers): Seq[Page] = CheckYourAnswersValidator(userAnswers).validate
 
 }

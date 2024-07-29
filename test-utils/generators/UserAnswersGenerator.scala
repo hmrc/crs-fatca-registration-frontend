@@ -20,8 +20,10 @@ import models.{RichJsObject, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
-import pages._
+import pages.{RegistrationInfoPage, _}
+import models._
 import play.api.libs.json.{JsObject, JsPath, JsValue, Json}
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
   self: Generators =>
@@ -58,25 +60,26 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       arbitrary[(ContactEmailPage.type, JsValue)] ::
       Nil
 
-  implicit lazy val arbitraryUserData: Arbitrary[UserAnswers] = {
+  implicit lazy val arbitraryUserData: Arbitrary[UserAnswers] = Arbitrary {
+    for {
+      id <- nonEmptyString
+      data <- generators match {
+        case Nil => Gen.const(Map[QuestionPage[_], JsValue]())
+        case _   => Gen.mapOf(oneOf(generators))
+      }
+    } yield UserAnswers(
+      id = id,
+      data = data.foldLeft(Json.obj()) {
+        case (obj, (path, value)) =>
+          obj.setObject(path.path, value).get
+      }
+    )
+  }
 
-    import models._
-
-    Arbitrary {
-      for {
-        id <- nonEmptyString
-        data <- generators match {
-          case Nil => Gen.const(Map[QuestionPage[_], JsValue]())
-          case _   => Gen.mapOf(oneOf(generators))
-        }
-      } yield UserAnswers(
-        id = id,
-        data = data.foldLeft(Json.obj()) {
-          case (obj, (path, value)) =>
-            obj.setObject(path.path, value).get
-        }
-      )
-    }
+  implicit lazy val arbitraryOrgAffinityGroup: Arbitrary[AffinityGroup] = Arbitrary {
+    for {
+      affinityGroup <- Gen.oneOf(AffinityGroup.Organisation, AffinityGroup.Agent)
+    } yield affinityGroup
   }
 
   private def genJsObj(gens: Gen[(QuestionPage[_], JsValue)]*): Gen[JsObject] =
@@ -122,95 +125,258 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       } yield obj
     }
 
-  private lazy val indPhone =
-    Arbitrary {
-      for {
-        havePhone <- arbitrary[Boolean]
-        data <- if (havePhone) {
-          genJsObj(arbitrary[(IndContactPhonePage.type, JsValue)])
-        } else {
-          Gen.const(Json.obj())
-        }
-        obj = setFields(
-          Json.obj(),
-          IndContactHavePhonePage.path -> Json.toJson(havePhone)
-        ) ++ data
-      } yield obj
-    }
-
-  lazy val indWithoutId: Arbitrary[UserAnswers] = {
-
-    import models._
-
-    Arbitrary {
-      for {
-        id      <- nonEmptyString
-        address <- indAddress.arbitrary
-        phone   <- indPhone.arbitrary
-        additionalData <- genJsObj(arbitrary[(IndWhatIsYourNamePage.type, JsValue)],
-                                   arbitrary[(DateOfBirthWithoutIdPage.type, JsValue)],
-                                   arbitrary[(IndContactEmailPage.type, JsValue)]
-        )
-        obj =
-          setFields(
-            Json.obj(),
-            ReporterTypePage.path         -> Json.toJson(ReporterType.Individual.asInstanceOf[ReporterType]),
-            IndDoYouHaveNINumberPage.path -> Json.toJson(false)
-          ) ++ address ++ phone ++ additionalData
-      } yield UserAnswers(
-        id = id,
-        data = obj
-      )
-    }
+  private def phoneNumberArbitrary[T <: QuestionPage[Boolean], U <: QuestionPage[String]](
+    havePhonePage: T,
+    phonePage: U
+  )(implicit arb: Arbitrary[(phonePage.type, JsValue)]) = Arbitrary {
+    for {
+      havePhone <- arbitrary[Boolean]
+      data <- if (havePhone) {
+        genJsObj(arbitrary[(phonePage.type, JsValue)])
+      } else {
+        Gen.const(Json.obj())
+      }
+      obj = setFields(
+        Json.obj(),
+        havePhonePage.path -> Json.toJson(havePhone)
+      ) ++ data
+    } yield obj
   }
 
-  lazy val indWithId: Arbitrary[UserAnswers] = {
-    import models._
+  private def pageArbitrary[T <: QuestionPage[_]](page: T)(implicit arb: Arbitrary[(page.type, JsValue)]) = Arbitrary {
+    for {
+      email <- genJsObj(arbitrary[(page.type, JsValue)])
+    } yield email
+  }
 
-    Arbitrary {
-      for {
-        id    <- nonEmptyString
-        phone <- indPhone.arbitrary
-        additionalData <- genJsObj(
-          arbitrary[(IndWhatIsYourNINumberPage.type, JsValue)],
-          arbitrary[(IndContactNamePage.type, JsValue)],
-          arbitrary[(IndDateOfBirthPage.type, JsValue)],
-          arbitrary[(RegistrationInfoPage.type, JsValue)],
-          arbitrary[(IndContactEmailPage.type, JsValue)]
-        )
-        obj =
-          setFields(
-            Json.obj(),
-            ReporterTypePage.path         -> Json.toJson(ReporterType.Individual.asInstanceOf[ReporterType]),
-            IndDoYouHaveNINumberPage.path -> Json.toJson(true)
-          ) ++ additionalData ++ phone
-      } yield UserAnswers(
-        id = id,
-        data = obj
+  private def contactArbitrary[T <: QuestionPage[String], U <: QuestionPage[String], V <: QuestionPage[Boolean], W <: QuestionPage[String]](
+    namePage: T,
+    emailPage: U,
+    havePhonePage: V,
+    phonePage: W
+  )(
+    implicit
+    arbName: Arbitrary[(namePage.type, JsValue)],
+    arbEmail: Arbitrary[(emailPage.type, JsValue)],
+    arbPhone: Arbitrary[(phonePage.type, JsValue)]
+  ) = Arbitrary {
+    for {
+      name  <- pageArbitrary(namePage).arbitrary
+      email <- pageArbitrary(emailPage).arbitrary
+      phone <- phoneNumberArbitrary(havePhonePage, phonePage).arbitrary
+    } yield name ++ email ++ phone
+  }
+
+  private lazy val indContactDetails = Arbitrary {
+    for {
+      email <- genJsObj(arbitrary[(IndContactEmailPage.type, JsValue)])
+      phone <- phoneNumberArbitrary(IndContactHavePhonePage, IndContactPhonePage).arbitrary
+    } yield email ++ phone
+  }
+
+  private lazy val orgContactDetails = Arbitrary {
+    for {
+      haveSecondContact <- arbitrary[Boolean]
+      firstContact      <- contactArbitrary(ContactNamePage, ContactEmailPage, ContactHavePhonePage, ContactPhonePage).arbitrary
+      secondContact <- if (haveSecondContact) {
+        contactArbitrary(SecondContactNamePage, SecondContactEmailPage, SecondContactHavePhonePage, SecondContactPhonePage).arbitrary
+      } else {
+        Gen.const(Json.obj())
+      }
+      obj = setFields(
+        Json.obj(),
+        HaveSecondContactPage.path -> Json.toJson(haveSecondContact)
+      ) ++ firstContact ++ secondContact
+    } yield obj
+  }
+
+  lazy val indWithoutId: Arbitrary[UserAnswers] = Arbitrary {
+    for {
+      id             <- nonEmptyString
+      address        <- indAddress.arbitrary
+      contactDetails <- indContactDetails.arbitrary
+      additionalData <- genJsObj(arbitrary[(IndWhatIsYourNamePage.type, JsValue)], arbitrary[(DateOfBirthWithoutIdPage.type, JsValue)])
+      obj =
+        setFields(
+          Json.obj(),
+          ReporterTypePage.path         -> Json.toJson(ReporterType.Individual.asInstanceOf[ReporterType]),
+          IndDoYouHaveNINumberPage.path -> Json.toJson(false)
+        ) ++ address ++ contactDetails ++ additionalData
+    } yield UserAnswers(
+      id = id,
+      data = obj
+    )
+  }
+
+  lazy val indWithId: Arbitrary[UserAnswers] = Arbitrary {
+    for {
+      id             <- nonEmptyString
+      contactDetails <- indContactDetails.arbitrary
+      additionalData <- genJsObj(
+        arbitrary[(IndWhatIsYourNINumberPage.type, JsValue)],
+        arbitrary[(IndContactNamePage.type, JsValue)],
+        arbitrary[(IndDateOfBirthPage.type, JsValue)],
+        arbitrary[(RegistrationInfoPage.type, JsValue)],
+        arbitrary[(IndContactEmailPage.type, JsValue)]
       )
-    }
+      obj =
+        setFields(
+          Json.obj(),
+          ReporterTypePage.path         -> Json.toJson(ReporterType.Individual.asInstanceOf[ReporterType]),
+          IndDoYouHaveNINumberPage.path -> Json.toJson(true)
+        ) ++ additionalData ++ contactDetails
+    } yield UserAnswers(
+      id = id,
+      data = obj
+    )
+  }
+
+  lazy val orgWithId: Arbitrary[UserAnswers] = Arbitrary {
+    for {
+      id           <- nonEmptyString
+      reporterType <- Gen.oneOf(ReporterType.values.filterNot(_ == ReporterType.Individual))
+      additionalData <- genJsObj(
+        arbitrary[(WhatIsYourUTRPage.type, JsValue)],
+        arbitrary[(RegistrationInfoPage.type, JsValue)]
+      )
+      businessName <- if (reporterType == ReporterType.Sole) {
+        genJsObj(arbitrary[(WhatIsYourNamePage.type, JsValue)])
+      } else {
+        genJsObj(arbitrary[(BusinessNamePage.type, JsValue)])
+      }
+      contactDetails <- if (reporterType == ReporterType.Sole) {
+        indContactDetails.arbitrary
+      } else {
+        orgContactDetails.arbitrary
+      }
+      obj = setFields(
+        Json.obj(),
+        ReporterTypePage.path          -> Json.toJson(reporterType),
+        RegisteredAddressInUKPage.path -> Json.toJson(true)
+      ) ++ businessName ++ additionalData ++ contactDetails
+    } yield UserAnswers(
+      id = id,
+      data = obj
+    )
+  }
+
+  lazy val orgWithoutId: Arbitrary[UserAnswers] = Arbitrary {
+    for {
+      id           <- nonEmptyString
+      reporterType <- Gen.oneOf(ReporterType.values.filterNot(Seq(ReporterType.Individual, ReporterType.Sole).contains))
+      additionalData <- genJsObj(
+        arbitrary[(BusinessNameWithoutIDPage.type, JsValue)],
+        arbitrary[(NonUKBusinessAddressWithoutIDPage.type, JsValue)]
+      )
+      haveTradingName <- arbitrary[Boolean]
+      tradingName <- if (haveTradingName) {
+        genJsObj(arbitrary[(BusinessTradingNameWithoutIDPage.type, JsValue)])
+      } else {
+        Gen.const(Json.obj())
+      }
+      contactDetails <- orgContactDetails.arbitrary
+      obj = setFields(
+        Json.obj(),
+        ReporterTypePage.path                     -> Json.toJson(reporterType),
+        RegisteredAddressInUKPage.path            -> Json.toJson(false),
+        DoYouHaveUniqueTaxPayerReferencePage.path -> Json.toJson(false),
+        HaveTradingNamePage.path                  -> Json.toJson(haveTradingName)
+      ) ++ tradingName ++ additionalData ++ contactDetails
+    } yield UserAnswers(
+      id = id,
+      data = obj
+    )
+  }
+
+  private def missingAnswersArb(arb: Arbitrary[UserAnswers], possibleAnswers: Seq[QuestionPage[_]]): Arbitrary[UserAnswers] = Arbitrary {
+    for {
+      answers <- arb.arbitrary
+      validPossibleAnswers = possibleAnswers.filter(
+        a => answers.data.keys.toSeq.contains(a.toString)
+      )
+      n                <- Gen.oneOf(1, validPossibleAnswers.length)
+      missingQuestions <- Gen.pick(n, validPossibleAnswers)
+      updatedAnswers = missingQuestions.foldLeft(answers) {
+        case (acc, page) => acc.remove(page).success.value
+      }
+    } yield updatedAnswers
   }
 
   lazy val indWithoutIdMissingAnswers: Arbitrary[UserAnswers] =
-    Arbitrary {
-      for {
-        answers <- indWithoutId.arbitrary
-        basicQuestions = Seq(IndWhatIsYourNamePage, DateOfBirthWithoutIdPage, IndContactEmailPage, IndWhereDoYouLivePage, IndContactHavePhonePage)
-        addressQuestions = answers.get(IndWhereDoYouLivePage) match {
-          case Some(true) => Seq(IndWhatIsYourPostcodePage)
-          case _          => Seq(IndNonUKAddressWithoutIdPage)
-        }
-        phoneQuestions = answers.get(IndContactHavePhonePage) match {
-          case Some(true) => Seq(IndContactPhonePage)
-          case _          => Nil
-        }
-        allQuestions = basicQuestions ++ addressQuestions ++ phoneQuestions
-        n                <- Gen.oneOf(1, allQuestions.length)
-        missingQuestions <- Gen.pick(n, allQuestions)
-        updatedAnswers = missingQuestions.foldLeft(answers) {
-          case (acc, page) => acc.remove(page.asInstanceOf[QuestionPage[_]]).success.value
-        }
-      } yield updatedAnswers
-    }
+    missingAnswersArb(
+      indWithoutId,
+      Seq(
+        IndWhatIsYourNamePage,
+        DateOfBirthWithoutIdPage,
+        IndContactEmailPage,
+        IndWhereDoYouLivePage,
+        IndContactHavePhonePage,
+        IndWhatIsYourPostcodePage,
+        IndUKAddressWithoutIdPage,
+        IndNonUKAddressWithoutIdPage,
+        IndSelectAddressPage,
+        IndContactPhonePage
+      )
+    )
+
+  lazy val indWithIdMissingAnswers: Arbitrary[UserAnswers] =
+    missingAnswersArb(
+      indWithId,
+      Seq(
+        IndWhatIsYourNINumberPage,
+        IndContactNamePage,
+        IndDateOfBirthPage,
+        RegistrationInfoPage,
+        IndContactEmailPage,
+        IndContactHavePhonePage,
+        IndContactPhonePage
+      )
+    )
+
+  lazy val orgWithIdMissingAnswers: Arbitrary[UserAnswers] =
+    missingAnswersArb(
+      orgWithId,
+      Seq(
+        WhatIsYourUTRPage,
+        WhatIsYourNamePage,
+        BusinessNamePage,
+        RegistrationInfoPage,
+        IndContactEmailPage,
+        IndContactHavePhonePage,
+        IndContactPhonePage,
+        ContactNamePage,
+        ContactEmailPage,
+        ContactHavePhonePage,
+        ContactPhonePage,
+        HaveSecondContactPage,
+        SecondContactNamePage,
+        SecondContactEmailPage,
+        SecondContactHavePhonePage,
+        SecondContactPhonePage
+      )
+    )
+
+  lazy val orgWithoutIdMissingAnswers: Arbitrary[UserAnswers] =
+    missingAnswersArb(
+      orgWithoutId,
+      Seq(
+        BusinessNameWithoutIDPage,
+        HaveTradingNamePage,
+        BusinessTradingNameWithoutIDPage,
+        NonUKBusinessAddressWithoutIDPage,
+        IndContactEmailPage,
+        IndContactHavePhonePage,
+        IndContactPhonePage,
+        ContactNamePage,
+        ContactEmailPage,
+        ContactHavePhonePage,
+        ContactPhonePage,
+        HaveSecondContactPage,
+        SecondContactNamePage,
+        SecondContactEmailPage,
+        SecondContactHavePhonePage,
+        SecondContactPhonePage
+      )
+    )
 
 }
