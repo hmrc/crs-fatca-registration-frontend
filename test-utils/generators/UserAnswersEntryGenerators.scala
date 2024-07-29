@@ -16,7 +16,6 @@
 
 package generators
 
-import models.UniqueTaxpayerReference
 import models.matching.RegistrationInfo
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
@@ -157,7 +156,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[pages.WhatIsYourUTRPage.type]
-        value <- arbitrary[UniqueTaxpayerReference].map(Json.toJson(_))
+        value <- arbitrary[models.UniqueTaxpayerReference].map(Json.toJson(_))
       } yield (page, value)
     }
 
