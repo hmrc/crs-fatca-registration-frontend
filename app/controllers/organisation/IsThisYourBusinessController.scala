@@ -113,7 +113,7 @@ class IsThisYourBusinessController @Inject() (
   ): Future[Result] =
     subscriptionService.getSubscription(registrationInfo.safeId) flatMap {
       case Some(displaySubscriptionResponse) =>
-        controllerHelper.updateSubscriptionIdAndCreateEnrolment(registrationInfo.safeId, displaySubscriptionResponse.subscriptionId)
+        controllerHelper.updateSubscriptionIdAndCreateEnrolment(displaySubscriptionResponse.subscriptionId)
       case _ =>
         val preparedForm = request.userAnswers.get(IsThisYourBusinessPage) match {
           case None        => form

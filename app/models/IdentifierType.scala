@@ -17,15 +17,13 @@
 package models
 
 object IdentifierType {
-  val UTR  = "UTR"
-  val NINO = "NINO"
-  val SAFE = "SAFE"
+  val POSTCODE   = "PostCode"
+  val ABROADFLAG = "AbroadFlag"
+  val UTR        = "UTR"
 
   val FATCAID = "FATCAID"
+  val SAFEID  = "SAFEID"
+  val SAFE    = "SAFE"
 
-  val SAFEID = "SAFEID"
-  val SAUTR  = "SAUTR"
-  val CTUTR  = "CTUTR"
-
-  val NonUKPostalCode = "NonUKPostalCode"
+  val NINO = "NINO"
 }

@@ -67,6 +67,12 @@ trait ModelGenerators extends RegexConstants with Generators {
     Gen.oneOf[ContactType](arbitrary[OrganisationDetails], arbitrary[IndividualDetails])
   }
 
+  implicit lazy val arbitrarySubscriptionID: Arbitrary[SubscriptionID] = Arbitrary {
+    for {
+      id <- Gen.alphaNumChar.map(_.toString)
+    } yield SubscriptionID(id)
+  }
+
   implicit val arbitraryPrimaryContact: Arbitrary[ContactInformation] = Arbitrary {
     for {
       contactInformation <- arbitrary[ContactType]

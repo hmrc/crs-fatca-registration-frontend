@@ -216,6 +216,9 @@ trait Generators extends RegexConstants {
   val subscriptionIDRegex              = "^[X][A-Z][0-9]{13}"
   def validSubscriptionID: Gen[String] = RegexpGen.from(subscriptionIDRegex)
 
+  val abroadFlagRegex              = "^(Y|N)$"
+  def validAbroadFlag: Gen[String] = RegexpGen.from(abroadFlagRegex)
+
   def invalidCountry: Gen[String] = Gen.oneOf(Set("Invalid Country 1", "Invalid Country 2", ""))
 
 }

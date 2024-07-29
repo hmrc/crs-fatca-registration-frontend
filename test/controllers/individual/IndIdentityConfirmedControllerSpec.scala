@@ -105,7 +105,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
           when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
             .thenReturn(Future.successful(Right(registrationInfo)))
           when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(Some(subscription)))
-          when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+          when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
           retrieveUserAnswersData(validUserAnswers)
@@ -127,7 +127,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
           when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
             .thenReturn(Future.successful(Right(registrationInfo)))
           when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(Some(subscription)))
-          when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
+          when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
