@@ -65,16 +65,16 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       val affinityGroup: AffinityGroup         = AffinityGroup.Individual
       val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers)
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Right(1)))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.RegistrationConfirmationController.onPageLoad().url)
 
-      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any(), any())(any(), any())
+      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }
 
     "Redirect to Individual already registered when tax enrolments returns EnrolmentExists error" in {
@@ -82,16 +82,16 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
 
       val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers)
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url)
 
-      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any(), any())(any(), any())
+      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }
 
     "Redirect to Business already registered with ID when tax enrolments returns EnrolmentExists error" in {
@@ -101,16 +101,16 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
         .withPage(RegistrationInfoPage, OrgRegistrationInfo(safeId, name = "", address = addressResponse))
       val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers2)
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.PreRegisteredController.onPageLoad(withId = true).url)
 
-      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any(), any())(any(), any())
+      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }
 
     "Redirect to Business already registered without ID when tax enrolments returns EnrolmentExists error" in {
@@ -118,16 +118,16 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
 
       val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers)
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.PreRegisteredController.onPageLoad(withId = false).url)
 
-      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any(), any())(any(), any())
+      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }
 
     "Redirect to SomeInformation is missing controller" in {
@@ -135,16 +135,16 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
 
       val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers)
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(MandatoryInformationMissingError("Error"))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.InformationMissingController.onPageLoad().url)
 
-      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any(), any())(any(), any())
+      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }
 
     "Return service unavailable for other errors" in {
@@ -152,15 +152,15 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
 
       val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers)
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any()))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(ApiError.ServiceUnavailableError)))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SERVICE_UNAVAILABLE
 
-      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any(), any())(any(), any())
+      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }
   }
 

@@ -83,7 +83,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .success
         .value
 
-      val result = service.checkAndCreateEnrolment(safeId, userAnswers, subscriptionID)
+      val result = service.checkAndCreateEnrolment(userAnswers, subscriptionID)
 
       result.futureValue mustBe Right(NO_CONTENT)
     }
@@ -117,7 +117,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .success
         .value
 
-      val result = service.checkAndCreateEnrolment(safeId, userAnswers, subscriptionID)
+      val result = service.checkAndCreateEnrolment(userAnswers, subscriptionID)
 
       result.futureValue mustBe Left(UnableToCreateEnrolmentError)
     }
@@ -153,7 +153,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .success
         .value
 
-      val result = service.checkAndCreateEnrolment(safeId, userAnswers, subscriptionID)
+      val result = service.checkAndCreateEnrolment(userAnswers, subscriptionID)
 
       result.futureValue mustBe Left(EnrolmentExistsError(groupIds))
     }

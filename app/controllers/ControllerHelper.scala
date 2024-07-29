@@ -17,7 +17,6 @@
 package controllers
 
 import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingError, ServiceUnavailableError}
-import models.matching.SafeId
 import models.requests.DataRequest
 import models.{SubscriptionID, UserAnswers}
 import pages.{RegistrationInfoPage, SubscriptionIDPage}
@@ -44,11 +43,11 @@ class ControllerHelper @Inject() (
     with I18nSupport
     with Logging {
 
-  private def createEnrolment(safeId: SafeId, userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
+  private def createEnrolment(userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
     request: DataRequest[AnyContent]
   ): Future[Result] =
-    taxEnrolmentService.checkAndCreateEnrolment(safeId, userAnswers, subscriptionId) flatMap {
+    taxEnrolmentService.checkAndCreateEnrolment(userAnswers, subscriptionId) flatMap {
       case Right(_) =>
         Future.successful(Redirect(routes.RegistrationConfirmationController.onPageLoad())) // TODO DAC6-2756 and DAC6-2858
       case Left(EnrolmentExistsError(groupIds)) if request.affinityGroup == AffinityGroup.Individual =>
@@ -75,14 +74,14 @@ class ControllerHelper @Inject() (
         }
     }
 
-  def updateSubscriptionIdAndCreateEnrolment(safeId: SafeId, subscriptionId: SubscriptionID)(implicit
+  def updateSubscriptionIdAndCreateEnrolment(subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
     request: DataRequest[AnyContent]
   ): Future[Result] =
     for {
       updatedAnswers <- Future.fromTry(request.userAnswers.set(SubscriptionIDPage, subscriptionId))
       _              <- sessionRepository.set(updatedAnswers)
-      result         <- createEnrolment(safeId, request.userAnswers, subscriptionId)
+      result         <- createEnrolment(request.userAnswers, subscriptionId)
     } yield result
 
 }

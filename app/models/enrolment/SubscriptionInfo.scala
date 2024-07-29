@@ -17,7 +17,7 @@
 package models.enrolment
 
 import models.IdentifierType._
-import models.error.ApiError
+import models.matching.OrgRegistrationInfo
 import models.{SubscriptionID, UserAnswers}
 import pages._
 import play.api.libs.json.{Json, OFormat}
@@ -27,11 +27,11 @@ case class SubscriptionInfo(postCode: Option[String] = None, abroadFlag: Option[
   def convertToEnrolmentRequest: EnrolmentRequest =
     EnrolmentRequest(identifiers = Seq(Identifier(FATCAID, id)), verifiers = buildVerifiers)
 
-  def buildVerifiers: Seq[Verifier] =
+  private def buildVerifiers: Seq[Verifier] =
     buildOptionalVerifier(postCode, POSTCODE) ++
       buildOptionalVerifier(abroadFlag, ABROADFLAG)
 
-  def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] =
+  private def buildOptionalVerifier(optionalInfo: Option[String], key: String): Seq[Verifier] =
     optionalInfo
       .map(
         info => Verifier(key, info)
@@ -43,26 +43,25 @@ case class SubscriptionInfo(postCode: Option[String] = None, abroadFlag: Option[
 object SubscriptionInfo {
   implicit val format: OFormat[SubscriptionInfo] = Json.format[SubscriptionInfo]
 
-  def createSubscriptionInfo(userAnswers: UserAnswers, subscriptionId: SubscriptionID): Either[ApiError, SubscriptionInfo] =
-    Right(
-      SubscriptionInfo(
-        postCode = getNonUkPostCodeIfProvided(userAnswers),
-        abroadFlag = getAbroadFlagIfProvided(userAnswers),
-        id = subscriptionId.value
-      )
+  def apply(userAnswers: UserAnswers, subscriptionId: SubscriptionID): SubscriptionInfo =
+    SubscriptionInfo(
+      postCode = getPostCodeIfProvided(userAnswers),
+      abroadFlag = getAbroadFlagIfProvided(userAnswers),
+      id = subscriptionId.value
     )
 
-  private def getNonUkPostCodeIfProvided(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(NonUKBusinessAddressWithoutIDPage) match {
-      case Some(address) => address.postCode
-      case _             => None
+  private def getPostCodeIfProvided(userAnswers: UserAnswers): Option[String] =
+    (userAnswers.get(RegistrationInfoPage), userAnswers.get(NonUKBusinessAddressWithoutIDPage)) match {
+      case (Some(OrgRegistrationInfo(_, _, address)), _) => address.postalCode
+      case (_, Some(address))                            => address.postCode
+      case _                                             => None
     }
 
   private def getAbroadFlagIfProvided(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(RegisteredAddressInUKPage) match {
-      case Some(true)  => Some("Y")
-      case Some(false) => Some("N")
-      case None        => None
+    (userAnswers.get(RegistrationInfoPage), userAnswers.get(NonUKBusinessAddressWithoutIDPage)) match {
+      case (Some(OrgRegistrationInfo(_, _, _)), _) => Some("N")
+      case (_, Some(_))                            => Some("Y")
+      case _                                       => None
     }
 
 }

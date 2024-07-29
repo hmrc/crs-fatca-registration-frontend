@@ -21,7 +21,6 @@ import connectors.{EnrolmentStoreProxyConnector, TaxEnrolmentsConnector}
 import models.enrolment.SubscriptionInfo
 import models.{SubscriptionID, UserAnswers}
 import models.error.ApiError
-import models.matching.SafeId
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -30,19 +29,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxEnrolmentService @Inject() (taxEnrolmentsConnector: TaxEnrolmentsConnector, enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector)
     extends Logging {
 
-  def checkAndCreateEnrolment(safeId: SafeId, userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
+  def checkAndCreateEnrolment(userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Either[ApiError, Int]] =
     enrolmentStoreProxyConnector.enrolmentStatus(subscriptionId).value flatMap {
       case Right(_) =>
-        SubscriptionInfo.createSubscriptionInfo(userAnswers, subscriptionId) match {
-          case Right(subscriptionInfo: SubscriptionInfo) =>
-            taxEnrolmentsConnector.createEnrolment(subscriptionInfo).value
-          case Left(apiError: ApiError) =>
-            logger.error("checkAndCreateEnrolment: Could not create subscription info for enrolment missing Safe ID")
-            Future.successful(Left(apiError))
-        }
+        val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
+        taxEnrolmentsConnector.createEnrolment(subscriptionInfo).value
       case Left(apiError: ApiError) =>
         logger.error("checkAndCreateEnrolment: Could not create subscription info for enrolment missing Safe ID")
         Future.successful(Left(apiError))

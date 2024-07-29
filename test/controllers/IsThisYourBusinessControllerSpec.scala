@@ -106,7 +106,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       when(mockMatchingService.sendBusinessRegistrationInformation(mockitoEq(registerWithID))(any(), any()))
         .thenReturn(Future.successful(Right(OrgRegistrationInfo(safeId, businessName, address))))
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(validUserAnswers)
@@ -128,7 +128,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       when(mockMatchingService.sendBusinessRegistrationInformation(mockitoEq(registerWithID))(any(), any()))
         .thenReturn(Future.successful(Right(OrgRegistrationInfo(safeId, businessName, address))))
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(false)
       retrieveUserAnswersData(validUserAnswers)
 
@@ -149,7 +149,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       when(mockMatchingService.sendBusinessRegistrationInformation(mockitoEq(registerWithID))(any(), any()))
         .thenReturn(Future.successful(Left(NotFoundError)))
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(validUserAnswers)
@@ -180,7 +180,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       when(mockMatchingService.sendBusinessRegistrationInformation(mockitoEq(registerWithID))(any(), any()))
         .thenReturn(Future.successful(Right(registrationInfo)))
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(mockitoEq(updatedUserAnswer))) thenReturn Future.successful(true)
       when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(userAnswersWithAutoMatchedUtr)
@@ -205,7 +205,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       when(mockMatchingService.sendBusinessRegistrationInformation(mockitoEq(registerWithID))(any(), any()))
         .thenReturn(Future.successful(Right(OrgRegistrationInfo(safeId, businessName, address))))
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(userAnswersWithoutReporterType)
@@ -232,7 +232,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       when(mockMatchingService.sendBusinessRegistrationInformation(mockitoEq(registerWithID))(any(), any()))
         .thenReturn(Future.successful(Left(NotFoundError)))
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(mockitoEq(userAnswersWithAutoMatchedFieldCleared))) thenReturn Future.successful(true)
       when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(userAnswersWithAutoMatchedUtr)
@@ -250,7 +250,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       when(mockMatchingService.sendBusinessRegistrationInformation(any())(any(), any()))
         .thenReturn(Future.successful(Right(OrgRegistrationInfo(safeId, OrgName, address))))
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
@@ -284,7 +284,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
             .thenReturn(Future.successful(Right(OrgRegistrationInfo(safeId, OrgName, address))))
 
           when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(Some(subscription)))
-          when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
+          when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           retrieveUserAnswersData(validUserAnswers)
@@ -304,7 +304,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       when(mockMatchingService.sendBusinessRegistrationInformation(any())(any(), any()))
         .thenReturn(Future.successful(Right(OrgRegistrationInfo(safeId, OrgName, address))))
 
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
