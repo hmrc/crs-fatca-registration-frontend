@@ -233,27 +233,41 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
 
   lazy val orgWithId: Arbitrary[UserAnswers] = Arbitrary {
     for {
-      id           <- nonEmptyString
-      reporterType <- Gen.oneOf(ReporterType.values.filterNot(_ == ReporterType.Individual))
+      id             <- nonEmptyString
+      autoMatchedUtr <- arbitrary[Boolean]
+      reporterType <- if (autoMatchedUtr) {
+        Gen.const(None)
+      } else {
+        Gen.oneOf(ReporterType.values.filterNot(_ == ReporterType.Individual)).map(Some(_))
+      }
       additionalData <- genJsObj(
         arbitrary[(WhatIsYourUTRPage.type, JsValue)],
         arbitrary[(RegistrationInfoPage.type, JsValue)]
       )
-      businessName <- if (reporterType == ReporterType.Sole) {
+      businessName <- if (reporterType.contains(ReporterType.Sole)) {
         genJsObj(arbitrary[(WhatIsYourNamePage.type, JsValue)])
-      } else {
+      } else if (reporterType.isDefined) {
         genJsObj(arbitrary[(BusinessNamePage.type, JsValue)])
+      } else {
+        Gen.const(Json.obj())
       }
-      contactDetails <- if (reporterType == ReporterType.Sole) {
+      contactDetails <- if (reporterType.contains(ReporterType.Sole)) {
         indContactDetails.arbitrary
       } else {
         orgContactDetails.arbitrary
       }
+      autoMatchedUtrObj = if (autoMatchedUtr) {
+        Json.obj().setObject(AutoMatchedUTRPage.path, (additionalData \ WhatIsYourUTRPage.toString).as[JsObject]).get
+      } else {
+        Json.obj()
+      }
+      reportTypeObj = reporterType.fold(Json.obj())(
+        r => Json.obj().setObject(ReporterTypePage.path, Json.toJson(r)).get
+      )
       obj = setFields(
         Json.obj(),
-        ReporterTypePage.path          -> Json.toJson(reporterType),
         RegisteredAddressInUKPage.path -> Json.toJson(true)
-      ) ++ businessName ++ additionalData ++ contactDetails
+      ) ++ reportTypeObj ++ autoMatchedUtrObj ++ businessName ++ additionalData ++ contactDetails
     } yield UserAnswers(
       id = id,
       data = obj

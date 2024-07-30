@@ -112,13 +112,18 @@ sealed trait OrgAnswersValidator {
 
   private def checkOrgWithIdMissingAnswers: Seq[Page] = Seq(
     checkPage(WhatIsYourUTRPage),
-    if (reporterType.contains(ReporterType.Sole)) checkPage(WhatIsYourNamePage) else checkPage(BusinessNamePage),
+    if (isAutoMatchedUtr) {
+      None
+    } else {
+      if (reporterType.contains(ReporterType.Sole)) checkPage(WhatIsYourNamePage) else checkPage(BusinessNamePage)
+    },
     checkPage(RegistrationInfoPage)
   ).flatten ++ checkContactDetailsMissingAnswers
 
-  def checkOrgMissingAnswers: Seq[Page] = userAnswers.get(RegisteredAddressInUKPage) match {
-    case Some(true) => checkOrgWithIdMissingAnswers
-    case Some(false) => userAnswers.get(DoYouHaveUniqueTaxPayerReferencePage) match {
+  def checkOrgMissingAnswers: Seq[Page] = (isAutoMatchedUtr, userAnswers.get(RegisteredAddressInUKPage)) match {
+    case (true, _)       => checkOrgWithIdMissingAnswers
+    case (_, Some(true)) => checkOrgWithIdMissingAnswers
+    case (_, Some(false)) => userAnswers.get(DoYouHaveUniqueTaxPayerReferencePage) match {
         case Some(true) => checkOrgWithIdMissingAnswers
         case Some(false) => reporterType match {
             case Some(ReporterType.Individual) | Some(ReporterType.Sole) => checkIndividualMissingAnswers
@@ -133,7 +138,8 @@ sealed trait OrgAnswersValidator {
 
 class CheckYourAnswersValidator(val userAnswers: UserAnswers) extends IndividualAnswersValidator with OrgAnswersValidator {
 
-  private[utils] val reporterType = userAnswers.get(ReporterTypePage)
+  private[utils] val reporterType     = userAnswers.get(ReporterTypePage)
+  private[utils] val isAutoMatchedUtr = userAnswers.get(AutoMatchedUTRPage).isDefined
 
   private[utils] def checkPage[A](page: QuestionPage[A])(implicit rds: Reads[A]): Option[Page] =
     userAnswers.get(page) match {
@@ -144,10 +150,10 @@ class CheckYourAnswersValidator(val userAnswers: UserAnswers) extends Individual
   private[utils] def any(checkPages: Option[Page]*): Option[Page] = checkPages.find(_.isEmpty).getOrElse(checkPages.last)
 
   def validate: Seq[Page] =
-    reporterType match {
-      case Some(ReporterType.Individual) => checkIndividualMissingAnswers
-      case Some(_)                       => checkOrgMissingAnswers
-      case _                             => Seq(ReporterTypePage)
+    (reporterType, isAutoMatchedUtr) match {
+      case (Some(ReporterType.Individual), _) => checkIndividualMissingAnswers
+      case (Some(_), _) | (_, true)           => checkOrgMissingAnswers
+      case _                                  => Seq(ReporterTypePage)
     }
 
 }
