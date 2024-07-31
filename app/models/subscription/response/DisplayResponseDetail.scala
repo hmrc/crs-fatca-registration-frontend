@@ -19,7 +19,7 @@ package models.subscription.response
 import models.subscription.request.ContactInformation
 import play.api.libs.json.{Json, OFormat}
 
-case class DisplayResponseDetail(crsFatcaReference: String,
+case class DisplayResponseDetail(id: String,
                                  tradingName: Option[String],
                                  gbUser: Boolean,
                                  primaryContact: ContactInformation,
