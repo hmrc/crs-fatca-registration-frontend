@@ -16,9 +16,11 @@
 
 package generators
 
+import models.matching.RegistrationInfo
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.domain.Nino
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
@@ -78,11 +80,43 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
+  implicit lazy val arbitraryIndNameUserAnswersEntry: Arbitrary[(pages.IndWhatIsYourNamePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndWhatIsYourNamePage.type]
+        value <- arbitrary[models.Name].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryIndWhereDoYouLivePageEntry: Arbitrary[(pages.IndWhereDoYouLivePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndWhereDoYouLivePage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryIndNonUKAddressWithoutIdPageEntry: Arbitrary[(pages.IndNonUKAddressWithoutIdPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndNonUKAddressWithoutIdPage.type]
+        value <- arbitrary[models.Address].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryIndUKAddressWithoutIdPageEntry: Arbitrary[(pages.IndUKAddressWithoutIdPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndUKAddressWithoutIdPage.type]
+        value <- arbitrary[models.Address].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
   implicit lazy val arbitrarySoleNameUserAnswersEntry: Arbitrary[(pages.IndContactNamePage.type, JsValue)] =
     Arbitrary {
       for {
         page  <- arbitrary[pages.IndContactNamePage.type]
-        value <- Gen.alphaStr.suchThat(_.nonEmpty).map(Json.toJson(_))
+        value <- arbitrary[models.Name].map(Json.toJson(_))
       } yield (page, value)
     }
 
@@ -122,7 +156,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[pages.WhatIsYourUTRPage.type]
-        value <- Gen.alphaStr.suchThat(_.nonEmpty).map(Json.toJson(_))
+        value <- arbitrary[models.UniqueTaxpayerReference].map(Json.toJson(_))
       } yield (page, value)
     }
 
@@ -226,7 +260,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[pages.IndWhatIsYourNINumberPage.type]
-        value <- Gen.alphaStr.suchThat(_.nonEmpty).map(Json.toJson(_))
+        value <- arbitrary[Nino].map(Json.toJson(_))
       } yield (page, value)
     }
 
@@ -235,6 +269,30 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       for {
         page  <- arbitrary[pages.DateOfBirthWithoutIdPage.type]
         value <- arbitrary[Int].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryRegistrationInfoEntry: Arbitrary[(pages.RegistrationInfoPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.RegistrationInfoPage.type]
+        value <- arbitrary[RegistrationInfo].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryIsThisYourAddressEntry: Arbitrary[(pages.IsThisYourAddressPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IsThisYourAddressPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryIndSelectAddressEntry: Arbitrary[(pages.IndSelectAddressPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[pages.IndSelectAddressPage.type]
+        value <- Gen.alphaStr.suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }
 

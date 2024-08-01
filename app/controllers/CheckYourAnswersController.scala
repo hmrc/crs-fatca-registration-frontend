@@ -20,19 +20,19 @@ import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
+import models.UserAnswers
 import models.error.ApiError
 import models.error.ApiError.{MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, SafeId}
 import models.requests.DataRequest
-import pages.RegistrationInfoPage
+import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{BusinessMatchingWithoutIdService, SubscriptionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{CountryListFactory, UserAnswersHelper}
-import viewmodels.Section
+import utils.{CheckYourAnswersValidator, CountryListFactory, UserAnswersHelper}
 import viewmodels.checkAnswers.CheckYourAnswersViewModel
 import views.html.{CheckYourAnswersView, ThereIsAProblemView}
 
@@ -57,9 +57,10 @@ class CheckYourAnswersController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) {
     implicit request =>
-      val viewModel: Seq[Section] =
-        CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)
-      Ok(view(viewModel))
+      getMissingAnswers(request.userAnswers) match {
+        case Nil => Ok(view(CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)))
+        case _   => Redirect(routes.InformationMissingController.onPageLoad())
+      }
   }
 
   def onSubmit(): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
@@ -97,5 +98,7 @@ class CheckYourAnswersController @Inject() (
       case _ =>
         registrationService.registerWithoutId()
     }
+
+  private def getMissingAnswers(userAnswers: UserAnswers): Seq[Page] = CheckYourAnswersValidator(userAnswers).validate
 
 }

@@ -50,6 +50,18 @@ trait PageGenerators {
   implicit lazy val arbitraryWhatIsYourNamePage: Arbitrary[pages.WhatIsYourNamePage.type] =
     Arbitrary(pages.WhatIsYourNamePage)
 
+  implicit lazy val arbitraryIndWhatIsYourNamePage: Arbitrary[pages.IndWhatIsYourNamePage.type] =
+    Arbitrary(pages.IndWhatIsYourNamePage)
+
+  implicit lazy val arbitraryIndWhereDoYouLivePage: Arbitrary[pages.IndWhereDoYouLivePage.type] =
+    Arbitrary(pages.IndWhereDoYouLivePage)
+
+  implicit lazy val arbitraryIndNonUKAddressWithoutIdPage: Arbitrary[pages.IndNonUKAddressWithoutIdPage.type] =
+    Arbitrary(pages.IndNonUKAddressWithoutIdPage)
+
+  implicit lazy val arbitraryIndUKAddressWithoutIdPage: Arbitrary[pages.IndUKAddressWithoutIdPage.type] =
+    Arbitrary(pages.IndUKAddressWithoutIdPage)
+
   implicit lazy val arbitraryWhatIsYourNationalInsuranceNumberPage: Arbitrary[pages.IndWhatIsYourNINumberPage.type] =
     Arbitrary(pages.IndWhatIsYourNINumberPage)
 
@@ -100,5 +112,14 @@ trait PageGenerators {
 
   implicit lazy val arbitraryDateOfBirthWithoutIdPage: Arbitrary[pages.DateOfBirthWithoutIdPage.type] =
     Arbitrary(pages.DateOfBirthWithoutIdPage)
+
+  implicit lazy val arbitraryRegistrationInfoPage: Arbitrary[pages.RegistrationInfoPage.type] =
+    Arbitrary(pages.RegistrationInfoPage)
+
+  implicit lazy val arbitraryIsThisYourAddressPage: Arbitrary[pages.IsThisYourAddressPage.type] =
+    Arbitrary(pages.IsThisYourAddressPage)
+
+  implicit lazy val arbitraryIndSelectAddressPage: Arbitrary[pages.IndSelectAddressPage.type] =
+    Arbitrary(pages.IndSelectAddressPage)
 
 }
