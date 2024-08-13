@@ -19,6 +19,8 @@ package controllers
 import controllers.actions._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl._
+import uk.gov.hmrc.play.bootstrap.binders.{OnlyRelative, RedirectUrl}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ContactDetailsMissingView
 
@@ -32,9 +34,9 @@ class ContactDetailsMissingController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(continueUrl: Option[String] = None): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
-      Ok(view(continueUrl.getOrElse(routes.IndexController.onPageLoad.url)))
+      Ok(view(continueUrl.map(_.get(OnlyRelative).url).getOrElse(routes.IndexController.onPageLoad.url)))
   }
 
 }

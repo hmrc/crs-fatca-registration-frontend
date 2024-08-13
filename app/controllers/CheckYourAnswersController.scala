@@ -31,6 +31,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{BusinessMatchingWithoutIdService, SubscriptionService}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.{CheckYourAnswersValidator, CountryListFactory, UserAnswersHelper}
 import viewmodels.checkAnswers.CheckYourAnswersViewModel
@@ -60,13 +61,19 @@ class CheckYourAnswersController @Inject() (
       getMissingAnswers(request.userAnswers) match {
         case Nil => Ok(view(CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)))
         case result if missingFirstContact(result) =>
-          Redirect(routes.ContactDetailsMissingController.onPageLoad(Some(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url)))
+          Redirect(routes.ContactDetailsMissingController.onPageLoad(
+            Some(RedirectUrl(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url))
+          ))
         case result if missingSecondContact(result) =>
           Redirect(
-            routes.ContactDetailsMissingController.onPageLoad(Some(controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode).url))
+            routes.ContactDetailsMissingController.onPageLoad(
+              Some(RedirectUrl(controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode).url))
+            )
           )
         case result if missingIndividualContact(result) =>
-          Redirect(routes.ContactDetailsMissingController.onPageLoad(Some(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url)))
+          Redirect(routes.ContactDetailsMissingController.onPageLoad(
+            Some(RedirectUrl(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url))
+          ))
         case _ => Redirect(routes.InformationMissingController.onPageLoad())
       }
   }

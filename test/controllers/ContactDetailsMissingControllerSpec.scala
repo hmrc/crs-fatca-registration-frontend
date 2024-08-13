@@ -20,6 +20,7 @@ import base.SpecBase
 import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.ContactDetailsMissingView
 
 class ContactDetailsMissingControllerSpec extends SpecBase {
@@ -50,7 +51,7 @@ class ContactDetailsMissingControllerSpec extends SpecBase {
         val request = FakeRequest(
           GET,
           routes.ContactDetailsMissingController.onPageLoad(
-            Some(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url)
+            Some(RedirectUrl(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url))
           ).url
         )
 

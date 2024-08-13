@@ -36,6 +36,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{BusinessMatchingWithoutIdService, SubscriptionService, TaxEnrolmentService}
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.ThereIsAProblemView
 
 import scala.concurrent.Future
@@ -60,9 +61,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
   val mockTaxEnrolmentsService: TaxEnrolmentService = mock[TaxEnrolmentService]
 
   private def missingContactInformationUrls = Seq(
-    routes.ContactDetailsMissingController.onPageLoad(Some(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url)).url,
-    routes.ContactDetailsMissingController.onPageLoad(Some(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url)).url,
-    routes.ContactDetailsMissingController.onPageLoad(Some(controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode).url)).url
+    routes.ContactDetailsMissingController.onPageLoad(
+      Some(RedirectUrl(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url))
+    ).url,
+    routes.ContactDetailsMissingController.onPageLoad(Some(RedirectUrl(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url))).url,
+    routes.ContactDetailsMissingController.onPageLoad(
+      Some(RedirectUrl(controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode).url))
+    ).url
   )
 
   private def missingInformationUrls = Seq(
@@ -204,7 +209,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
                 status(result) mustEqual SEE_OTHER
                 redirectLocation(result).value mustBe routes.ContactDetailsMissingController.onPageLoad(
-                  Some(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url)
+                  Some(RedirectUrl(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url))
                 ).url
               }
           }
@@ -229,7 +234,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
                 status(result) mustEqual SEE_OTHER
                 redirectLocation(result).value mustBe routes.ContactDetailsMissingController.onPageLoad(
-                  Some(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url)
+                  Some(RedirectUrl(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url))
                 ).url
               }
           }
