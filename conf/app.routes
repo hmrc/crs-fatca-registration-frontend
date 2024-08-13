@@ -20,6 +20,7 @@ GET         /register/sole-trader-not-identified              controllers.SoleTr
 GET         /register/problem/signed-out                    controllers.SessionExpiredController.onPageLoad()
 
 GET         /register/problem/some-information-is-missing   controllers.InformationMissingController.onPageLoad()
+GET         /register/problem/contact-details-are-missing   controllers.ContactDetailsMissingController.onPageLoad(continueUrl: Option[String] ?= None)
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey

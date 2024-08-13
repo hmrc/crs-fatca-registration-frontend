@@ -122,6 +122,7 @@ class CheckYourAnswersValidatorSpec extends AnyFreeSpec with Matchers with Model
               WhatIsYourUTRPage,
               WhatIsYourNamePage,
               BusinessNamePage,
+              IsThisYourBusinessPage,
               RegistrationInfoPage,
               IndContactEmailPage,
               IndContactHavePhonePage,

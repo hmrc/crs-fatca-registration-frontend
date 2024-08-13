@@ -117,6 +117,7 @@ sealed trait OrgAnswersValidator {
     } else {
       if (reporterType.contains(ReporterType.Sole)) checkPage(WhatIsYourNamePage) else checkPage(BusinessNamePage)
     },
+    checkPage(IsThisYourBusinessPage),
     checkPage(RegistrationInfoPage)
   ).flatten ++ checkContactDetailsMissingAnswers
 

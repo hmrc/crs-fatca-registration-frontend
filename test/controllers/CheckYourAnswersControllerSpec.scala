@@ -23,7 +23,7 @@ import helpers.JsonFixtures._
 import models.enrolment.GroupIds
 import models.error.ApiError._
 import models.matching.IndRegistrationInfo
-import models.{Address, Country, SubscriptionID, UserAnswers}
+import models.{Address, Country, NormalMode, SubscriptionID, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{reset, when}
@@ -58,6 +58,16 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
   val secondContactPhone                            = "+44 0808 157 0193"
   val mockSubscriptionService: SubscriptionService  = mock[SubscriptionService]
   val mockTaxEnrolmentsService: TaxEnrolmentService = mock[TaxEnrolmentService]
+
+  private def missingContactInformationUrls = Seq(
+    routes.ContactDetailsMissingController.onPageLoad(Some(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url)).url,
+    routes.ContactDetailsMissingController.onPageLoad(Some(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url)).url,
+    routes.ContactDetailsMissingController.onPageLoad(Some(controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode).url)).url
+  )
+
+  private def missingInformationUrls = Seq(
+    routes.InformationMissingController.onPageLoad().url
+  ) ++ missingContactInformationUrls
 
   override def beforeEach(): Unit = {
     reset(mockSubscriptionService, mockRegistrationService, mockTaxEnrolmentsService)
@@ -110,7 +120,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
                 val result = route(application, request).value
 
                 status(result) mustEqual SEE_OTHER
-                redirectLocation(result).value mustBe routes.InformationMissingController.onPageLoad().url
+                missingInformationUrls must contain(redirectLocation(result).value)
               }
           }
         }
@@ -155,7 +165,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
                 val result = route(application, request).value
 
                 status(result) mustEqual SEE_OTHER
-                redirectLocation(result).value mustBe routes.InformationMissingController.onPageLoad().url
+                missingInformationUrls must contain(redirectLocation(result).value)
               }
           }
         }
@@ -172,6 +182,56 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
+          }
+        }
+
+        "redirect the user to contact missing page when missing contact details for individual without id" in {
+          forAll(indWithoutIdMissingContactAnswers.arbitrary) {
+            (userAnswers: UserAnswers) =>
+              val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Individual)
+                .overrides(
+                  bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+                  bind[SubscriptionService].toInstance(mockSubscriptionService),
+                  bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+                  bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+                )
+                .build()
+
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+                val result = route(application, request).value
+
+                status(result) mustEqual SEE_OTHER
+                redirectLocation(result).value mustBe routes.ContactDetailsMissingController.onPageLoad(
+                  Some(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url)
+                ).url
+              }
+          }
+        }
+
+        "redirect the user to contact missing page when missing contact details for individual with id" in {
+          forAll(indWithIdMissingContactAnswers.arbitrary) {
+            (userAnswers: UserAnswers) =>
+              val application = applicationBuilder(userAnswers = Option(userAnswers), AffinityGroup.Individual)
+                .overrides(
+                  bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+                  bind[SubscriptionService].toInstance(mockSubscriptionService),
+                  bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+                  bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+                )
+                .build()
+
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+                val result = route(application, request).value
+
+                status(result) mustEqual SEE_OTHER
+                redirectLocation(result).value mustBe routes.ContactDetailsMissingController.onPageLoad(
+                  Some(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url)
+                ).url
+              }
           }
         }
       }
@@ -218,7 +278,30 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
                 val result = route(application, request).value
 
                 status(result) mustEqual SEE_OTHER
-                redirectLocation(result).value mustBe routes.InformationMissingController.onPageLoad().url
+                missingInformationUrls must contain(redirectLocation(result).value)
+              }
+          }
+        }
+
+        "must redirect to Missing Contact Information when missing some UserAnswers for organisation with id" in {
+          forAll(orgWithIdMissingContactAnswers.arbitrary, arbitraryOrgAffinityGroup.arbitrary) {
+            (userAnswers, affinityGroup) =>
+              val application = applicationBuilder(userAnswers = Option(userAnswers), affinityGroup)
+                .overrides(
+                  bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+                  bind[SubscriptionService].toInstance(mockSubscriptionService),
+                  bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+                  bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+                )
+                .build()
+
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+                val result = route(application, request).value
+
+                status(result) mustEqual SEE_OTHER
+                missingContactInformationUrls must contain(redirectLocation(result).value)
               }
           }
         }
@@ -263,7 +346,30 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
                 val result = route(application, request).value
 
                 status(result) mustEqual SEE_OTHER
-                redirectLocation(result).value mustBe routes.InformationMissingController.onPageLoad().url
+                missingInformationUrls must contain(redirectLocation(result).value)
+              }
+          }
+        }
+
+        "must redirect to Missing Contact Information when missing some UserAnswers for organisation without id" in {
+          forAll(orgWithoutIdMissingContactAnswers.arbitrary, arbitraryOrgAffinityGroup.arbitrary) {
+            (userAnswers, affinityGroup) =>
+              val application = applicationBuilder(userAnswers = Option(userAnswers), affinityGroup)
+                .overrides(
+                  bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+                  bind[SubscriptionService].toInstance(mockSubscriptionService),
+                  bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
+                  bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
+                )
+                .build()
+
+              running(application) {
+                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+                val result = route(application, request).value
+
+                status(result) mustEqual SEE_OTHER
+                missingContactInformationUrls must contain(redirectLocation(result).value)
               }
           }
         }

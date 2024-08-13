@@ -20,7 +20,7 @@ import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import models.error.ApiError
 import models.error.ApiError.{MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, SafeId}
@@ -59,7 +59,15 @@ class CheckYourAnswersController @Inject() (
     implicit request =>
       getMissingAnswers(request.userAnswers) match {
         case Nil => Ok(view(CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)))
-        case _   => Redirect(routes.InformationMissingController.onPageLoad())
+        case result if missingFirstContact(result) =>
+          Redirect(routes.ContactDetailsMissingController.onPageLoad(Some(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url)))
+        case result if missingSecondContact(result) =>
+          Redirect(
+            routes.ContactDetailsMissingController.onPageLoad(Some(controllers.organisation.routes.HaveSecondContactController.onPageLoad(NormalMode).url))
+          )
+        case result if missingIndividualContact(result) =>
+          Redirect(routes.ContactDetailsMissingController.onPageLoad(Some(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode).url)))
+        case _ => Redirect(routes.InformationMissingController.onPageLoad())
       }
   }
 
@@ -100,5 +108,22 @@ class CheckYourAnswersController @Inject() (
     }
 
   private def getMissingAnswers(userAnswers: UserAnswers): Seq[Page] = CheckYourAnswersValidator(userAnswers).validate
+
+  private def missingFirstContact(missingPages: Seq[Page]) =
+    missingPages.headOption.exists(Seq(ContactNamePage, ContactEmailPage, ContactHavePhonePage, ContactPhonePage).contains(_))
+
+  private def missingSecondContact(missingPages: Seq[Page]) =
+    missingPages.headOption.exists(
+      Seq(
+        HaveSecondContactPage,
+        SecondContactNamePage,
+        SecondContactEmailPage,
+        SecondContactHavePhonePage,
+        SecondContactPhonePage
+      ).contains(_)
+    )
+
+  private def missingIndividualContact(missingPages: Seq[Page]) =
+    missingPages.headOption.exists(Seq(IndContactEmailPage, IndContactHavePhonePage, IndContactPhonePage).contains(_))
 
 }

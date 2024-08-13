@@ -266,7 +266,8 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       )
       obj = setFields(
         Json.obj(),
-        RegisteredAddressInUKPage.path -> Json.toJson(true)
+        RegisteredAddressInUKPage.path -> Json.toJson(true),
+        IsThisYourBusinessPage.path    -> Json.toJson(true)
       ) ++ reportTypeObj ++ autoMatchedUtrObj ++ businessName ++ additionalData ++ contactDetails
     } yield UserAnswers(
       id = id,
@@ -354,6 +355,7 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
         WhatIsYourUTRPage,
         WhatIsYourNamePage,
         BusinessNamePage,
+        IsThisYourBusinessPage,
         RegistrationInfoPage,
         IndContactEmailPage,
         IndContactHavePhonePage,
@@ -378,6 +380,64 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
         HaveTradingNamePage,
         BusinessTradingNameWithoutIDPage,
         NonUKBusinessAddressWithoutIDPage,
+        IndContactEmailPage,
+        IndContactHavePhonePage,
+        IndContactPhonePage,
+        ContactNamePage,
+        ContactEmailPage,
+        ContactHavePhonePage,
+        ContactPhonePage,
+        HaveSecondContactPage,
+        SecondContactNamePage,
+        SecondContactEmailPage,
+        SecondContactHavePhonePage,
+        SecondContactPhonePage
+      )
+    )
+
+  lazy val indWithoutIdMissingContactAnswers: Arbitrary[UserAnswers] =
+    missingAnswersArb(
+      indWithoutId,
+      Seq(
+        IndContactEmailPage,
+        IndContactHavePhonePage,
+        IndContactPhonePage
+      )
+    )
+
+  lazy val indWithIdMissingContactAnswers: Arbitrary[UserAnswers] =
+    missingAnswersArb(
+      indWithId,
+      Seq(
+        IndContactEmailPage,
+        IndContactHavePhonePage,
+        IndContactPhonePage
+      )
+    )
+
+  lazy val orgWithIdMissingContactAnswers: Arbitrary[UserAnswers] =
+    missingAnswersArb(
+      orgWithId,
+      Seq(
+        IndContactEmailPage,
+        IndContactHavePhonePage,
+        IndContactPhonePage,
+        ContactNamePage,
+        ContactEmailPage,
+        ContactHavePhonePage,
+        ContactPhonePage,
+        HaveSecondContactPage,
+        SecondContactNamePage,
+        SecondContactEmailPage,
+        SecondContactHavePhonePage,
+        SecondContactPhonePage
+      )
+    )
+
+  lazy val orgWithoutIdMissingContactAnswers: Arbitrary[UserAnswers] =
+    missingAnswersArb(
+      orgWithoutId,
+      Seq(
         IndContactEmailPage,
         IndContactHavePhonePage,
         IndContactPhonePage,
