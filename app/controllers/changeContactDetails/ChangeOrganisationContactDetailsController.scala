@@ -18,17 +18,20 @@ package controllers.changeContactDetails
 
 import config.FrontendAppConfig
 import controllers.actions._
-import models.UserAnswers
+import controllers.routes
+import models.{CheckMode, UserAnswers}
 import models.requests.DataRequestWithUserAnswers
 import models.subscription.response.DisplaySubscriptionResponse
-import pages.changeContactDetails.ChangeContactDetailsInProgressPage
+import pages._
+import pages.changeContactDetails._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.SubscriptionService
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{ChangeOrganisationContactDetailsHelper, CountryListFactory}
+import utils.{ChangeOrganisationContactDetailsHelper, CheckYourAnswersValidator, CountryListFactory}
 import viewmodels.govuk.summarylist._
 import views.html.ThereIsAProblemView
 import views.html.changeContactDetails.ChangeOrganisationContactDetailsView
@@ -100,9 +103,34 @@ class ChangeOrganisationContactDetailsController @Inject() (
     val secondaryContactList = SummaryListViewModel(helper.changeOrganisationSecondaryContactDetails)
 
     subscriptionService.checkIfOrgContactDetailsHasChanged(subscriptionResponse, userAnswers) match {
-      case Some(hasChanges) => Future.successful(Ok(view(primaryContactList, secondaryContactList, frontendAppConfig, hasChanges)))
-      case _                => Future.successful(InternalServerError(errorView()))
+      case Some(hasChanges) => validateAnswers(userAnswers) {
+          Future.successful(Ok(view(primaryContactList, secondaryContactList, frontendAppConfig, hasChanges)))
+        }
+      case _ => Future.successful(InternalServerError(errorView()))
     }
   }
+
+  private def validateAnswers(userAnswers: UserAnswers)(f: => Future[Result]): Future[Result] =
+    CheckYourAnswersValidator(userAnswers).validateOrgChangeContactDetails match {
+      case Nil => f
+      case result if missingSecondContact(result) =>
+        Future.successful(Redirect(routes.ContactDetailsMissingController.onPageLoad(
+          Some(RedirectUrl(controllers.changeContactDetails.routes.OrganisationHaveSecondContactController.onPageLoad(CheckMode).url))
+        )))
+      case _ => Future.successful(Redirect(routes.ContactDetailsMissingController.onPageLoad(
+          Some(RedirectUrl(controllers.changeContactDetails.routes.OrganisationContactNameController.onPageLoad(CheckMode).url))
+        )))
+    }
+
+  private def missingSecondContact(missingPages: Seq[Page]) =
+    missingPages.headOption.exists(
+      Seq(
+        OrganisationHaveSecondContactPage,
+        OrganisationSecondContactNamePage,
+        OrganisationSecondContactEmailPage,
+        OrganisationSecondContactHavePhonePage,
+        OrganisationSecondContactPhonePage
+      ).contains(_)
+    )
 
 }

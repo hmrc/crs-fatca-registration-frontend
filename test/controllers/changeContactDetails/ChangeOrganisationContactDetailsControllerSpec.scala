@@ -19,7 +19,7 @@ package controllers.changeContactDetails
 import base.SpecBase
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController
-import generators.ModelGenerators
+import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures.subscriptionId
 import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse, OrganisationRegistrationType}
 import models.{SubscriptionID, UserAnswers}
@@ -40,7 +40,8 @@ import views.html.ThereIsAProblemView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with MockitoSugar with ScalaCheckPropertyChecks with ModelGenerators {
+class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with MockitoSugar with ScalaCheckPropertyChecks with UserAnswersGenerator
+    with ModelGenerators {
 
   private val mockSubscriptionService           = mock[SubscriptionService]
   private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
@@ -56,21 +57,21 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
 
     "onPageLoad" - {
       "must return OK and show 'confirm and send' button for a GET request when there is no change to the contact details" in {
-        forAll(arbitrary[DisplaySubscriptionResponse]) {
-          subscription =>
-            val userAnswers = Some(emptyUserAnswers)
+        forAll(arbitrary[DisplaySubscriptionResponse], orgChangeContact.arbitrary) {
+          (subscription, userAnswers) =>
+            val userAnswersOpt = Some(userAnswers)
 
             when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(Option(subscription)))
             when(mockSubscriptionService.populateUserAnswersFromOrgSubscription(any[UserAnswers](), any[DisplayResponseDetail]()))
-              .thenReturn(userAnswers)
+              .thenReturn(userAnswersOpt)
             when(mockSubscriptionService.checkIfOrgContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
               .thenReturn(Some(true))
-            when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
-            when(mockSessionRepository.set(userAnswers.value.withPage(ChangeContactDetailsInProgressPage, true)))
+            when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswersOpt))
+            when(mockSessionRepository.set(userAnswers.withPage(ChangeContactDetailsInProgressPage, true)))
               .thenReturn(Future.successful(true))
 
-            val application = applicationBuilder(userAnswers)
+            val application = applicationBuilder(userAnswersOpt)
               .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
               .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
               .build()
@@ -88,17 +89,17 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
       }
 
       "must not populate userAnswers with subscription from backend when change contact details is in progress" in {
-        forAll(arbitrary[DisplaySubscriptionResponse]) {
-          subscription =>
-            val userAnswers = Some(emptyUserAnswers.withPage(ChangeContactDetailsInProgressPage, true))
+        forAll(arbitrary[DisplaySubscriptionResponse], orgChangeContact.arbitrary) {
+          (subscription, userAnswers) =>
+            val userAnswersOpt = Some(userAnswers.withPage(ChangeContactDetailsInProgressPage, true))
 
             when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(Option(subscription)))
             when(mockSubscriptionService.checkIfOrgContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
               .thenReturn(Some(true))
-            when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
+            when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswersOpt))
 
-            val application = applicationBuilder(userAnswers)
+            val application = applicationBuilder(userAnswersOpt)
               .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
               .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
               .build()
@@ -116,19 +117,20 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
       }
 
       "must return OK but hide 'confirm and send' button for a GET request when there are changes to the contact details" in {
-        forAll(arbitrary[DisplaySubscriptionResponse]) {
-          subscription =>
-            val userAnswers = Some(emptyUserAnswers)
+        forAll(arbitrary[DisplaySubscriptionResponse], orgChangeContact.arbitrary) {
+          (subscription, userAnswers) =>
+            val userAnswersOpt = Some(userAnswers)
 
             when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(Option(subscription)))
             when(mockSubscriptionService.populateUserAnswersFromOrgSubscription(any[UserAnswers](), any[DisplayResponseDetail]()))
-              .thenReturn(userAnswers)
+              .thenReturn(userAnswersOpt)
             when(mockSubscriptionService.checkIfOrgContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
               .thenReturn(Some(false))
-            when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
+            when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswersOpt))
+            when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-            val application = applicationBuilder(userAnswers)
+            val application = applicationBuilder(userAnswersOpt)
               .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
               .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
               .build()

@@ -22,6 +22,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages.{RegistrationInfoPage, _}
 import models._
+import pages.changeContactDetails._
 import play.api.libs.json.{JsObject, JsPath, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup
 
@@ -174,6 +175,13 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
     } yield email ++ phone
   }
 
+  private lazy val indChangeContactDetails = Arbitrary {
+    for {
+      email <- genJsObj(arbitrary[(IndividualEmailPage.type, JsValue)])
+      phone <- phoneNumberArbitrary(IndividualHavePhonePage, IndividualPhonePage).arbitrary
+    } yield email ++ phone
+  }
+
   private lazy val orgContactDetails = Arbitrary {
     for {
       haveSecondContact <- arbitrary[Boolean]
@@ -186,6 +194,27 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       obj = setFields(
         Json.obj(),
         HaveSecondContactPage.path -> Json.toJson(haveSecondContact)
+      ) ++ firstContact ++ secondContact
+    } yield obj
+  }
+
+  private lazy val orgChangeContactDetails = Arbitrary {
+    for {
+      haveSecondContact <- arbitrary[Boolean]
+      firstContact <-
+        contactArbitrary(OrganisationContactNamePage, OrganisationContactEmailPage, OrganisationContactHavePhonePage, OrganisationContactPhonePage).arbitrary
+      secondContact <- if (haveSecondContact) {
+        contactArbitrary(OrganisationSecondContactNamePage,
+                         OrganisationSecondContactEmailPage,
+                         OrganisationSecondContactHavePhonePage,
+                         OrganisationSecondContactPhonePage
+        ).arbitrary
+      } else {
+        Gen.const(Json.obj())
+      }
+      obj = setFields(
+        Json.obj(),
+        OrganisationHaveSecondContactPage.path -> Json.toJson(haveSecondContact)
       ) ++ firstContact ++ secondContact
     } yield obj
   }
@@ -231,6 +260,25 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
     )
   }
 
+  lazy val indChangeContact: Arbitrary[UserAnswers] = Arbitrary {
+    for {
+      id             <- nonEmptyString
+      contactDetails <- indChangeContactDetails.arbitrary
+    } yield UserAnswers(
+      id = id,
+      data = contactDetails
+    )
+  }
+
+  lazy val missingIndChangeContact: Arbitrary[UserAnswers] = missingAnswersArb(
+    indChangeContact,
+    Seq(
+      IndividualEmailPage,
+      IndividualHavePhonePage,
+      IndividualPhonePage
+    )
+  )
+
   lazy val orgWithId: Arbitrary[UserAnswers] = Arbitrary {
     for {
       id             <- nonEmptyString
@@ -274,6 +322,31 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       data = obj
     )
   }
+
+  lazy val orgChangeContact: Arbitrary[UserAnswers] = Arbitrary {
+    for {
+      id             <- nonEmptyString
+      contactDetails <- orgChangeContactDetails.arbitrary
+    } yield UserAnswers(
+      id = id,
+      data = contactDetails
+    )
+  }
+
+  lazy val missingOrgChangeContact: Arbitrary[UserAnswers] = missingAnswersArb(
+    orgChangeContact,
+    Seq(
+      OrganisationContactNamePage,
+      OrganisationContactEmailPage,
+      OrganisationContactHavePhonePage,
+      OrganisationContactPhonePage,
+      OrganisationHaveSecondContactPage,
+      OrganisationSecondContactNamePage,
+      OrganisationSecondContactEmailPage,
+      OrganisationSecondContactHavePhonePage,
+      OrganisationSecondContactPhonePage
+    )
+  )
 
   lazy val orgWithoutId: Arbitrary[UserAnswers] = Arbitrary {
     for {
@@ -380,64 +453,6 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
         HaveTradingNamePage,
         BusinessTradingNameWithoutIDPage,
         NonUKBusinessAddressWithoutIDPage,
-        IndContactEmailPage,
-        IndContactHavePhonePage,
-        IndContactPhonePage,
-        ContactNamePage,
-        ContactEmailPage,
-        ContactHavePhonePage,
-        ContactPhonePage,
-        HaveSecondContactPage,
-        SecondContactNamePage,
-        SecondContactEmailPage,
-        SecondContactHavePhonePage,
-        SecondContactPhonePage
-      )
-    )
-
-  lazy val indWithoutIdMissingContactAnswers: Arbitrary[UserAnswers] =
-    missingAnswersArb(
-      indWithoutId,
-      Seq(
-        IndContactEmailPage,
-        IndContactHavePhonePage,
-        IndContactPhonePage
-      )
-    )
-
-  lazy val indWithIdMissingContactAnswers: Arbitrary[UserAnswers] =
-    missingAnswersArb(
-      indWithId,
-      Seq(
-        IndContactEmailPage,
-        IndContactHavePhonePage,
-        IndContactPhonePage
-      )
-    )
-
-  lazy val orgWithIdMissingContactAnswers: Arbitrary[UserAnswers] =
-    missingAnswersArb(
-      orgWithId,
-      Seq(
-        IndContactEmailPage,
-        IndContactHavePhonePage,
-        IndContactPhonePage,
-        ContactNamePage,
-        ContactEmailPage,
-        ContactHavePhonePage,
-        ContactPhonePage,
-        HaveSecondContactPage,
-        SecondContactNamePage,
-        SecondContactEmailPage,
-        SecondContactHavePhonePage,
-        SecondContactPhonePage
-      )
-    )
-
-  lazy val orgWithoutIdMissingContactAnswers: Arbitrary[UserAnswers] =
-    missingAnswersArb(
-      orgWithoutId,
-      Seq(
         IndContactEmailPage,
         IndContactHavePhonePage,
         IndContactPhonePage,

@@ -34,7 +34,7 @@ class ContactDetailsMissingController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequired() {
     implicit request =>
       Ok(view(continueUrl.map(_.get(OnlyRelative).url).getOrElse(routes.IndexController.onPageLoad.url)))
   }

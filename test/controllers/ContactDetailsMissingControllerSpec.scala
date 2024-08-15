@@ -16,20 +16,34 @@
 
 package controllers
 
-import base.SpecBase
+import base.{SpecBase, TestValues}
+import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
+import org.mockito.MockitoSugar.when
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.ContactDetailsMissingView
 
-class ContactDetailsMissingControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class ContactDetailsMissingControllerSpec extends SpecBase with TestValues {
+
+  private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
   "ContactDetailsMissing Controller" - {
 
+    when(mockSubscriptionIdRetrievalAction.apply())
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+    when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(emptyUserAnswers)))
+
     "must return OK and the correct view with default continue url for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ContactDetailsMissingController.onPageLoad().url)
@@ -45,7 +59,9 @@ class ContactDetailsMissingControllerSpec extends SpecBase {
 
     "must return OK and the correct view with specific continue url for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+        .build()
 
       running(application) {
         val request = FakeRequest(

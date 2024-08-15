@@ -184,6 +184,42 @@ class CheckYourAnswersValidatorSpec extends AnyFreeSpec with Matchers with Model
         }
       }
     }
+
+    "Organisation Change Contact Details" - {
+      "return an empty list if no answers are missing" in {
+        forAll(orgChangeContact.arbitrary) {
+          (userAnswers: UserAnswers) =>
+            val result = CheckYourAnswersValidator(userAnswers).validateOrgChangeContactDetails
+            result mustBe Nil
+        }
+      }
+
+      "return missing answers" in {
+        forAll(missingOrgChangeContact.arbitrary) {
+          (userAnswers: UserAnswers) =>
+            val result = CheckYourAnswersValidator(userAnswers).validateOrgChangeContactDetails
+            result mustNot be(empty)
+        }
+      }
+    }
+
+    "Individual Change Contact Details" - {
+      "return an empty list if no answers are missing" in {
+        forAll(indChangeContact.arbitrary) {
+          (userAnswers: UserAnswers) =>
+            val result = CheckYourAnswersValidator(userAnswers).validateIndChangeContactDetails
+            result mustBe Nil
+        }
+      }
+
+      "return missing answers" in {
+        forAll(missingIndChangeContact.arbitrary) {
+          (userAnswers: UserAnswers) =>
+            val result = CheckYourAnswersValidator(userAnswers).validateIndChangeContactDetails
+            result mustNot be(empty)
+        }
+      }
+    }
   }
 
 }

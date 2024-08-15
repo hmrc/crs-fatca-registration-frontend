@@ -18,7 +18,8 @@ package controllers.changeContactDetails
 
 import config.FrontendAppConfig
 import controllers.actions._
-import models.UserAnswers
+import controllers.routes
+import models.{CheckMode, UserAnswers}
 import models.requests.DataRequestWithUserAnswers
 import models.subscription.response.DisplaySubscriptionResponse
 import pages.changeContactDetails.ChangeContactDetailsInProgressPage
@@ -27,8 +28,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.SubscriptionService
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.ChangeIndividualContactDetailsHelper
+import utils.{ChangeIndividualContactDetailsHelper, CheckYourAnswersValidator}
 import viewmodels.govuk.summarylist._
 import views.html.ThereIsAProblemView
 import views.html.changeContactDetails.ChangeIndividualContactDetailsView
@@ -98,9 +100,19 @@ class ChangeIndividualContactDetailsController @Inject() (
     val contactList = SummaryListViewModel(helper.changeIndividualContactDetails)
 
     subscriptionService.checkIfIndContactDetailsHasChanged(subscriptionResponse, userAnswers) match {
-      case Some(hasChanges) => Future.successful(Ok(view(contactList, frontendAppConfig, hasChanges)))
-      case _                => Future.successful(InternalServerError(errorView()))
+      case Some(hasChanges) => validateAnswers(userAnswers) {
+          Future.successful(Ok(view(contactList, frontendAppConfig, hasChanges)))
+        }
+      case _ => Future.successful(InternalServerError(errorView()))
     }
   }
+
+  private def validateAnswers(userAnswers: UserAnswers)(f: => Future[Result]): Future[Result] =
+    CheckYourAnswersValidator(userAnswers).validateIndChangeContactDetails match {
+      case Nil => f
+      case _ => Future.successful(Redirect(routes.ContactDetailsMissingController.onPageLoad(
+          Some(RedirectUrl(controllers.changeContactDetails.routes.IndividualEmailController.onPageLoad(CheckMode).url))
+        )))
+    }
 
 }

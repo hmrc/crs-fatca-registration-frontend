@@ -18,10 +18,19 @@ package utils
 
 import models.{ReporterType, UserAnswers}
 import pages._
+import pages.changeContactDetails._
 import play.api.libs.json.Reads
 
 sealed trait IndividualAnswersValidator {
   self: CheckYourAnswersValidator =>
+
+  private def checkIndChangePhoneAnswers: Seq[Page] = (userAnswers.get(IndividualHavePhonePage) match {
+    case Some(true)  => checkPage(IndividualPhonePage)
+    case Some(false) => None
+    case _           => Some(IndividualHavePhonePage)
+  }).toSeq
+
+  private[utils] def checkIndChangeContactDetailsMissingAnswers: Seq[Page] = checkPage(IndividualEmailPage).toSeq ++ checkIndChangePhoneAnswers
 
   private def checkIndPhoneAnswers: Seq[Page] = (userAnswers.get(IndContactHavePhonePage) match {
     case Some(true)  => checkPage(IndContactPhonePage)
@@ -67,6 +76,35 @@ sealed trait IndividualAnswersValidator {
 
 sealed trait OrgAnswersValidator {
   self: CheckYourAnswersValidator with IndividualAnswersValidator =>
+
+  private def checkOrgChangePhoneMissingAnswers: Seq[Page] = (userAnswers.get(OrganisationContactHavePhonePage) match {
+    case Some(true)  => checkPage(OrganisationContactPhonePage)
+    case Some(false) => None
+    case _           => Some(OrganisationContactHavePhonePage)
+  }).toSeq
+
+  private def checkOrgChangeSecPhoneMissingAnswers: Seq[Page] = (userAnswers.get(OrganisationSecondContactHavePhonePage) match {
+    case Some(true)  => checkPage(OrganisationSecondContactPhonePage)
+    case Some(false) => None
+    case _           => Some(OrganisationSecondContactHavePhonePage)
+  }).toSeq
+
+  private def checkOrgChangeFirstContactDetailsMissingAnswers: Seq[Page] = Seq(
+    checkPage(OrganisationContactNamePage),
+    checkPage(OrganisationContactEmailPage)
+  ).flatten ++ checkOrgChangePhoneMissingAnswers
+
+  private def checkOrgChangeSecContactDetailsMissingAnswers: Seq[Page] =
+    userAnswers.get(OrganisationHaveSecondContactPage) match {
+      case Some(true) => Seq(
+          checkPage(OrganisationSecondContactNamePage),
+          checkPage(OrganisationSecondContactEmailPage)
+        ).flatten ++ checkOrgChangeSecPhoneMissingAnswers
+      case Some(false) => Seq.empty
+      case _           => Seq(OrganisationHaveSecondContactPage)
+    }
+
+  private[utils] def checkChangeContactDetailsMissingAnswers = checkOrgChangeFirstContactDetailsMissingAnswers ++ checkOrgChangeSecContactDetailsMissingAnswers
 
   private def checkOrgPhoneMissingAnswers: Seq[Page] = (userAnswers.get(ContactHavePhonePage) match {
     case Some(true)  => checkPage(ContactPhonePage)
@@ -156,6 +194,9 @@ class CheckYourAnswersValidator(val userAnswers: UserAnswers) extends Individual
       case (Some(_), _) | (_, true)           => checkOrgMissingAnswers
       case _                                  => Seq(ReporterTypePage)
     }
+
+  def validateIndChangeContactDetails: Seq[Page] = checkIndChangeContactDetailsMissingAnswers
+  def validateOrgChangeContactDetails: Seq[Page] = checkChangeContactDetailsMissingAnswers
 
 }
 

@@ -122,4 +122,34 @@ trait PageGenerators {
   implicit lazy val arbitraryIndSelectAddressPage: Arbitrary[pages.IndSelectAddressPage.type] =
     Arbitrary(pages.IndSelectAddressPage)
 
+  implicit lazy val arbitraryIndividualPhonePage: Arbitrary[pages.changeContactDetails.IndividualPhonePage.type] =
+    Arbitrary(pages.changeContactDetails.IndividualPhonePage)
+
+  implicit lazy val arbitraryIndividualEmailPage: Arbitrary[pages.changeContactDetails.IndividualEmailPage.type] =
+    Arbitrary(pages.changeContactDetails.IndividualEmailPage)
+
+  implicit lazy val arbitraryOrganisationContactNamePage: Arbitrary[pages.changeContactDetails.OrganisationContactNamePage.type] =
+    Arbitrary(pages.changeContactDetails.OrganisationContactNamePage)
+
+  implicit lazy val arbitraryOrganisationContactEmailPage: Arbitrary[pages.changeContactDetails.OrganisationContactEmailPage.type] =
+    Arbitrary(pages.changeContactDetails.OrganisationContactEmailPage)
+
+  implicit lazy val arbitraryOrganisationContactHavePhonePage: Arbitrary[pages.changeContactDetails.OrganisationContactHavePhonePage.type] =
+    Arbitrary(pages.changeContactDetails.OrganisationContactHavePhonePage)
+
+  implicit lazy val arbitraryOrganisationContactPhonePage: Arbitrary[pages.changeContactDetails.OrganisationContactPhonePage.type] =
+    Arbitrary(pages.changeContactDetails.OrganisationContactPhonePage)
+
+  implicit lazy val arbitraryOrganisationSecondContactNamePage: Arbitrary[pages.changeContactDetails.OrganisationSecondContactNamePage.type] =
+    Arbitrary(pages.changeContactDetails.OrganisationSecondContactNamePage)
+
+  implicit lazy val arbitraryOrganisationSecondContactEmailPage: Arbitrary[pages.changeContactDetails.OrganisationSecondContactEmailPage.type] =
+    Arbitrary(pages.changeContactDetails.OrganisationSecondContactEmailPage)
+
+  implicit lazy val arbitraryOrganisationSecondContactHavePhonePage: Arbitrary[pages.changeContactDetails.OrganisationSecondContactHavePhonePage.type] =
+    Arbitrary(pages.changeContactDetails.OrganisationSecondContactHavePhonePage)
+
+  implicit lazy val arbitraryOrganisationSecondContactPhonePage: Arbitrary[pages.changeContactDetails.OrganisationSecondContactPhonePage.type] =
+    Arbitrary(pages.changeContactDetails.OrganisationSecondContactPhonePage)
+
 }
