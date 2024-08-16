@@ -18,7 +18,7 @@ package controllers.changeContactDetails
 
 import config.FrontendAppConfig
 import controllers.actions._
-import controllers.routes
+import controllers.{routes, ContactDetailsMissingController}
 import models.{CheckMode, UserAnswers}
 import models.requests.DataRequestWithUserAnswers
 import models.subscription.response.DisplaySubscriptionResponse
@@ -28,7 +28,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.SubscriptionService
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.{ChangeIndividualContactDetailsHelper, CheckYourAnswersValidator}
 import viewmodels.govuk.summarylist._
@@ -110,9 +109,10 @@ class ChangeIndividualContactDetailsController @Inject() (
   private def validateAnswers(userAnswers: UserAnswers)(f: => Future[Result]): Future[Result] =
     CheckYourAnswersValidator(userAnswers).validateIndChangeContactDetails match {
       case Nil => f
-      case _ => Future.successful(Redirect(routes.ContactDetailsMissingController.onPageLoad(
-          Some(RedirectUrl(controllers.changeContactDetails.routes.IndividualEmailController.onPageLoad(CheckMode).url))
-        )))
+      case _ => Future.successful(Redirect(routes.ContactDetailsMissingController.onPageLoad())
+          .flashing(
+            ContactDetailsMissingController.continueUrlKey -> controllers.changeContactDetails.routes.IndividualEmailController.onPageLoad(CheckMode).url
+          ))
     }
 
 }

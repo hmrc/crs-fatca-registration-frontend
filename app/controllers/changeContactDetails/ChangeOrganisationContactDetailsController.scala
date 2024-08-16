@@ -18,7 +18,7 @@ package controllers.changeContactDetails
 
 import config.FrontendAppConfig
 import controllers.actions._
-import controllers.routes
+import controllers.{routes, ContactDetailsMissingController}
 import models.{CheckMode, UserAnswers}
 import models.requests.DataRequestWithUserAnswers
 import models.subscription.response.DisplaySubscriptionResponse
@@ -29,7 +29,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.SubscriptionService
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.{ChangeOrganisationContactDetailsHelper, CheckYourAnswersValidator, CountryListFactory}
 import viewmodels.govuk.summarylist._
@@ -115,11 +114,14 @@ class ChangeOrganisationContactDetailsController @Inject() (
       case Nil => f
       case result if missingSecondContact(result) =>
         Future.successful(Redirect(routes.ContactDetailsMissingController.onPageLoad(
-          Some(RedirectUrl(controllers.changeContactDetails.routes.OrganisationHaveSecondContactController.onPageLoad(CheckMode).url))
-        )))
-      case _ => Future.successful(Redirect(routes.ContactDetailsMissingController.onPageLoad(
-          Some(RedirectUrl(controllers.changeContactDetails.routes.OrganisationContactNameController.onPageLoad(CheckMode).url))
-        )))
+        )).flashing(
+          ContactDetailsMissingController.continueUrlKey -> controllers.changeContactDetails.routes.OrganisationHaveSecondContactController.onPageLoad(
+            CheckMode
+          ).url
+        ))
+      case _ => Future.successful(Redirect(routes.ContactDetailsMissingController.onPageLoad()).flashing(
+          ContactDetailsMissingController.continueUrlKey -> controllers.changeContactDetails.routes.OrganisationContactNameController.onPageLoad(CheckMode).url
+        ))
     }
 
   private def missingSecondContact(missingPages: Seq[Page]) =

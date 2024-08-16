@@ -18,13 +18,12 @@ package controllers
 
 import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
-import models.NormalMode
+import models.CheckMode
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.ContactDetailsMissingView
 
 import scala.concurrent.Future
@@ -66,9 +65,10 @@ class ContactDetailsMissingControllerSpec extends SpecBase with TestValues {
       running(application) {
         val request = FakeRequest(
           GET,
-          routes.ContactDetailsMissingController.onPageLoad(
-            Some(RedirectUrl(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url))
-          ).url
+          routes.ContactDetailsMissingController.onPageLoad().url
+        ).withFlash(
+          ContactDetailsMissingController.continueUrlKey ->
+            controllers.organisation.routes.ContactNameController.onPageLoad(CheckMode).url
         )
 
         val result = route(application, request).value
@@ -77,7 +77,7 @@ class ContactDetailsMissingControllerSpec extends SpecBase with TestValues {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(controllers.organisation.routes.ContactNameController.onPageLoad(NormalMode).url)(request, messages(application)).toString
+          view(controllers.organisation.routes.ContactNameController.onPageLoad(CheckMode).url)(request, messages(application)).toString
       }
     }
   }
