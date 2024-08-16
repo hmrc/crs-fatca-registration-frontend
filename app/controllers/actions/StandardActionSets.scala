@@ -70,4 +70,7 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
   def subscriptionIdWithChangeDetailsRequiredForIndividual(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
     retrieveSubscriptionId(Some(IndividualRegistrationType)) andThen changeDetailsDataRequired
 
+  def subscriptionIdWithChangeDetailsRequired(): ActionBuilder[DataRequestWithUserAnswers, AnyContent] =
+    retrieveSubscriptionId() andThen changeDetailsDataRequired
+
 }

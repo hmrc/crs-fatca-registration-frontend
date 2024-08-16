@@ -1,294 +1,295 @@
 # microservice specific routes
 
-->          /hmrc-frontend                               hmrcfrontend.Routes
+->          /hmrc-frontend                                                       hmrcfrontend.Routes
 
-GET         /                                            controllers.IndexController.onPageLoad
+GET         /                                                                    controllers.IndexController.onPageLoad
 
-GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                                        controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                                                      controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                             controllers.KeepAliveController.keepAlive
+GET         /refresh-session                                                     controllers.KeepAliveController.keepAlive
 
-GET         /register/problem/there-is-a-problem              controllers.JourneyRecoveryController.onPageLoad()
+GET         /register/problem/there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad()
 
-GET         /register/check-your-answers                      controllers.CheckYourAnswersController.onPageLoad()
-POST        /register/check-your-answers                      controllers.CheckYourAnswersController.onSubmit()
+GET         /register/check-your-answers                                         controllers.CheckYourAnswersController.onPageLoad()
+POST        /register/check-your-answers                                         controllers.CheckYourAnswersController.onSubmit()
 
-GET         /register/sole-trader-not-identified              controllers.SoleTraderNotIdentifiedController.onPageLoad
+GET         /register/sole-trader-not-identified                                 controllers.SoleTraderNotIdentifiedController.onPageLoad
 
-GET         /register/problem/signed-out                    controllers.SessionExpiredController.onPageLoad()
+GET         /register/problem/signed-out                                         controllers.SessionExpiredController.onPageLoad()
 
-GET         /register/problem/some-information-is-missing   controllers.InformationMissingController.onPageLoad()
+GET         /register/problem/some-information-is-missing                        controllers.InformationMissingController.onPageLoad()
+GET         /register/problem/contact-details-are-missing                        controllers.ContactDetailsMissingController.onPageLoad()
 
-GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
-GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey
-GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad
+GET         /account/sign-out-survey                                             controllers.auth.AuthController.signOut
+GET         /account/sign-out                                                    controllers.auth.AuthController.signOutNoSurvey
+GET         /account/signed-out                                                  controllers.auth.SignedOutController.onPageLoad
 
-GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad
+GET         /unauthorised                                                        controllers.UnauthorisedController.onPageLoad
 
-GET        /register/problem/organisation-without-utr-pre-registered        controllers.PreRegisteredController.onPageLoad(withId: Boolean = false)
-GET        /register/problem/organisation-with-utr-pre-registered           controllers.PreRegisteredController.onPageLoad(withId: Boolean = true)
+GET         /register/problem/organisation-without-utr-pre-registered            controllers.PreRegisteredController.onPageLoad(withId: Boolean = false)
+GET         /register/problem/organisation-with-utr-pre-registered               controllers.PreRegisteredController.onPageLoad(withId: Boolean = true)
 
-GET        /register/problem/individual-pre-registered                                  controllers.individual.IndividualAlreadyRegisteredController.onPageLoad()
+GET         /register/problem/individual-pre-registered                          controllers.individual.IndividualAlreadyRegisteredController.onPageLoad()
 
-GET        /register/your-contact-details                controllers.YourContactDetailsController.onPageLoad()
-POST       /register/your-contact-details                controllers.YourContactDetailsController.onSubmit()
+GET         /register/your-contact-details                                       controllers.YourContactDetailsController.onPageLoad()
+POST        /register/your-contact-details                                       controllers.YourContactDetailsController.onSubmit()
 
-GET        /register/contact-name                        controllers.organisation.ContactNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/contact-name                        controllers.organisation.ContactNameController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-contact-name                 controllers.organisation.ContactNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-contact-name                 controllers.organisation.ContactNameController.onSubmit(mode: Mode = CheckMode)
+GET         /register/contact-name                                               controllers.organisation.ContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/contact-name                                               controllers.organisation.ContactNameController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-contact-name                                        controllers.organisation.ContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-contact-name                                        controllers.organisation.ContactNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/email                               controllers.organisation.ContactEmailController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/email                               controllers.organisation.ContactEmailController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-email                        controllers.organisation.ContactEmailController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-email                        controllers.organisation.ContactEmailController.onSubmit(mode: Mode = CheckMode)
+GET         /register/email                                                      controllers.organisation.ContactEmailController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/email                                                      controllers.organisation.ContactEmailController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-email                                               controllers.organisation.ContactEmailController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-email                                               controllers.organisation.ContactEmailController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/have-phone                          controllers.organisation.ContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/have-phone                          controllers.organisation.ContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-have-phone                   controllers.organisation.ContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-have-phone                   controllers.organisation.ContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
+GET         /register/have-phone                                                 controllers.organisation.ContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/have-phone                                                 controllers.organisation.ContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-have-phone                                          controllers.organisation.ContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-have-phone                                          controllers.organisation.ContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/phone                               controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/phone                               controllers.organisation.ContactPhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-phone                        controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-phone                        controllers.organisation.ContactPhoneController.onSubmit(mode: Mode = CheckMode)
+GET         /register/phone                                                      controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/phone                                                      controllers.organisation.ContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-phone                                               controllers.organisation.ContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-phone                                               controllers.organisation.ContactPhoneController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/second-contact-email                controllers.organisation.SecondContactEmailController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/second-contact-email                controllers.organisation.SecondContactEmailController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-second-contact-email         controllers.organisation.SecondContactEmailController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-second-contact-email         controllers.organisation.SecondContactEmailController.onSubmit(mode: Mode = CheckMode)
+GET         /register/second-contact-email                                       controllers.organisation.SecondContactEmailController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/second-contact-email                                       controllers.organisation.SecondContactEmailController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-second-contact-email                                controllers.organisation.SecondContactEmailController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-second-contact-email                                controllers.organisation.SecondContactEmailController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/have-second-contact                 controllers.organisation.HaveSecondContactController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/have-second-contact                 controllers.organisation.HaveSecondContactController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-have-second-contact          controllers.organisation.HaveSecondContactController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-have-second-contact          controllers.organisation.HaveSecondContactController.onSubmit(mode: Mode = CheckMode)
+GET         /register/have-second-contact                                        controllers.organisation.HaveSecondContactController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/have-second-contact                                        controllers.organisation.HaveSecondContactController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-have-second-contact                                 controllers.organisation.HaveSecondContactController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-have-second-contact                                 controllers.organisation.HaveSecondContactController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/second-contact-name                 controllers.organisation.SecondContactNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/second-contact-name                 controllers.organisation.SecondContactNameController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-second-contact-name          controllers.organisation.SecondContactNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-second-contact-name          controllers.organisation.SecondContactNameController.onSubmit(mode: Mode = CheckMode)
+GET         /register/second-contact-name                                        controllers.organisation.SecondContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/second-contact-name                                        controllers.organisation.SecondContactNameController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-second-contact-name                                 controllers.organisation.SecondContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-second-contact-name                                 controllers.organisation.SecondContactNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/second-contact-have-phone           controllers.organisation.SecondContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/second-contact-have-phone           controllers.organisation.SecondContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-second-contact-have-phone    controllers.organisation.SecondContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-second-contact-have-phone    controllers.organisation.SecondContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
+GET         /register/second-contact-have-phone                                  controllers.organisation.SecondContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/second-contact-have-phone                                  controllers.organisation.SecondContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-second-contact-have-phone                           controllers.organisation.SecondContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-second-contact-have-phone                           controllers.organisation.SecondContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/second-contact-phone                controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-second-contact-phone         controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
+GET         /register/second-contact-phone                                       controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/second-contact-phone                                       controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-second-contact-phone                                controllers.organisation.SecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-second-contact-phone                                controllers.organisation.SecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/individual-have-phone               controllers.individual.IndContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/individual-have-phone               controllers.individual.IndContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-individual-have-phone        controllers.individual.IndContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-individual-have-phone        controllers.individual.IndContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
+GET         /register/individual-have-phone                                      controllers.individual.IndContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/individual-have-phone                                      controllers.individual.IndContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-individual-have-phone                               controllers.individual.IndContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-individual-have-phone                               controllers.individual.IndContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/individual-phone                    controllers.individual.IndContactPhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/individual-phone                    controllers.individual.IndContactPhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-individual-phone             controllers.individual.IndContactPhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-individual-phone             controllers.individual.IndContactPhoneController.onSubmit(mode: Mode = CheckMode)
+GET         /register/individual-phone                                           controllers.individual.IndContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/individual-phone                                           controllers.individual.IndContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-individual-phone                                    controllers.individual.IndContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-individual-phone                                    controllers.individual.IndContactPhoneController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/individual-email                    controllers.individual.IndContactEmailController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/individual-email                    controllers.individual.IndContactEmailController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-individual-email             controllers.individual.IndContactEmailController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-individual-email             controllers.individual.IndContactEmailController.onSubmit(mode: Mode = CheckMode)
+GET         /register/individual-email                                           controllers.individual.IndContactEmailController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/individual-email                                           controllers.individual.IndContactEmailController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-individual-email                                    controllers.individual.IndContactEmailController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-individual-email                                    controllers.individual.IndContactEmailController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/date-of-birth                       controllers.individual.IndDateOfBirthController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/date-of-birth                       controllers.individual.IndDateOfBirthController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-date-of-birth                controllers.individual.IndDateOfBirthController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-date-of-birth                controllers.individual.IndDateOfBirthController.onSubmit(mode: Mode = CheckMode)
+GET         /register/date-of-birth                                              controllers.individual.IndDateOfBirthController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/date-of-birth                                              controllers.individual.IndDateOfBirthController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-date-of-birth                                       controllers.individual.IndDateOfBirthController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-date-of-birth                                       controllers.individual.IndDateOfBirthController.onSubmit(mode: Mode = CheckMode)
 
-GET        /register/name                                controllers.individual.IndContactNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/name                                controllers.individual.IndContactNameController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-name                         controllers.individual.IndContactNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-name                         controllers.individual.IndContactNameController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/identity-confirmed                 controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)
-GET        /register/change-identity-confirmed          controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = CheckMode)
-
-GET        /register/could-not-confirm-identity/:key     controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad(key: String)
-
-GET        /register/without-id/business-name            controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/business-name            controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-business-name     controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-business-name     controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/have-ni-number                      controllers.individual.IndDoYouHaveNINumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/have-ni-number                      controllers.individual.IndDoYouHaveNINumberController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-have-ni-number               controllers.individual.IndDoYouHaveNINumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-have-ni-number               controllers.individual.IndDoYouHaveNINumberController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/without-id/have-trading-name         controllers.organisation.HaveTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/have-trading-name         controllers.organisation.HaveTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-have-trading-name  controllers.organisation.HaveTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-have-trading-name  controllers.organisation.HaveTradingNameController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/without-id/trading-name             controllers.organisation.BusinessTradingNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/trading-name             controllers.organisation.BusinessTradingNameWithoutIDController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-trading-name      controllers.organisation.BusinessTradingNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-trading-name      controllers.organisation.BusinessTradingNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/without-id/address-non-uk         controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/address-non-uk         controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-address-non-uk  controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-address-non-uk  controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/ni-number                        controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/ni-number                        controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-ni-number                  controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-ni-number                  controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/without-id/business-address                        controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/business-address                        controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-business-address                 controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-business-address                 controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
-
-
-GET        /register/problem/sign-in-problem                controllers.UnauthorisedStandardUserController.onPageLoad()
-
-GET        /register/problem/information-sent               controllers.InformationSentController.onPageLoad()
-
-GET        /register/without-id/name                              controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.NormalMode)
-POST       /register/without-id/name                                controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.NormalMode)
-GET        /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.CheckMode)
-POST       /register/without-id/change-name                         controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.CheckMode)
-
-GET        /register/business-name                        controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/business-name                        controllers.organisation.BusinessNameController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-business-name                  controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-business-name                  controllers.organisation.BusinessNameController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/registered-address-in-uk                        controllers.organisation.RegisteredAddressInUKController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/registered-address-in-uk                        controllers.organisation.RegisteredAddressInUKController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-registered-address-in-uk                  controllers.organisation.RegisteredAddressInUKController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-registered-address-in-uk                  controllers.organisation.RegisteredAddressInUKController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/registration-type                        controllers.ReporterTypeController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/registration-type                        controllers.ReporterTypeController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-registration-type                  controllers.ReporterTypeController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-registration-type                  controllers.ReporterTypeController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/your-name                        controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/your-name                        controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-your-name                  controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-your-name                  controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/have-utr                            controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.NormalMode)
-POST       /register/have-utr                            controllers.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode: models.Mode = models.NormalMode)
-GET        /register/change-have-utr                     controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.CheckMode)
-POST       /register/change-have-utr                     controllers.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode: models.Mode = models.CheckMode)
-
-GET        /register/without-id/address-uk         controllers.individual.IndUKAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/address-uk         controllers.individual.IndUKAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-address-uk  controllers.individual.IndUKAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-address-uk  controllers.individual.IndUKAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/without-id/is-this-your-address              controllers.individual.IndIsThisYourAddressController.onPageLoad(mode: models.Mode = models.NormalMode)
-POST       /register/without-id/is-this-your-address              controllers.individual.IndIsThisYourAddressController.onSubmit(mode: models.Mode = models.NormalMode)
-GET        /register/without-id/change-is-this-your-address       controllers.individual.IndIsThisYourAddressController.onPageLoad(mode: models.Mode = models.CheckMode)
-POST       /register/without-id/change-is-this-your-address       controllers.individual.IndIsThisYourAddressController.onSubmit(mode: models.Mode = models.CheckMode)
-
-GET        /register/without-id/uk-postcode                         controllers.individual.IndWhatIsYourPostcodeController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/uk-postcode                         controllers.individual.IndWhatIsYourPostcodeController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-uk-postcode                  controllers.individual.IndWhatIsYourPostcodeController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-uk-postcode                  controllers.individual.IndWhatIsYourPostcodeController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/without-id/date-of-birth                        controllers.individual.IndDateOfBirthWithoutIdController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/without-id/date-of-birth                        controllers.individual.IndDateOfBirthWithoutIdController.onSubmit(mode: Mode = NormalMode)
-GET        /register/without-id/change-date-of-birth                  controllers.individual.IndDateOfBirthWithoutIdController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/without-id/change-date-of-birth                  controllers.individual.IndDateOfBirthWithoutIdController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/utr                        controllers.organisation.WhatIsYourUTRController.onPageLoad(mode: Mode = NormalMode)
-POST       /register/utr                        controllers.organisation.WhatIsYourUTRController.onSubmit(mode: Mode = NormalMode)
-GET        /register/change-utr                  controllers.organisation.WhatIsYourUTRController.onPageLoad(mode: Mode = CheckMode)
-POST       /register/change-utr                  controllers.organisation.WhatIsYourUTRController.onSubmit(mode: Mode = CheckMode)
-
-GET        /register/without-id/select-address                       controllers.individual.IndSelectAddressController.onPageLoad(mode: models.Mode = models.NormalMode)
-POST       /register/without-id/select-address                      controllers.individual.IndSelectAddressController.onSubmit(mode: models.Mode = models.NormalMode)
-GET        /register/without-id/change-select-address                 controllers.individual.IndSelectAddressController.onPageLoad(mode: models.Mode = models.CheckMode)
-POST       /register/without-id/change-select-address                 controllers.individual.IndSelectAddressController.onSubmit(mode: models.Mode = models.CheckMode)
-
-GET        /register/is-this-your-business                            controllers.organisation.IsThisYourBusinessController.onPageLoad(mode: models.Mode = models.NormalMode)
-POST       /register/is-this-your-business                            controllers.organisation.IsThisYourBusinessController.onSubmit(mode: models.Mode = models.NormalMode)
-GET        /register/change-is-this-your-business                     controllers.organisation.IsThisYourBusinessController.onPageLoad(mode: models.Mode = models.CheckMode)
-POST       /register/change-is-this-your-business                     controllers.organisation.IsThisYourBusinessController.onSubmit(mode: models.Mode = models.CheckMode)
-
-GET        /register/business-not-identified                          controllers.organisation.BusinessNotIdentifiedController.onPageLoad()
-
-GET        /register/problem/different-business                       controllers.organisation.DifferentBusinessController.onPageLoad()
-
-GET        /register/problem/unable-to-change-business                controllers.organisation.UnableToChangeBusinessController.onPageLoad()
-
-GET        /register/without-id/where-do-you-live                     controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: models.Mode = models.NormalMode)
-POST       /register/without-id/where-do-you-live                     controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: models.Mode = models.NormalMode)
-GET        /register/without-id/change-where-do-you-live              controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: models.Mode = models.CheckMode)
-POST       /register/without-id/change-where-do-you-live              controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: models.Mode = models.CheckMode)
-
-GET        /register/confirm-registration                             controllers.RegistrationConfirmationController.onPageLoad()
-
-GET        /change-contact/individual/email                        controllers.changeContactDetails.IndividualEmailController.onPageLoad(mode: Mode = NormalMode)
-POST       /change-contact/individual/email                        controllers.changeContactDetails.IndividualEmailController.onSubmit(mode: Mode = NormalMode)
-GET        /change-contact/individual/change-email                  controllers.changeContactDetails.IndividualEmailController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-contact/individual/change-email                  controllers.changeContactDetails.IndividualEmailController.onSubmit(mode: Mode = CheckMode)
-
-GET        /change-contact/individual/have-phone                        controllers.changeContactDetails.IndividualHavePhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /change-contact/individual/have-phone                        controllers.changeContactDetails.IndividualHavePhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /change-contact/individual/change-have-phone                  controllers.changeContactDetails.IndividualHavePhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-contact/individual/change-have-phone                  controllers.changeContactDetails.IndividualHavePhoneController.onSubmit(mode: Mode = CheckMode)
-
-GET        /change-contact/individual/phone                        controllers.changeContactDetails.IndividualPhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /change-contact/individual/phone                        controllers.changeContactDetails.IndividualPhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /change-contact/individual/change-phone                  controllers.changeContactDetails.IndividualPhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-contact/individual/change-phone                  controllers.changeContactDetails.IndividualPhoneController.onSubmit(mode: Mode = CheckMode)
-
-GET        /change-contact/organisation/contact-name                            controllers.changeContactDetails.OrganisationContactNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /change-contact/organisation/contact-name                            controllers.changeContactDetails.OrganisationContactNameController.onSubmit(mode: Mode = NormalMode)
-GET        /change-contact/organisation/change-contact-name                     controllers.changeContactDetails.OrganisationContactNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-contact/organisation/change-contact-name                     controllers.changeContactDetails.OrganisationContactNameController.onSubmit(mode: Mode = CheckMode)
-
-GET        /change-contact/organisation/email                                   controllers.changeContactDetails.OrganisationContactEmailController.onPageLoad(mode: Mode = NormalMode)
-POST       /change-contact/organisation/email                                   controllers.changeContactDetails.OrganisationContactEmailController.onSubmit(mode: Mode = NormalMode)
-GET        /change-contact/organisation/change-email                            controllers.changeContactDetails.OrganisationContactEmailController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-contact/organisation/change-email                            controllers.changeContactDetails.OrganisationContactEmailController.onSubmit(mode: Mode = CheckMode)
-
-GET        /change-contact/organisation/have-phone                              controllers.changeContactDetails.OrganisationContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /change-contact/organisation/have-phone                              controllers.changeContactDetails.OrganisationContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /change-contact/organisation/change-have-phone                       controllers.changeContactDetails.OrganisationContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-contact/organisation/change-have-phone                       controllers.changeContactDetails.OrganisationContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
-
-GET        /change-contact/organisation/phone                                   controllers.changeContactDetails.OrganisationContactPhoneController.onPageLoad(mode: Mode = NormalMode)
-POST       /change-contact/organisation/phone                                   controllers.changeContactDetails.OrganisationContactPhoneController.onSubmit(mode: Mode = NormalMode)
-GET        /change-contact/organisation/change-phone                            controllers.changeContactDetails.OrganisationContactPhoneController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-contact/organisation/change-phone                            controllers.changeContactDetails.OrganisationContactPhoneController.onSubmit(mode: Mode = CheckMode)
-
-GET         /change-contact/organisation/have-second-contact                    controllers.changeContactDetails.OrganisationHaveSecondContactController.onPageLoad(mode: Mode = NormalMode)
-POST        /change-contact/organisation/have-second-contact                    controllers.changeContactDetails.OrganisationHaveSecondContactController.onSubmit(mode: Mode = NormalMode)
-GET         /change-contact/organisation/change-have-second-contact             controllers.changeContactDetails.OrganisationHaveSecondContactController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-contact/organisation/change-have-second-contact             controllers.changeContactDetails.OrganisationHaveSecondContactController.onSubmit(mode: Mode = CheckMode)
-
-GET         /change-contact/organisation/second-contact-name                    controllers.changeContactDetails.OrganisationSecondContactNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /change-contact/organisation/second-contact-name                    controllers.changeContactDetails.OrganisationSecondContactNameController.onSubmit(mode: Mode = NormalMode)
-GET         /change-contact/organisation/change-second-contact-name             controllers.changeContactDetails.OrganisationSecondContactNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-contact/organisation/change-second-contact-name             controllers.changeContactDetails.OrganisationSecondContactNameController.onSubmit(mode: Mode = CheckMode)
-
-GET         /change-contact/organisation/second-contact-email                   controllers.changeContactDetails.OrganisationSecondContactEmailController.onPageLoad(mode: Mode = NormalMode)
-POST        /change-contact/organisation/second-contact-email                   controllers.changeContactDetails.OrganisationSecondContactEmailController.onSubmit(mode: Mode = NormalMode)
-GET         /change-contact/organisation/change-second-contact-email            controllers.changeContactDetails.OrganisationSecondContactEmailController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-contact/organisation/change-second-contact-email            controllers.changeContactDetails.OrganisationSecondContactEmailController.onSubmit(mode: Mode = CheckMode)
-
-GET         /change-contact/organisation/second-contact-have-phone              controllers.changeContactDetails.OrganisationSecondContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
-POST        /change-contact/organisation/second-contact-have-phone              controllers.changeContactDetails.OrganisationSecondContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
-GET         /change-contact/organisation/change-second-contact-have-phone       controllers.changeContactDetails.OrganisationSecondContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-contact/organisation/change-second-contact-have-phone       controllers.changeContactDetails.OrganisationSecondContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
-
-GET         /change-contact/organisation/second-contact-phone                   controllers.changeContactDetails.OrganisationSecondContactPhoneController.onPageLoad(mode: Mode = NormalMode)
-POST        /change-contact/organisation/second-contact-phone                   controllers.changeContactDetails.OrganisationSecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
-GET         /change-contact/organisation/change-second-contact-phone            controllers.changeContactDetails.OrganisationSecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-contact/organisation/change-second-contact-phone            controllers.changeContactDetails.OrganisationSecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
-
-GET         /change-contact/details-updated                                     controllers.DetailsUpdatedController.onPageLoad()
+GET         /register/name                                                       controllers.individual.IndContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/name                                                       controllers.individual.IndContactNameController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-name                                                controllers.individual.IndContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-name                                                controllers.individual.IndContactNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/identity-confirmed                                         controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)
+GET         /register/change-identity-confirmed                                  controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = CheckMode)
+
+GET         /register/could-not-confirm-identity/:key                            controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad(key: String)
+
+GET         /register/without-id/business-name                                   controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/without-id/business-name                                   controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = NormalMode)
+GET         /register/without-id/change-business-name                            controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/without-id/change-business-name                            controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/have-ni-number                                             controllers.individual.IndDoYouHaveNINumberController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/have-ni-number                                             controllers.individual.IndDoYouHaveNINumberController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-have-ni-number                                      controllers.individual.IndDoYouHaveNINumberController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-have-ni-number                                      controllers.individual.IndDoYouHaveNINumberController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/without-id/have-trading-name                               controllers.organisation.HaveTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/without-id/have-trading-name                               controllers.organisation.HaveTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET         /register/without-id/change-have-trading-name                        controllers.organisation.HaveTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/without-id/change-have-trading-name                        controllers.organisation.HaveTradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/without-id/trading-name                                    controllers.organisation.BusinessTradingNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/without-id/trading-name                                    controllers.organisation.BusinessTradingNameWithoutIDController.onSubmit(mode: Mode = NormalMode)
+GET         /register/without-id/change-trading-name                             controllers.organisation.BusinessTradingNameWithoutIDController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/without-id/change-trading-name                             controllers.organisation.BusinessTradingNameWithoutIDController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/without-id/address-non-uk                                  controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/without-id/address-non-uk                                  controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
+GET         /register/without-id/change-address-non-uk                           controllers.individual.IndNonUKAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/without-id/change-address-non-uk                           controllers.individual.IndNonUKAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/ni-number                                                  controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/ni-number                                                  controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-ni-number                                           controllers.individual.IndWhatIsYourNINumberController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-ni-number                                           controllers.individual.IndWhatIsYourNINumberController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/without-id/business-address                                controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/without-id/business-address                                controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = NormalMode)
+GET         /register/without-id/change-business-address                         controllers.organisation.NonUKBusinessAddressWithoutIDController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/without-id/change-business-address                         controllers.organisation.NonUKBusinessAddressWithoutIDController.onSubmit(mode: Mode = CheckMode)
+
+
+GET         /register/problem/sign-in-problem                                    controllers.UnauthorisedStandardUserController.onPageLoad()
+
+GET         /register/problem/information-sent                                   controllers.InformationSentController.onPageLoad()
+
+GET         /register/without-id/name                                            controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST        /register/without-id/name                                            controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.NormalMode)
+GET         /register/without-id/change-name                                     controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST        /register/without-id/change-name                                     controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.CheckMode)
+
+GET         /register/business-name                                              controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/business-name                                              controllers.organisation.BusinessNameController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-business-name                                       controllers.organisation.BusinessNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-business-name                                       controllers.organisation.BusinessNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/registered-address-in-uk                                   controllers.organisation.RegisteredAddressInUKController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/registered-address-in-uk                                   controllers.organisation.RegisteredAddressInUKController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-registered-address-in-uk                            controllers.organisation.RegisteredAddressInUKController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-registered-address-in-uk                            controllers.organisation.RegisteredAddressInUKController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/registration-type                                          controllers.ReporterTypeController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/registration-type                                          controllers.ReporterTypeController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-registration-type                                   controllers.ReporterTypeController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-registration-type                                   controllers.ReporterTypeController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/your-name                                                  controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/your-name                                                  controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-your-name                                           controllers.organisation.WhatIsYourNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-your-name                                           controllers.organisation.WhatIsYourNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/have-utr                                                   controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST        /register/have-utr                                                   controllers.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode: models.Mode = models.NormalMode)
+GET         /register/change-have-utr                                            controllers.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST        /register/change-have-utr                                            controllers.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode: models.Mode = models.CheckMode)
+
+GET         /register/without-id/address-uk                                      controllers.individual.IndUKAddressWithoutIdController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/without-id/address-uk                                      controllers.individual.IndUKAddressWithoutIdController.onSubmit(mode: Mode = NormalMode)
+GET         /register/without-id/change-address-uk                               controllers.individual.IndUKAddressWithoutIdController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/without-id/change-address-uk                               controllers.individual.IndUKAddressWithoutIdController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/without-id/is-this-your-address                            controllers.individual.IndIsThisYourAddressController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST        /register/without-id/is-this-your-address                            controllers.individual.IndIsThisYourAddressController.onSubmit(mode: models.Mode = models.NormalMode)
+GET         /register/without-id/change-is-this-your-address                     controllers.individual.IndIsThisYourAddressController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST        /register/without-id/change-is-this-your-address                     controllers.individual.IndIsThisYourAddressController.onSubmit(mode: models.Mode = models.CheckMode)
+
+GET         /register/without-id/uk-postcode                                     controllers.individual.IndWhatIsYourPostcodeController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/without-id/uk-postcode                                     controllers.individual.IndWhatIsYourPostcodeController.onSubmit(mode: Mode = NormalMode)
+GET         /register/without-id/change-uk-postcode                              controllers.individual.IndWhatIsYourPostcodeController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/without-id/change-uk-postcode                              controllers.individual.IndWhatIsYourPostcodeController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/without-id/date-of-birth                                   controllers.individual.IndDateOfBirthWithoutIdController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/without-id/date-of-birth                                   controllers.individual.IndDateOfBirthWithoutIdController.onSubmit(mode: Mode = NormalMode)
+GET         /register/without-id/change-date-of-birth                            controllers.individual.IndDateOfBirthWithoutIdController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/without-id/change-date-of-birth                            controllers.individual.IndDateOfBirthWithoutIdController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/utr                                                        controllers.organisation.WhatIsYourUTRController.onPageLoad(mode: Mode = NormalMode)
+POST        /register/utr                                                        controllers.organisation.WhatIsYourUTRController.onSubmit(mode: Mode = NormalMode)
+GET         /register/change-utr                                                 controllers.organisation.WhatIsYourUTRController.onPageLoad(mode: Mode = CheckMode)
+POST        /register/change-utr                                                 controllers.organisation.WhatIsYourUTRController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register/without-id/select-address                                  controllers.individual.IndSelectAddressController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST        /register/without-id/select-address                                  controllers.individual.IndSelectAddressController.onSubmit(mode: models.Mode = models.NormalMode)
+GET         /register/without-id/change-select-address                           controllers.individual.IndSelectAddressController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST        /register/without-id/change-select-address                           controllers.individual.IndSelectAddressController.onSubmit(mode: models.Mode = models.CheckMode)
+
+GET         /register/is-this-your-business                                      controllers.organisation.IsThisYourBusinessController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST        /register/is-this-your-business                                      controllers.organisation.IsThisYourBusinessController.onSubmit(mode: models.Mode = models.NormalMode)
+GET         /register/change-is-this-your-business                               controllers.organisation.IsThisYourBusinessController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST        /register/change-is-this-your-business                               controllers.organisation.IsThisYourBusinessController.onSubmit(mode: models.Mode = models.CheckMode)
+
+GET         /register/business-not-identified                                    controllers.organisation.BusinessNotIdentifiedController.onPageLoad()
+
+GET         /register/problem/different-business                                 controllers.organisation.DifferentBusinessController.onPageLoad()
+
+GET         /register/problem/unable-to-change-business                          controllers.organisation.UnableToChangeBusinessController.onPageLoad()
+
+GET         /register/without-id/where-do-you-live                               controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: models.Mode = models.NormalMode)
+POST        /register/without-id/where-do-you-live                               controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: models.Mode = models.NormalMode)
+GET         /register/without-id/change-where-do-you-live                        controllers.individual.IndWhereDoYouLiveController.onPageLoad(mode: models.Mode = models.CheckMode)
+POST        /register/without-id/change-where-do-you-live                        controllers.individual.IndWhereDoYouLiveController.onSubmit(mode: models.Mode = models.CheckMode)
+
+GET         /register/confirm-registration                                       controllers.RegistrationConfirmationController.onPageLoad()
+
+GET         /change-contact/individual/email                                     controllers.changeContactDetails.IndividualEmailController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/individual/email                                     controllers.changeContactDetails.IndividualEmailController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/individual/change-email                              controllers.changeContactDetails.IndividualEmailController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/individual/change-email                              controllers.changeContactDetails.IndividualEmailController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/individual/have-phone                                controllers.changeContactDetails.IndividualHavePhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/individual/have-phone                                controllers.changeContactDetails.IndividualHavePhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/individual/change-have-phone                         controllers.changeContactDetails.IndividualHavePhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/individual/change-have-phone                         controllers.changeContactDetails.IndividualHavePhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/individual/phone                                     controllers.changeContactDetails.IndividualPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/individual/phone                                     controllers.changeContactDetails.IndividualPhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/individual/change-phone                              controllers.changeContactDetails.IndividualPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/individual/change-phone                              controllers.changeContactDetails.IndividualPhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/contact-name                            controllers.changeContactDetails.OrganisationContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/contact-name                            controllers.changeContactDetails.OrganisationContactNameController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-contact-name                     controllers.changeContactDetails.OrganisationContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-contact-name                     controllers.changeContactDetails.OrganisationContactNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/email                                   controllers.changeContactDetails.OrganisationContactEmailController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/email                                   controllers.changeContactDetails.OrganisationContactEmailController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-email                            controllers.changeContactDetails.OrganisationContactEmailController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-email                            controllers.changeContactDetails.OrganisationContactEmailController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/have-phone                              controllers.changeContactDetails.OrganisationContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/have-phone                              controllers.changeContactDetails.OrganisationContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-have-phone                       controllers.changeContactDetails.OrganisationContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-have-phone                       controllers.changeContactDetails.OrganisationContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/phone                                   controllers.changeContactDetails.OrganisationContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/phone                                   controllers.changeContactDetails.OrganisationContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-phone                            controllers.changeContactDetails.OrganisationContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-phone                            controllers.changeContactDetails.OrganisationContactPhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/have-second-contact                     controllers.changeContactDetails.OrganisationHaveSecondContactController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/have-second-contact                     controllers.changeContactDetails.OrganisationHaveSecondContactController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-have-second-contact              controllers.changeContactDetails.OrganisationHaveSecondContactController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-have-second-contact              controllers.changeContactDetails.OrganisationHaveSecondContactController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/second-contact-name                     controllers.changeContactDetails.OrganisationSecondContactNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/second-contact-name                     controllers.changeContactDetails.OrganisationSecondContactNameController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-second-contact-name              controllers.changeContactDetails.OrganisationSecondContactNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-second-contact-name              controllers.changeContactDetails.OrganisationSecondContactNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/second-contact-email                    controllers.changeContactDetails.OrganisationSecondContactEmailController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/second-contact-email                    controllers.changeContactDetails.OrganisationSecondContactEmailController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-second-contact-email             controllers.changeContactDetails.OrganisationSecondContactEmailController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-second-contact-email             controllers.changeContactDetails.OrganisationSecondContactEmailController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/second-contact-have-phone               controllers.changeContactDetails.OrganisationSecondContactHavePhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/second-contact-have-phone               controllers.changeContactDetails.OrganisationSecondContactHavePhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-second-contact-have-phone        controllers.changeContactDetails.OrganisationSecondContactHavePhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-second-contact-have-phone        controllers.changeContactDetails.OrganisationSecondContactHavePhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/organisation/second-contact-phone                    controllers.changeContactDetails.OrganisationSecondContactPhoneController.onPageLoad(mode: Mode = NormalMode)
+POST        /change-contact/organisation/second-contact-phone                    controllers.changeContactDetails.OrganisationSecondContactPhoneController.onSubmit(mode: Mode = NormalMode)
+GET         /change-contact/organisation/change-second-contact-phone             controllers.changeContactDetails.OrganisationSecondContactPhoneController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-contact/organisation/change-second-contact-phone             controllers.changeContactDetails.OrganisationSecondContactPhoneController.onSubmit(mode: Mode = CheckMode)
+
+GET         /change-contact/details-updated                                      controllers.DetailsUpdatedController.onPageLoad()
 
 GET         /individualDetails                                                   controllers.IndividualDetailsController.onPageLoad()
 

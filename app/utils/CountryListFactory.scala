@@ -43,10 +43,10 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
         )
     }
 
-  def getDescriptionFromCode(code: String): Option[String] = countryList map {
-    _.filter(
+  def getDescriptionFromCode(code: String): Option[String] = countryList flatMap {
+    _.find(
       (p: Country) => p.code == code
-    ).head.description
+    ).map(_.description)
   }
 
   lazy val countryListWithoutGB: Option[Seq[Country]] = countryList.map {
