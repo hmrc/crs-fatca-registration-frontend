@@ -53,17 +53,32 @@ class ReporterTypePageSpec extends PageBehaviours {
     beRemovable[ReporterType](ReporterTypePage)
 
     "cleanUp" - {
-      val ua = createUserAnswers.sample.value
-      "must not clear answers" - {
+      "must clear answers" - {
         "when answer changes to 'Sole Trader'" in {
+          val ua     = createUserAnswersForSoleTraderCleanup.sample.value
           val result = ReporterTypePage.cleanup(Some(Sole), ua).success.value
-          result mustBe ua
+
+          result.get(BusinessNamePage) mustBe empty
+          result.get(IsThisYourBusinessPage) mustBe empty
+          result.get(RegistrationInfoPage) mustBe empty
+          result.get(BusinessNameWithoutIDPage) mustBe empty
+          result.get(HaveTradingNamePage) mustBe empty
+          result.get(BusinessTradingNameWithoutIDPage) mustBe empty
+          result.get(NonUKBusinessAddressWithoutIDPage) mustBe empty
+          result.get(ContactNamePage) mustBe empty
+          result.get(ContactEmailPage) mustBe empty
+          result.get(ContactHavePhonePage) mustBe empty
+          result.get(ContactPhonePage) mustBe empty
+          result.get(HaveSecondContactPage) mustBe empty
+          result.get(SecondContactNamePage) mustBe empty
+          result.get(SecondContactEmailPage) mustBe empty
+          result.get(SecondContactHavePhonePage) mustBe empty
+          result.get(SecondContactPhonePage) mustBe empty
 
         }
-      }
 
-      "must clear answers" - {
         "when answer changes to anything other than 'An individual not connected to a business' or 'Sole Trader'" in {
+          val ua     = createUserAnswersForLimitedCompanyCleanup.sample.value
           val result = ReporterTypePage.cleanup(Some(LimitedCompany), ua).success.value
 
           result.get(IndWhatIsYourNINumberPage) mustBe empty
@@ -87,7 +102,7 @@ class ReporterTypePageSpec extends PageBehaviours {
         }
       }
       "when answer changes to 'An individual not connected to a business'" in {
-
+        val ua     = createUserAnswersForIndividualCleanup.sample.value
         val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
 
         result.get(WhatIsYourUTRPage) mustBe empty
@@ -115,35 +130,17 @@ class ReporterTypePageSpec extends PageBehaviours {
     }
   }
 
-  def createUserAnswers: Gen[UserAnswers] =
+  def createUserAnswersForIndividualCleanup: Gen[UserAnswers] =
     for {
       (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
     } yield emptyUserAnswers
       .withPage(WhatIsYourUTRPage, utr)
-      .withPage(RegistrationInfoPage, registrationInfo)
       .withPage(WhatIsYourNamePage, name)
       .withPage(BusinessNamePage, stringField)
       .withPage(IsThisYourBusinessPage, booleanField)
       .withPage(BusinessNameWithoutIDPage, stringField)
       .withPage(HaveTradingNamePage, booleanField)
-      .withPage(IndWhatIsYourNINumberPage, nino)
-      .withPage(IndContactNamePage, name)
-      .withPage(IndDateOfBirthPage, dob)
       .withPage(RegistrationInfoPage, registrationInfo)
-      .withPage(IndWhatIsYourNamePage, name)
-      .withPage(DateOfBirthWithoutIdPage, dob)
-      .withPage(IndWhereDoYouLivePage, booleanField)
-      .withPage(IndWhatIsYourPostcodePage, postcode)
-      .withPage(AddressLookupPage, Seq(addressLookup))
-      .withPage(IndSelectAddressPage, stringField)
-      .withPage(IndSelectedAddressLookupPage, addressLookup)
-      .withPage(IsThisYourAddressPage, booleanField)
-      .withPage(IndUKAddressWithoutIdPage, address)
-      .withPage(IndNonUKAddressWithoutIdPage, address)
-      .withPage(IndContactEmailPage, stringField)
-      .withPage(IndContactHavePhonePage, booleanField)
-      .withPage(IndContactPhonePage, stringField)
-      .withPage(IndDoYouHaveNINumberPage, booleanField)
       .withPage(BusinessTradingNameWithoutIDPage, stringField)
       .withPage(NonUKBusinessAddressWithoutIDPage, address)
       .withPage(ContactNamePage, stringField)
@@ -157,5 +154,48 @@ class ReporterTypePageSpec extends PageBehaviours {
       .withPage(SecondContactPhonePage, stringField)
       .withPage(RegisteredAddressInUKPage, booleanField)
       .withPage(DoYouHaveUniqueTaxPayerReferencePage, booleanField)
+
+  def createUserAnswersForSoleTraderCleanup: Gen[UserAnswers] =
+    for {
+      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
+    } yield emptyUserAnswers
+      .withPage(BusinessNamePage, stringField)
+      .withPage(IsThisYourBusinessPage, booleanField)
+      .withPage(BusinessNameWithoutIDPage, stringField)
+      .withPage(HaveTradingNamePage, booleanField)
+      .withPage(BusinessTradingNameWithoutIDPage, stringField)
+      .withPage(NonUKBusinessAddressWithoutIDPage, address)
+      .withPage(ContactNamePage, stringField)
+      .withPage(ContactEmailPage, stringField)
+      .withPage(ContactHavePhonePage, booleanField)
+      .withPage(ContactPhonePage, stringField)
+      .withPage(HaveSecondContactPage, booleanField)
+      .withPage(SecondContactNamePage, stringField)
+      .withPage(SecondContactEmailPage, stringField)
+      .withPage(SecondContactHavePhonePage, booleanField)
+      .withPage(SecondContactPhonePage, stringField)
+
+  def createUserAnswersForLimitedCompanyCleanup: Gen[UserAnswers] =
+    for {
+      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
+    } yield emptyUserAnswers
+      .withPage(IndWhatIsYourNINumberPage, nino)
+      .withPage(IndContactNamePage, name)
+      .withPage(IndDateOfBirthPage, dob)
+      .withPage(RegistrationInfoPage, registrationInfo)
+      .withPage(IndWhatIsYourNamePage, name)
+      .withPage(DateOfBirthWithoutIdPage, dob)
+      .withPage(IndWhereDoYouLivePage, booleanField)
+      .withPage(IndWhatIsYourPostcodePage, stringField)
+      .withPage(AddressLookupPage, Seq(addressLookup))
+      .withPage(IndSelectAddressPage, stringField)
+      .withPage(IndSelectedAddressLookupPage, addressLookup)
+      .withPage(IsThisYourAddressPage, booleanField)
+      .withPage(IndUKAddressWithoutIdPage, address)
+      .withPage(IndNonUKAddressWithoutIdPage, address)
+      .withPage(IndContactEmailPage, stringField)
+      .withPage(IndContactHavePhonePage, booleanField)
+      .withPage(IndContactPhonePage, stringField)
+      .withPage(IndDoYouHaveNINumberPage, booleanField)
 
 }
