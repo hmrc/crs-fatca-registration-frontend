@@ -24,7 +24,7 @@ import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingE
 import models.matching.OrgRegistrationInfo
 import models.register.response.details.AddressResponse
 import models.requests.DataRequest
-import models.{SubscriptionID, UserAnswers}
+import models.{ReporterType, SubscriptionID, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
@@ -77,10 +77,28 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }
 
-    "Redirect to Individual already registered when tax enrolments returns EnrolmentExists error" in {
+    "Redirect to Individual already registered when tax enrolments returns EnrolmentExists error for Affinity Group Individual" in {
       val affinityGroup: AffinityGroup = AffinityGroup.Individual
 
       val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers)
+
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
+        .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url)
+
+      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
+    }
+
+    "Redirect to Individual already registered when tax enrolments returns EnrolmentExists error for Affinity Group Agent" in {
+      val affinityGroup: AffinityGroup = AffinityGroup.Agent
+
+      val dataRequest: DataRequest[AnyContent] =
+        DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers.withPage(ReporterTypePage, ReporterType.Individual))
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))

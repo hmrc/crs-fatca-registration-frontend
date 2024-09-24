@@ -18,8 +18,8 @@ package controllers
 
 import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingError, ServiceUnavailableError}
 import models.requests.DataRequest
-import models.{SubscriptionID, UserAnswers}
-import pages.{RegistrationInfoPage, SubscriptionIDPage}
+import models.{ReporterType, SubscriptionID, UserAnswers}
+import pages.{RegistrationInfoPage, ReporterTypePage, SubscriptionIDPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Result}
@@ -43,6 +43,10 @@ class ControllerHelper @Inject() (
     with I18nSupport
     with Logging {
 
+  private def indAlreadyRegistered(implicit request: DataRequest[AnyContent]) =
+    request.affinityGroup == AffinityGroup.Individual ||
+      (request.affinityGroup == AffinityGroup.Agent && request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains))
+
   private def createEnrolment(userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
     request: DataRequest[AnyContent]
@@ -50,7 +54,7 @@ class ControllerHelper @Inject() (
     taxEnrolmentService.checkAndCreateEnrolment(userAnswers, subscriptionId) flatMap {
       case Right(_) =>
         Future.successful(Redirect(routes.RegistrationConfirmationController.onPageLoad())) // TODO DAC6-2756 and DAC6-2858
-      case Left(EnrolmentExistsError(groupIds)) if request.affinityGroup == AffinityGroup.Individual =>
+      case Left(EnrolmentExistsError(groupIds)) if indAlreadyRegistered =>
         logger.info(s"ControllerHelper: EnrolmentExistsError for the the groupIds $groupIds")
         Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad()))
       case Left(EnrolmentExistsError(groupIds)) =>

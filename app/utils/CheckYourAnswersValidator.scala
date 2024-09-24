@@ -41,7 +41,7 @@ sealed trait IndividualAnswersValidator {
   private[utils] def checkIndividualContactDetailsMissingAnswers: Seq[Page] = checkPage(IndContactEmailPage).toSeq ++ checkIndPhoneAnswers
 
   private def checkIndividualAddressMissingAnswers: Seq[Page] = (userAnswers.get(IndWhereDoYouLivePage) match {
-    case Some(true) => checkPage(IndWhatIsYourPostcodePage)
+    case Some(true) => any(checkPage(IndWhatIsYourPostcodePage), checkPage(IndUKAddressWithoutIdPage))
         .orElse(
           any(
             checkPage(IndSelectAddressPage),
