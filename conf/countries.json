@@ -176,8 +176,6 @@
   {"code": "MK", "state":  "valid", "description": "Macedonia", "alternativeName": "Republic of North Macedonia"},
   {"code": "ML", "state":  "valid", "description": "Mali"},
   {"code": "MM", "state":  "valid", "description": "Myanmar (Burma)"},
-  {"code": "MM", "state":  "valid", "description": "Myanmar (Burma)", "alternativeName": "Myanmar"},
-  {"code": "MM", "state":  "valid", "description": "Myanmar (Burma)", "alternativeName": "Burma"},
   {"code": "MN", "state":  "valid", "description": "Mongolia"},
   {"code": "MO", "state":  "valid", "description": "Macao"},
   {"code": "MP", "state":  "valid", "description": "Northern Mariana Islands"},
