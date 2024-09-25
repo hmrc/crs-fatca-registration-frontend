@@ -173,7 +173,6 @@
   {"code": "MH", "state":  "valid", "description": "Marshall Islands"},
   {"code": "MH", "state":  "valid", "description": "Marshall Islands", "alternativeName": "The Marshall Islands"},
   {"code": "MK", "state":  "valid", "description": "North Macedonia"},
-  {"code": "MK", "state":  "valid", "description": "Macedonia", "alternativeName": "Republic of North Macedonia"},
   {"code": "ML", "state":  "valid", "description": "Mali"},
   {"code": "MM", "state":  "valid", "description": "Myanmar (Burma)"},
   {"code": "MN", "state":  "valid", "description": "Mongolia"},
