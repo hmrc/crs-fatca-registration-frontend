@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import helpers.JsonFixtures.subscriptionId
+import org.jsoup.Jsoup
 import org.mockito.MockitoSugar.when
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -48,6 +49,10 @@ class DetailsUpdatedControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
+
+        val page = Jsoup.parse(contentAsString(result))
+        page.getElementsContainingText("Back to manage your CRS and FATCA reports").toString
+          .must(include(routes.IndexController.onPageLoad.url))
       }
     }
   }

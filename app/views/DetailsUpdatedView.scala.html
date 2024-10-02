@@ -26,7 +26,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@homepageLink = @{link(routes.DetailsUpdatedController.onPageLoad.url, messages("detailsUpdated.link.text"), classes = "govuk-link govuk-body")}
+@homepageLink = @{link(controllers.routes.IndexController.onPageLoad.url, messages("detailsUpdated.link.text"), classes = "govuk-link govuk-body")}
 
 @layout(pageTitle = titleNoForm(messages("detailsUpdated.title")), showBackLink = false) {
 

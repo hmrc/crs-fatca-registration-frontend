@@ -29,7 +29,7 @@
 
 @(primary: SummaryList, secondary: SummaryList, frontendAppConfig: FrontendAppConfig, hasChanges: Boolean)(implicit request: Request[_], messages: Messages)
 
-@homepageLink = @{link(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad.url, messages("site.backToReportPage"), classes = "govuk-link govuk-body")}
+@homepageLink = @{link(controllers.routes.IndexController.onPageLoad.url, messages("site.backToReportPage"), classes = "govuk-link govuk-body")}
 
 @layout(pageTitle = titleNoForm(messages(if(hasChanges) "checkOrganisationContactDetails.title" else "changeOrganisationContactDetails.title"))) {
     @formHelper(action = controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onSubmit()) {

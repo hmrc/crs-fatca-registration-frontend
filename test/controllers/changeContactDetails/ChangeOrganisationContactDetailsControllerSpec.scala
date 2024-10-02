@@ -19,6 +19,7 @@ package controllers.changeContactDetails
 import base.SpecBase
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController
+import controllers.routes
 import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures.subscriptionId
 import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse, OrganisationRegistrationType}
@@ -84,6 +85,9 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
               status(result) mustEqual OK
               val page = Jsoup.parse(contentAsString(result))
               page.getElementsContainingText("Confirm and send").isEmpty mustBe false
+
+              page.getElementsContainingText("Back to manage your CRS and FATCA reports").toString
+                .must(include(routes.IndexController.onPageLoad.url))
             }
         }
       }
