@@ -30,9 +30,7 @@
 @(contactDetails: SummaryList, frontendAppConfig: FrontendAppConfig, hasChanges: Boolean)(implicit request: Request[_], messages: Messages)
 
 @linkClasses = @{if(hasChanges) "govuk-body" else "govuk-body govuk-!-margin-top-9"}
-@homepageLink = @{paragraph(
-                    link(controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad.url, messages("site.backToReportPage"), classes = "govuk-link"), classes = linkClasses
-                )}
+@homepageLink = @{paragraph(link(controllers.routes.IndexController.onPageLoad.url, messages("site.backToReportPage"), classes = "govuk-link"), classes = linkClasses)}
 
 @layout(pageTitle = titleNoForm(messages(if(hasChanges) "checkIndividualContactDetails.title" else "changeIndividualContactDetails.title"))) {
 
