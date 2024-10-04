@@ -76,7 +76,7 @@ class IsThisYourBusinessController @Inject() (
             case Right(response) =>
               handleRegistrationFound(mode, autoMatchedUtr, response)
             case Left(NotFoundError) =>
-              handleRegistrationNotFound(mode, autoMatchedUtr)
+              handleRegistrationNotFound(mode, autoMatchedUtr, request.userAnswers.get(ReporterTypePage).contains(Sole))
             case _ =>
               Future.successful(InternalServerError(errorView()))
           }
@@ -142,12 +142,17 @@ class IsThisYourBusinessController @Inject() (
 
   private def handleRegistrationNotFound(
     mode: Mode,
-    autoMatchedUtr: Option[UniqueTaxpayerReference]
+    autoMatchedUtr: Option[UniqueTaxpayerReference],
+    isSoleTrader: Boolean
   )(implicit request: DataRequest[AnyContent]): Future[Result] =
     if (autoMatchedUtr.nonEmpty) {
       resultWithAutoMatchedFieldCleared(mode)
     } else {
-      Future.successful(Redirect(controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad()))
+      if (isSoleTrader) {
+        Future.successful(Redirect(controllers.routes.SoleTraderNotIdentifiedController.onPageLoad))
+      } else {
+        Future.successful(Redirect(controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad()))
+      }
     }
 
   private def resultWithAutoMatchedFieldCleared(mode: Mode)(implicit request: DataRequest[AnyContent]): Future[Result] =

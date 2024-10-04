@@ -162,6 +162,24 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       redirectLocation(result).value mustEqual controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad().url
     }
 
+    "must redirect to SoleTraderNotIdentifiedController for a GET when there is no CT UTR and registration info not found" in {
+
+      when(mockMatchingService.sendBusinessRegistrationInformation(any())(any(), any()))
+        .thenReturn(Future.successful(Left(NotFoundError)))
+
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
+      retrieveUserAnswersData(validUserAnswers.withPage(ReporterTypePage, Sole).withPage(WhatIsYourNamePage, Name(FirstName, LastName)))
+
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, loadRoute)
+
+      val result = route(mockedApp, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.SoleTraderNotIdentifiedController.onPageLoad.url
+    }
+
     "must return OK and the correct view for a GET when there is a CT UTR" in {
 
       val registrationInfo              = OrgRegistrationInfo(safeId, businessName, address)
