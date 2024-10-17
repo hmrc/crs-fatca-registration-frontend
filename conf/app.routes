@@ -15,7 +15,7 @@ GET         /register/problem/there-is-a-problem                                
 GET         /register/check-your-answers                                         controllers.CheckYourAnswersController.onPageLoad()
 POST        /register/check-your-answers                                         controllers.CheckYourAnswersController.onSubmit()
 
-GET         /register/sole-trader-not-identified                                 controllers.SoleTraderNotIdentifiedController.onPageLoad
+GET         /register/problem/sole-trader-not-identified                         controllers.SoleTraderNotIdentifiedController.onPageLoad
 
 GET         /register/problem/signed-out                                         controllers.SessionExpiredController.onPageLoad()
 
@@ -109,7 +109,7 @@ POST        /register/change-name                                               
 GET         /register/identity-confirmed                                         controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)
 GET         /register/change-identity-confirmed                                  controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = CheckMode)
 
-GET         /register/could-not-confirm-identity/:key                            controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad(key: String)
+GET         /register/problem/could-not-confirm-identity                         controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad()
 
 GET         /register/without-id/business-name                                   controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
 POST        /register/without-id/business-name                                   controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = NormalMode)
@@ -216,7 +216,7 @@ POST        /register/is-this-your-business                                     
 GET         /register/change-is-this-your-business                               controllers.organisation.IsThisYourBusinessController.onPageLoad(mode: models.Mode = models.CheckMode)
 POST        /register/change-is-this-your-business                               controllers.organisation.IsThisYourBusinessController.onSubmit(mode: models.Mode = models.CheckMode)
 
-GET         /register/business-not-identified                                    controllers.organisation.BusinessNotIdentifiedController.onPageLoad()
+GET         /register/problem/business-not-identified                            controllers.organisation.BusinessNotIdentifiedController.onPageLoad()
 
 GET         /register/problem/different-business                                 controllers.organisation.DifferentBusinessController.onPageLoad()
 

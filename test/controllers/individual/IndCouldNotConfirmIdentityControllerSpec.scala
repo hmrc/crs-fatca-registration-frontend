@@ -34,14 +34,14 @@ class IndCouldNotConfirmIdentityControllerSpec extends SpecBase with ControllerM
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       running(application) {
-        val request = FakeRequest(GET, controllers.individual.routes.IndCouldNotConfirmIdentityController.onPageLoad("identity").url)
+        val request = FakeRequest(GET, controllers.individual.routes.IndCouldNotConfirmIdentityController.onPageLoad().url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[IndCouldNotConfirmIdentityView]
         status(result) mustEqual OK
         val continueUrl: String = routes.IndexController.onPageLoad.url
-        contentAsString(result) mustEqual view(continueUrl, "identity")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(continueUrl)(request, messages(application)).toString
       }
     }
   }
