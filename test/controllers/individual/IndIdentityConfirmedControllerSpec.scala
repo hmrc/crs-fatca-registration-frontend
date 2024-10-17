@@ -155,7 +155,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual controllers.individual.routes.IndCouldNotConfirmIdentityController.onPageLoad("identity").url
+      redirectLocation(result).value mustEqual controllers.individual.routes.IndCouldNotConfirmIdentityController.onPageLoad().url
     }
 
     "return return Internal Server Error for a GET when an error other than NotFoundError is returned" in {

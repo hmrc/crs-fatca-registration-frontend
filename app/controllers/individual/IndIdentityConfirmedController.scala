@@ -78,7 +78,7 @@ class IndIdentityConfirmedController @Inject() (
                       Future.successful(Ok(view(mode, action)))
                   }
                 case Left(NotFoundError) =>
-                  Future.successful(Redirect(routes.IndCouldNotConfirmIdentityController.onPageLoad("identity")))
+                  Future.successful(Redirect(routes.IndCouldNotConfirmIdentityController.onPageLoad()))
                 case _ =>
                   Future.successful(InternalServerError(errorView()))
               }

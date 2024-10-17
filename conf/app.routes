@@ -109,7 +109,7 @@ POST        /register/change-name                                               
 GET         /register/identity-confirmed                                         controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = NormalMode)
 GET         /register/change-identity-confirmed                                  controllers.individual.IndIdentityConfirmedController.onPageLoad(mode: Mode = CheckMode)
 
-GET         /register/problem/could-not-confirm-identity/:key                             controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad(key: String)
+GET         /register/problem/could-not-confirm-identity                         controllers.individual.IndCouldNotConfirmIdentityController.onPageLoad()
 
 GET         /register/without-id/business-name                                   controllers.organisation.BusinessNameWithoutIDController.onPageLoad(mode: Mode = NormalMode)
 POST        /register/without-id/business-name                                   controllers.organisation.BusinessNameWithoutIDController.onSubmit(mode: Mode = NormalMode)

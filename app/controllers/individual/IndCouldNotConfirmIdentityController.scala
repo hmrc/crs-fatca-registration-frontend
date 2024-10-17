@@ -34,11 +34,11 @@ class IndCouldNotConfirmIdentityController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(key: String): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
       val continueUrl = controllers.routes.IndexController.onPageLoad.url
 
-      Ok(view(continueUrl, key))
+      Ok(view(continueUrl))
   }
 
 }
