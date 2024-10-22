@@ -17,16 +17,20 @@
 package controllers
 
 import base.SpecBase
+import generators.UserAnswersGenerator
 import models.UserAnswers
+import org.mockito.ArgumentMatchers.{eq => is}
+import org.mockito.MockitoSugar.when
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import generators.{ModelGenerators, UserAnswersGenerator}
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.RegistrationConfirmationView
 
-class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGenerator {
+import scala.concurrent.Future
 
+class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGenerator {
 
   "RegistrationConfirmation Controller" - {
 
@@ -35,7 +39,7 @@ class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGe
       forAll(orgWithId.arbitrary) {
         (userAnswers: UserAnswers) =>
           val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Organisation).build()
-
+          when(mockSessionRepository.set(is(userAnswers.copy(data = Json.obj())))).thenReturn(Future.successful(true))
           running(application) {
             val request = FakeRequest(GET, routes.RegistrationConfirmationController.onPageLoad().url)
 
@@ -49,4 +53,5 @@ class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGe
       }
     }
   }
+
 }
