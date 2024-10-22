@@ -17,29 +17,36 @@
 package controllers
 
 import base.SpecBase
+import models.UserAnswers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+import generators.{ModelGenerators, UserAnswersGenerator}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.RegistrationConfirmationView
 
-class RegistrationConfirmationControllerSpec extends SpecBase {
+class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGenerator {
+
 
   "RegistrationConfirmation Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET with valid orgWithId userAnswers" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(orgWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Organisation).build()
 
-      running(application) {
-        val request = FakeRequest(GET, routes.RegistrationConfirmationController.onPageLoad().url)
+          running(application) {
+            val request = FakeRequest(GET, routes.RegistrationConfirmationController.onPageLoad().url)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[RegistrationConfirmationView]
+            val view = application.injector.instanceOf[RegistrationConfirmationView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view()(request, messages(application)).toString
+          }
       }
     }
   }
-
 }
