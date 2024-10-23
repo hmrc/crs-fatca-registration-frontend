@@ -29,6 +29,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import play.api.Logging
+import utils.AddressHelper.formatAddress
 import views.html.individual.IndSelectAddressView
 
 import javax.inject.Inject
@@ -60,7 +61,7 @@ class IndSelectAddressController @Inject() (
             }
 
             val radios: Seq[RadioItem] = addresses.map(
-              address => RadioItem(content = Text(s"${address.format}"), value = Some(s"${address.format}"))
+              address => RadioItem(content = Text(s"$address"), value = Some(s"$address"))
             )
 
             Ok(view(preparedForm, radios, mode))
@@ -77,7 +78,7 @@ class IndSelectAddressController @Inject() (
         request.userAnswers.get(AddressLookupPage) match {
           case Some(addresses) =>
             val radios: Seq[RadioItem] = addresses.map(
-              address => RadioItem(content = Text(s"${address.format}"), value = Some(s"${address.format}"))
+              address => RadioItem(content = Text(s"${formatAddress(address)}"), value = Some(s"${formatAddress(address)}"))
             )
 
             form
@@ -85,7 +86,7 @@ class IndSelectAddressController @Inject() (
               .fold(
                 formWithErrors => Future.successful(BadRequest(view(formWithErrors, radios, mode))),
                 value => {
-                  val addressToStore: AddressLookup = addresses.find(_.format == value).getOrElse(throw new Exception("Cannot get address"))
+                  val addressToStore: AddressLookup = addresses.find(formatAddress(_) == value).getOrElse(throw new Exception("Cannot get address"))
 
                   for {
                     updatedAnswers                    <- Future.fromTry(request.userAnswers.set(IndSelectAddressPage, value))
