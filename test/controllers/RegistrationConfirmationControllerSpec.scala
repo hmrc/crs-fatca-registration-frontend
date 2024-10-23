@@ -19,14 +19,14 @@ package controllers
 import base.SpecBase
 import generators.UserAnswersGenerator
 import models.UserAnswers
-import org.mockito.ArgumentMatchers.{eq => is}
+import org.mockito.ArgumentMatchers.{any, eq => is}
 import org.mockito.MockitoSugar.when
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AffinityGroup
-import views.html.RegistrationConfirmationView
+import views.html.{RegistrationConfirmationView, ThereIsAProblemView}
 
 import scala.concurrent.Future
 
@@ -46,6 +46,45 @@ class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGe
             val result = route(application, request).value
 
             val view = application.injector.instanceOf[RegistrationConfirmationView]
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view()(request, messages(application)).toString
+          }
+      }
+    }
+
+    "must return OK and the correct view for a GET with valid indWithId userAnswers" in {
+
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Individual).build()
+          when(mockSessionRepository.set(is(userAnswers.copy(data = Json.obj())))).thenReturn(Future.successful(true))
+          running(application) {
+            val request = FakeRequest(GET, routes.RegistrationConfirmationController.onPageLoad().url)
+
+            val result = route(application, request).value
+
+            val view = application.injector.instanceOf[RegistrationConfirmationView]
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view()(request, messages(application)).toString
+          }
+      }
+    }
+
+    "must return OK and the there-is-a-problem view for a GET when unable to empty user answers data" in {
+      forAll(orgWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Organisation).build()
+
+          when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(false))
+
+          running(application) {
+            val request = FakeRequest(GET, routes.RegistrationConfirmationController.onPageLoad().url)
+
+            val result = route(application, request).value
+
+            val view = application.injector.instanceOf[ThereIsAProblemView]
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view()(request, messages(application)).toString
