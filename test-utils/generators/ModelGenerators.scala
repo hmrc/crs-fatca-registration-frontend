@@ -136,7 +136,8 @@ trait ModelGenerators extends RegexConstants with Generators {
         postCode     <- arbitrary[String]
         town         <- arbitrary[String]
         county       <- arbitrary[Option[String]]
-      } yield AddressLookup(addressLine1, addressLine2, addressLine3, addressLine4, town, county, postCode)
+        country      <- arbitrary[Option[Country]]
+      } yield AddressLookup(addressLine1, addressLine2, addressLine3, addressLine4, town, county, postCode, country)
     }
 
   implicit lazy val arbitraryName: Arbitrary[models.Name] =

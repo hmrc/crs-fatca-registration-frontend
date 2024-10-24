@@ -53,7 +53,7 @@ class IndWhereDoYouLivePageSpec extends PageBehaviours {
           forAll(generator) {
             case (addressLookup, address) =>
               val userAnswers = emptyUserAnswers
-                .withPage(IndSelectAddressPage, addressLookup.format)
+                .withPage(IndSelectAddressPage, "someSelectedAddress")
                 .withPage(IndWhatIsYourPostcodePage, TestPostCode)
                 .withPage(IndSelectedAddressLookupPage, addressLookup)
                 .withPage(AddressLookupPage, Seq(addressLookup))

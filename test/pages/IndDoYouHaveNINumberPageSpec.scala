@@ -57,7 +57,7 @@ class IndDoYouHaveNINumberPageSpec extends PageBehaviours {
               .withPage(IndWhereDoYouLivePage, booleanField)
               .withPage(IndWhatIsYourPostcodePage, postcode)
               .withPage(AddressLookupPage, Seq(addressLookup))
-              .withPage(IndSelectAddressPage, addressLookup.format)
+              .withPage(IndSelectAddressPage, "someSelectedAddress")
               .withPage(IndSelectedAddressLookupPage, addressLookup)
               .withPage(IsThisYourAddressPage, booleanField)
               .withPage(IndUKAddressWithoutIdPage, address)

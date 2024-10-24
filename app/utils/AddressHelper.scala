@@ -26,15 +26,11 @@ object AddressHelper {
       address.addressLine2,
       address.addressLine3,
       address.addressLine4,
-      address.town,
-      address.postcode,
+      Option(address.town),
+      Option(address.postcode),
       address.county,
       address.country.map(_.description)
-    )
-      .collect {
-        case s: String => s
-        case Some(s)   => s
-      }
+    ).flatten
     lines.mkString(", ")
   }
 
