@@ -27,7 +27,8 @@ case class AddressLookup(addressLine1: Option[String],
                          addressLine4: Option[String],
                          town: String,
                          county: Option[String],
-                         postcode: String
+                         postcode: String,
+                         country: Option[Country]
 ) {
 
   val toAddress: Option[Address] =
@@ -43,13 +44,6 @@ case class AddressLookup(addressLine1: Option[String],
       safePostcode = Option(postcode)
     } yield Address(line1, line2, line3, line4, safePostcode, Country.GB)
 
-  def format: String = {
-    val lines = Seq(addressLine1, addressLine2, addressLine3, addressLine4).flatten.mkString(", ")
-    s"$lines, $town, ${county.fold("")(
-        county => s"$county, "
-      )}$postcode"
-  }
-
 }
 
 object LookupAddressByPostcode {
@@ -58,32 +52,30 @@ object LookupAddressByPostcode {
 
 object AddressLookup {
 
-  implicit val addressLookupWrite: Writes[AddressLookup] = new Writes[AddressLookup] {
+  implicit val addressLookupWrite: Writes[AddressLookup] = (addressLookup: AddressLookup) => {
+    def lines: List[String] = List(addressLookup.addressLine1, addressLookup.addressLine2, addressLookup.addressLine3, addressLookup.addressLine4).flatten
 
-    def writes(addressLookup: AddressLookup) = {
-      def lines: List[String] = List(addressLookup.addressLine1, addressLookup.addressLine2, addressLookup.addressLine3, addressLookup.addressLine4).flatten
-
-      Json.obj(
-        "address" ->
-          Json.obj(
-            "lines"    -> lines,
-            "town"     -> addressLookup.town,
-            "county"   -> addressLookup.county,
-            "postcode" -> addressLookup.postcode
-          )
-      )
-    }
-
+    Json.obj(
+      "address" ->
+        Json.obj(
+          "lines"    -> lines,
+          "town"     -> addressLookup.town,
+          "county"   -> addressLookup.county,
+          "postcode" -> addressLookup.postcode,
+          "country"  -> addressLookup.country
+        )
+    )
   }
 
   implicit val addressLookupReads: Reads[AddressLookup] =
-    (
-      (JsPath \ "address" \ "lines").read[List[String]] and
-        (JsPath \ "address" \ "town").read[String] and
-        (JsPath \ "address" \ "county").readNullable[String] and
-        (JsPath \ "address" \ "postcode").read[String]
-    ) {
-      (lines, town, county, postcode) =>
+    ((JsPath \ "address" \ "lines").read[List[String]] and
+      (JsPath \ "address" \ "town").read[String] and
+      (JsPath \ "address" \ "county").readNullable[String] and
+      (JsPath \ "address" \ "postcode").read[String] and
+      (JsPath \ "address" \ "country" \ "code").readNullable[String] and
+      (JsPath \ "address" \ "country" \ "description").readNullable[String] and
+      (JsPath \ "address" \ "country" \ "name").readNullable[String]) {
+      (lines, town, county, postcode, countryCode, countryDescription, countryName) =>
         val addressLines: (Option[String], Option[String], Option[String], Option[String]) =
           lines.size match {
             case 0 =>
@@ -96,7 +88,18 @@ object AddressLookup {
               (Some(lines.head), Some(lines(1)), Some(lines(2)), None)
             case numberOfLines if numberOfLines >= 4 => (Some(lines.head), Some(lines(1)), Some(lines(2)), Some(lines(3)))
           }
-        AddressLookup(addressLines._1, addressLines._2, addressLines._3, addressLines._4, town, county, postcode)
+        AddressLookup(
+          addressLines._1,
+          addressLines._2,
+          addressLines._3,
+          addressLines._4,
+          town,
+          county,
+          postcode,
+          countryCode.map(
+            code => Country("", code, countryDescription.orElse(countryName).getOrElse(code))
+          )
+        )
     }
 
   implicit val addressesLookupReads: Reads[Seq[AddressLookup]] = Reads {

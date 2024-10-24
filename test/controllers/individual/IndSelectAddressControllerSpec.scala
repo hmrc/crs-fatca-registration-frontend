@@ -18,7 +18,7 @@ package controllers.individual
 
 import base.SpecBase
 import forms.IndSelectAddressFormProvider
-import models.{AddressLookup, NormalMode}
+import models.{AddressLookup, Country, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.any
@@ -41,13 +41,13 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
   val form: Form[String] = formProvider()
 
   val addresses: Seq[AddressLookup] = Seq(
-    AddressLookup(Some("1 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ"),
-    AddressLookup(Some("2 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ")
+    AddressLookup(Some("1 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ", Some(Country.GB)),
+    AddressLookup(Some("2 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ", Some(Country.GB))
   )
 
   val addressRadios: Seq[RadioItem] = Seq(
-    RadioItem(content = Text("1 Address line 1, Town, ZZ1 1ZZ"), value = Some("1 Address line 1, Town, ZZ1 1ZZ")),
-    RadioItem(content = Text("2 Address line 1, Town, ZZ1 1ZZ"), value = Some("2 Address line 1, Town, ZZ1 1ZZ"))
+    RadioItem(content = Text("1 Address line 1, Town, ZZ1 1ZZ, United Kingdom"), value = Some("1 Address line 1, Town, ZZ1 1ZZ, United Kingdom")),
+    RadioItem(content = Text("2 Address line 1, Town, ZZ1 1ZZ, United Kingdom"), value = Some("2 Address line 1, Town, ZZ1 1ZZ, United Kingdom"))
   )
 
   val userAnswers = emptyUserAnswers
@@ -59,14 +59,7 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val userAnswers = emptyUserAnswers
-        .set(AddressLookupPage, addresses)
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-        .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         implicit val request = FakeRequest(GET, selectAddressRoute)
@@ -111,7 +104,7 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, selectAddressRoute).withFormUrlEncodedBody(("value", "1 Address line 1, Town, ZZ1 1ZZ"))
+          FakeRequest(POST, selectAddressRoute).withFormUrlEncodedBody(("value", "1 Address line 1, Town, ZZ1 1ZZ, United Kingdom"))
 
         val result = route(application, request).value
 

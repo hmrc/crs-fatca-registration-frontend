@@ -33,13 +33,12 @@ class IndUKAddressWithoutIdPageSpec extends PageBehaviours {
     "cleanup" - {
       "must remove IndSelectAddressPage" in {
         val generator = for {
-          addressLookup <- arbitrary[models.AddressLookup]
-          address       <- arbitrary[models.Address]
-        } yield (addressLookup, address)
+          address <- arbitrary[models.Address]
+        } yield address
 
         forAll(generator) {
-          case (addressLookup, address) =>
-            val userAnswers = emptyUserAnswers.withPage(IndSelectAddressPage, addressLookup.format)
+          address =>
+            val userAnswers = emptyUserAnswers.withPage(IndSelectAddressPage, "someSelectedAddress")
 
             val result = IndUKAddressWithoutIdPage.cleanup(Option(address), userAnswers).success.value
 

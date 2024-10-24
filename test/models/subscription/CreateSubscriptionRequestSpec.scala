@@ -373,7 +373,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
       }
 
       "when a individual selected a gb address" in {
-        val address     = AddressLookup(Some(""), None, None, None, "town", None, "")
+        val address     = AddressLookup(Some(""), None, None, None, "town", None, "", None)
         val userAnswers = UserAnswers("").set(IndSelectedAddressLookupPage, address).success.value
 
         val result = CreateSubscriptionRequest.isGBUser(userAnswers)
