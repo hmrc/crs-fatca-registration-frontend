@@ -16,7 +16,7 @@
 
 package controllers.organisation
 
-import controllers.actions.StandardActionSets
+import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
 import forms.BusinessNameFormProvider
 import models.ReporterType._
 import models.{Mode, ReporterType}
@@ -37,6 +37,7 @@ class BusinessNameController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: BusinessNameFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: BusinessNameView
 )(implicit ec: ExecutionContext)
@@ -52,7 +53,7 @@ class BusinessNameController @Inject() (
     }
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    standardActionSets.identifiedUserWithDependantAnswer(ReporterTypePage).async {
+    (standardActionSets.identifiedUserWithDependantAnswer(ReporterTypePage) andThen checkForSubmission) async {
       implicit request =>
         selectedReporterTypeText(request.userAnswers.get(ReporterTypePage).get) match {
           case Some(businessTypeText) =>

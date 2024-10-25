@@ -49,6 +49,7 @@ class IsThisYourBusinessController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: IsThisYourBusinessFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   matchingService: BusinessMatchingWithIdService,
   subscriptionService: SubscriptionService,
@@ -67,7 +68,7 @@ class IsThisYourBusinessController @Inject() (
   implicit private val uuidGenerator: UUIDGen = uuidGen
   implicit private val implicitClock: Clock   = clock
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       val autoMatchedUtr = request.userAnswers.get(AutoMatchedUTRPage)
       buildRegisterWithId(autoMatchedUtr) match {

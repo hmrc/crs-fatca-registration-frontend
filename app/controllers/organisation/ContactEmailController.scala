@@ -36,6 +36,7 @@ class ContactEmailController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: ContactEmailFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: ContactEmailView
 )(implicit ec: ExecutionContext)
@@ -44,14 +45,14 @@ class ContactEmailController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedWithoutEnrolmentCheck() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(ContactEmailPage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, getContactName(request.userAnswers)))
+      Future.successful(Ok(view(preparedForm, mode, getContactName(request.userAnswers))))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck().async {
