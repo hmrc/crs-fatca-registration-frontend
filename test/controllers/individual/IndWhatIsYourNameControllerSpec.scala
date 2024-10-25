@@ -19,11 +19,13 @@ package controllers.individual
 import base.SpecBase
 import controllers.routes
 import forms.IndWhatIsYourNameFormProvider
+import generators.UserAnswersGenerator
 import models.{Name, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.IndWhatIsYourNamePage
 import play.api.inject.bind
 import play.api.libs.json.Json
@@ -33,7 +35,7 @@ import views.html.individual.IndWhatIsYourNameView
 
 import scala.concurrent.Future
 
-class IndWhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
+class IndWhatIsYourNameControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   val formProvider = new IndWhatIsYourNameFormProvider()
   val form         = formProvider()
@@ -63,17 +65,20 @@ class IndWhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      running(application) {
-        val request = FakeRequest(GET, whatIsYourNameRoute)
+          running(application) {
+            val request = FakeRequest(GET, whatIsYourNameRoute)
 
-        val view = application.injector.instanceOf[IndWhatIsYourNameView]
+            val view = application.injector.instanceOf[IndWhatIsYourNameView]
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
       }
     }
 

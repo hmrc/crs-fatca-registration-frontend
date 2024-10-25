@@ -18,11 +18,13 @@ package controllers.organisation
 
 import base.SpecBase
 import forms.WhatIsYourNameFormProvider
-import models.{Name, NormalMode}
+import generators.UserAnswersGenerator
+import models.{Name, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.WhatIsYourNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -31,7 +33,7 @@ import views.html.organisation.WhatIsYourNameView
 
 import scala.concurrent.Future
 
-class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
+class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   val form = new WhatIsYourNameFormProvider().apply()
 
@@ -50,17 +52,21 @@ class WhatIsYourNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          when(mockSessionRepository.set(userAnswers)).thenReturn(Future.successful(true))
 
-      running(application) {
-        val request = FakeRequest(GET, whatIsYourNameRoute)
+          running(application) {
+            val request = FakeRequest(GET, whatIsYourNameRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[WhatIsYourNameView]
+            val view = application.injector.instanceOf[WhatIsYourNameView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
       }
     }
 

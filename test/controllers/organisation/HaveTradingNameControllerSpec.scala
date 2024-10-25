@@ -18,11 +18,13 @@ package controllers.organisation
 
 import base.SpecBase
 import forms.HaveTradingNameFormProvider
+import generators.UserAnswersGenerator
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.HaveTradingNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -31,7 +33,7 @@ import views.html.organisation.HaveTradingNameView
 
 import scala.concurrent.Future
 
-class HaveTradingNameControllerSpec extends SpecBase with MockitoSugar {
+class HaveTradingNameControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   val formProvider = new HaveTradingNameFormProvider()
   val form         = formProvider()
@@ -42,17 +44,20 @@ class HaveTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(orgWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      running(application) {
-        val request = FakeRequest(GET, haveTradingNameRoute)
+          running(application) {
+            val request = FakeRequest(GET, haveTradingNameRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[HaveTradingNameView]
+            val view = application.injector.instanceOf[HaveTradingNameView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
       }
     }
 

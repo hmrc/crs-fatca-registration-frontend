@@ -19,11 +19,13 @@ package controllers.organisation
 import base.SpecBase
 import config.FrontendAppConfig
 import forms.NonUKAddressWithoutIdFormProvider
+import generators.UserAnswersGenerator
 import models.{Address, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.NonUKBusinessAddressWithoutIDPage
 import play.api.data.Form
 import play.api.inject.bind
@@ -34,7 +36,7 @@ import views.html.organisation.NonUKBusinessAddressWithoutIDView
 
 import scala.concurrent.Future
 
-class NonUKBusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
+class NonUKBusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   private val testCountry: Country  = Country("valid", "GG", "Guernsey", Option("Guernsey"))
   val testCountryList: Seq[Country] = Seq(testCountry)
@@ -56,25 +58,28 @@ class NonUKBusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoS
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[CountryListFactory].to(countryListFactory)
-        )
-        .build()
+      forAll(orgWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[CountryListFactory].to(countryListFactory)
+            )
+            .build()
 
-      running(application) {
-        val request = FakeRequest(GET, LoadNonUKBusinessAddressWithoutIDRoute)
+          running(application) {
+            val request = FakeRequest(GET, LoadNonUKBusinessAddressWithoutIDRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[NonUKBusinessAddressWithoutIDView]
+            val view = application.injector.instanceOf[NonUKBusinessAddressWithoutIDView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(
-          form,
-          countryListFactory.countrySelectList(form.data, testCountryList),
-          NormalMode
-        )(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(
+              form,
+              countryListFactory.countrySelectList(form.data, testCountryList),
+              NormalMode
+            )(request, messages(application)).toString
+          }
       }
     }
 
