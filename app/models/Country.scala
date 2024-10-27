@@ -22,7 +22,7 @@ case class Country(state: String, code: String, description: String, alternative
 
 object Country {
 
-  val GB = Country("valid", "GB", "United Kingdom")
+  val GB = Country("", "GB", "United Kingdom")
 
   implicit val format: OFormat[Country] = Json.format[Country]
 }

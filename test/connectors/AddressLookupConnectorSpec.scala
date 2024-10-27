@@ -58,7 +58,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
        |         "name": "England"
        |     },
        |     "country": {
-       |         "code": "UK",
+       |         "code": "GB",
        |         "name": "United Kingdom"
        |     }
        |  },
@@ -153,7 +153,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -184,7 +184,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -214,7 +214,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -244,7 +244,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -274,7 +274,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -305,7 +305,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -335,7 +335,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -365,7 +365,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -395,7 +395,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -425,7 +425,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -455,7 +455,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -489,7 +489,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -520,7 +520,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -550,7 +550,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -580,7 +580,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -610,7 +610,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -640,7 +640,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -681,7 +681,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -712,7 +712,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -743,7 +743,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -774,7 +774,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -805,7 +805,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -836,7 +836,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -867,7 +867,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -898,7 +898,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -976,7 +976,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -1007,7 +1007,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -1038,7 +1038,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -1069,7 +1069,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -1100,7 +1100,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -1131,7 +1131,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -1162,7 +1162,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },
@@ -1193,7 +1193,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
            |         "name": "England"
            |     },
            |     "country": {
-           |         "code": "UK",
+           |         "code": "GB",
            |         "name": "United Kingdom"
            |     }
            |  },

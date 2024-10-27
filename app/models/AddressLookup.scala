@@ -42,7 +42,19 @@ case class AddressLookup(addressLine1: Option[String],
         .getOrElse(town)
       line4        = addressLine4
       safePostcode = Option(postcode)
-    } yield Address(line1, line2, line3, line4, safePostcode, Country.GB)
+    } yield Address(line1, line2, line3, line4, safePostcode, country.getOrElse(Country.GB))
+
+  lazy val format: String =
+    Seq(
+      addressLine1,
+      addressLine2,
+      addressLine3,
+      addressLine4,
+      Option(town),
+      Option(postcode),
+      county,
+      country.map(_.description)
+    ).flatten.mkString(", ")
 
 }
 
