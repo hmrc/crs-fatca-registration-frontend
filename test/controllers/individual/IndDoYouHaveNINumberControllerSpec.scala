@@ -54,10 +54,11 @@ class IndDoYouHaveNINumberControllerSpec extends SpecBase with MockitoSugar with
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[IndDoYouHaveNINumberView]
+            val view        = application.injector.instanceOf[IndDoYouHaveNINumberView]
+            val updatedForm = userAnswers.get(IndDoYouHaveNINumberPage).map(form.fill).getOrElse(form)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(updatedForm, NormalMode)(request, messages(application)).toString
           }
       }
     }

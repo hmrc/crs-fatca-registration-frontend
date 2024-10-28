@@ -55,10 +55,11 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar with 
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[IndContactHavePhoneView]
+            val view        = application.injector.instanceOf[IndContactHavePhoneView]
+            val updatedForm = userAnswers.get(IndContactHavePhonePage).map(form.fill).getOrElse(form)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(updatedForm, NormalMode)(request, messages(application)).toString
           }
       }
     }

@@ -24,7 +24,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import pages.AddressLookupPage
+import pages.{AddressLookupPage, IndSelectAddressPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -77,10 +77,11 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar with Use
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndSelectAddressView]
+        val view        = application.injector.instanceOf[IndSelectAddressView]
+        val updatedForm = userAnswers.get(IndSelectAddressPage).map(form.fill).getOrElse(form)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, addressRadios, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(updatedForm, addressRadios, NormalMode)(request, messages(application)).toString
       }
     }
 

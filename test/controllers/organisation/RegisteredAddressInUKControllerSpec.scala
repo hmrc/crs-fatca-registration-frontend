@@ -54,10 +54,11 @@ class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar wit
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[RegisteredAddressInUKView]
+            val view        = application.injector.instanceOf[RegisteredAddressInUKView]
+            val updatedForm = userAnswers.get(RegisteredAddressInUKPage).map(form.fill).getOrElse(form)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(updatedForm, NormalMode)(request, messages(application)).toString
           }
       }
     }

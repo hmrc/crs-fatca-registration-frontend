@@ -57,10 +57,11 @@ class ContactNameControllerSpec extends SpecBase with MockitoSugar with UserAnsw
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[ContactNameView]
+            val view        = application.injector.instanceOf[ContactNameView]
+            val updatedForm = userAnswers.get(ContactNamePage).map(form.fill).getOrElse(form)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(updatedForm, NormalMode)(request, messages(application)).toString
           }
       }
     }

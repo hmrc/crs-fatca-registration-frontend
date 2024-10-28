@@ -54,10 +54,11 @@ class SecondContactNameControllerSpec extends SpecBase with MockitoSugar with Us
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[SecondContactNameView]
+            val view        = application.injector.instanceOf[SecondContactNameView]
+            val updatedForm = userAnswers.get(SecondContactNamePage).map(form.fill).getOrElse(form)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(updatedForm, NormalMode)(request, messages(application)).toString
           }
       }
     }
