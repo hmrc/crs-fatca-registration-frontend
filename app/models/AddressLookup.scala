@@ -109,7 +109,7 @@ object AddressLookup {
           county,
           postcode,
           countryCode.map(
-            code => Country("", code, countryDescription.orElse(countryName).getOrElse(code))
+            code => Country(code, countryDescription.orElse(countryName).getOrElse(code))
           )
         )
     }

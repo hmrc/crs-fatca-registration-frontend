@@ -76,7 +76,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
     }
 
     "must return required rows including second contact details for 'business-without-id' registration" in {
-      val businessAddress = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val businessAddress = Address("", None, "", None, None, Country("GB", "United Kingdom"))
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.LimitedCompany)
         .withPage(RegisteredAddressInUKPage, false)
@@ -163,7 +163,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
     }
 
     "must return required rows without second contact details for 'individual-without-id' registration" in {
-      val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val address = Address("", None, "", None, None, Country("GB", "United Kingdom"))
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.Individual)
         .withPage(IndDoYouHaveNINumberPage, false)
@@ -214,7 +214,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
     }
 
     "must return required rows without second contact details for 'sole-without-id'" in {
-      val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val address = Address("", None, "", None, None, Country("GB", "United Kingdom"))
       val userAnswers = emptyUserAnswers
         .withPage(ReporterTypePage, ReporterType.Sole)
         .withPage(IndWhereDoYouLivePage, false)

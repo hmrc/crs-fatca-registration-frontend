@@ -62,7 +62,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
       when(mockEnrolmentStoreProxyConnector.enrolmentStatus(any())(any(), any())).thenReturn(EitherT.fromEither[Future](Right(())))
 
       val subscriptionID = SubscriptionID("id")
-      val address        = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val address        = Address("", None, "", None, None, Country("GB", "United Kingdom"))
       val userAnswers = UserAnswers("")
         .set(DoYouHaveUniqueTaxPayerReferencePage, false)
         .success
@@ -96,7 +96,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
       when(mockEnrolmentStoreProxyConnector.enrolmentStatus(any())(any(), any())).thenReturn(EitherT.fromEither[Future](Right(())))
 
       val subscriptionID = SubscriptionID("id")
-      val address        = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val address        = Address("", None, "", None, None, Country("GB", "United Kingdom"))
       val userAnswers = UserAnswers("")
         .set(DoYouHaveUniqueTaxPayerReferencePage, false)
         .success
@@ -132,7 +132,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
         .thenReturn(EitherT.fromEither[Future](Left(EnrolmentExistsError(groupIds))))
 
       val subscriptionID = SubscriptionID("id")
-      val address        = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val address        = Address("", None, "", None, None, Country("GB", "United Kingdom"))
       val userAnswers = UserAnswers("")
         .set(DoYouHaveUniqueTaxPayerReferencePage, false)
         .success

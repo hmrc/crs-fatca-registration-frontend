@@ -108,10 +108,9 @@ trait ModelGenerators extends RegexConstants with Generators {
   implicit lazy val arbitraryCountry: Arbitrary[Country] =
     Arbitrary {
       for {
-        state <- Gen.oneOf(Seq("Valid", "Invalid"))
-        code  <- Gen.pick(countryNumber, 'A' to 'Z')
-        name  <- arbitrary[String]
-      } yield Country(state, code.mkString, name)
+        code <- Gen.pick(countryNumber, 'A' to 'Z')
+        name <- arbitrary[String]
+      } yield Country(code.mkString, name)
     }
 
   implicit lazy val arbitraryAddressWithoutId: Arbitrary[models.Address] =

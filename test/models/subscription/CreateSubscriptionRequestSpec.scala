@@ -73,7 +73,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
       "for a business without id (org affinity group)" in {
         val businessName         = nameGen.sample.value
         val tradingName          = nameGen.sample.value
-        val address              = Address("", None, "", None, None, Country("state", "GG", "Guernsey"))
+        val address              = Address("", None, "", None, None, Country("GG", "Guernsey"))
         val primaryContactName   = nameGen.sample.value
         val secondaryContactName = nameGen.sample.value
 
@@ -160,7 +160,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
       "for a business without id (individual affinity group)" in {
         val businessName       = nameGen.sample.value
         val tradingName        = nameGen.sample.value
-        val address            = Address("", None, "", None, None, Country("state", "GG", "Guernsey"))
+        val address            = Address("", None, "", None, None, Country("GG", "Guernsey"))
         val primaryContactName = nameGen.sample.value
 
         val userAnswers = UserAnswers("")
@@ -235,7 +235,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
       "for a individual without id" in {
         val contactDob     = validDateOfBirth().sample.value
         val contactName    = arbitraryName.arbitrary.sample.value
-        val contactAddress = Address("", None, "", None, None, Country("state", "GB", "United Kingdom"))
+        val contactAddress = Address("", None, "", None, None, Country("GB", "United Kingdom"))
 
         val userAnswers = UserAnswers("")
           .set(ReporterTypePage, ReporterType.Individual).success.value
@@ -304,7 +304,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
 
       "for a sole trader without id" in {
         val contactDob     = validDateOfBirth().sample.value
-        val contactAddress = Address("", None, "", None, None, Country("state", "US", "United States of America"))
+        val contactAddress = Address("", None, "", None, None, Country("US", "United States of America"))
 
         val userAnswers = UserAnswers("")
           .set(ReporterTypePage, ReporterType.Sole).success.value
@@ -382,7 +382,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
       }
 
       "when a individual manually entered a gb address" in {
-        val address     = Address("", None, "", None, None, Country("state", "GB", "United Kingdom"))
+        val address     = Address("", None, "", None, None, Country("GB", "United Kingdom"))
         val userAnswers = UserAnswers("").set(IndUKAddressWithoutIdPage, address).success.value
 
         val result = CreateSubscriptionRequest.isGBUser(userAnswers)
@@ -403,7 +403,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
       }
 
       "when a individual manually entered a crown dependency address" in {
-        val address     = Address("", None, "", None, None, Country("state", "GG", "Guernsey"))
+        val address     = Address("", None, "", None, None, Country("GG", "Guernsey"))
         val userAnswers = UserAnswers("").set(IndUKAddressWithoutIdPage, address).success.value
 
         val result = CreateSubscriptionRequest.isGBUser(userAnswers)
@@ -412,7 +412,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
       }
 
       "when a individual manually entered a non-uk address" in {
-        val address     = Address("", None, "", None, None, Country("state", "US", "United States of America"))
+        val address     = Address("", None, "", None, None, Country("US", "United States of America"))
         val userAnswers = UserAnswers("").set(IndNonUKAddressWithoutIdPage, address).success.value
 
         val result = CreateSubscriptionRequest.isGBUser(userAnswers)
