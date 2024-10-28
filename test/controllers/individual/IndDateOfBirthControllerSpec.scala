@@ -19,11 +19,13 @@ package controllers.individual
 import java.time.{LocalDate, ZoneOffset}
 import base.SpecBase
 import forms.IndDateOfBirthFormProvider
+import generators.UserAnswersGenerator
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.IndDateOfBirthPage
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
@@ -33,7 +35,7 @@ import views.html.individual.IndDateOfBirthView
 
 import scala.concurrent.Future
 
-class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar {
+class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   val formProvider = new IndDateOfBirthFormProvider()
   private def form = formProvider()
@@ -59,15 +61,19 @@ class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
 
-      running(application) {
-        val result = route(application, getRequest).value
+          running(application) {
+            val result = route(application, getRequest).value
 
-        val view = application.injector.instanceOf[IndDateOfBirthView]
+            val view = application.injector.instanceOf[IndDateOfBirthView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(getRequest, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(getRequest, messages(application)).toString
+          }
       }
     }
 

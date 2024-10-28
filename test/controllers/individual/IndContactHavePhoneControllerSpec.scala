@@ -18,6 +18,7 @@ package controllers.individual
 
 import base.SpecBase
 import forms.IndContactHavePhoneFormProvider
+import generators.UserAnswersGenerator
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -33,7 +34,7 @@ import views.html.individual.IndContactHavePhoneView
 
 import scala.concurrent.Future
 
-class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
+class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   lazy val indContactHavePhoneRoute = routes.IndContactHavePhoneController.onPageLoad(NormalMode).url
 
@@ -44,17 +45,21 @@ class IndContactHavePhoneControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
 
-      running(application) {
-        val request = FakeRequest(GET, indContactHavePhoneRoute)
+          running(application) {
+            val request = FakeRequest(GET, indContactHavePhoneRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndContactHavePhoneView]
+            val view = application.injector.instanceOf[IndContactHavePhoneView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
       }
     }
 

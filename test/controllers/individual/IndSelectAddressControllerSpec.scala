@@ -18,10 +18,12 @@ package controllers.individual
 
 import base.SpecBase
 import forms.IndSelectAddressFormProvider
-import models.{AddressLookup, NormalMode}
+import generators.UserAnswersGenerator
+import models.{AddressLookup, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.any
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.AddressLookupPage
 import play.api.data.Form
 import play.api.inject.bind
@@ -33,7 +35,7 @@ import views.html.individual.IndSelectAddressView
 
 import scala.concurrent.Future
 
-class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
+class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   lazy val selectAddressRoute: String = controllers.individual.routes.IndSelectAddressController.onPageLoad(NormalMode).url
 
@@ -67,6 +69,8 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
         .build()
+
+      when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
 
       running(application) {
         implicit val request = FakeRequest(GET, selectAddressRoute)

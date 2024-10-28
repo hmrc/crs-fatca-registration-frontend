@@ -18,12 +18,14 @@ package controllers.organisation
 
 import base.SpecBase
 import forms.WhatIsYourUTRFormProvider
+import generators.UserAnswersGenerator
 import models.ReporterType.Sole
-import models.{NormalMode, ReporterType, UniqueTaxpayerReference}
+import models.{NormalMode, ReporterType, UniqueTaxpayerReference, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.{ReporterTypePage, WhatIsYourUTRPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -32,7 +34,7 @@ import views.html.organisation.WhatIsYourUTRView
 
 import scala.concurrent.Future
 
-class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar {
+class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   lazy val loadRoute   = routes.WhatIsYourUTRController.onPageLoad(NormalMode).url
   lazy val submitRoute = routes.WhatIsYourUTRController.onSubmit(NormalMode).url
@@ -47,17 +49,21 @@ class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET when self assessment" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(orgWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
 
-      running(application) {
-        val request = FakeRequest(GET, loadRoute)
+          running(application) {
+            val request = FakeRequest(GET, loadRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[WhatIsYourUTRView]
+            val view = application.injector.instanceOf[WhatIsYourUTRView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, taxType)(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode, taxType)(request, messages(application)).toString
+          }
       }
     }
 

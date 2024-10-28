@@ -17,10 +17,12 @@
 package controllers.individual
 
 import base.SpecBase
-import models.NormalMode
+import generators.UserAnswersGenerator
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.IndWhereDoYouLivePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -29,7 +31,7 @@ import views.html.individual.IndWhereDoYouLiveView
 
 import scala.concurrent.Future
 
-class IndWhereDoYouControllerSpec extends SpecBase with MockitoSugar {
+class IndWhereDoYouControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   private lazy val loadRoute   = routes.IndWhereDoYouLiveController.onPageLoad(NormalMode).url
   private lazy val submitRoute = routes.IndWhereDoYouLiveController.onSubmit(NormalMode).url
@@ -40,19 +42,24 @@ class IndWhereDoYouControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-        .build()
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+            .build()
 
-      running(application) {
-        val request = FakeRequest(GET, loadRoute)
-        val view    = application.injector.instanceOf[IndWhereDoYouLiveView]
+          when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
 
-        val result = route(application, request).value
+          running(application) {
+            val request = FakeRequest(GET, loadRoute)
+            val view    = application.injector.instanceOf[IndWhereDoYouLiveView]
 
-        status(result) mustEqual OK
+            val result = route(application, request).value
 
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            status(result) mustEqual OK
+
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
       }
     }
 

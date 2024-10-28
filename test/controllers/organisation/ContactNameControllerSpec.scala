@@ -19,11 +19,13 @@ package controllers.organisation
 import base.SpecBase
 import controllers.routes
 import forms.ContactNameFormProvider
+import generators.UserAnswersGenerator
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.ContactNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -32,7 +34,7 @@ import views.html.organisation.ContactNameView
 
 import scala.concurrent.Future
 
-class ContactNameControllerSpec extends SpecBase with MockitoSugar {
+class ContactNameControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   val formProvider = new ContactNameFormProvider()
   private val form = formProvider()
@@ -45,17 +47,21 @@ class ContactNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(orgWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
 
-      running(application) {
-        val request = FakeRequest(GET, contactNameRoute)
+          running(application) {
+            val request = FakeRequest(GET, contactNameRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ContactNameView]
+            val view = application.injector.instanceOf[ContactNameView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
       }
     }
 
