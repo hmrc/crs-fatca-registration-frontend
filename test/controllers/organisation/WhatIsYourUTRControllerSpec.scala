@@ -60,9 +60,12 @@ class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar with UserAn
             val result = route(application, request).value
 
             val view = application.injector.instanceOf[WhatIsYourUTRView]
+            val updatedForm = userAnswers.get(WhatIsYourUTRPage).map(
+              utr => form.fill(utr)
+            ).getOrElse(form)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, NormalMode, taxType)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(updatedForm, NormalMode, taxType)(request, messages(application)).toString
           }
       }
     }
