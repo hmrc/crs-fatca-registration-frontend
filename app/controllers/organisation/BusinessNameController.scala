@@ -38,6 +38,7 @@ class BusinessNameController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: BusinessNameFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: BusinessNameView
 )(implicit ec: ExecutionContext)
@@ -53,7 +54,7 @@ class BusinessNameController @Inject() (
     }
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    standardActionSets.identifiedUserWithDependantAnswer(ReporterTypePage).async {
+    (standardActionSets.identifiedUserWithDependantAnswer(ReporterTypePage) andThen checkForSubmission) async {
       implicit request =>
         selectedReporterTypeText(request.userAnswers.get(ReporterTypePage).get) match {
           case Some(businessTypeText) =>
@@ -64,11 +65,7 @@ class BusinessNameController @Inject() (
             }
             Future.successful(Ok(view(preparedForm, mode, businessTypeText)))
           case _ =>
-            if (request.userAnswers.data == Json.obj()) {
-              Future.successful(Redirect(controllers.routes.InformationSentController.onPageLoad()))
-            } else {
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            }
         }
     }
 
