@@ -94,6 +94,17 @@ class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar with UserA
       }
     }
 
+    "must redirect to Information sent when UserAnswers is empty" in {
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
+
+      running(application) {
+        val result = route(application, getRequest).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)

@@ -81,6 +81,19 @@ class SecondContactNameControllerSpec extends SpecBase with MockitoSugar with Us
       }
     }
 
+    "must redirect to Information sent when UserAnswers is empty" in {
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, secondContactNameRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
