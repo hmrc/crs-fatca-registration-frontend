@@ -116,6 +116,19 @@ class ContactPhoneControllerSpec extends SpecBase with MockitoSugar with TableDr
         }
     }
 
+    "must redirect to Information sent when UserAnswers is empty" in {
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, contactPhoneRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()

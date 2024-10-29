@@ -36,6 +36,7 @@ class ContactNameController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: ContactNameFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: ContactNameView
 )(implicit ec: ExecutionContext)
@@ -44,14 +45,14 @@ class ContactNameController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(ContactNamePage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Future.successful(Ok(view(preparedForm, mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData().async {

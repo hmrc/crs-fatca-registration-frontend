@@ -18,11 +18,13 @@ package controllers.organisation
 
 import base.SpecBase
 import forms.RegisteredAddressInUKFormProvider
+import generators.UserAnswersGenerator
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.RegisteredAddressInUKPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -31,7 +33,7 @@ import views.html.organisation.RegisteredAddressInUKView
 
 import scala.concurrent.Future
 
-class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
+class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   val formProvider = new RegisteredAddressInUKFormProvider()
   val form         = formProvider()
@@ -42,17 +44,22 @@ class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(orgWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
 
-      running(application) {
-        val request = FakeRequest(GET, registeredAddressInUKRoute)
+          running(application) {
+            val request = FakeRequest(GET, registeredAddressInUKRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[RegisteredAddressInUKView]
+            val view        = application.injector.instanceOf[RegisteredAddressInUKView]
+            val updatedForm = userAnswers.get(RegisteredAddressInUKPage).map(form.fill).getOrElse(form)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(updatedForm, NormalMode)(request, messages(application)).toString
+          }
       }
     }
 
@@ -71,6 +78,19 @@ class RegisteredAddressInUKControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Information sent when UserAnswers is empty" in {
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, registeredAddressInUKRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
       }
     }
 

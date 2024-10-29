@@ -36,6 +36,7 @@ class SecondContactNameController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: SecondContactNameFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: SecondContactNameView
 )(implicit ec: ExecutionContext)
@@ -44,14 +45,14 @@ class SecondContactNameController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedWithoutEnrolmentCheck() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(SecondContactNamePage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Future.successful(Ok(view(preparedForm, mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck().async {

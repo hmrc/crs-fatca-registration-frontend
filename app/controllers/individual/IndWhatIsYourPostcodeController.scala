@@ -39,6 +39,7 @@ class IndWhatIsYourPostcodeController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: IndWhatIsYourPostcodeFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   addressLookupConnector: AddressLookupConnector,
   view: IndWhatIsYourPostcodeView
@@ -48,14 +49,14 @@ class IndWhatIsYourPostcodeController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(IndWhatIsYourPostcodePage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Future.successful(Ok(view(preparedForm, mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {

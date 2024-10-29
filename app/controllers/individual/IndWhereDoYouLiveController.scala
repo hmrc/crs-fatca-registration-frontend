@@ -36,6 +36,7 @@ class IndWhereDoYouLiveController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: IndWhereDoYouLiveFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: IndWhereDoYouLiveView
 )(implicit ec: ExecutionContext)
@@ -45,14 +46,14 @@ class IndWhereDoYouLiveController @Inject() (
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    standardActionSets.identifiedUserWithData() {
+    (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
       implicit request =>
         val preparedForm = request.userAnswers.get(IndWhereDoYouLivePage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode))
+        Future.successful(Ok(view(preparedForm, mode)))
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {

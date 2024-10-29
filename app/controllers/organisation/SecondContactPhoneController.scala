@@ -38,6 +38,7 @@ class SecondContactPhoneController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: SecondContactPhoneFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: SecondContactPhoneView
 )(implicit ec: ExecutionContext)
@@ -47,14 +48,14 @@ class SecondContactPhoneController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(SecondContactPhonePage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, getSecondContactName(request.userAnswers)))
+      Future.successful(Ok(view(preparedForm, mode, getSecondContactName(request.userAnswers))))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {

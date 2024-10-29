@@ -37,6 +37,7 @@ class IndWhatIsYourNINumberController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: IndWhatIsYourNINumberFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: IndWhatIsYourNINumberView
 )(implicit ec: ExecutionContext)
@@ -45,14 +46,14 @@ class IndWhatIsYourNINumberController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(IndWhatIsYourNINumberPage) match {
         case None       => form
         case Some(nino) => form.fill(nino.nino)
       }
 
-      Ok(view(preparedForm, mode))
+      Future.successful(Ok(view(preparedForm, mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
