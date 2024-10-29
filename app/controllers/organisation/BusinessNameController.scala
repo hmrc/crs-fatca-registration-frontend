@@ -54,7 +54,9 @@ class BusinessNameController @Inject() (
     }
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    (standardActionSets.identifiedUserWithDependantAnswer(ReporterTypePage) andThen checkForSubmission) async {
+    (standardActionSets.identifiedUserWithData() andThen checkForSubmission andThen standardActionSets.identifiedUserWithDependantAnswer(
+      ReporterTypePage
+    )) async {
       implicit request =>
         selectedReporterTypeText(request.userAnswers.get(ReporterTypePage).get) match {
           case Some(businessTypeText) =>
@@ -65,7 +67,7 @@ class BusinessNameController @Inject() (
             }
             Future.successful(Ok(view(preparedForm, mode, businessTypeText)))
           case _ =>
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
     }
 
