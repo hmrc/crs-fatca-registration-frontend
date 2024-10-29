@@ -20,7 +20,7 @@ import controllers.actions._
 import forms.IndIsThisYourAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.{AddressLookupPage, IndSelectedAddressLookupPage, IsThisYourAddressPage}
+import pages.{AddressLookupPage, IndSelectAddressPage, IndSelectedAddressLookupPage, IsThisYourAddressPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -83,6 +83,7 @@ class IndIsThisYourAddressController @Inject() (
               case Some(address :: _) =>
                 for {
                   updatedAnswers                 <- Future.fromTry(request.userAnswers.set(IsThisYourAddressPage, value))
+                  updatedAnswers                 <- Future.fromTry(updatedAnswers.set(IndSelectAddressPage, address.format))
                   userAnswersWithSelectedAddress <- Future.fromTry(updatedAnswers.set(IndSelectedAddressLookupPage, address))
                   _                              <- sessionRepository.set(userAnswersWithSelectedAddress)
                 } yield Redirect(navigator.nextPage(IsThisYourAddressPage, mode, userAnswersWithSelectedAddress))
