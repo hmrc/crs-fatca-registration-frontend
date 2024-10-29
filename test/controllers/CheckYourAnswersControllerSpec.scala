@@ -161,17 +161,17 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         }
 
         "must redirect to Information sent when UserAnswers is empty" in {
-            val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), AffinityGroup.Individual)
-              .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-              .build()
+          val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), AffinityGroup.Individual)
+            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+            .build()
 
-              running(application) {
-                val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
 
-                val result = route(application, request).value
+            val result = route(application, request).value
 
-                status(result) mustEqual SEE_OTHER
-                redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
           }
         }
       }

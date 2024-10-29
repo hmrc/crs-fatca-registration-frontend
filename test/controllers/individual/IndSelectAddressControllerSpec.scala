@@ -87,16 +87,19 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar with Use
 
     "must redirect to manual UK address page if there are no address matches" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-        .build()
-      running(application) {
-        val request = FakeRequest(GET, selectAddressRoute)
-        val result  = route(application, request).value
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers.remove(AddressLookupPage).success.value))
+            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+            .build()
+          running(application) {
+            val request = FakeRequest(GET, selectAddressRoute)
+            val result  = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode).url
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode).url
+          }
       }
 
     }

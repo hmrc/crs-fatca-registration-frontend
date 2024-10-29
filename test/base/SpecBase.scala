@@ -94,8 +94,7 @@ trait SpecBase
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, affinityGroup)),
         bind[DataRetrievalAction].toInstance(mockDataRetrievalAction),
-        bind[SessionRepository].toInstance(mockSessionRepository),
-        bind[CheckForSubmissionAction].toInstance(new FakeCheckForSubmissionAction)
+        bind[SessionRepository].toInstance(mockSessionRepository)
       )
   }
 
