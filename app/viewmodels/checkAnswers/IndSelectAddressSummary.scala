@@ -32,7 +32,7 @@ object IndSelectAddressSummary {
       answer =>
         SummaryListRowViewModel(
           key = s"$IndSelectAddressPage.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlContent(s"$answer")),
+          value = ValueViewModel(HtmlContent(s"${answer.replace(",", "<br>")}")),
           actions = Seq(
             changeAction(
               IndSelectAddressPage.toString,
