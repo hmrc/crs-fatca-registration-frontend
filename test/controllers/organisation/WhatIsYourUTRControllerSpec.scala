@@ -19,7 +19,7 @@ package controllers.organisation
 import base.SpecBase
 import forms.WhatIsYourUTRFormProvider
 import generators.UserAnswersGenerator
-import models.ReporterType.Sole
+import models.ReporterType.{LimitedCompany, Sole, UnincorporatedAssociation}
 import models.{NormalMode, ReporterType, UniqueTaxpayerReference, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -59,10 +59,13 @@ class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar with UserAn
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[WhatIsYourUTRView]
-            val updatedForm = userAnswers.get(WhatIsYourUTRPage).map(
-              utr => form.fill(utr)
-            ).getOrElse(form)
+            val taxType = userAnswers.get(ReporterTypePage) match {
+              case Some(LimitedCompany) | Some(UnincorporatedAssociation) => "Corporation Tax"
+              case _                                                      => "Self Assessment"
+            }
+            val form        = new WhatIsYourUTRFormProvider().apply(taxType)
+            val view        = application.injector.instanceOf[WhatIsYourUTRView]
+            val updatedForm = userAnswers.get(WhatIsYourUTRPage).map(form.fill).getOrElse(form)
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(updatedForm, NormalMode, taxType)(request, messages(application)).toString

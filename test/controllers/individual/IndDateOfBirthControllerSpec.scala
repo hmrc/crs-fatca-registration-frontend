@@ -69,11 +69,11 @@ class IndDateOfBirthControllerSpec extends SpecBase with MockitoSugar with UserA
           running(application) {
             val result = route(application, getRequest).value
 
-            val view = application.injector.instanceOf[IndDateOfBirthView]
-            //val updatedForm = userAnswers.get[IndDateOfBirthPage].map(form.fill).getOrElse(form)
+            val view        = application.injector.instanceOf[IndDateOfBirthView]
+            val updatedForm = userAnswers.get(IndDateOfBirthPage).map(form.fill).getOrElse(form)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, NormalMode)(getRequest, messages(application)).toString
+            contentAsString(result) mustEqual view(updatedForm, NormalMode)(getRequest, messages(application)).toString
           }
       }
     }
