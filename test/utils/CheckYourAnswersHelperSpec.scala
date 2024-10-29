@@ -97,7 +97,7 @@ class CheckYourAnswersHelperSpec extends SpecBase with GuiceOneAppPerSuite {
 
       val summaryRow = service.selectAddress.value
       summaryRow.key mustBe Key(Text(s"$IndSelectAddressPage.checkYourAnswersLabel"))
-      summaryRow.value.content mustBe HtmlContent(s"${addressAsString.replace(",", "<br>")}")
+      summaryRow.value.content mustBe HtmlContent(s"$addressAsString")
     }
   }
 
