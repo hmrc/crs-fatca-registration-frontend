@@ -32,15 +32,14 @@ class YourContactDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
-  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: YourContactDetailsView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() andThen checkForSubmission) async {
+  def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData() {
     implicit request =>
-      Future.successful(Ok(view()))
+      Ok(view())
   }
 
   def onSubmit(): Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckInitialisedData().async {
