@@ -18,10 +18,10 @@ package controllers.changeContactDetails
 
 import config.FrontendAppConfig
 import controllers.actions._
-import controllers.{routes, ContactDetailsMissingController}
-import models.{CheckMode, UserAnswers}
+import controllers.{ContactDetailsMissingController, routes}
 import models.requests.DataRequestWithUserAnswers
 import models.subscription.response.DisplaySubscriptionResponse
+import models.{CheckMode, UserAnswers}
 import pages.changeContactDetails.ChangeContactDetailsInProgressPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -36,7 +36,6 @@ import views.html.changeContactDetails.ChangeIndividualContactDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class ChangeIndividualContactDetailsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -80,13 +79,8 @@ class ChangeIndividualContactDetailsController @Inject() (
     implicit request =>
       subscriptionService.updateIndContactDetails(request.subscriptionId, request.userAnswers) map {
         case true =>
-          request.userAnswers.remove(ChangeContactDetailsInProgressPage) match {
-            case Success(_) =>
-              Redirect(controllers.routes.DetailsUpdatedController.onPageLoad())
-            case Failure(exception) =>
-              logger.warn(s"Failed to remove $ChangeContactDetailsInProgressPage", exception)
-              InternalServerError(errorView())
-          }
+          sessionRepository.clear(request.userId)
+          Redirect(controllers.routes.DetailsUpdatedController.onPageLoad())
         case false => InternalServerError(errorView())
       }
   }

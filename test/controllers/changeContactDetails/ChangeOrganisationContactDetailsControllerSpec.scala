@@ -26,11 +26,12 @@ import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionR
 import models.{SubscriptionID, UserAnswers}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq => mEq}
-import org.mockito.MockitoSugar.{reset, when}
+import org.mockito.Mockito.verify
+import org.mockito.MockitoSugar.{reset, times, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.changeContactDetails.ChangeContactDetailsInProgressPage
+import pages.changeContactDetails.{ChangeContactDetailsInProgressPage, OrganisationContactPhonePage}
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -175,12 +176,17 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
     }
 
     "onSubmit" - {
-      "redirect to confirmation page on updating ContactDetails" in {
-        val userAnswers = Some(emptyUserAnswers)
+      "redirect to confirmation page on updating ContactDetails and clears useranswers" in {
+        reset(mockSessionRepository)
+
+        val userAnswers = Some(emptyUserAnswers
+          .withPage(OrganisationContactPhonePage, validPhoneNumber(11).toString)
+          .withPage(ChangeContactDetailsInProgressPage, true))
 
         when(mockSubscriptionService.updateOrgContactDetails(mEq(subscriptionId), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(true))
         when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
+        when(mockSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
         val application = applicationBuilder(userAnswers)
           .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
@@ -194,6 +200,7 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.routes.DetailsUpdatedController.onPageLoad().url
+          verify(mockSessionRepository, times(1)).clear(any())
         }
       }
 
