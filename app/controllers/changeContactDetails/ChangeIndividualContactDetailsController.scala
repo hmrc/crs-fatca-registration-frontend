@@ -25,6 +25,8 @@ import models.subscription.response.DisplaySubscriptionResponse
 import pages.changeContactDetails.ChangeContactDetailsInProgressPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.Json
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.SubscriptionService
@@ -44,6 +46,7 @@ class ChangeIndividualContactDetailsController @Inject() (
   standardActionSets: StandardActionSets,
   subscriptionService: SubscriptionService,
   sessionRepository: SessionRepository,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: ChangeIndividualContactDetailsView,
   errorView: ThereIsAProblemView
@@ -55,6 +58,9 @@ class ChangeIndividualContactDetailsController @Inject() (
     implicit request =>
       subscriptionService.getSubscription(request.subscriptionId).flatMap {
         case Some(subscriptionResponse) =>
+          if (request.userAnswers.data == Json.obj()) {
+            Future.successful(Left(Redirect(routes.InformationSentController.onPageLoad())))
+          }
           if (request.userAnswers.get(ChangeContactDetailsInProgressPage).isEmpty) {
             subscriptionService.populateUserAnswersFromIndSubscription(request.userAnswers, subscriptionResponse.success) match {
               case Some(userAnswers) =>

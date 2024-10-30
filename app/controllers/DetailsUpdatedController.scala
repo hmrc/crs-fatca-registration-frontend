@@ -17,24 +17,37 @@
 package controllers
 
 import controllers.actions._
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.DetailsUpdatedView
+import views.html.{DetailsUpdatedView, ThereIsAProblemView}
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class DetailsUpdatedController @Inject() (
   override val messagesApi: MessagesApi,
   retrieveSubscriptionId: SubscriptionIdRetrievalAction,
+  sessionRepository: SessionRepository,
+  standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
-  view: DetailsUpdatedView
-) extends FrontendBaseController
+  view: DetailsUpdatedView,
+  errorView: ThereIsAProblemView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = retrieveSubscriptionId() {
+  def onPageLoad: Action[AnyContent] = (retrieveSubscriptionId() andThen standardActionSets.identifiedUserWithData()) async {
     implicit request =>
-      Ok(view())
+      sessionRepository.set(request.userAnswers.copy(data = Json.obj())).flatMap {
+        case true => Future.successful(Ok(view()))
+        case false =>
+          logger.error(s"Failed to clear user answers after updating details")
+          Future.successful(Ok(errorView()))
+      }
   }
 
 }
