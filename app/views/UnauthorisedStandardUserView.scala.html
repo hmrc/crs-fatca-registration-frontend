@@ -15,25 +15,26 @@
  *@
 
 @import config.FrontendAppConfig
+@import components._
 
 @this(
-layout: templates.Layout,
-link: components.Link,
-appConfig: FrontendAppConfig
+    layout: templates.Layout,
+    link: Link,
+    appConfig: FrontendAppConfig,
+    para: Paragraph,
+    heading: Heading
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
+@manageServicesLink = @{link(appConfig.manageServicesLink, "unauthorisedStandardUser.link", openInNewWindow = true)}
+
 @layout(pageTitle = titleNoForm(messages("unauthorisedStandardUser.title")),
-showBackLink = false) {
+showBackLink = true) {
 
-     <h1 class="govuk-heading-l">@messages("unauthorisedStandardUser.heading")</h1>
+    @heading(messages("unauthorisedStandardUser.heading"))
+    @para(Html(messages("unauthorisedStandardUser.paragraph1")))
+    @para(Html(messages("unauthorisedStandardUser.paragraph2")))
+    @para(Html(messages("unauthorisedStandardUser.paragraph3",manageServicesLink)))
 
-     <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph1")</p>
-     <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph2")</p>
-     <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph3")</p>
-
-     <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph4")
-         <span> @link(appConfig.businessTaxAccountLink, "unauthorisedStandardUser.link", openInNewWindow = true).</span>
-     </p>
 }

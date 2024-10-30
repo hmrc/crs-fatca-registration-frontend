@@ -60,7 +60,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   private val exitSurveyBaseUrl: String        = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String                    = s"$exitSurveyBaseUrl/feedback/crs-fatca-registration-frontend"
-  lazy val businessTaxAccountLink: String      = configuration.get[String]("urls.btaLogin")
+  lazy val manageServicesLink: String          = configuration.get[String]("urls.manageServicesFrontend")
   lazy val corporationTaxEnquiriesLink: String = configuration.get[String]("urls.corporationTaxEnquiries")
   lazy val selfAssessmentEnquiriesLink: String = configuration.get[String]("urls.selfAssessmentEnquiries")
   lazy val emailEnquiries: String              = configuration.get[String]("urls.emailEnquiries")
