@@ -19,7 +19,7 @@ package controllers.individual
 import base.SpecBase
 import controllers.routes
 import forms.IndIsThisYourAddressFormProvider
-import models.{AddressLookup, NormalMode, UserAnswers}
+import models.{AddressLookup, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -44,11 +44,12 @@ class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
     addressLine4 = Some("test 2"),
     town = "London",
     county = Some("Greater London"),
-    postcode = "SW1A 1AA"
+    postcode = "SW1A 1AA",
+    country = Some(Country.GB)
   )
 
   val addresses: Seq[AddressLookup] = Seq(
-    AddressLookup(Some("123 Main Street"), Some("Apt 4B"), Some("test 1"), Some("test 2"), "London", Some("Greater London"), "SW1A 1AA")
+    AddressLookup(Some("123 Main Street"), Some("Apt 4B"), Some("test 1"), Some("test 2"), "London", Some("Greater London"), "SW1A 1AA", Some(Country.GB))
   )
 
   lazy val isThisYourAddressRoute = controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(NormalMode).url

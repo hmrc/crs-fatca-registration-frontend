@@ -25,11 +25,11 @@ import wolfendale.scalacheck.regexp.RegexpGen
 class NonUKAddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
 
   private val countries = Seq(
-    Country("valid", "AD", "Andorra", Some("Andorra")),
-    Country("valid", "FJ", "Fiji", Some("Fiji")),
-    Country("valid", "GG", "Guernsey", Some("Guernsey")),
-    Country("valid", "GG", "Guernsey", Some("Alderney")),
-    Country("valid", "GG", "Guernsey", Some("Sark"))
+    Country("AD", "Andorra", Some("Andorra")),
+    Country("FJ", "Fiji", Some("Fiji")),
+    Country("GG", "Guernsey", Some("Guernsey")),
+    Country("GG", "Guernsey", Some("Alderney")),
+    Country("GG", "Guernsey", Some("Sark"))
   )
 
   val form = new NonUKAddressWithoutIdFormProvider()(countries)
