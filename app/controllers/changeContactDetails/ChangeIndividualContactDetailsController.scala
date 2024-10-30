@@ -18,7 +18,7 @@ package controllers.changeContactDetails
 
 import config.FrontendAppConfig
 import controllers.actions._
-import controllers.{ContactDetailsMissingController, routes}
+import controllers.{routes, ContactDetailsMissingController}
 import models.requests.DataRequestWithUserAnswers
 import models.subscription.response.DisplaySubscriptionResponse
 import models.{CheckMode, UserAnswers}
