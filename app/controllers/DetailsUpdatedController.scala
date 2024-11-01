@@ -34,13 +34,14 @@ class DetailsUpdatedController @Inject() (
   sessionRepository: SessionRepository,
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
+  checkForSubmissionAction: CheckForSubmissionAction,
   view: DetailsUpdatedView,
   errorView: ThereIsAProblemView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (retrieveSubscriptionId() andThen standardActionSets.identifiedUserWithData()) async {
+  def onPageLoad: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequired() async {
     implicit request =>
       sessionRepository.set(request.userAnswers.copy(data = Json.obj())).flatMap {
         case true => Future.successful(Ok(view()))
