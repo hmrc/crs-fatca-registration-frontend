@@ -27,7 +27,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@manageServicesLink = @{link(appConfig.manageServicesLink, "unauthorisedStandardUser.link", openInNewWindow = true)}
+@manageServicesLink = @{link(appConfig.manageServicesLink, "unauthorisedStandardUser.link")}
 
 @layout(pageTitle = titleNoForm(messages("unauthorisedStandardUser.title")),
 showBackLink = true) {
