@@ -16,20 +16,20 @@
 
 package models.enrolment
 
+import base.TestValues
 import generators.ModelGenerators
-import helpers.JsonFixtures.UserAnswersId
+import models.matching.{IndRegistrationInfo, OrgRegistrationInfo}
 import models.{Address, SubscriptionID, UserAnswers}
-import models.matching.OrgRegistrationInfo
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{NonUKBusinessAddressWithoutIDPage, RegistrationInfoPage}
+import pages.{IndNonUKAddressWithoutIdPage, IndUKAddressWithoutIdPage, NonUKBusinessAddressWithoutIDPage, RegistrationInfoPage}
 import play.api.libs.json.Json
 
 import java.time.{Clock, Instant, ZoneId}
 
-class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerators with ScalaCheckPropertyChecks {
+class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerators with ScalaCheckPropertyChecks with TestValues {
 
   def emptyUserAnswers: UserAnswers = UserAnswers(
     UserAnswersId,
@@ -72,6 +72,39 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
       forAll {
         (address: Address, subscriptionId: SubscriptionID) =>
           val userAnswers      = emptyUserAnswers.set(NonUKBusinessAddressWithoutIDPage, address).success.value
+          val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
+
+          subscriptionInfo.abroadFlag mustBe Some("Y")
+      }
+    }
+
+    "contains postCode for ind registration info" in {
+      forAll {
+        (address: Address, subscriptionId: SubscriptionID) =>
+          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId)).success.value
+            .set(IndUKAddressWithoutIdPage, address).success.value
+          val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
+
+          subscriptionInfo.postCode mustBe address.postCode
+      }
+    }
+
+    "contains abroadFlag as N for ind registration info" in {
+      forAll {
+        (address: Address, subscriptionId: SubscriptionID) =>
+          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId)).success.value
+            .set(IndUKAddressWithoutIdPage, address).success.value
+          val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
+
+          subscriptionInfo.abroadFlag mustBe Some("N")
+      }
+    }
+
+    "contains abroadFlag as Y for ind registration info" in {
+      forAll {
+        (address: Address, subscriptionId: SubscriptionID) =>
+          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId)).success.value
+            .set(IndNonUKAddressWithoutIdPage, address).success.value
           val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
 
           subscriptionInfo.abroadFlag mustBe Some("Y")

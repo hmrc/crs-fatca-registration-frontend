@@ -51,17 +51,23 @@ object SubscriptionInfo {
     )
 
   private def getPostCodeIfProvided(userAnswers: UserAnswers): Option[String] =
-    (userAnswers.get(RegistrationInfoPage), userAnswers.get(NonUKBusinessAddressWithoutIDPage)) match {
-      case (Some(OrgRegistrationInfo(_, _, address)), _) => address.postalCode
-      case (_, Some(address))                            => address.postCode
-      case _                                             => None
+    (userAnswers.get(RegistrationInfoPage), userAnswers.get(NonUKBusinessAddressWithoutIDPage), userAnswers.get(IndUKAddressWithoutIdPage)) match {
+      case (Some(OrgRegistrationInfo(_, _, address)), _, _) => address.postalCode
+      case (_, Some(address), _)                            => address.postCode
+      case (_, _, Some(address))                            => address.postCode
+      case _                                                => None
     }
 
   private def getAbroadFlagIfProvided(userAnswers: UserAnswers): Option[String] =
-    (userAnswers.get(RegistrationInfoPage), userAnswers.get(NonUKBusinessAddressWithoutIDPage)) match {
-      case (Some(OrgRegistrationInfo(_, _, _)), _) => Some("N")
-      case (_, Some(_))                            => Some("Y")
-      case _                                       => None
+    (userAnswers.get(RegistrationInfoPage),
+     userAnswers.get(IndUKAddressWithoutIdPage),
+     userAnswers.get(NonUKBusinessAddressWithoutIDPage),
+     userAnswers.get(IndNonUKAddressWithoutIdPage)
+    ) match {
+      case (Some(OrgRegistrationInfo(_, _, _)), _, _, _) => Some("N")
+      case (_, Some(_), _, _)                            => Some("N")
+      case (_, _, Some(_), _) | (_, _, _, Some(_))       => Some("Y")
+      case _                                             => None
     }
 
 }
