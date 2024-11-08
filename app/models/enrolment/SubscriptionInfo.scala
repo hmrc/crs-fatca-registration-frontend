@@ -18,7 +18,7 @@ package models.enrolment
 
 import models.IdentifierType._
 import models.matching.OrgRegistrationInfo
-import models.{SubscriptionID, UserAnswers}
+import models.{Address, SubscriptionID, UserAnswers}
 import pages._
 import play.api.libs.json.{Json, OFormat}
 
@@ -51,17 +51,24 @@ object SubscriptionInfo {
     )
 
   private def getPostCodeIfProvided(userAnswers: UserAnswers): Option[String] =
-    (userAnswers.get(RegistrationInfoPage), userAnswers.get(NonUKBusinessAddressWithoutIDPage)) match {
+    (userAnswers.get(RegistrationInfoPage), getAddress(userAnswers)) match {
       case (Some(OrgRegistrationInfo(_, _, address)), _) => address.postalCode
       case (_, Some(address))                            => address.postCode
       case _                                             => None
     }
 
   private def getAbroadFlagIfProvided(userAnswers: UserAnswers): Option[String] =
-    (userAnswers.get(RegistrationInfoPage), userAnswers.get(NonUKBusinessAddressWithoutIDPage)) match {
+    (userAnswers.get(RegistrationInfoPage), getAddress(userAnswers)) match {
       case (Some(OrgRegistrationInfo(_, _, _)), _) => Some("N")
-      case (_, Some(_))                            => Some("Y")
+      case (_, Some(address)) if address.isGB      => Some("N")
+      case (_, Some(address)) if !address.isGB     => Some("Y")
       case _                                       => None
     }
+
+  private def getAddress(userAnswers: UserAnswers): Option[Address] =
+    userAnswers.get(IndUKAddressWithoutIdPage) orElse
+      userAnswers.get(IndNonUKAddressWithoutIdPage) orElse
+      userAnswers.get(NonUKBusinessAddressWithoutIDPage) orElse
+      userAnswers.get(IndSelectedAddressLookupPage).flatMap(_.toAddress)
 
 }
