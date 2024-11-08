@@ -19,7 +19,7 @@ package models.enrolment
 import base.TestValues
 import generators.ModelGenerators
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo}
-import models.{Address, SubscriptionID, UserAnswers}
+import models.{Address, Country, SubscriptionID, UserAnswers}
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -93,7 +93,7 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
       forAll {
         (address: Address, subscriptionId: SubscriptionID) =>
           val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId)).success.value
-            .set(IndUKAddressWithoutIdPage, address).success.value
+            .set(IndUKAddressWithoutIdPage, address.copy(country = Country.GB)).success.value
           val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
 
           subscriptionInfo.abroadFlag mustBe Some("N")
