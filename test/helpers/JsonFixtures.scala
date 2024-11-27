@@ -28,13 +28,13 @@ object JsonFixtures extends TestValues {
       |{
       |"registerWithIDRequest": {
       |"requestCommon": {
-      |"regime": "CRSFATCA",
+      |"regime": "CRFA",
       |"receiptDate": "2016-08-16T15:55:30Z",
       |"acknowledgementReference": "ec031b045855445e96f98a569ds56cd2",
       |"requestParameters": [
       |{
       |"paramName": "REGIME",
-      |"paramValue": "CRSFATCA"
+      |"paramValue": "CRFA"
       |}
       |]
       |},
@@ -56,13 +56,13 @@ object JsonFixtures extends TestValues {
   val registerWithIDJson: JsObject = Json.obj(
     "registerWithIDRequest" -> Json.obj(
       "requestCommon" -> Json.obj(
-        "regime"                   -> "CRSFATCA",
+        "regime"                   -> "CRFA",
         "receiptDate"              -> "2016-08-16T15:55:30Z",
         "acknowledgementReference" -> "ec031b045855445e96f98a569ds56cd2",
         "requestParameters" -> Json.arr(
           Json.obj(
             "paramName"  -> "REGIME",
-            "paramValue" -> "CRSFATCA"
+            "paramValue" -> "CRFA"
           )
         )
       ),
@@ -287,7 +287,7 @@ object JsonFixtures extends TestValues {
        |{
        |  "createSubscriptionRequest": {
        |    "requestCommon": {
-       |      "regime": "CRSFATCA",
+       |      "regime": "CRFA",
        |      "receiptDate": "2020-09-23T16:12:11Z",
        |      "acknowledgementReference": "AB123c",
        |      "originatingSystem": "MDTP",
@@ -317,7 +317,7 @@ object JsonFixtures extends TestValues {
       |{
       |  "createSubscriptionRequest": {
       |    "requestCommon": {
-      |      "regime": "CRSFATCA",
+      |      "regime": "CRFA",
       |      "receiptDate": "2020-09-23T16:12:11Z",
       |      "acknowledgementReference": "AB123c",
       |      "originatingSystem": "MDTP",
@@ -354,7 +354,7 @@ object JsonFixtures extends TestValues {
        |{
        |  "createSubscriptionRequest": {
        |    "requestCommon": {
-       |      "regime": "CRSFATCA",
+       |      "regime": "CRFA",
        |      "receiptDate": "2020-09-23T16:12:11Z",
        |      "acknowledgementReference": "AB123c",
        |      "originatingSystem": "MDTP"
@@ -394,7 +394,7 @@ object JsonFixtures extends TestValues {
        |{
        |  "createSubscriptionRequest": {
        |    "requestCommon": {
-       |      "regime": "CRSFATCA",
+       |      "regime": "CRFA",
        |      "receiptDate": "2020-09-23T16:12:11Z",
        |      "acknowledgementReference": "AB123c",
        |      "originatingSystem": "MDTP"
@@ -427,7 +427,7 @@ object JsonFixtures extends TestValues {
     Json.obj(
       "createSubscriptionRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime"                   -> "CRSFATCA",
+          "regime"                   -> "CRFA",
           "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
           "originatingSystem"        -> "MDTP",
@@ -457,7 +457,7 @@ object JsonFixtures extends TestValues {
     Json.obj(
       "createSubscriptionRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime"                   -> "CRSFATCA",
+          "regime"                   -> "CRFA",
           "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
           "originatingSystem"        -> "MDTP",
@@ -494,7 +494,7 @@ object JsonFixtures extends TestValues {
     Json.obj(
       "createSubscriptionRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime"                   -> "CRSFATCA",
+          "regime"                   -> "CRFA",
           "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
           "originatingSystem"        -> "MDTP"
@@ -532,7 +532,7 @@ object JsonFixtures extends TestValues {
     Json.obj(
       "createSubscriptionRequest" -> Json.obj(
         "requestCommon" -> Json.obj(
-          "regime"                   -> "CRSFATCA",
+          "regime"                   -> "CRFA",
           "receiptDate"              -> "2020-09-23T16:12:11Z",
           "acknowledgementReference" -> "AB123c",
           "originatingSystem"        -> "MDTP"
@@ -567,13 +567,13 @@ object JsonFixtures extends TestValues {
       |{
       |"registerWithoutIDRequest": {
       |"requestCommon": {
-      |"regime": "CRSFATCA",
+      |"regime": "CRFA",
       |"receiptDate": "2016-08-16T15:55:30Z",
       |"acknowledgementReference": "ec031b045855445e96f98a569ds56cd2",
       |"requestParameters": [
       |{
       |"paramName": "REGIME",
-      |"paramValue": "CRSFATCA"
+      |"paramValue": "CRFA"
       |}
       |]
       |},
@@ -609,13 +609,13 @@ object JsonFixtures extends TestValues {
   val registerWithoutIDJson: JsObject = Json.obj(
     "registerWithoutIDRequest" -> Json.obj(
       "requestCommon" -> Json.obj(
-        "regime"                   -> "CRSFATCA",
+        "regime"                   -> "CRFA",
         "receiptDate"              -> "2016-08-16T15:55:30Z",
         "acknowledgementReference" -> "ec031b045855445e96f98a569ds56cd2",
         "requestParameters" -> Json.arr(
           Json.obj(
             "paramName"  -> "REGIME",
-            "paramValue" -> "CRSFATCA"
+            "paramValue" -> "CRFA"
           )
         )
       ),

@@ -20,9 +20,9 @@ sealed trait Regime
 
 object Regime extends Enumerable.Implicits {
 
-  case object CRSFATCA extends WithName("CRSFATCA") with Regime
+  case object CRFA extends WithName("CRFA") with Regime
 
-  val values: Seq[Regime] = Seq(CRSFATCA)
+  val values: Seq[Regime] = Seq(CRFA)
 
   implicit val enumerable: Enumerable[Regime] =
     Enumerable(

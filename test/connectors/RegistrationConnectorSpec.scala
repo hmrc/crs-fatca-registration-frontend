@@ -55,9 +55,9 @@ class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with
   val requestCommon: RequestCommon =
     RequestCommon(
       "2016-08-16T15:55:30Z",
-      Regime.CRSFATCA.toString,
+      Regime.CRFA.toString,
       "ec031b045855445e96f98a569ds56cd2",
-      Some(Seq(Parameters("REGIME", Regime.CRSFATCA.toString)))
+      Some(Seq(Parameters("REGIME", Regime.CRFA.toString)))
     )
 
   val registrationWithIndividualIDPayload: RegisterWithID = RegisterWithID(

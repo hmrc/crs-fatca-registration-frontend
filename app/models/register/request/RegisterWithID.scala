@@ -33,7 +33,7 @@ object RegisterWithID {
   ): RegisterWithID =
     RegisterWithID(
       RegisterWithIDRequest(
-        RequestCommon(Regime.CRSFATCA.toString),
+        RequestCommon(Regime.CRFA.toString),
         RequestWithIDDetails(name, dob, identifierName, identifierValue)
       )
     )
@@ -41,7 +41,7 @@ object RegisterWithID {
   def apply(registrationRequest: RegistrationRequest)(implicit uuidGenerator: UUIDGen, clock: Clock): RegisterWithID =
     RegisterWithID(
       RegisterWithIDRequest(
-        RequestCommon(Regime.CRSFATCA.toString),
+        RequestCommon(Regime.CRFA.toString),
         RequestWithIDDetails(registrationRequest)
       )
     )
@@ -49,7 +49,7 @@ object RegisterWithID {
   def apply(registrationRequest: AutoMatchedRegistrationRequest)(implicit uuidGenerator: UUIDGen, clock: Clock): RegisterWithID =
     RegisterWithID(
       RegisterWithIDRequest(
-        RequestCommon(Regime.CRSFATCA.toString),
+        RequestCommon(Regime.CRFA.toString),
         RequestWithIDDetails(registrationRequest)
       )
     )
