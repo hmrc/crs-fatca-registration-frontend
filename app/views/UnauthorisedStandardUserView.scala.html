@@ -30,10 +30,20 @@ showBackLink = false) {
      <h1 class="govuk-heading-l">@messages("unauthorisedStandardUser.heading")</h1>
 
      <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph1")</p>
-     <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph2")</p>
-     <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph3")</p>
 
-     <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph4")
-         <span> @link(appConfig.businessTaxAccountLink, "unauthorisedStandardUser.link", openInNewWindow = true).</span>
-     </p>
+    <h2 class="govuk-heading-m">@messages("unauthorisedStandardUser.subheading")</h2>
+
+    <ol class="govuk-list govuk-list--number">
+        <li>@messages("unauthorisedStandardUser.bullet1")</li>
+        <li>@messages("unauthorisedStandardUser.bullet2")</li>
+        <li>@messages("unauthorisedStandardUser.bullet3")</li>
+    </ol>
+
+    <p class="govuk-body govuk-!-margin-bottom-1">@messages("unauthorisedStandardUser.paragraph2")</p>
+    <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph3")</p>
+
+    <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph4")</p>
+
+
+
 }

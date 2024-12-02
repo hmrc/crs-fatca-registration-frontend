@@ -40,6 +40,33 @@ class UnauthorisedStandardUserControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
+
+    "must display the correct messages" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.UnauthorisedStandardUserController.onPageLoad().url)
+
+        val result      = route(application, request).value
+        val htmlContent = contentAsString(result)
+
+        htmlContent must include("You’re unable to register for this service")
+        htmlContent must include("What your administrator must do next")
+        htmlContent must include("You have signed in as a standard user. " +
+          "Only people in your organisation with an administrator role can register for this service.")
+
+        htmlContent must include("Sign in with their Government Gateway details.")
+        htmlContent must include("Register for the CRS and FATCA service.")
+        htmlContent must include("Give you permission to use this service through the tax and scheme management service.")
+
+        htmlContent must include("If your administrator does not have the link for the tax and scheme management service," +
+          " then you can share this link with them.")
+
+        htmlContent must include("www.tax.service.gov.uk/tax-and-scheme-management/services")
+        htmlContent must include("Once your administrator has completed these steps," +
+          " then you will then be able to sign in with your own Government Gateway details to use this service.")
+      }
+    }
   }
 
 }
