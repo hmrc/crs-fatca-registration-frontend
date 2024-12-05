@@ -153,40 +153,37 @@ class CountryListFactorySpec extends SpecBase {
     "must return non-breaking-space item when no country is selected" in {
       val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
       val countries = Seq(
-        Country("AB", "Country_1", Some("Country_1")),
-        Country("AB", "Country_1", Some("Country_1_2")),
+        Country("AB", "Country_1"),
         Country("BC", "Country_2", Some("Country_2"))
       )
 
       factory.countrySelectList(Map.empty, countries) must contain theSameElementsAs Seq(
         SelectItem(None, ""),
-        SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
-        SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = false),
-        SelectItem(value = Some("Country_2"), text = "Country_2", selected = false)
+        SelectItem(value = Some("AB"), text = "Country_1", selected = false),
+        SelectItem(value = Some("BC"), text = "Country_2", selected = false)
       )
     }
 
     "must return selected country when there is one" in {
       val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
       val countries = Seq(
-        Country("AB", "Country_1", Some("Country_1")),
+        Country("AB", "Country_1"),
         Country("AB", "Country_1", Some("Country_1_2")),
         Country("BC", "Country_2", Some("Country_2"))
       )
-      val selectedCountry = Map("country" -> "Country_2")
+      val selectedCountry = Map("country" -> "BC")
 
       factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
         SelectItem(value = None, text = ""),
-        SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
-        SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = false),
-        SelectItem(value = Some("Country_2"), text = "Country_2", selected = true)
+        SelectItem(value = Some("AB"), text = "Country_1:Country_1_2", selected = false),
+        SelectItem(value = Some("BC"), text = "Country_2", selected = true)
       )
     }
 
     "must return the correct selected country when there are alternative names" in {
       val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
       val countries = Seq(
-        Country("AB", "Country_1", Some("Country_1")),
+        Country("AB", "Country_1"),
         Country("AB", "Country_1", Some("Country_1_2")),
         Country("BC", "Country_2", Some("Country_2"))
       )
@@ -194,9 +191,8 @@ class CountryListFactorySpec extends SpecBase {
 
       factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
         SelectItem(value = None, text = ""),
-        SelectItem(value = Some("Country_1"), text = "Country_1", selected = false),
-        SelectItem(value = Some("Country_1_2"), text = "Country_1_2", selected = true),
-        SelectItem(value = Some("Country_2"), text = "Country_2", selected = false)
+        SelectItem(value = Some("AB"), text = "Country_1:Country_1_2", selected = false),
+        SelectItem(value = Some("BC"), text = "Country_2", selected = false)
       )
     }
   }

@@ -70,15 +70,19 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
   }
 
   def countrySelectList(value: Map[String, String], countries: Seq[Country]): Seq[SelectItem] = {
-    val countryJsonList =
-      for {
-        country         <- countries
-        alternativeName <- country.alternativeName
-      } yield SelectItem(
-        country.alternativeName,
-        alternativeName,
-        value.get("country") == country.alternativeName
-      )
+    val countryJsonList = countries.groupBy(_.code).map {
+      case (_, countries) =>
+        val country = countries.head
+        val names = countries.flatMap(
+          c => List(Some(c.description), c.alternativeName)
+        ).flatten.distinct
+        val isSelected = value.get("country").contains(country.code)
+        SelectItem(
+          Some(country.code),
+          if (isSelected) country.description else names.mkString(":"),
+          isSelected
+        )
+    }.toSeq.sortBy(_.text)
     SelectItem(None, "") +: countryJsonList
   }
 

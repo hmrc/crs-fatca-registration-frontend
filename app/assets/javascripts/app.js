@@ -121,3 +121,26 @@ function upTo(el, tagName) {
 
   return null;
 }
+var countrySelect = document.querySelector('select#country');
+if (countrySelect !== null) {
+  HMRCAccessibleAutocomplete.enhanceSelectElement({
+    defaultValue: '',
+    selectElement: countrySelect,
+    showAllValues: true,
+    autoSelect: true,
+    templates: {
+        suggestion: function (suggestion) {
+            if (suggestion) {
+                return suggestion.split(':')[0];
+            }
+            return suggestion;
+        },
+        inputValue: function (suggestion) {
+            if (suggestion) {
+                return suggestion.split(':')[0];
+            }
+            return suggestion;
+        }
+    }
+  })
+}

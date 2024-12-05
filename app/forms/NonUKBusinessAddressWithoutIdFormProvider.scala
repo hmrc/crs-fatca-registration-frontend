@@ -64,16 +64,14 @@ class NonUKBusinessAddressWithoutIdFormProvider @Inject() extends Mappings with 
       "country" -> text("addressWithoutId.error.country.required")
         .verifying(
           "addressWithoutId.error.country.required",
-          value => countryList.exists(_.alternativeName.contains(value))
+          value => countryList.exists(_.code == value)
         )
         .transform[Country](
           value =>
             countryList
-              .find(_.alternativeName.contains(value))
-              .getOrElse(throw new IllegalStateException(s"Failed to derive country given text [$value]")),
-          country =>
-            country.alternativeName
-              .getOrElse(throw new IllegalStateException(s"Failed to derive text given country [$country]"))
+              .find(_.code.contains(value))
+              .getOrElse(throw new IllegalStateException(s"Failed to derive country given code [$value]")),
+          country => country.code
         )
     )(Address.apply)(Address.unapply)
   )
