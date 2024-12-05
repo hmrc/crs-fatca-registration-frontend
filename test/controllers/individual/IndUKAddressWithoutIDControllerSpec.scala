@@ -124,7 +124,7 @@ class IndUKAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
               ("addressLine3", "value 2"),
               ("addressLine4", "value 2"),
               ("postCode", "XX9 9XX"),
-              ("country", "Guernsey")
+              ("country", "GG")
             )
 
         val result = route(application, request).value
