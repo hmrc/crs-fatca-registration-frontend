@@ -53,7 +53,7 @@ class ControllerHelper @Inject() (
   ): Future[Result] =
     taxEnrolmentService.checkAndCreateEnrolment(userAnswers, subscriptionId) flatMap {
       case Right(_) =>
-        Future.successful(Redirect(routes.RegistrationConfirmationController.onPageLoad())) // TODO DAC6-2756 and DAC6-2858
+        Future.successful(Redirect(routes.RegistrationConfirmationController.onPageLoad()))
       case Left(EnrolmentExistsError(groupIds)) if indAlreadyRegistered =>
         logger.info(s"ControllerHelper: EnrolmentExistsError for the the groupIds $groupIds")
         Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad()))
