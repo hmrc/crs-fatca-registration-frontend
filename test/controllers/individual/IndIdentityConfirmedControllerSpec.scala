@@ -116,7 +116,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
           status(result) mustEqual SEE_OTHER
           redirectLocation(
             result
-          ).value mustEqual routes.RegistrationConfirmationController.onPageLoad().url // TODO : Replace with RegistationConfirmed controller
+          ).value mustEqual routes.RegistrationConfirmationController.onPageLoad().url
       }
     }
 
