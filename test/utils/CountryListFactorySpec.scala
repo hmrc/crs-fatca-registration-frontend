@@ -57,14 +57,14 @@ class CountryListFactorySpec extends SpecBase {
       val factory = sut(env, conf)
 
       factory.countryList.value must contain theSameElementsInOrderAs Seq(
-        Country("valid", "XX", "Andorra", Some("Andorra")),
-        Country("valid", "XX", "Bonaire, Saint Eustatius and Saba", Some("Bonaire, Saint Eustatius and Saba")),
-        Country("valid", "XX", "United Arab Emirates", Some("United Arab Emirates")),
-        Country("valid", "XX", "Uruguay", Some("Uruguay")),
-        Country("valid", "XX", "US Minor Outlying Islands", Some("US Minor Outlying Islands")),
-        Country("valid", "XX", "Yemen", Some("Yemen")),
-        Country("valid", "XX", "Zimbabwe", Some("Zimbabwe")),
-        Country("valid", "XX", "Åland Islands", Some("Åland Islands"))
+        Country("XX", "Andorra", Some("Andorra")),
+        Country("XX", "Bonaire, Saint Eustatius and Saba", Some("Bonaire, Saint Eustatius and Saba")),
+        Country("XX", "United Arab Emirates", Some("United Arab Emirates")),
+        Country("XX", "Uruguay", Some("Uruguay")),
+        Country("XX", "US Minor Outlying Islands", Some("US Minor Outlying Islands")),
+        Country("XX", "Yemen", Some("Yemen")),
+        Country("XX", "Zimbabwe", Some("Zimbabwe")),
+        Country("XX", "Åland Islands", Some("Åland Islands"))
       )
     }
 
@@ -84,7 +84,7 @@ class CountryListFactorySpec extends SpecBase {
 
       val factory = sut(env, conf)
 
-      factory.countryListWithoutGB mustBe Some(Seq(Country("valid", "ZW", "Zimbabwe", Some("Zimbabwe"))))
+      factory.countryListWithoutGB mustBe Some(Seq(Country("ZW", "Zimbabwe", Some("Zimbabwe"))))
     }
 
     "return None when country list cannot be loaded from environment" in {
@@ -153,9 +153,9 @@ class CountryListFactorySpec extends SpecBase {
     "must return non-breaking-space item when no country is selected" in {
       val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
       val countries = Seq(
-        Country("valid", "AB", "Country_1", Some("Country_1")),
-        Country("valid", "AB", "Country_1", Some("Country_1_2")),
-        Country("valid", "BC", "Country_2", Some("Country_2"))
+        Country("AB", "Country_1", Some("Country_1")),
+        Country("AB", "Country_1", Some("Country_1_2")),
+        Country("BC", "Country_2", Some("Country_2"))
       )
 
       factory.countrySelectList(Map.empty, countries) must contain theSameElementsAs Seq(
@@ -169,9 +169,9 @@ class CountryListFactorySpec extends SpecBase {
     "must return selected country when there is one" in {
       val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
       val countries = Seq(
-        Country("valid", "AB", "Country_1", Some("Country_1")),
-        Country("valid", "AB", "Country_1", Some("Country_1_2")),
-        Country("valid", "BC", "Country_2", Some("Country_2"))
+        Country("AB", "Country_1", Some("Country_1")),
+        Country("AB", "Country_1", Some("Country_1_2")),
+        Country("BC", "Country_2", Some("Country_2"))
       )
       val selectedCountry = Map("country" -> "Country_2")
 
@@ -186,9 +186,9 @@ class CountryListFactorySpec extends SpecBase {
     "must return the correct selected country when there are alternative names" in {
       val factory = new CountryListFactory(app.environment, new FrontendAppConfig(app.configuration))
       val countries = Seq(
-        Country("valid", "AB", "Country_1", Some("Country_1")),
-        Country("valid", "AB", "Country_1", Some("Country_1_2")),
-        Country("valid", "BC", "Country_2", Some("Country_2"))
+        Country("AB", "Country_1", Some("Country_1")),
+        Country("AB", "Country_1", Some("Country_1_2")),
+        Country("BC", "Country_2", Some("Country_2"))
       )
       val selectedCountry = Map("country" -> "Country_1_2")
 

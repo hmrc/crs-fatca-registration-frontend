@@ -20,7 +20,7 @@ import base.SpecBase
 import connectors.AddressLookupConnector
 import forms.IndWhatIsYourPostcodeFormProvider
 import generators.UserAnswersGenerator
-import models.{AddressLookup, NormalMode, UserAnswers}
+import models.{AddressLookup, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
@@ -95,8 +95,8 @@ class IndWhatIsYourPostcodeControllerSpec extends SpecBase with UserAnswersGener
     "must redirect to the next page when valid data is submitted" in {
 
       val addresses: Seq[AddressLookup] = Seq(
-        AddressLookup(Some("1 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ"),
-        AddressLookup(Some("2 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ")
+        AddressLookup(Some("1 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ", Some(Country.GB)),
+        AddressLookup(Some("2 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ", Some(Country.GB))
       )
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)

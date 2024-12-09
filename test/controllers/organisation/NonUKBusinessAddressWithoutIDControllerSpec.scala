@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 class NonUKBusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
-  private val testCountry: Country  = Country("valid", "GG", "Guernsey", Option("Guernsey"))
+  private val testCountry: Country  = Country("GG", "Guernsey", Option("Guernsey"))
   val testCountryList: Seq[Country] = Seq(testCountry)
   val formProvider                  = new NonUKAddressWithoutIdFormProvider()
   val form: Form[Address]           = formProvider(testCountryList)

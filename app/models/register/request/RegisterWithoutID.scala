@@ -34,7 +34,7 @@ object RegisterWithoutID {
   def apply(name: Name, dob: LocalDate, address: Address, contactDetails: ContactDetails)(implicit uuidGen: UUIDGen, clock: Clock): RegisterWithoutID =
     RegisterWithoutID(
       RegisterWithoutIDRequest(
-        RequestCommon(Regime.CRSFATCA.toString),
+        RequestCommon(Regime.CRFA.toString),
         RequestWithoutIDDetails(None, Option(Individual(name, dob)), AddressRequest(address), contactDetails, None)
       )
     )
@@ -42,7 +42,7 @@ object RegisterWithoutID {
   def apply(organisationName: String, address: Address, contactDetails: ContactDetails)(implicit uuidGen: UUIDGen, clock: Clock): RegisterWithoutID =
     RegisterWithoutID(
       RegisterWithoutIDRequest(
-        RequestCommon(Regime.CRSFATCA.toString),
+        RequestCommon(Regime.CRFA.toString),
         RequestWithoutIDDetails(Option(organisationName).map(NoIdOrganisation(_)), None, AddressRequest(address), contactDetails, None)
       )
     )

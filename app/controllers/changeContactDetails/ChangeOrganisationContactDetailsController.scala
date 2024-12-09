@@ -19,9 +19,9 @@ package controllers.changeContactDetails
 import config.FrontendAppConfig
 import controllers.actions._
 import controllers.{routes, ContactDetailsMissingController}
-import models.{CheckMode, UserAnswers}
 import models.requests.DataRequestWithUserAnswers
 import models.subscription.response.DisplaySubscriptionResponse
+import models.{CheckMode, UserAnswers}
 import pages._
 import pages.changeContactDetails._
 import play.api.Logging
@@ -37,7 +37,6 @@ import views.html.changeContactDetails.ChangeOrganisationContactDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class ChangeOrganisationContactDetailsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -82,13 +81,8 @@ class ChangeOrganisationContactDetailsController @Inject() (
     implicit request =>
       subscriptionService.updateOrgContactDetails(request.subscriptionId, request.userAnswers) map {
         case true =>
-          request.userAnswers.remove(ChangeContactDetailsInProgressPage) match {
-            case Success(_) =>
-              Redirect(controllers.routes.DetailsUpdatedController.onPageLoad())
-            case Failure(exception) =>
-              logger.warn(s"Failed to remove $ChangeContactDetailsInProgressPage", exception)
-              InternalServerError(errorView())
-          }
+          sessionRepository.clear(request.userId)
+          Redirect(controllers.routes.DetailsUpdatedController.onPageLoad())
         case false => InternalServerError(errorView())
       }
   }

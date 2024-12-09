@@ -71,7 +71,6 @@ class NonUKBusinessAddressWithoutIDController @Inject() (
           )
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")
-          // TODO: Change this to ThereIsAProblemController when implemented
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }
@@ -102,7 +101,6 @@ class NonUKBusinessAddressWithoutIDController @Inject() (
             )
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")
-          // TODO: Change this to ThereIsAProblemController when implemented
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }

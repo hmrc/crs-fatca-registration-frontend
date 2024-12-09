@@ -84,10 +84,10 @@ class IndIsThisYourAddressController @Inject() (
               case Some(address :: _) =>
                 for {
                   updatedAnswers                 <- Future.fromTry(request.userAnswers.set(IsThisYourAddressPage, value))
-                  userAnswersWithAddress         <- Future.fromTry(updatedAnswers.set(IndSelectAddressPage, address.format))
-                  userAnswersWithSelectedAddress <- Future.fromTry(userAnswersWithAddress.set(IndSelectedAddressLookupPage, address))
+                  updatedAnswers                 <- Future.fromTry(updatedAnswers.set(IndSelectAddressPage, address.format))
+                  userAnswersWithSelectedAddress <- Future.fromTry(updatedAnswers.set(IndSelectedAddressLookupPage, address))
                   _                              <- sessionRepository.set(userAnswersWithSelectedAddress)
-                } yield Redirect(navigator.nextPage(IsThisYourAddressPage, mode, userAnswersWithAddress))
+                } yield Redirect(navigator.nextPage(IsThisYourAddressPage, mode, userAnswersWithSelectedAddress))
               case _ =>
                 logger.error("No selected address was found")
                 Future.successful(error)

@@ -64,7 +64,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
       when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
       when(mockSubscriptionConnector.createSubscription(any())(any(), any())).thenReturn(response)
 
-      val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val address = Address("", None, "", None, None, Country("GB", "United Kingdom"))
       val userAnswers = UserAnswers("")
         .set(ReporterTypePage, ReporterType.Individual).success.value
         .set(IndDoYouHaveNINumberPage, false).success.value
@@ -87,7 +87,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
       when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
       when(mockSubscriptionConnector.createSubscription(any())(any(), any())).thenReturn(response)
 
-      val address = Address("", None, "", None, None, Country("valid", "GB", "United Kingdom"))
+      val address = Address("", None, "", None, None, Country("GB", "United Kingdom"))
       val userAnswers = UserAnswers("")
         .set(ReporterTypePage, ReporterType.Individual).success.value
         .set(IndDoYouHaveNINumberPage, false).success.value
