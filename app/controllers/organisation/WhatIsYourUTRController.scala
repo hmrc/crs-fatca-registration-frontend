@@ -38,13 +38,14 @@ class WhatIsYourUTRController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: WhatIsYourUTRFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: WhatIsYourUTRView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       val taxType = getTaxType(request.userAnswers)
       val form    = formProvider(taxType)
@@ -54,7 +55,7 @@ class WhatIsYourUTRController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, taxType))
+      Future.successful(Ok(view(preparedForm, mode, taxType)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {

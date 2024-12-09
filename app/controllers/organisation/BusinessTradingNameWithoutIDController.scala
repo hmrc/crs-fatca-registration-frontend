@@ -37,6 +37,7 @@ class BusinessTradingNameWithoutIDController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: BusinessTradingNameWithoutIDFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: BusinessTradingNameWithoutIDView
 )(implicit ec: ExecutionContext)
@@ -45,14 +46,14 @@ class BusinessTradingNameWithoutIDController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(BusinessTradingNameWithoutIDPage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Future.successful(Ok(view(preparedForm, mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {

@@ -40,6 +40,7 @@ class IndSelectAddressController @Inject() (
   formProvider: IndSelectAddressFormProvider,
   navigator: Navigator,
   sessionRepository: SessionRepository,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: IndSelectAddressView
 )(implicit ec: ExecutionContext)
@@ -50,7 +51,7 @@ class IndSelectAddressController @Inject() (
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    standardActionSets.identifiedUserWithData() {
+    (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
       implicit request =>
         request.userAnswers.get(AddressLookupPage) match {
           case Some(addresses) =>
@@ -63,11 +64,11 @@ class IndSelectAddressController @Inject() (
               address => RadioItem(content = Text(s"${address.format}"), value = Some(s"${address.format}"))
             )
 
-            Ok(view(preparedForm, radios, mode))
+            Future.successful(Ok(view(preparedForm, radios, mode)))
 
           case None =>
             logger.error("No addresses found in userAnswers.")
-            Redirect(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(mode))
+            Future.successful(Redirect(controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(mode)))
         }
     }
 

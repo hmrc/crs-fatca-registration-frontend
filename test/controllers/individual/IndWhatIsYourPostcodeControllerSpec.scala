@@ -19,10 +19,12 @@ package controllers.individual
 import base.SpecBase
 import connectors.AddressLookupConnector
 import forms.IndWhatIsYourPostcodeFormProvider
+import generators.UserAnswersGenerator
 import models.{AddressLookup, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.IndWhatIsYourPostcodePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -31,7 +33,7 @@ import views.html.individual.IndWhatIsYourPostcodeView
 
 import scala.concurrent.Future
 
-class IndWhatIsYourPostcodeControllerSpec extends SpecBase {
+class IndWhatIsYourPostcodeControllerSpec extends SpecBase with UserAnswersGenerator {
 
   val formProvider = new IndWhatIsYourPostcodeFormProvider()
   val form         = formProvider()
@@ -42,17 +44,20 @@ class IndWhatIsYourPostcodeControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      running(application) {
-        val request = FakeRequest(GET, indWhatIsYourPostcodeRoute)
+          running(application) {
+            val request = FakeRequest(GET, indWhatIsYourPostcodeRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndWhatIsYourPostcodeView]
+            val view = application.injector.instanceOf[IndWhatIsYourPostcodeView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
       }
     }
 
@@ -71,6 +76,19 @@ class IndWhatIsYourPostcodeControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Information sent when UserAnswers is empty" in {
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, indWhatIsYourPostcodeRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
       }
     }
 

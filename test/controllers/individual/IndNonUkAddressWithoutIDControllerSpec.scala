@@ -19,11 +19,13 @@ package controllers.individual
 import base.SpecBase
 import config.FrontendAppConfig
 import forms.NonUKAddressWithoutIdFormProvider
+import generators.UserAnswersGenerator
 import models.{Address, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.IndNonUKAddressWithoutIdPage
 import play.api.data.Form
 import play.api.inject.bind
@@ -34,7 +36,7 @@ import views.html.individual.IndNonUkAddressWithoutIdView
 
 import scala.concurrent.Future
 
-class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar {
+class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   private val testCountry: Country  = Country("FR", "France", Option("France"))
   val testCountryList: Seq[Country] = Seq(testCountry)
@@ -56,25 +58,28 @@ class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[CountryListFactory].to(countryListFactory)
-        )
-        .build()
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[CountryListFactory].to(countryListFactory)
+            )
+            .build()
 
-      running(application) {
-        val request = FakeRequest(GET, LoadIndNonUkAddressWithoutIDRoute)
+          running(application) {
+            val request = FakeRequest(GET, LoadIndNonUkAddressWithoutIDRoute)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndNonUkAddressWithoutIdView]
+            val view = application.injector.instanceOf[IndNonUkAddressWithoutIdView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(
-          form,
-          countryListFactory.countrySelectList(form.data, testCountryList),
-          NormalMode
-        )(request, messages(application)).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(
+              form,
+              countryListFactory.countrySelectList(form.data, testCountryList),
+              NormalMode
+            )(request, messages(application)).toString
+          }
       }
     }
 
@@ -101,6 +106,19 @@ class IndNonUkAddressWithoutIDControllerSpec extends SpecBase with MockitoSugar 
           countryListFactory.countrySelectList(form.data, testCountryList),
           NormalMode
         )(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Information sent when UserAnswers is empty" in {
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, LoadIndNonUkAddressWithoutIDRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
       }
     }
 
