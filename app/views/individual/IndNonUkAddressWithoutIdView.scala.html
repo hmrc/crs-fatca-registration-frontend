@@ -97,13 +97,7 @@
                 label = LabelViewModel(messages("addressWithoutId.countryCode")),
                 items = countries
             )
-                    .withAttribute("autocomplete" -> "country-name")
-                    .asAccessibleAutocomplete(Some(
-                AccessibleAutocomplete(
-                    defaultValue = Some(""),
-                    showAllValues = true,
-                    autoSelect = true)
-            ))
+            .withAttribute("autocomplete" -> "country-name")
         )
 
     </fieldset>

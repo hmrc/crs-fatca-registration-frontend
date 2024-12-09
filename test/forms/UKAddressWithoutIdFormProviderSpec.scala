@@ -233,7 +233,7 @@ class UKAddressWithoutIdFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      Gen.oneOf(countries.map(_.alternativeName.value))
+      Gen.oneOf(countries.map(_.code))
     )
 
     behave like fieldWithInvalidData(
