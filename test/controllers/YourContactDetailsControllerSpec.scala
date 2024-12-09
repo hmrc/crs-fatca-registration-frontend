@@ -39,15 +39,7 @@ class YourContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(ReporterTypePage, LimitedCompany)
-        .success
-        .value
-        .set(BusinessNamePage, "answer")
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, yourContactDetailsRoute)
@@ -58,19 +50,6 @@ class YourContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Information sent when UserAnswers is empty" in {
-      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, yourContactDetailsRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
       }
     }
 
