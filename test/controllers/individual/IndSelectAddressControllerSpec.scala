@@ -18,11 +18,13 @@ package controllers.individual
 
 import base.SpecBase
 import forms.IndSelectAddressFormProvider
-import models.{AddressLookup, Country, NormalMode}
+import generators.UserAnswersGenerator
+import models.{AddressLookup, Country, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.any
-import pages.AddressLookupPage
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+import pages.{AddressLookupPage, IndSelectAddressPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -33,7 +35,7 @@ import views.html.individual.IndSelectAddressView
 
 import scala.concurrent.Future
 
-class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
+class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar with UserAnswersGenerator {
 
   lazy val selectAddressRoute: String = controllers.individual.routes.IndSelectAddressController.onPageLoad(NormalMode).url
 
@@ -61,32 +63,51 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
+      when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
+
       running(application) {
         implicit val request = FakeRequest(GET, selectAddressRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndSelectAddressView]
+        val view        = application.injector.instanceOf[IndSelectAddressView]
+        val updatedForm = userAnswers.get(IndSelectAddressPage).map(form.fill).getOrElse(form)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, addressRadios, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(updatedForm, addressRadios, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to manual UK address page if there are no address matches" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-        .build()
-      running(application) {
-        val request = FakeRequest(GET, selectAddressRoute)
-        val result  = route(application, request).value
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers.remove(AddressLookupPage).success.value))
+            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+            .build()
+          running(application) {
+            val request = FakeRequest(GET, selectAddressRoute)
+            val result  = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode).url
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              controllers.individual.routes.IndUKAddressWithoutIdController.onPageLoad(NormalMode).url
+          }
       }
 
+    }
+
+    "must redirect to Information sent when UserAnswers is empty" in {
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, selectAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
+      }
     }
 
     "must redirect to the next page when valid data is submitted" in {

@@ -39,6 +39,7 @@ class IndNonUKAddressWithoutIdController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: NonUKAddressWithoutIdFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: IndNonUkAddressWithoutIdView
 )(implicit ec: ExecutionContext)
@@ -48,7 +49,7 @@ class IndNonUKAddressWithoutIdController @Inject() (
 
   val countriesList: Option[Seq[Country]] = countryListFactory.countryListWithoutUKCountries
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       countriesList match {
         case Some(countries) =>
@@ -57,17 +58,19 @@ class IndNonUKAddressWithoutIdController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-
-          Ok(
-            view(
-              preparedForm,
-              countryListFactory.countrySelectList(preparedForm.data, countries),
-              mode
+          Future.successful(
+            Ok(
+              view(
+                preparedForm,
+                countryListFactory.countrySelectList(preparedForm.data, countries),
+                mode
+              )
             )
           )
+
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 

@@ -27,6 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CountryListFactory
+import views.html.ThereIsAProblemView
 import views.html.organisation.NonUKBusinessAddressWithoutIDView
 
 import javax.inject.Inject
@@ -39,6 +40,8 @@ class NonUKBusinessAddressWithoutIDController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: NonUKBusinessAddressWithoutIdFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
+  errorView: ThereIsAProblemView,
   val controllerComponents: MessagesControllerComponents,
   view: NonUKBusinessAddressWithoutIDView
 )(implicit ec: ExecutionContext)
@@ -48,7 +51,7 @@ class NonUKBusinessAddressWithoutIDController @Inject() (
 
   private val countriesList: Option[Seq[Country]] = countryListFactory.countryListWithoutGB
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       countriesList match {
         case Some(countries) =>
@@ -57,17 +60,18 @@ class NonUKBusinessAddressWithoutIDController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-
-          Ok(
-            view(
-              preparedForm,
-              countryListFactory.countrySelectList(preparedForm.data, countries),
-              mode
+          Future.successful(
+            Ok(
+              view(
+                preparedForm,
+                countryListFactory.countrySelectList(preparedForm.data, countries),
+                mode
+              )
             )
           )
         case None =>
           logger.error("Could not retrieve countries list from JSON file.")
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 
