@@ -24,7 +24,9 @@ case class RequestWithoutIDDetails(organisation: Option[NoIdOrganisation],
                                    individual: Option[Individual],
                                    address: AddressRequest,
                                    contactDetails: ContactDetails,
-                                   identification: Option[Identification]
+                                   identification: Option[Identification],
+                                   isAGroup: Boolean,
+                                   isAnAgent: Boolean
 )
 
 object RequestWithoutIDDetails {
