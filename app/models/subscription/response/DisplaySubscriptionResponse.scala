@@ -21,10 +21,10 @@ import models.subscription.request.OrganisationDetails
 import play.api.libs.json.{Json, OFormat}
 
 case class DisplaySubscriptionResponse(success: DisplayResponseDetail) {
-  def subscriptionId: SubscriptionID = SubscriptionID(success.id)
+  def subscriptionId: SubscriptionID = SubscriptionID(success.crfaSubscriptionDetails.crfaReference)
 
   val registrationType: RegistrationType =
-    success.primaryContact.contactInformation match {
+    success.crfaSubscriptionDetails.primaryContact.contactInformation match {
       case OrganisationDetails(_) => OrganisationRegistrationType
       case _                      => IndividualRegistrationType
     }

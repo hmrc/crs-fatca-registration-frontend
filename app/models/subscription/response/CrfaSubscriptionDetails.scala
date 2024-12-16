@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,16 @@
 
 package models.subscription.response
 
+import models.subscription.request.ContactInformation
 import play.api.libs.json.{Json, OFormat}
 
-case class DisplayResponseDetail(crfaSubscriptionDetails: CrfaSubscriptionDetails)
+case class CrfaSubscriptionDetails(crfaReference: String,
+                                   tradingName: Option[String],
+                                   gbUser: Boolean,
+                                   primaryContact: ContactInformation,
+                                   secondaryContact: Option[ContactInformation]
+)
 
-object DisplayResponseDetail {
-  implicit val format: OFormat[DisplayResponseDetail] = Json.format[DisplayResponseDetail]
+object CrfaSubscriptionDetails {
+  implicit lazy val format: OFormat[CrfaSubscriptionDetails] = Json.format[CrfaSubscriptionDetails]
 }
