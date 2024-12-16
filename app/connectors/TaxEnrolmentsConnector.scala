@@ -40,7 +40,7 @@ class TaxEnrolmentsConnector @Inject() (
     enrolmentInfo: SubscriptionInfo
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, Int] = {
 
-    val url = url"${config.taxEnrolmentsUrl1}${config.enrolmentKey}${config.taxEnrolmentsUrl2}"
+    val url = url"${config.taxEnrolmentsUrl1}/${config.enrolmentKey}/${config.taxEnrolmentsUrl2}"
 
     val enrolmentRequest = Json.toJson(enrolmentInfo.convertToEnrolmentRequest)
 
