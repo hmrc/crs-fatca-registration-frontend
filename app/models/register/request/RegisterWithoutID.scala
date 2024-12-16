@@ -35,7 +35,7 @@ object RegisterWithoutID {
     RegisterWithoutID(
       RegisterWithoutIDRequest(
         RequestCommon(Regime.CRFA.toString),
-        RequestWithoutIDDetails(None, Option(Individual(name, dob)), AddressRequest(address), contactDetails, None)
+        RequestWithoutIDDetails(None, Option(Individual(name, dob)), AddressRequest(address), contactDetails, None, isAGroup = false, isAnAgent = false)
       )
     )
 
@@ -43,7 +43,14 @@ object RegisterWithoutID {
     RegisterWithoutID(
       RegisterWithoutIDRequest(
         RequestCommon(Regime.CRFA.toString),
-        RequestWithoutIDDetails(Option(organisationName).map(NoIdOrganisation(_)), None, AddressRequest(address), contactDetails, None)
+        RequestWithoutIDDetails(Option(organisationName).map(NoIdOrganisation(_)),
+                                None,
+                                AddressRequest(address),
+                                contactDetails,
+                                None,
+                                isAGroup = false,
+                                isAnAgent = false
+        )
       )
     )
 
