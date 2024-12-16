@@ -25,14 +25,16 @@ import models.register.request.{RegisterWithID, RegisterWithoutID}
 import models.register.response.{RegistrationWithIDResponse, RegistrationWithoutIDResponse}
 import play.api.Logging
 import play.api.http.Status._
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationConnector @Inject() (val config: FrontendAppConfig, val http: HttpClient) extends Logging {
+class RegistrationConnector @Inject() (val config: FrontendAppConfig, val http: HttpClientV2) extends Logging {
 
   val submissionUrl = s"${config.businessMatchingUrl}/registration"
 
@@ -51,11 +53,15 @@ class RegistrationConnector @Inject() (val config: FrontendAppConfig, val http: 
     endpoint: String
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, RegistrationWithIDResponse] =
     EitherT {
-      http.POST[RegisterWithID, HttpResponse](s"$submissionUrl$endpoint", registration) map {
-        case responseMessage if is2xx(responseMessage.status) =>
-          Right(responseMessage.json.as[RegistrationWithIDResponse])
-        case responseMessage => handleError(responseMessage, endpoint)
-      }
+      http
+        .post(url"$submissionUrl$endpoint")
+        .withBody(Json.toJson(registration))
+        .execute[HttpResponse]
+        .map {
+          case responseMessage if is2xx(responseMessage.status) =>
+            Right(responseMessage.json.as[RegistrationWithIDResponse])
+          case responseMessage => handleError(responseMessage, endpoint)
+        }
     }
 
   def withIndividualNoId(
@@ -72,16 +78,19 @@ class RegistrationConnector @Inject() (val config: FrontendAppConfig, val http: 
     registration: RegisterWithoutID,
     endpoint: String
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ApiError, SafeId]] =
-    http.POST[RegisterWithoutID, HttpResponse](s"$submissionUrl$endpoint", registration) map {
-      case responseMessage if is2xx(responseMessage.status) =>
-        responseMessage.json.as[RegistrationWithoutIDResponse].registerWithoutIDResponse.safeId match {
-          case Some(safeId) => Right(safeId)
-          case _ =>
-            logger.warn(s"Error in registration with $endpoint: safeId is missing.")
-            Left(NotFoundError)
-        }
-      case responseMessage => handleError(responseMessage, endpoint)
-    }
+    http.post(url"$submissionUrl$endpoint")
+      .withBody(Json.toJson(registration))
+      .execute[HttpResponse]
+      .map {
+        case responseMessage if is2xx(responseMessage.status) =>
+          responseMessage.json.as[RegistrationWithoutIDResponse].registerWithoutIDResponse.safeId match {
+            case Some(safeId) => Right(safeId)
+            case _ =>
+              logger.warn(s"Error in registration with $endpoint: safeId is missing.")
+              Left(NotFoundError)
+          }
+        case responseMessage => handleError(responseMessage, endpoint)
+      }
 
   def handleError[A](responseMessage: HttpResponse, endpoint: String): Either[ApiError, A] =
     responseMessage.status match {

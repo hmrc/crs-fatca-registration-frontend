@@ -22,38 +22,42 @@ import models.enrolment.SubscriptionInfo
 import models.error.ApiError
 import models.error.ApiError.{ServiceUnavailableError, UnableToCreateEnrolmentError}
 import play.api.Logging
-import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpErrorFunctions.{is2xx, is4xx}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class TaxEnrolmentsConnector @Inject() (
   val config: FrontendAppConfig,
-  val http: HttpClient
+  val http: HttpClientV2
 ) extends Logging {
 
   def createEnrolment(
     enrolmentInfo: SubscriptionInfo
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, Int] = {
 
-    val url: String = s"${config.taxEnrolmentsUrl1}${config.enrolmentKey}${config.taxEnrolmentsUrl2}"
+    val url = url"${config.taxEnrolmentsUrl1}${config.enrolmentKey}${config.taxEnrolmentsUrl2}"
 
-    val json = Json.toJson(enrolmentInfo.convertToEnrolmentRequest)
+    val enrolmentRequest = Json.toJson(enrolmentInfo.convertToEnrolmentRequest)
 
     EitherT {
-      http.PUT[JsValue, HttpResponse](url, json) map {
-        case responseMessage if is2xx(responseMessage.status) =>
-          Right(responseMessage.status)
-        case responseMessage if is4xx(responseMessage.status) =>
-          logger.error(s"Error with tax-enrolments call  ${responseMessage.status} : ${responseMessage.body}")
-          Left(UnableToCreateEnrolmentError)
-        case responseMessage =>
-          logger.error(s"Service error when creating enrolment  ${responseMessage.status} : ${responseMessage.body}")
-          Left(ServiceUnavailableError)
-      }
+      http.put(url)
+        .withBody(Json.toJson(enrolmentRequest))
+        .execute[HttpResponse]
+        .map {
+          case responseMessage if is2xx(responseMessage.status) =>
+            Right(responseMessage.status)
+          case responseMessage if is4xx(responseMessage.status) =>
+            logger.error(s"Error with tax-enrolments call  ${responseMessage.status} : ${responseMessage.body}")
+            Left(UnableToCreateEnrolmentError)
+          case responseMessage =>
+            logger.error(s"Service error when creating enrolment  ${responseMessage.status} : ${responseMessage.body}")
+            Left(ServiceUnavailableError)
+        }
     }
   }
 
