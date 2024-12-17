@@ -41,11 +41,10 @@ object ApiError {
 
   def convertToErrorCode(apiError: ApiError): Int =
     apiError match {
-      case NotFoundError            => Status.NOT_FOUND
-      case UnprocessableEntityError => Status.UNPROCESSABLE_ENTITY
-      case BadRequestError          => Status.BAD_REQUEST
-      case ServiceUnavailableError  => Status.SERVICE_UNAVAILABLE
-      case _                        => Status.INTERNAL_SERVER_ERROR
+      case NotFoundError           => Status.NOT_FOUND
+      case BadRequestError         => Status.BAD_REQUEST
+      case ServiceUnavailableError => Status.SERVICE_UNAVAILABLE
+      case _                       => Status.INTERNAL_SERVER_ERROR
     }
 
   case object BadRequestError extends ApiError
