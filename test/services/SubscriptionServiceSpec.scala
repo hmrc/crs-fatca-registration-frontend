@@ -169,12 +169,12 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
         forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails], validPhoneNumber(PhoneNumberLength)) {
           (subscription, organisationDetails, contactPhoneNumber) =>
             val subscriptionResponse = subscription
-              .modify(_.success.primaryContact.contactInformation).setTo(organisationDetails)
-              .modify(_.success.secondaryContact).setTo(None)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation).setTo(organisationDetails)
+              .modify(_.success.crfaSubscriptionDetails.secondaryContact).setTo(None)
 
             val userAnswers = emptyUserAnswers
               .withPage(OrganisationContactNamePage, name.fullName)
-              .withPage(OrganisationContactEmailPage, subscription.success.primaryContact.email)
+              .withPage(OrganisationContactEmailPage, subscription.success.crfaSubscriptionDetails.primaryContact.email)
               .withPage(OrganisationContactHavePhonePage, true)
               .withPage(OrganisationContactPhonePage, contactPhoneNumber)
               .withPage(OrganisationHaveSecondContactPage, false)
@@ -193,12 +193,12 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
         forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails]) {
           (subscription, organisationDetails) =>
             val subscriptionResponse = subscription
-              .modify(_.success.primaryContact.contactInformation)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation)
               .setTo(organisationDetails)
 
             val userAnswers = emptyUserAnswers
               .withPage(OrganisationContactNamePage, name.fullName)
-              .withPage(OrganisationContactEmailPage, subscription.success.primaryContact.email)
+              .withPage(OrganisationContactEmailPage, subscription.success.crfaSubscriptionDetails.primaryContact.email)
               .withPage(OrganisationContactHavePhonePage, true)
               .withPage(OrganisationHaveSecondContactPage, false)
 
@@ -225,16 +225,16 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
         forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails], validPhoneNumber(PhoneNumberLength)) {
           (subscription, organisationDetails, phoneNumber) =>
             val subscriptionResponse = subscription
-              .modify(_.success.primaryContact.contactInformation)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation)
               .setTo(organisationDetails)
-              .modify(_.success.primaryContact.phone)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.phone)
               .setTo(Some(phoneNumber))
-              .modify(_.success.secondaryContact)
+              .modify(_.success.crfaSubscriptionDetails.secondaryContact)
               .setTo(None)
 
             val userAnswers = emptyUserAnswers
               .withPage(OrganisationContactNamePage, organisationDetails.name)
-              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.primaryContact.email)
+              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.crfaSubscriptionDetails.primaryContact.email)
               .withPage(OrganisationContactHavePhonePage, true)
               .withPage(OrganisationContactPhonePage, phoneNumber)
               .withPage(OrganisationHaveSecondContactPage, false)
@@ -256,12 +256,12 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
         ) {
           (subscription, organisationDetails, contactPhoneNumber, secondContactEmail, secondContactPhoneNumber, secondContactName) =>
             val subscriptionResponse = subscription
-              .modify(_.success.primaryContact.contactInformation)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation)
               .setTo(organisationDetails)
 
             val userAnswers = emptyUserAnswers
               .withPage(OrganisationContactNamePage, name.fullName)
-              .withPage(OrganisationContactEmailPage, subscription.success.primaryContact.email)
+              .withPage(OrganisationContactEmailPage, subscription.success.crfaSubscriptionDetails.primaryContact.email)
               .withPage(OrganisationContactHavePhonePage, true)
               .withPage(OrganisationContactPhonePage, contactPhoneNumber)
               .withPage(OrganisationHaveSecondContactPage, true)
@@ -286,16 +286,16 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
         ) {
           (subscription, contactPhoneNumber, secondContactEmail, secondContactPhoneNumber, secondContactName) =>
             val subscriptionResponse = subscription
-              .modify(_.success.primaryContact.contactInformation)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation)
               .setTo(OrganisationDetails(name.fullName))
-              .modify(_.success.primaryContact.phone)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.phone)
               .setTo(Some(contactPhoneNumber))
-              .modify(_.success.secondaryContact)
+              .modify(_.success.crfaSubscriptionDetails.secondaryContact)
               .setTo(None)
 
             val userAnswers = emptyUserAnswers
               .withPage(OrganisationContactNamePage, name.fullName)
-              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.primaryContact.email)
+              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.crfaSubscriptionDetails.primaryContact.email)
               .withPage(OrganisationContactHavePhonePage, true)
               .withPage(OrganisationContactPhonePage, contactPhoneNumber)
               .withPage(OrganisationHaveSecondContactPage, true)
@@ -319,18 +319,18 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
         ) {
           (subscription, contactEmail, contactPhoneNumber, secondContactEmail) =>
             val subscriptionResponse = subscription
-              .modify(_.success.primaryContact.contactInformation)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation)
               .setTo(OrganisationDetails(name.fullName))
-              .modify(_.success.primaryContact.email)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.email)
               .setTo(contactEmail)
-              .modify(_.success.primaryContact.phone)
+              .modify(_.success.crfaSubscriptionDetails.primaryContact.phone)
               .setTo(Some(contactPhoneNumber))
-              .modify(_.success.secondaryContact)
+              .modify(_.success.crfaSubscriptionDetails.secondaryContact)
               .setTo(Some(ContactInformation(OrganisationDetails(name.fullName), secondContactEmail, phone = None)))
 
             val userAnswers = emptyUserAnswers
               .withPage(OrganisationContactNamePage, name.fullName)
-              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.primaryContact.email)
+              .withPage(OrganisationContactEmailPage, subscriptionResponse.success.crfaSubscriptionDetails.primaryContact.email)
               .withPage(OrganisationContactHavePhonePage, true)
               .withPage(OrganisationContactPhonePage, contactPhoneNumber)
               .withPage(OrganisationHaveSecondContactPage, false)

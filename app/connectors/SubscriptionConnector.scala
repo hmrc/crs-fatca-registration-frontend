@@ -20,11 +20,18 @@ import cats.data.EitherT
 import config.FrontendAppConfig
 import models.SubscriptionID
 import models.error.ApiError
-import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
+import models.error.ApiError.{
+  BadRequestError,
+  DuplicateSubmissionError,
+  NotFoundError,
+  ServiceUnavailableError,
+  UnableToCreateEMTPSubscriptionError,
+  UnprocessableEntityError
+}
 import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest, UpdateSubscriptionRequest}
 import models.subscription.response.{CreateSubscriptionResponse, DisplaySubscriptionResponse}
 import play.api.Logging
-import play.api.http.Status.{BAD_REQUEST, CONFLICT, NOT_FOUND, SERVICE_UNAVAILABLE}
+import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, SERVICE_UNAVAILABLE, UNPROCESSABLE_ENTITY}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
@@ -77,9 +84,9 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
               case Some(response) => Right(response.subscriptionId)
               case _              => Left(UnableToCreateEMTPSubscriptionError)
             }
-          case response if response.status equals CONFLICT =>
+          case response if response.status equals UNPROCESSABLE_ENTITY =>
             logger.warn(s"Duplicate submission to ETMP. ${response.status} response status")
-            Left(DuplicateSubmissionError)
+            Left(UnprocessableEntityError)
           case response =>
             logger.warn(s"Unable to create a subscription to ETMP. ${response.status} response status")
             handleError(response)
@@ -108,6 +115,8 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
         Left(BadRequestError)
       case SERVICE_UNAVAILABLE =>
         Left(ServiceUnavailableError)
+      case UNPROCESSABLE_ENTITY =>
+        Left(UnprocessableEntityError)
       case _ =>
         Left(UnableToCreateEMTPSubscriptionError)
     }
