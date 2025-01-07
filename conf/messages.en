@@ -337,7 +337,7 @@ doYouHaveUniqueTaxPayerReference.heading = Do you have a UK Unique Taxpayer Refe
 doYouHaveUniqueTaxPayerReference.p1 = You can {0}.
 doYouHaveUniqueTaxPayerReference.p1.link = find a lost UTR
 doYouHaveUniqueTaxPayerReference.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax and Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
-doYouHaveUniqueTaxPayerReference.error.required = Select yes if you have a UTR
+doYouHaveUniqueTaxPayerReference.error.required = Select yes if you have a Unique Taxpayer Reference
 
 
 businessName.title.llp = What is the registered name of your business?
