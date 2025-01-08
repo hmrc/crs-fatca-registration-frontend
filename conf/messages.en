@@ -58,8 +58,10 @@ signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We did not save your answers.
 
-unauthorised.title = You can’t access this service with this account
-unauthorised.heading = You can’t access this service with this account
+unauthorised.title = You cannot access this page
+unauthorised.heading = You cannot access this page
+unauthorised.link = Back to send a CRS or FATCA report
+unauthorised.emailLink = You can email {0} if you need support with using the service.
 
 yourContactDetails.title = Setting up contact details for CRS and FATCA
 yourContactDetails.heading = Setting up contact details for CRS and FATCA
