@@ -31,8 +31,8 @@ appConfig: FrontendAppConfig
 
 <p class="govuk-body">@messages("individualAlreadyRegistered.p1")</p>
 
-<p class="govuk-body">@link(appConfig.loginUrl, "individualAlreadyRegistered.link", openInNewWindow = true)</p>
+<p class="govuk-body">@link(appConfig.loginUrl, "individualAlreadyRegistered.link", openInNewWindow = false)</p>
 
-<p class="govuk-body">@Html(messages("individualAlreadyRegistered.p2" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.email", openInNewWindow = true)))</p>
+<p class="govuk-body">@Html(messages("individualAlreadyRegistered.p2" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.email", openInNewWindow = false)))</p>
 
 }
