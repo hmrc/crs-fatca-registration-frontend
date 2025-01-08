@@ -21,8 +21,9 @@ import cats.data.EitherT
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.ModelGenerators
+import helpers.JsonFixtures.{safeId, TestEmail, TestPhoneNumber}
 import helpers.WireMockServerHandler
-import models.SubscriptionID
+import models.{IdentifierType, SubscriptionID}
 import models.error.ApiError
 import models.error.ApiError.{
   BadRequestError,
@@ -32,7 +33,7 @@ import models.error.ApiError.{
   UnableToCreateEMTPSubscriptionError,
   UnprocessableEntityError
 }
-import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
+import models.subscription.request.{ContactInformation, CreateSubscriptionRequest, IndividualDetails, ReadSubscriptionRequest}
 import models.subscription.response.DisplaySubscriptionResponse
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -182,8 +183,22 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
       }
 
       "must return UnableToCreateEMTPSubscriptionError when submission to backend fails" in {
-        val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
-        val errorCode                 = errorCodes.sample.value
+        val createSubscriptionRequest = CreateSubscriptionRequest(
+          idType = IdentifierType.SAFE,
+          idNumber = safeId.value,
+          tradingName = None,
+          gbUser = true,
+          primaryContact = ContactInformation(
+            contactInformation = IndividualDetails(
+              firstName = "test",
+              lastName = "testLast"
+            ),
+            email = TestEmail,
+            phone = Some(TestPhoneNumber)
+          ),
+          secondaryContact = None
+        )
+        val errorCode = errorCodes.sample.value
 
         val subscriptionErrorResponse: String =
           s"""
