@@ -89,14 +89,21 @@ class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with
   val registrationWithoutOrganisationIDPayload: RegisterWithoutID = RegisterWithoutID(
     RegisterWithoutIDRequest(
       requestCommon,
-      RequestWithoutIDDetails(Some(NoIdOrganisation(OrgName)), None, addressRequest, contactDetails, None)
+      RequestWithoutIDDetails(Some(NoIdOrganisation(OrgName)), None, addressRequest, contactDetails, None, isAGroup = false, isAnAgent = false)
     )
   )
 
   val registrationWithoutIndividualIDPayload: RegisterWithoutID = RegisterWithoutID(
     RegisterWithoutIDRequest(
       requestCommon,
-      RequestWithoutIDDetails(None, Some(Individual(Name(FirstName, LastName), LocalDate.parse(TestDate, formatter))), addressRequest, contactDetails, None)
+      RequestWithoutIDDetails(None,
+                              Some(Individual(Name(FirstName, LastName), LocalDate.parse(TestDate, formatter))),
+                              addressRequest,
+                              contactDetails,
+                              None,
+                              isAGroup = false,
+                              isAnAgent = false
+      )
     )
   )
 

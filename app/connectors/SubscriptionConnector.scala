@@ -20,28 +20,39 @@ import cats.data.EitherT
 import config.FrontendAppConfig
 import models.SubscriptionID
 import models.error.ApiError
-import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
+import models.error.ApiError.{
+  BadRequestError,
+  DuplicateSubmissionError,
+  NotFoundError,
+  ServiceUnavailableError,
+  UnableToCreateEMTPSubscriptionError,
+  UnprocessableEntityError
+}
 import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest, UpdateSubscriptionRequest}
 import models.subscription.response.{CreateSubscriptionResponse, DisplaySubscriptionResponse}
 import play.api.Logging
-import play.api.http.Status.{BAD_REQUEST, CONFLICT, NOT_FOUND, SERVICE_UNAVAILABLE}
-import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
+import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, SERVICE_UNAVAILABLE, UNPROCESSABLE_ENTITY}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: HttpClient) extends Logging {
+class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: HttpClientV2) extends Logging {
 
   def readSubscription(
     readSubscriptionRequest: ReadSubscriptionRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[DisplaySubscriptionResponse]] = {
 
-    val submissionUrl = s"${config.businessMatchingUrl}/subscription/read-subscription"
+    val submissionUrl = url"${config.businessMatchingUrl}/subscription/read-subscription"
 
     http
-      .POST[ReadSubscriptionRequest, HttpResponse](submissionUrl, readSubscriptionRequest)
+      .post(submissionUrl)
+      .withBody(Json.toJson(readSubscriptionRequest))
+      .execute[HttpResponse]
       .map {
         case responseMessage if is2xx(responseMessage.status) =>
           responseMessage.json
@@ -61,22 +72,21 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
     createSubscriptionRequest: CreateSubscriptionRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, SubscriptionID] = {
 
-    val submissionUrl = s"${config.businessMatchingUrl}/subscription/create-subscription"
+    val submissionUrl = url"${config.businessMatchingUrl}/subscription/create-subscription"
     EitherT {
       http
-        .POST[CreateSubscriptionRequest, HttpResponse](
-          submissionUrl,
-          createSubscriptionRequest
-        )(wts = CreateSubscriptionRequest.writes, rds = readRaw, hc = hc, ec = ec)
+        .post(submissionUrl)
+        .withBody(Json.toJson(createSubscriptionRequest))
+        .execute[HttpResponse]
         .map {
           case response if is2xx(response.status) =>
             response.json.asOpt[CreateSubscriptionResponse] match {
               case Some(response) => Right(response.subscriptionId)
               case _              => Left(UnableToCreateEMTPSubscriptionError)
             }
-          case response if response.status equals CONFLICT =>
+          case response if response.status equals UNPROCESSABLE_ENTITY =>
             logger.warn(s"Duplicate submission to ETMP. ${response.status} response status")
-            Left(DuplicateSubmissionError)
+            Left(UnprocessableEntityError)
           case response =>
             logger.warn(s"Unable to create a subscription to ETMP. ${response.status} response status")
             handleError(response)
@@ -85,9 +95,11 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
   }
 
   def updateSubscription(requestDetail: UpdateSubscriptionRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
-    val updateSubscriptionUrl = s"${config.businessMatchingUrl}/subscription/update-subscription"
+    val updateSubscriptionUrl = url"${config.businessMatchingUrl}/subscription/update-subscription"
     http
-      .PUT[UpdateSubscriptionRequest, HttpResponse](updateSubscriptionUrl, requestDetail)
+      .put(updateSubscriptionUrl)
+      .withBody(Json.toJson(requestDetail))
+      .execute[HttpResponse]
       .map {
         responseMessage =>
           logger.info(s"updateSubscription: Status ${responseMessage.status} has been received when update subscription was called")
@@ -103,6 +115,8 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
         Left(BadRequestError)
       case SERVICE_UNAVAILABLE =>
         Left(ServiceUnavailableError)
+      case UNPROCESSABLE_ENTITY =>
+        Left(UnprocessableEntityError)
       case _ =>
         Left(UnableToCreateEMTPSubscriptionError)
     }

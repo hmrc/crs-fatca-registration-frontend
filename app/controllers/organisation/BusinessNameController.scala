@@ -16,13 +16,14 @@
 
 package controllers.organisation
 
-import controllers.actions.StandardActionSets
+import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
 import forms.BusinessNameFormProvider
 import models.ReporterType._
 import models.{Mode, ReporterType}
 import navigation.Navigator
 import pages.{BusinessNamePage, ReporterTypePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -37,6 +38,7 @@ class BusinessNameController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: BusinessNameFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: BusinessNameView
 )(implicit ec: ExecutionContext)
@@ -52,7 +54,9 @@ class BusinessNameController @Inject() (
     }
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    standardActionSets.identifiedUserWithDependantAnswer(ReporterTypePage).async {
+    (standardActionSets.identifiedUserWithData() andThen checkForSubmission andThen standardActionSets.identifiedUserWithDependantAnswer(
+      ReporterTypePage
+    )) async {
       implicit request =>
         selectedReporterTypeText(request.userAnswers.get(ReporterTypePage).get) match {
           case Some(businessTypeText) =>
@@ -62,7 +66,8 @@ class BusinessNameController @Inject() (
               case Some(value) => form.fill(value)
             }
             Future.successful(Ok(view(preparedForm, mode, businessTypeText)))
-          case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          case _ =>
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
     }
 

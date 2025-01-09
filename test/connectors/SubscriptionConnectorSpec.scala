@@ -21,11 +21,19 @@ import cats.data.EitherT
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.ModelGenerators
+import helpers.JsonFixtures.{safeId, TestEmail, TestPhoneNumber}
 import helpers.WireMockServerHandler
-import models.SubscriptionID
+import models.{IdentifierType, SubscriptionID}
 import models.error.ApiError
-import models.error.ApiError.{BadRequestError, DuplicateSubmissionError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError}
-import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest}
+import models.error.ApiError.{
+  BadRequestError,
+  DuplicateSubmissionError,
+  NotFoundError,
+  ServiceUnavailableError,
+  UnableToCreateEMTPSubscriptionError,
+  UnprocessableEntityError
+}
+import models.subscription.request.{ContactInformation, CreateSubscriptionRequest, IndividualDetails, ReadSubscriptionRequest}
 import models.subscription.response.DisplaySubscriptionResponse
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -46,7 +54,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
     )
     .build()
 
-  private val seqOfCodes                    = Seq(400, 404, 403, 500, 501, 502, 503, 504)
+  private val seqOfCodes                    = Seq(400, 403, 404, 422, 500, 501, 502, 503, 504)
   lazy val connector: SubscriptionConnector = application.injector.instanceOf[SubscriptionConnector]
   private val subscriptionUrl               = "/crs-fatca-registration/subscription"
   private val errorCodes: Gen[Int]          = Gen.oneOf(seqOfCodes)
@@ -93,8 +101,8 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         val subscriptionResponse = Json.obj(
           "success" -> Json.obj(
-            "processingDate"    -> "2020-01-01T00:00:00Z",
-            "crsFatcaReference" -> "Subscription 123"
+            "processingDate" -> "2020-01-01T00:00:00Z",
+            "crfaReference"  -> "Subscription 123"
           )
         )
 
@@ -109,8 +117,8 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         val subscriptionResponse = Json.obj(
           "failure" -> Json.obj(
-            "processingDate"    -> "2020-01-01T00:00:00Z",
-            "crsFatcaReference" -> "Subscription 123"
+            "processingDate" -> "2020-01-01T00:00:00Z",
+            "crfaReference"  -> "Subscription 123"
           )
         )
 
@@ -168,15 +176,29 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
              |  }
              |""".stripMargin
 
-        stubPostResponse("/create-subscription", CONFLICT, subscriptionErrorResponse)
+        stubPostResponse("/create-subscription", UNPROCESSABLE_ENTITY, subscriptionErrorResponse)
 
         val result = connector.createSubscription(createSubscriptionRequest)
-        result.value.futureValue mustBe Left(DuplicateSubmissionError)
+        result.value.futureValue mustBe Left(UnprocessableEntityError)
       }
 
       "must return UnableToCreateEMTPSubscriptionError when submission to backend fails" in {
-        val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
-        val errorCode                 = errorCodes.sample.value
+        val createSubscriptionRequest = CreateSubscriptionRequest(
+          idType = IdentifierType.SAFE,
+          idNumber = safeId.value,
+          tradingName = None,
+          gbUser = true,
+          primaryContact = ContactInformation(
+            contactInformation = IndividualDetails(
+              firstName = "test",
+              lastName = "testLast"
+            ),
+            email = TestEmail,
+            phone = Some(TestPhoneNumber)
+          ),
+          secondaryContact = None
+        )
+        val errorCode = errorCodes.sample.value
 
         val subscriptionErrorResponse: String =
           s"""

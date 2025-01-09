@@ -31,6 +31,7 @@ object ApiError {
       case (_, _, response) =>
         response.status match {
           case status if status == 404                 => HttpReads.pure(Left(NotFoundError))
+          case status if status == 422                 => HttpReads.pure(Left(UnprocessableEntityError))
           case status if is4xx(status)                 => HttpReads.pure(Left(BadRequestError))
           case status if status == SERVICE_UNAVAILABLE => HttpReads.pure(Left(ServiceUnavailableError))
           case status if is5xx(status)                 => HttpReads.pure(Left(InternalServerError))
@@ -49,6 +50,8 @@ object ApiError {
   case object BadRequestError extends ApiError
 
   case object NotFoundError extends ApiError
+
+  case object UnprocessableEntityError extends ApiError
 
   case object ServiceUnavailableError extends ApiError
 

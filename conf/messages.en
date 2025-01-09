@@ -17,7 +17,7 @@ date.month = Month
 date.year = Year
 
 timeout.title = You’re about to be signed out
-timeout.message = For security reasons, you will be signed out of this service in
+timeout.message = For your security, we will sign you out in
 timeout.keepAlive = Stay signed in
 timeout.signOut = Sign out
 
@@ -58,8 +58,10 @@ signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We did not save your answers.
 
-unauthorised.title = You can’t access this service with this account
-unauthorised.heading = You can’t access this service with this account
+unauthorised.title = You cannot access this page
+unauthorised.heading = You cannot access this page
+unauthorised.link = Back to send a CRS or FATCA report
+unauthorised.emailLink = You can email {0} if you need support with using the service.
 
 yourContactDetails.title = Setting up contact details for CRS and FATCA
 yourContactDetails.heading = Setting up contact details for CRS and FATCA
@@ -337,7 +339,7 @@ doYouHaveUniqueTaxPayerReference.heading = Do you have a UK Unique Taxpayer Refe
 doYouHaveUniqueTaxPayerReference.p1 = You can {0}.
 doYouHaveUniqueTaxPayerReference.p1.link = find a lost UTR
 doYouHaveUniqueTaxPayerReference.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax and Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
-doYouHaveUniqueTaxPayerReference.error.required = Select yes if you have a UTR
+doYouHaveUniqueTaxPayerReference.error.required = Select yes if you have a Unique Taxpayer Reference
 
 
 businessName.title.llp = What is the registered name of your business?

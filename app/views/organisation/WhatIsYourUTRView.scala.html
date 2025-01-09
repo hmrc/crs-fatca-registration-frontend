@@ -33,13 +33,13 @@
 
     @formHelper(action = controllers.organisation.routes.WhatIsYourUTRController.onSubmit(mode)) {
 
-        <h1 class="govuk-heading-l">@messages("whatIsYourUTR.heading", taxType)</h1>
-
-        <p class="govuk-body">@Html(messages("whatIsYourUTR.p1" , link(appConfig.lostUTRUrl, "whatIsYourUTR.p1.link")))</p>
-
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
+
+        <h1 class="govuk-heading-l">@messages("whatIsYourUTR.heading", taxType)</h1>
+
+        <p class="govuk-body">@Html(messages("whatIsYourUTR.p1" , link(appConfig.lostUTRUrl, "whatIsYourUTR.p1.link")))</p>
 
         @govukInput(
             InputViewModel(

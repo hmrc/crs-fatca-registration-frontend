@@ -107,14 +107,14 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
     val subscriptionDetailFromBackend = subscriptionResponseFromBackend.success
     for {
       primaryContactDetailsFromUserAnswers <- getIndividualContactDetailsFromUserAnswers(userAnswers, subscriptionDetailFromBackend)
-      primaryContactHasChanged = !primaryContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.primaryContact)
+      primaryContactHasChanged = !primaryContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.crfaSubscriptionDetails.primaryContact)
     } yield primaryContactHasChanged
   }
 
   def populateUserAnswersFromIndSubscription(userAnswers: UserAnswers, responseDetail: DisplayResponseDetail): Option[UserAnswers] =
     for {
       contactSet: UserAnswers <-
-        populateUserAnswersFromIndContactInfo[ChangeIndividualContactDetailsPages](userAnswers, responseDetail.primaryContact)
+        populateUserAnswersFromIndContactInfo[ChangeIndividualContactDetailsPages](userAnswers, responseDetail.crfaSubscriptionDetails.primaryContact)
     } yield contactSet
 
   private def populateUserAnswersFromIndContactInfo[T <: ContactTypePage](
@@ -136,7 +136,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
   ): Option[ContactInformation] =
     getContactDetailsFromUserAnswers[ChangeIndividualContactDetailsPages](
       userAnswers,
-      subscriptionDetailFromBackend.primaryContact.contactInformation
+      subscriptionDetailFromBackend.crfaSubscriptionDetails.primaryContact.contactInformation
     )
 
   // ORGANISATION
@@ -150,17 +150,18 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
     for {
       primaryContactDetailsFromUserAnswers <- getOrgPrimaryContactDetailsFromUserAnswers(userAnswers, subscriptionDetailFromBackend)
       secondContactDetailsFromUserAnswers = getOrgSecondContactDetailsFromUserAnswers(userAnswers, subscriptionDetailFromBackend)
-      primaryContactHasChanged            = !primaryContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.primaryContact)
-      secondContactHasChanged             = !secondContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.secondaryContact)
+      primaryContactHasChanged            = !primaryContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.crfaSubscriptionDetails.primaryContact)
+      secondContactHasChanged             = !secondContactDetailsFromUserAnswers.equals(subscriptionDetailFromBackend.crfaSubscriptionDetails.secondaryContact)
     } yield primaryContactHasChanged || secondContactHasChanged
   }
 
   def populateUserAnswersFromOrgSubscription(userAnswers: UserAnswers, responseDetail: DisplayResponseDetail): Option[UserAnswers] =
     for {
-      primaryContactSet <- populateUserAnswersFromOrgContactInfo[ChangeOrganisationPrimaryContactDetailsPages](userAnswers, responseDetail.primaryContact)
-      hasSecondContact = responseDetail.secondaryContact.nonEmpty
+      primaryContactSet <-
+        populateUserAnswersFromOrgContactInfo[ChangeOrganisationPrimaryContactDetailsPages](userAnswers, responseDetail.crfaSubscriptionDetails.primaryContact)
+      hasSecondContact = responseDetail.crfaSubscriptionDetails.secondaryContact.nonEmpty
       haveSecondContactSet <- primaryContactSet.set(OrganisationHaveSecondContactPage, hasSecondContact).toOption
-      secondaryContactSet <- responseDetail.secondaryContact
+      secondaryContactSet <- responseDetail.crfaSubscriptionDetails.secondaryContact
         .flatMap(
           secondContact =>
             populateUserAnswersFromOrgContactInfo[ChangeOrganisationSecondaryContactDetailsPages](
@@ -192,7 +193,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
   ): Option[ContactInformation] =
     getContactDetailsFromUserAnswers[ChangeOrganisationPrimaryContactDetailsPages](
       userAnswers,
-      subscriptionDetailFromBackend.primaryContact.contactInformation
+      subscriptionDetailFromBackend.crfaSubscriptionDetails.primaryContact.contactInformation
     )
 
   private def getOrgSecondContactDetailsFromUserAnswers(
@@ -226,7 +227,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
   }
 
   private def getContactType(userAnswers: UserAnswers, subscription: DisplayResponseDetail): Option[ContactType] =
-    (subscription.secondaryContact, userAnswers.get(OrganisationSecondContactNamePage)) match {
+    (subscription.crfaSubscriptionDetails.secondaryContact, userAnswers.get(OrganisationSecondContactNamePage)) match {
       case (_, Some(name)) =>
         Option(OrganisationDetails(name))
       case (Some(contactInformation), _) =>

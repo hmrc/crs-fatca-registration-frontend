@@ -21,39 +21,44 @@ import models.Regime.CRFA
 import models.{AddressLookup, LookupAddressByPostcode}
 import play.api.Logging
 import play.api.http.Status._
-import play.api.libs.json.Reads
+import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class AddressLookupConnector @Inject() (http: HttpClient, config: FrontendAppConfig) extends Logging {
+class AddressLookupConnector @Inject() (http: HttpClientV2, config: FrontendAppConfig) extends Logging {
 
   def addressLookupByPostcode(postCode: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[AddressLookup]] = {
 
-    val addressLookupUrl: String = s"${config.addressLookUpUrl}/lookup"
+    val addressLookupUrl = url"${config.addressLookUpUrl}/lookup"
 
     implicit val reads: Reads[Seq[AddressLookup]] = AddressLookup.addressesLookupReads
 
     val lookupAddressByPostcode = LookupAddressByPostcode(postCode, None)
 
-    http.POST[LookupAddressByPostcode, HttpResponse](addressLookupUrl, lookupAddressByPostcode, headers = Seq("X-Hmrc-Origin" -> CRFA.toString)) flatMap {
-      case response if response.status equals OK =>
-        Future.successful(
-          sortAddresses(
-            response.json
-              .as[Seq[AddressLookup]]
-              .filterNot(
-                address => address.addressLine1.isEmpty && address.addressLine2.isEmpty
-              )
+    http.post(addressLookupUrl)
+      .setHeader("X-Hmrc-Origin" -> CRFA.toString)
+      .withBody(Json.toJson(lookupAddressByPostcode))
+      .execute[HttpResponse]
+      .flatMap {
+        case response if response.status equals OK =>
+          Future.successful(
+            sortAddresses(
+              response.json
+                .as[Seq[AddressLookup]]
+                .filterNot(
+                  address => address.addressLine1.isEmpty && address.addressLine2.isEmpty
+                )
+            )
           )
-        )
-      case response =>
-        val message = s"Address Lookup failed with status ${response.status} Response body: ${response.body}"
-        Future.failed(new HttpException(message, response.status))
-    } recover {
+        case response =>
+          val message = s"Address Lookup failed with status ${response.status} Response body: ${response.body}"
+          Future.failed(new HttpException(message, response.status))
+      } recover {
       case e: Exception =>
         logger.error("Exception in Address Lookup", e)
         throw e

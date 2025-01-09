@@ -38,6 +38,7 @@ class HaveSecondContactController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: HaveSecondContactFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: HaveSecondContactView
 )(implicit ec: ExecutionContext)
@@ -47,14 +48,14 @@ class HaveSecondContactController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(HaveSecondContactPage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, getFirstContactName(request.userAnswers), mode))
+      Future.successful(Ok(view(preparedForm, getFirstContactName(request.userAnswers), mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {

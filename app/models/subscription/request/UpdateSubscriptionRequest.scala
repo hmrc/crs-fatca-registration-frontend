@@ -40,13 +40,13 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
     val response = displaySubscriptionResponse.success
 
     val primaryContact = getOrgContactInformation[ChangeOrganisationPrimaryContactDetailsPages](
-      response.primaryContact.contactInformation,
+      response.crfaSubscriptionDetails.primaryContact.contactInformation,
       userAnswers
     )
 
     val hasSecondContact  = userAnswers.get(OrganisationHaveSecondContactPage)
     val secondContactName = userAnswers.get(OrganisationSecondContactNamePage)
-    val secondaryContact = (hasSecondContact, response.secondaryContact, secondContactName) match {
+    val secondaryContact = (hasSecondContact, response.crfaSubscriptionDetails.secondaryContact, secondContactName) match {
       case (Some(true), Some(contactDetails), Some(secondContactName)) =>
         contactDetails.contactInformation match {
           case _: OrganisationDetails =>
@@ -64,8 +64,8 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
         UpdateSubscriptionRequest(
           IdentifierType.FATCAID,
           displaySubscriptionResponse.subscriptionId.value,
-          response.tradingName,
-          response.gbUser,
+          response.crfaSubscriptionDetails.tradingName,
+          response.crfaSubscriptionDetails.gbUser,
           primaryContact,
           secondaryContact
         )
@@ -99,7 +99,7 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
     val response = displaySubscriptionResponse.success
 
     val individualContact = getIndContactInformation[ChangeIndividualContactDetailsPages](
-      response.primaryContact.contactInformation,
+      response.crfaSubscriptionDetails.primaryContact.contactInformation,
       userAnswers
     )
 
@@ -108,8 +108,8 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
         UpdateSubscriptionRequest(
           IdentifierType.FATCAID,
           displaySubscriptionResponse.subscriptionId.value,
-          response.tradingName,
-          response.gbUser,
+          response.crfaSubscriptionDetails.tradingName,
+          response.crfaSubscriptionDetails.gbUser,
           contact,
           None
         )

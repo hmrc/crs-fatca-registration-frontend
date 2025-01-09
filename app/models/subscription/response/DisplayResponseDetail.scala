@@ -16,15 +16,9 @@
 
 package models.subscription.response
 
-import models.subscription.request.ContactInformation
 import play.api.libs.json.{Json, OFormat}
 
-case class DisplayResponseDetail(id: String,
-                                 tradingName: Option[String],
-                                 gbUser: Boolean,
-                                 primaryContact: ContactInformation,
-                                 secondaryContact: Option[ContactInformation]
-)
+case class DisplayResponseDetail(crfaSubscriptionDetails: CrfaSubscriptionDetails)
 
 object DisplayResponseDetail {
   implicit val format: OFormat[DisplayResponseDetail] = Json.format[DisplayResponseDetail]

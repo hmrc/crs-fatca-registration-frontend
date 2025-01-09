@@ -20,7 +20,7 @@ import models._
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, RegistrationInfo, SafeId}
 import models.register.response.details.{AddressResponse => RegistrationAddressResponse}
 import models.subscription.request._
-import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse}
+import models.subscription.response.{CrfaSubscriptionDetails, DisplayResponseDetail, DisplaySubscriptionResponse}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.const
 import org.scalacheck.{Arbitrary, Gen}
@@ -195,11 +195,13 @@ trait ModelGenerators extends RegexConstants with Generators {
       subscription =>
         DisplaySubscriptionResponse(
           DisplayResponseDetail(
-            subscription.idNumber,
-            subscription.tradingName,
-            subscription.gbUser,
-            subscription.primaryContact,
-            subscription.secondaryContact
+            CrfaSubscriptionDetails(
+              subscription.idNumber,
+              subscription.tradingName,
+              subscription.gbUser,
+              subscription.primaryContact,
+              subscription.secondaryContact
+            )
           )
         )
     }

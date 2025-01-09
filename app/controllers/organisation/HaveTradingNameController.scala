@@ -36,6 +36,7 @@ class HaveTradingNameController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: HaveTradingNameFormProvider,
+  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: HaveTradingNameView
 )(implicit ec: ExecutionContext)
@@ -44,14 +45,14 @@ class HaveTradingNameController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
       val preparedForm = request.userAnswers.get(HaveTradingNamePage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Future.successful(Ok(view(preparedForm, mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
