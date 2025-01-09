@@ -15,13 +15,15 @@
  *@
 
 @import viewmodels.InputWidth._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukFieldset : GovukFieldset
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -34,26 +36,34 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("indWhatIsYourName.heading")</h1>
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h1 class="govuk-fieldset__heading">
+                @messages("indWhatIsYourName.heading")
+                </h1>
+            </legend>
 
-        @govukInput(
-            InputViewModel(
-                field = form("firstName"),
-                label = LabelViewModel(messages("indWhatIsYourName.firstName"))
+            @govukInput(
+                InputViewModel(
+                    field = form("firstName"),
+                    label = LabelViewModel(messages("indWhatIsYourName.firstName"))
+                )
+                .withWidth(TwoThirds).withAutocomplete("given-name")
             )
-            .withWidth(TwoThirds).withAutocomplete("given-name")
-        )
 
-        @govukInput(
-            InputViewModel(
-                field = form("lastName"),
-                label = LabelViewModel(messages("indWhatIsYourName.lastName"))
+            @govukInput(
+                InputViewModel(
+                    field = form("lastName"),
+                    label = LabelViewModel(messages("indWhatIsYourName.lastName"))
+                )
+                .withWidth(TwoThirds).withAutocomplete("family-name")
             )
-            .withWidth(TwoThirds).withAutocomplete("family-name")
-        )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
-        )
+            @govukButton(
+                ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
+            )
+
+        </fieldset>
+
     }
 }

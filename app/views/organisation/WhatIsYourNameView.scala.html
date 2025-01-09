@@ -38,29 +38,37 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("whatIsYourName.heading")</h1>
-        <p class="govuk-body">@messages("whatIsYourName.p1")</p>
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h1 class="govuk-fieldset__heading">
+                @messages("whatIsYourName.heading")
+                </h1>
+            </legend>
 
-        @govukInput(
-            InputViewModel(
-                field = form("firstName"),
-                label = LabelViewModel(messages("whatIsYourName.firstName"))
+            <p class="govuk-body">@messages("whatIsYourName.p1")</p>
+
+            @govukInput(
+                InputViewModel(
+                    field = form("firstName"),
+                    label = LabelViewModel(messages("whatIsYourName.firstName"))
+                )
+                .withAutocomplete("given-name")
+                .withWidth(TwoThirds)
             )
-            .withAutocomplete("given-name")
-            .withWidth(TwoThirds)
-        )
 
-        @govukInput(
-            InputViewModel(
-                field = form("lastName"),
-                label = LabelViewModel(messages("whatIsYourName.lastName"))
-        )
-            .withAutocomplete("family-name")
-            .withWidth(TwoThirds)
-        )
+            @govukInput(
+                InputViewModel(
+                    field = form("lastName"),
+                    label = LabelViewModel(messages("whatIsYourName.lastName"))
+            )
+                .withAutocomplete("family-name")
+                .withWidth(TwoThirds)
+            )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
-        )
+            @govukButton(
+                ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
+            )
+
+        </fieldset>
     }
 }
