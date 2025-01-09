@@ -31,5 +31,5 @@ appConfig: FrontendAppConfig
 
 <p class="govuk-body">@messages("thereIsAProblem.paragraph.1")</p>
 
-<p class="govuk-body">@Html(messages("thereIsAProblem.paragraph.2.a" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.email", openInNewWindow = false)))</p>
+<p class="govuk-body">@Html(messages("thereIsAProblem.paragraph.2.a" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.email")))</p>
 }
