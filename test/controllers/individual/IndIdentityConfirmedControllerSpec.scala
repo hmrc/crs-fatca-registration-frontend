@@ -21,8 +21,7 @@ import controllers.routes
 import generators.ModelGenerators
 import models.error.ApiError.{BadRequestError, NotFoundError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, SafeId}
-import models.subscription.response.DisplaySubscriptionResponse
-import models.{Name, NormalMode, UserAnswers}
+import models.{Name, NormalMode, SubscriptionID, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalacheck.Arbitrary
@@ -84,7 +83,7 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
       when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
         .thenReturn(Future.successful(Right(registrationInfo)))
 
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(None))
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -100,11 +99,11 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
 
     "must redirect to registration confirmation page when there is an existing subscription" in {
 
-      forAll(Arbitrary.arbitrary[DisplaySubscriptionResponse]) {
+      forAll(Arbitrary.arbitrary[SubscriptionID]) {
         subscription =>
           when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
             .thenReturn(Future.successful(Right(registrationInfo)))
-          when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(Some(subscription)))
+          when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(Some(subscription)))
           when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -122,11 +121,11 @@ class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFix
 
     "render technical difficulties page when there is an existing subscription and fails to create an enrolment" in {
 
-      forAll(Arbitrary.arbitrary[DisplaySubscriptionResponse]) {
+      forAll(Arbitrary.arbitrary[SubscriptionID]) {
         subscription =>
           when(mockMatchingService.sendIndividualRegistrationInformation(any())(any(), any()))
             .thenReturn(Future.successful(Right(registrationInfo)))
-          when(mockSubscriptionService.getSubscription(any[SafeId]())(any(), any())).thenReturn(Future.successful(Some(subscription)))
+          when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(Some(subscription)))
           when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)

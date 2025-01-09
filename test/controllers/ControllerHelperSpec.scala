@@ -33,6 +33,7 @@ import pages._
 import play.api.inject.bind
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.Helpers._
+import repositories.SubscriptionRepository
 import services.TaxEnrolmentService
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
@@ -41,13 +42,15 @@ import scala.concurrent.Future
 
 class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach {
 
-  val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
+  val mockTaxEnrolmentService: TaxEnrolmentService       = mock[TaxEnrolmentService]
+  val mockSubscriptionRepository: SubscriptionRepository = mock[SubscriptionRepository]
 
   override def beforeEach(): Unit =
-    reset(mockTaxEnrolmentService)
+    reset(mockTaxEnrolmentService, mockSubscriptionRepository)
 
   private val application = applicationBuilder()
     .overrides(bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentService))
+    .overrides(bind[SubscriptionRepository].toInstance(mockSubscriptionRepository))
     .build()
 
   val controller: ControllerHelper = application.injector.instanceOf[ControllerHelper]
@@ -68,8 +71,9 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Right(1)))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockSubscriptionRepository.clear(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.RegistrationConfirmationController.onPageLoad().url)
@@ -85,8 +89,9 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockSubscriptionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url)
@@ -103,8 +108,9 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockSubscriptionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url)
@@ -122,8 +128,9 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockSubscriptionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.PreRegisteredController.onPageLoad(withId = true).url)
@@ -139,8 +146,9 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockSubscriptionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.PreRegisteredController.onPageLoad(withId = false).url)
@@ -156,8 +164,9 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(MandatoryInformationMissingError("Error"))))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockSubscriptionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.InformationMissingController.onPageLoad().url)
@@ -173,8 +182,9 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
         .thenReturn(Future.successful(Left(ApiError.ServiceUnavailableError)))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockSubscriptionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(subscriptionId)(HeaderCarrier(), dataRequest)
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SERVICE_UNAVAILABLE
 

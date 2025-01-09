@@ -20,3 +20,5 @@ import play.api.libs.json.JsObject
 import uk.gov.hmrc.crypto.Sensitive
 
 case class SensitiveJsObject(override val decryptedValue: JsObject) extends Sensitive[JsObject]
+
+case class SensitiveString(override val decryptedValue: String) extends Sensitive[String]

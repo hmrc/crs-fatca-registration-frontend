@@ -17,13 +17,14 @@
 package controllers
 
 import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingError, ServiceUnavailableError}
+import models.matching.SafeId
 import models.requests.DataRequest
-import models.{ReporterType, SubscriptionID, UserAnswers}
+import models.{ReporterType, SubscriptionID, UserAnswers, UserSubscription}
 import pages.{RegistrationInfoPage, ReporterTypePage, SubscriptionIDPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Result}
-import repositories.SessionRepository
+import repositories.{SessionRepository, SubscriptionRepository}
 import services.TaxEnrolmentService
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,7 +38,8 @@ class ControllerHelper @Inject() (
   val controllerComponents: MessagesControllerComponents,
   taxEnrolmentService: TaxEnrolmentService,
   errorView: ThereIsAProblemView,
-  sessionRepository: SessionRepository
+  sessionRepository: SessionRepository,
+  subscriptionRepository: SubscriptionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -47,45 +49,65 @@ class ControllerHelper @Inject() (
     request.affinityGroup == AffinityGroup.Individual ||
       (request.affinityGroup == AffinityGroup.Agent && request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains))
 
-  private def createEnrolment(userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
+  private def createEnrolment(safeId: SafeId, userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
     request: DataRequest[AnyContent]
   ): Future[Result] =
     taxEnrolmentService.checkAndCreateEnrolment(userAnswers, subscriptionId) flatMap {
       case Right(_) =>
-        Future.successful(Redirect(routes.RegistrationConfirmationController.onPageLoad()))
+        subscriptionRepository.clear(safeId.value).map(
+          _ => Redirect(routes.RegistrationConfirmationController.onPageLoad())
+        )
       case Left(EnrolmentExistsError(groupIds)) if indAlreadyRegistered =>
         logger.info(s"ControllerHelper: EnrolmentExistsError for the the groupIds $groupIds")
-        Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad()))
+        subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
+          .map(
+            _ => Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad())
+          )
       case Left(EnrolmentExistsError(groupIds)) =>
         logger.info(s"ControllerHelper: EnrolmentExistsError for the the groupIds $groupIds")
         if (request.userAnswers.get(RegistrationInfoPage).isDefined) {
-          Future.successful(Redirect(routes.PreRegisteredController.onPageLoad(true)))
+          subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
+            .map(
+              _ => Redirect(routes.PreRegisteredController.onPageLoad(true))
+            )
         } else {
-          Future.successful(Redirect(routes.PreRegisteredController.onPageLoad(false)))
+          subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
+            .map(
+              _ => Redirect(routes.PreRegisteredController.onPageLoad(false))
+            )
         }
       case Left(MandatoryInformationMissingError(_)) =>
         logger.warn(s"ControllerHelper: Mandatory information is missing")
-        Future.successful(Redirect(routes.InformationMissingController.onPageLoad()))
+        subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
+          .map(
+            _ => Redirect(routes.InformationMissingController.onPageLoad())
+          )
 
       case Left(error) =>
         logger.warn(s"Error received from API: $error")
         error match {
           case ServiceUnavailableError =>
-            Future.successful(ServiceUnavailable(errorView()))
+            subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
+              .map(
+                _ => ServiceUnavailable(errorView())
+              )
           case _ =>
-            Future.successful(InternalServerError(errorView()))
+            subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
+              .map(
+                _ => InternalServerError(errorView())
+              )
         }
     }
 
-  def updateSubscriptionIdAndCreateEnrolment(subscriptionId: SubscriptionID)(implicit
+  def updateSubscriptionIdAndCreateEnrolment(safeId: SafeId, subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
     request: DataRequest[AnyContent]
   ): Future[Result] =
     for {
       updatedAnswers <- Future.fromTry(request.userAnswers.set(SubscriptionIDPage, subscriptionId))
       _              <- sessionRepository.set(updatedAnswers)
-      result         <- createEnrolment(request.userAnswers, subscriptionId)
+      result         <- createEnrolment(safeId, request.userAnswers, subscriptionId)
     } yield result
 
 }
