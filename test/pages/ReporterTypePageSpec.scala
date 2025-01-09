@@ -45,11 +45,11 @@ class ReporterTypePageSpec extends PageBehaviours {
 
   "ReporterTypePage" - {
 
-//    beRetrievable[ReporterType](ReporterTypePage)
-//
-//    beSettable[ReporterType](ReporterTypePage)
-//
-//    beRemovable[ReporterType](ReporterTypePage)
+    beRetrievable[ReporterType](ReporterTypePage)
+
+    beSettable[ReporterType](ReporterTypePage)
+
+    beRemovable[ReporterType](ReporterTypePage)
 
     "cleanUp" - {
       "must clear answers" - {

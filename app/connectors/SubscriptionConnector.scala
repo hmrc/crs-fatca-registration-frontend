@@ -20,14 +20,7 @@ import cats.data.EitherT
 import config.FrontendAppConfig
 import models.SubscriptionID
 import models.error.ApiError
-import models.error.ApiError.{
-  BadRequestError,
-  DuplicateSubmissionError,
-  NotFoundError,
-  ServiceUnavailableError,
-  UnableToCreateEMTPSubscriptionError,
-  UnprocessableEntityError
-}
+import models.error.ApiError.{BadRequestError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError, UnprocessableEntityError}
 import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest, UpdateSubscriptionRequest}
 import models.subscription.response.{CreateSubscriptionResponse, DisplaySubscriptionResponse}
 import play.api.Logging
