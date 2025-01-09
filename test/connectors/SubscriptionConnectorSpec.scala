@@ -23,18 +23,11 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.ModelGenerators
 import helpers.JsonFixtures.{safeId, TestEmail, TestPhoneNumber}
 import helpers.WireMockServerHandler
-import models.{IdentifierType, SubscriptionID}
 import models.error.ApiError
-import models.error.ApiError.{
-  BadRequestError,
-  DuplicateSubmissionError,
-  NotFoundError,
-  ServiceUnavailableError,
-  UnableToCreateEMTPSubscriptionError,
-  UnprocessableEntityError
-}
+import models.error.ApiError.{BadRequestError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError, UnprocessableEntityError}
 import models.subscription.request.{ContactInformation, CreateSubscriptionRequest, IndividualDetails, ReadSubscriptionRequest}
 import models.subscription.response.DisplaySubscriptionResponse
+import models.{IdentifierType, SubscriptionID}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks

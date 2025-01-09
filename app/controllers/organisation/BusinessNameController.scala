@@ -23,7 +23,6 @@ import models.{Mode, ReporterType}
 import navigation.Navigator
 import pages.{BusinessNamePage, ReporterTypePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
