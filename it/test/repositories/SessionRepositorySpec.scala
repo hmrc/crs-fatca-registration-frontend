@@ -54,7 +54,7 @@ class SessionRepositorySpec
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
-  when(mockAppConfig.userAnswersEncryptionEnabled) thenReturn false
+  when(mockAppConfig.mongoEncryptionEnabled) thenReturn false
 
   private val aesKey = {
     val keyLength = 32
@@ -101,73 +101,74 @@ class SessionRepositorySpec
       (json \ "data").get mustBe userAnswers.data
     }
 
-    ".get" - {
+  }
 
-      "when there is a record for this id" - {
+  ".get" - {
 
-        "must update the lastUpdated time and get the record" in {
+    "when there is a record for this id" - {
 
-          insert(userAnswers).futureValue
-
-          val result         = repository.get(userAnswers.id).futureValue
-          val expectedResult = userAnswers copy (lastUpdated = instant)
-
-          result.value mustEqual expectedResult
-        }
-      }
-
-      "when there is no record for this id" - {
-
-        "must return None" in {
-
-          repository.get("id that does not exist").futureValue must not be defined
-        }
-      }
-    }
-
-    ".clear" - {
-
-      "must remove a record" in {
+      "must update the lastUpdated time and get the record" in {
 
         insert(userAnswers).futureValue
 
-        val result = repository.clear(userAnswers.id).futureValue
+        val result         = repository.get(userAnswers.id).futureValue
+        val expectedResult = userAnswers copy (lastUpdated = instant)
 
-        result mustEqual true
-        repository.get(userAnswers.id).futureValue must not be defined
-      }
-
-      "must return true when there is no record to remove" in {
-        val result = repository.clear("id that does not exist").futureValue
-
-        result mustEqual true
+        result.value mustEqual expectedResult
       }
     }
 
-    ".keepAlive" - {
+    "when there is no record for this id" - {
 
-      "when there is a record for this id" - {
+      "must return None" in {
 
-        "must update its lastUpdated to `now` and return true" in {
-
-          insert(userAnswers).futureValue
-
-          val result = repository.keepAlive(userAnswers.id).futureValue
-
-          val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
-
-          result mustEqual true
-          val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
-          updatedAnswers mustEqual expectedUpdatedAnswers
-        }
+        repository.get("id that does not exist").futureValue must not be defined
       }
+    }
+  }
 
-      "when there is no record for this id" - {
+  ".clear" - {
 
-        "must return true" in {
+    "must remove a record" in {
 
-          repository.keepAlive("id that does not exist").futureValue mustEqual true
-        }
+      insert(userAnswers).futureValue
+
+      val result = repository.clear(userAnswers.id).futureValue
+
+      result mustEqual true
+      repository.get(userAnswers.id).futureValue must not be defined
+    }
+
+    "must return true when there is no record to remove" in {
+      val result = repository.clear("id that does not exist").futureValue
+
+      result mustEqual true
+    }
+  }
+
+  ".keepAlive" - {
+
+    "when there is a record for this id" - {
+
+      "must update its lastUpdated to `now` and return true" in {
+
+        insert(userAnswers).futureValue
+
+        val result = repository.keepAlive(userAnswers.id).futureValue
+
+        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
+
+        result mustEqual true
+        val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
+        updatedAnswers mustEqual expectedUpdatedAnswers
+      }
+    }
+
+    "when there is no record for this id" - {
+
+      "must return true" in {
+
+        repository.keepAlive("id that does not exist").futureValue mustEqual true
       }
     }
   }

@@ -27,6 +27,7 @@ import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionR
 import models.{Name, SubscriptionID, UserAnswers}
 import pages.changeContactDetails.{OrganisationHaveSecondContactPage, OrganisationSecondContactNamePage}
 import play.api.Logging
+import repositories.SubscriptionRepository
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,7 +35,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConnector) extends Logging {
+class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConnector, val subscriptionRepository: SubscriptionRepository) extends Logging {
 
   def updateOrgContactDetails(
     subscriptionId: SubscriptionID,
@@ -76,8 +77,8 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
     affinityGroup: AffinityGroup
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ApiError, SubscriptionID]] =
     getSubscription(safeId) flatMap {
-      case Some(displaySubscriptionResponse) =>
-        EitherT.rightT(displaySubscriptionResponse.subscriptionId).value
+      case Some(subscriptionId) =>
+        EitherT.rightT(subscriptionId).value
       case _ =>
         (CreateSubscriptionRequest.buildSubscriptionRequest(safeId, userAnswers, affinityGroup) match {
           case Some(subscriptionRequest) =>
@@ -88,10 +89,9 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
     }
 
   def getSubscription(safeId: SafeId)(implicit
-    hc: HeaderCarrier,
     ec: ExecutionContext
-  ): Future[Option[DisplaySubscriptionResponse]] =
-    subscriptionConnector.readSubscription(ReadSubscriptionRequest(safeId.value))
+  ): Future[Option[SubscriptionID]] =
+    subscriptionRepository.get(safeId.value).map(_.map(_.subscriptionID))
 
   def getSubscription(subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,

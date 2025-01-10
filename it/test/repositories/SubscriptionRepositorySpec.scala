@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.UserAnswers
-import models.crypto.SensitiveJsObject
+import models.{SubscriptionID, UserSubscription}
 import org.mockito.Mockito.when
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
@@ -28,10 +27,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
-import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, SymmetricCryptoFactory}
+import play.api.libs.json.{JsString, Json}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.security.SecureRandom
@@ -40,10 +37,10 @@ import java.time.{Clock, Instant, ZoneId}
 import java.util.Base64
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class EncryptedSessionRepositorySpec
+class SubscriptionRepositorySpec
     extends AnyFreeSpec
     with Matchers
-    with DefaultPlayMongoRepositorySupport[UserAnswers]
+    with DefaultPlayMongoRepositorySupport[UserSubscription]
     with ScalaFutures
     with IntegrationPatience
     with OptionValues
@@ -52,11 +49,11 @@ class EncryptedSessionRepositorySpec
   private val instant          = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
-  private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userSubscription = UserSubscription("id", SubscriptionID("subscriptionID"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
-  when(mockAppConfig.cacheTtl) thenReturn 1
-  when(mockAppConfig.mongoEncryptionEnabled) thenReturn true
+  when(mockAppConfig.subscriptionTtl) thenReturn 1
+  when(mockAppConfig.mongoEncryptionEnabled) thenReturn false
 
   private val aesKey = {
     val keyLength = 32
@@ -70,41 +67,36 @@ class EncryptedSessionRepositorySpec
   implicit private val crypto: Encrypter with Decrypter =
     SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
 
-  implicit val sensitiveFormat: Format[SensitiveJsObject] =
-    JsonEncryption.sensitiveEncrypterDecrypter(SensitiveJsObject.apply)
-
-  override protected val repository = new SessionRepository(
+  override protected val repository = new SubscriptionRepository(
     mongoComponent = mongoComponent,
     appConfig = mockAppConfig,
     clock = stubClock
   )
 
   ".set" - {
+    "must set the last updated time on the supplied user subscription to `now`, and save them" in {
+      val expectedResult = userSubscription copy (lastUpdated = instant)
 
-    "must set the last updated time on the supplied user answers to `now`, and save them" in {
-      val expectedResult = userAnswers copy (lastUpdated = instant)
-
-      val setResult     = repository.set(userAnswers).futureValue
-      val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
+      val setResult     = repository.set(userSubscription).futureValue
+      val updatedRecord = find(Filters.equal("_id", userSubscription.id)).futureValue.headOption.value
 
       setResult mustEqual true
       updatedRecord mustEqual expectedResult
     }
 
-    "must persist the data in encrypted format" in {
-      val setResult = repository.set(userAnswers).futureValue
+    "must persist the data in plain format" in {
+      val setResult = repository.set(userSubscription).futureValue
 
       setResult mustEqual true
 
       val retrievedRecord = repository.collection
-        .find[BsonDocument](Filters.and(Filters.equal("_id", userAnswers.id)))
+        .find[BsonDocument](Filters.and(Filters.equal("_id", userSubscription.id)))
         .headOption()
         .futureValue
         .value
 
-      val rawData       = retrievedRecord.get("data").asString().getValue
-      val decryptedData = crypto.decrypt(Crypted(rawData)).value
-      Json.parse(decryptedData) mustBe userAnswers.data
+      val json = Json.parse(retrievedRecord.toJson)
+      (json \ "subscriptionID" \ "value").get mustBe JsString(userSubscription.subscriptionID.value)
     }
   }
 
@@ -114,20 +106,20 @@ class EncryptedSessionRepositorySpec
 
       "must update the lastUpdated time and get the record" in {
 
-        insert(userAnswers).futureValue
+        insert(userSubscription).futureValue
 
-        val result         = repository.get(userAnswers.id).futureValue
-        val expectedResult = userAnswers copy (lastUpdated = instant)
+        val result         = repository.get(userSubscription.id).futureValue
+        val expectedResult = userSubscription copy (lastUpdated = instant)
 
         result.value mustEqual expectedResult
       }
-    }
 
-    "when there is no record for this id" - {
+      "when there is no record for this id" - {
 
-      "must return None" in {
+        "must return None" in {
 
-        repository.get("id that does not exist").futureValue must not be defined
+          repository.get("id that does not exist").futureValue must not be defined
+        }
       }
     }
   }
@@ -136,12 +128,12 @@ class EncryptedSessionRepositorySpec
 
     "must remove a record" in {
 
-      insert(userAnswers).futureValue
+      insert(userSubscription).futureValue
 
-      val result = repository.clear(userAnswers.id).futureValue
+      val result = repository.clear(userSubscription.id).futureValue
 
       result mustEqual true
-      repository.get(userAnswers.id).futureValue must not be defined
+      repository.get(userSubscription.id).futureValue must not be defined
     }
 
     "must return true when there is no record to remove" in {
@@ -157,15 +149,15 @@ class EncryptedSessionRepositorySpec
 
       "must update its lastUpdated to `now` and return true" in {
 
-        insert(userAnswers).futureValue
+        insert(userSubscription).futureValue
 
-        val result = repository.keepAlive(userAnswers.id).futureValue
+        val result = repository.keepAlive(userSubscription.id).futureValue
 
-        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
+        val expectedUpdatedSubscription = userSubscription copy (lastUpdated = instant)
 
         result mustEqual true
-        val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
-        updatedAnswers mustEqual expectedUpdatedAnswers
+        val updatedAnswers = find(Filters.equal("_id", userSubscription.id)).futureValue.headOption.value
+        updatedAnswers mustEqual expectedUpdatedSubscription
       }
     }
 

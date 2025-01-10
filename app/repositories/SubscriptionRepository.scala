@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.UserAnswers
+import models.UserSubscription
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
 import play.api.libs.json.Format
@@ -27,26 +27,25 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.{Clock, Instant}
-import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SessionRepository @Inject() (
+class SubscriptionRepository @Inject() (
   mongoComponent: MongoComponent,
   appConfig: FrontendAppConfig,
   clock: Clock
 )(implicit ec: ExecutionContext, crypto: Encrypter with Decrypter)
-    extends PlayMongoRepository[UserAnswers](
-      collectionName = "user-answers",
+    extends PlayMongoRepository[UserSubscription](
+      collectionName = "user-subscription",
       mongoComponent = mongoComponent,
-      domainFormat = UserAnswers.format(appConfig.mongoEncryptionEnabled),
+      domainFormat = UserSubscription.format(appConfig.mongoEncryptionEnabled),
       indexes = Seq(
         IndexModel(
           Indexes.ascending("lastUpdated"),
           IndexOptions()
-            .name("lastUpdatedIdx")
-            .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
+            .name("subscriptionLastUpdatedIdx")
+            .expireAfter(appConfig.subscriptionTtl, java.util.concurrent.TimeUnit.SECONDS)
         )
       )
     ) {
@@ -66,7 +65,7 @@ class SessionRepository @Inject() (
         _ => true
       )
 
-  def get(id: String): Future[Option[UserAnswers]] =
+  def get(id: String): Future[Option[UserSubscription]] =
     keepAlive(id).flatMap {
       _ =>
         collection
@@ -74,14 +73,14 @@ class SessionRepository @Inject() (
           .headOption()
     }
 
-  def set(answers: UserAnswers): Future[Boolean] = {
+  def set(subscription: UserSubscription): Future[Boolean] = {
 
-    val updatedAnswers = answers copy (lastUpdated = Instant.now(clock))
+    val updatedSubscription = subscription copy (lastUpdated = Instant.now(clock))
 
     collection
       .replaceOne(
-        filter = byId(updatedAnswers.id),
-        replacement = updatedAnswers,
+        filter = byId(updatedSubscription.id),
+        replacement = updatedSubscription,
         options = ReplaceOptions().upsert(true)
       )
       .toFuture()

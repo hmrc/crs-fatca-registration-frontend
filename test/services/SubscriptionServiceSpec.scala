@@ -26,7 +26,7 @@ import models.error.ApiError
 import models.error.ApiError._
 import models.subscription.request.{ContactInformation, OrganisationDetails, ReadSubscriptionRequest}
 import models.subscription.response.DisplaySubscriptionResponse
-import models.{Address, Country, ReporterType, SubscriptionID, UserAnswers}
+import models.{Address, Country, ReporterType, SubscriptionID, UserAnswers, UserSubscription}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
 import org.mockito.MockitoSugar.reset
@@ -41,16 +41,20 @@ import scala.concurrent.{ExecutionContext, Future}
 import com.softwaremill.quicklens._
 import org.scalacheck.Arbitrary.arbitrary
 import pages.changeContactDetails._
+import repositories.SubscriptionRepository
 
 class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks with ModelGenerators {
 
-  val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
+  val mockSubscriptionConnector: SubscriptionConnector   = mock[SubscriptionConnector]
+  val mockSubscriptionRepository: SubscriptionRepository = mock[SubscriptionRepository]
 
   private val application = applicationBuilder()
     .overrides(bind[SubscriptionConnector].toInstance(mockSubscriptionConnector))
+    .overrides(bind[SubscriptionRepository].toInstance(mockSubscriptionRepository))
 
   override def beforeEach(): Unit = {
     reset(mockSubscriptionConnector)
+    reset(mockSubscriptionRepository)
     super.beforeEach()
   }
 
@@ -61,7 +65,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
       val subscriptionID                                      = SubscriptionID("id")
       val response: EitherT[Future, ApiError, SubscriptionID] = EitherT.fromEither[Future](Right(subscriptionID))
 
-      when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
+      when(mockSubscriptionRepository.get(any())).thenReturn(Future.successful(None))
       when(mockSubscriptionConnector.createSubscription(any())(any(), any())).thenReturn(response)
 
       val address = Address("", None, "", None, None, Country("GB", "United Kingdom"))
@@ -76,7 +80,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
       val result = service.checkAndCreateSubscription(safeId, userAnswers, AffinityGroup.Individual)
       result.futureValue mustBe Right(SubscriptionID("id"))
 
-      verify(mockSubscriptionConnector, times(1)).readSubscription(any())(any(), any())
+      verify(mockSubscriptionRepository, times(1)).get(any())
       verify(mockSubscriptionConnector, times(1)).createSubscription(any())(any(), any())
     }
 
@@ -84,7 +88,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
       val subscriptionID                                      = SubscriptionID("id")
       val response: EitherT[Future, ApiError, SubscriptionID] = EitherT.fromEither[Future](Right(subscriptionID))
 
-      when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
+      when(mockSubscriptionRepository.get(any())).thenReturn(Future.successful(None))
       when(mockSubscriptionConnector.createSubscription(any())(any(), any())).thenReturn(response)
 
       val address = Address("", None, "", None, None, Country("GB", "United Kingdom"))
@@ -99,7 +103,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
       val result = service.checkAndCreateSubscription(safeId, userAnswers, AffinityGroup.Individual)
       result.futureValue mustBe Right(SubscriptionID("id"))
 
-      verify(mockSubscriptionConnector, times(1)).readSubscription(any())(any(), any())
+      verify(mockSubscriptionRepository, times(1)).get(any())
       verify(mockSubscriptionConnector, times(1)).createSubscription(any())(any(), any())
     }
 
@@ -107,7 +111,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
 
       forAll(arbitrary[DisplaySubscriptionResponse]) {
         subscription =>
-          when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(Some(subscription)))
+          when(mockSubscriptionRepository.get(any())).thenReturn(Future.successful(Some(UserSubscription(safeId.value, subscription.subscriptionId))))
 
           val result = service.checkAndCreateSubscription(safeId, emptyUserAnswers, AffinityGroup.Individual)
           result.futureValue.value mustBe subscription.subscriptionId
@@ -117,7 +121,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
     "must return MandatoryInformationMissingError when UserAnswers is empty" in {
       val response: EitherT[Future, ApiError, SubscriptionID] = EitherT.fromEither[Future](Left(MandatoryInformationMissingError()))
 
-      when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
+      when(mockSubscriptionRepository.get(any())).thenReturn(Future.successful(None))
       when(mockSubscriptionConnector.createSubscription(any())(any(), any())).thenReturn(response)
 
       val result = service.checkAndCreateSubscription(safeId, UserAnswers("id"), AffinityGroup.Individual)
@@ -136,7 +140,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
           .set(HaveSecondContactPage, false).success.value
 
         val response: EitherT[Future, ApiError, SubscriptionID] = EitherT.fromEither[Future](Left(error))
-        when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
+        when(mockSubscriptionRepository.get(any())).thenReturn(Future.successful(None))
         when(mockSubscriptionConnector.createSubscription(any())(any(), any())).thenReturn(response)
 
         val result = service.checkAndCreateSubscription(safeId, userAnswers, AffinityGroup.Organisation)
@@ -148,16 +152,16 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
     "getSubscription" - {
 
       "must return subscription details for valid input" in {
-        forAll(arbitrary[DisplaySubscriptionResponse]) {
+        forAll(arbitrary[SubscriptionID]) {
           subscription =>
-            when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(Some(subscription)))
+            when(mockSubscriptionRepository.get(any())).thenReturn(Future.successful(Some(UserSubscription(safeId.value, subscription))))
             val result = service.getSubscription(safeId)
             result.futureValue mustBe Some(subscription)
         }
       }
 
       "must return 'None' for any failures of exceptions" in {
-        when(mockSubscriptionConnector.readSubscription(any())(any(), any())).thenReturn(Future.successful(None))
+        when(mockSubscriptionRepository.get(any())).thenReturn(Future.successful(None))
         val result = service.getSubscription(safeId)
         result.futureValue mustBe None
       }
