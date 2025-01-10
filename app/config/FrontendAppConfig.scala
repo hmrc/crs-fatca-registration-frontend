@@ -82,5 +82,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val cacheTtl: Int        = configuration.get[Int]("mongodb.timeToLiveInSeconds")
   val subscriptionTtl: Int = configuration.get[Int]("mongodb.subscriptionTimeToLiveInSeconds")
 
-  val userAnswersEncryptionEnabled: Boolean = configuration.get[Boolean]("mongodb.encryptionEnabled")
+  val mongoEncryptionEnabled: Boolean = configuration.get[Boolean]("mongodb.encryptionEnabled")
 }

@@ -54,7 +54,7 @@ class SessionRepositorySpec
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
-  when(mockAppConfig.userAnswersEncryptionEnabled) thenReturn false
+  when(mockAppConfig.mongoEncryptionEnabled) thenReturn false
 
   private val aesKey = {
     val keyLength = 32

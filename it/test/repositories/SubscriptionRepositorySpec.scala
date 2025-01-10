@@ -53,7 +53,7 @@ class SubscriptionRepositorySpec
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.subscriptionTtl) thenReturn 1
-  when(mockAppConfig.userAnswersEncryptionEnabled) thenReturn false
+  when(mockAppConfig.mongoEncryptionEnabled) thenReturn false
 
   private val aesKey = {
     val keyLength = 32
@@ -74,7 +74,7 @@ class SubscriptionRepositorySpec
   )
 
   ".set" - {
-    "must set the last updated time on the supplied user answers to `now`, and save them" in {
+    "must set the last updated time on the supplied user subscription to `now`, and save them" in {
       val expectedResult = userSubscription copy (lastUpdated = instant)
 
       val setResult     = repository.set(userSubscription).futureValue
@@ -153,11 +153,11 @@ class SubscriptionRepositorySpec
 
         val result = repository.keepAlive(userSubscription.id).futureValue
 
-        val expectedUpdatedAnswers = userSubscription copy (lastUpdated = instant)
+        val expectedUpdatedSubscription = userSubscription copy (lastUpdated = instant)
 
         result mustEqual true
         val updatedAnswers = find(Filters.equal("_id", userSubscription.id)).futureValue.headOption.value
-        updatedAnswers mustEqual expectedUpdatedAnswers
+        updatedAnswers mustEqual expectedUpdatedSubscription
       }
     }
 

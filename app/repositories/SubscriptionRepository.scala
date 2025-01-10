@@ -39,7 +39,7 @@ class SubscriptionRepository @Inject() (
     extends PlayMongoRepository[UserSubscription](
       collectionName = "user-subscription",
       mongoComponent = mongoComponent,
-      domainFormat = UserSubscription.format(appConfig.userAnswersEncryptionEnabled),
+      domainFormat = UserSubscription.format(appConfig.mongoEncryptionEnabled),
       indexes = Seq(
         IndexModel(
           Indexes.ascending("lastUpdated"),

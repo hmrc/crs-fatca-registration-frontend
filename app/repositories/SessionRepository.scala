@@ -40,7 +40,7 @@ class SessionRepository @Inject() (
     extends PlayMongoRepository[UserAnswers](
       collectionName = "user-answers",
       mongoComponent = mongoComponent,
-      domainFormat = UserAnswers.format(appConfig.userAnswersEncryptionEnabled),
+      domainFormat = UserAnswers.format(appConfig.mongoEncryptionEnabled),
       indexes = Seq(
         IndexModel(
           Indexes.ascending("lastUpdated"),
