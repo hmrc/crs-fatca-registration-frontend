@@ -29,9 +29,9 @@ class WhatIsYourNINumberFormProviderSpec extends StringFieldBehaviours {
 
   val form = new IndWhatIsYourNINumberFormProvider()()
 
-  ".value" - {
+  ".ni-number" - {
 
-    val fieldName = "value"
+    val fieldName = "ni-number"
 
     behave like fieldThatBindsValidData(
       form,

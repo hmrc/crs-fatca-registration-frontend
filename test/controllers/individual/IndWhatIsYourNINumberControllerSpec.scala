@@ -70,7 +70,7 @@ class IndWhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar wit
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId).set(IndWhatIsYourNINumberPage, validAnswer).success.value
-      val filledForm  = form.bind(Map("value" -> validAnswer.nino))
+      val filledForm  = form.bind(Map("ni-number" -> validAnswer.nino))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -113,7 +113,7 @@ class IndWhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar wit
       running(application) {
         val request =
           FakeRequest(POST, whatIsYourNINumberRoute)
-            .withFormUrlEncodedBody(("value", "CC 12 34 56 C"))
+            .withFormUrlEncodedBody(("ni-number", "CC 12 34 56 C"))
 
         val result = route(application, request).value
 
@@ -129,9 +129,9 @@ class IndWhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar wit
       running(application) {
         val request =
           FakeRequest(POST, whatIsYourNINumberRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("ni-number", ""))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("ni-number" -> ""))
 
         val view = application.injector.instanceOf[IndWhatIsYourNINumberView]
 
@@ -163,7 +163,7 @@ class IndWhatIsYourNINumberControllerSpec extends SpecBase with MockitoSugar wit
       running(application) {
         val request =
           FakeRequest(POST, whatIsYourNINumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("ni-number", "answer"))
 
         val result = route(application, request).value
 
