@@ -48,8 +48,8 @@ class IndSelectAddressControllerSpec extends SpecBase with MockitoSugar with Use
   )
 
   val addressRadios: Seq[RadioItem] = Seq(
-    RadioItem(content = Text("1 Address line 1, Town, ZZ1 1ZZ, United Kingdom"), value = Some("1 Address line 1, Town, ZZ1 1ZZ, United Kingdom")),
-    RadioItem(content = Text("2 Address line 1, Town, ZZ1 1ZZ, United Kingdom"), value = Some("2 Address line 1, Town, ZZ1 1ZZ, United Kingdom"))
+    RadioItem(content = Text("1 Address line 1, Town, ZZ1 1ZZ"), value = Some("1 Address line 1, Town, ZZ1 1ZZ")),
+    RadioItem(content = Text("2 Address line 1, Town, ZZ1 1ZZ"), value = Some("2 Address line 1, Town, ZZ1 1ZZ"))
   )
 
   val userAnswers = emptyUserAnswers

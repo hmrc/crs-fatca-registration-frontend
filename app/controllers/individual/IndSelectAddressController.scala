@@ -61,7 +61,7 @@ class IndSelectAddressController @Inject() (
             }
 
             val radios: Seq[RadioItem] = addresses.map(
-              address => RadioItem(content = Text(s"${address.format}"), value = Some(s"${address.format}"))
+              address => RadioItem(content = Text(s"${address.formatRadios}"), value = Some(s"${address.formatRadios}"))
             )
 
             Future.successful(Ok(view(preparedForm, radios, mode)))
@@ -78,7 +78,7 @@ class IndSelectAddressController @Inject() (
         request.userAnswers.get(AddressLookupPage) match {
           case Some(addresses) =>
             val radios: Seq[RadioItem] = addresses.map(
-              address => RadioItem(content = Text(s"${address.format}"), value = Some(s"${address.format}"))
+              address => RadioItem(content = Text(s"${address.formatRadios}"), value = Some(s"${address.formatRadios}"))
             )
 
             form

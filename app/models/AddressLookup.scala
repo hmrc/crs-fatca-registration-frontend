@@ -56,6 +56,18 @@ case class AddressLookup(addressLine1: Option[String],
       country.map(_.description)
     ).flatten.mkString(", ")
 
+  lazy val formatRadios: String =
+    Seq(
+      addressLine1,
+      addressLine2,
+      addressLine3,
+      addressLine4,
+      Option(town),
+      Option(postcode),
+      county,
+      country.filterNot(_.description == "United Kingdom").map(_.description)
+    ).flatten.mkString(", ")
+
 }
 
 object LookupAddressByPostcode {
