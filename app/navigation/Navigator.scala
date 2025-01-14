@@ -170,7 +170,7 @@ class Navigator @Inject() () extends Logging {
           controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode),
           controllers.routes.CheckYourAnswersController.onPageLoad()
         )
-    case BusinessTradingNameWithoutIDPage  => userAnswers => controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode)
+    case BusinessTradingNameWithoutIDPage  => _ => controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode)
     case NonUKBusinessAddressWithoutIDPage => businessAddressWithoutIdRouting(CheckMode)
     case IndDoYouHaveNINumberPage          => doYouHaveNINORoutes(CheckMode)
     case IndWhatIsYourNINumberPage         => whatIsYourNINumberRoutes(CheckMode)
