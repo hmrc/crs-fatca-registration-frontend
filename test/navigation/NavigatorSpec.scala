@@ -681,11 +681,11 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode))
       }
 
-      "must go from HaveTradingNamePage to NonUKBusinessAddressWithoutIDController when user says No" in {
+      "must go from HaveTradingNamePage to CheckYourAnswersController when user says No" in {
         val userAnswers = emptyUserAnswers.withPage(HaveTradingNamePage, false)
         navigator
           .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
-          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
+          .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
       }
 
       "must go from BusinessTradingNameWithoutIDPage to NonUKBusinessAddressWithoutIDPage" in {
