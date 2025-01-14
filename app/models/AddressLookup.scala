@@ -65,7 +65,7 @@ case class AddressLookup(addressLine1: Option[String],
       Option(town),
       Option(postcode),
       county,
-      country.filterNot(_.description == "United Kingdom").map(_.description)
+      country.filterNot(_.code == "GB").map(_.description)
     ).flatten.mkString(", ")
 
 }
