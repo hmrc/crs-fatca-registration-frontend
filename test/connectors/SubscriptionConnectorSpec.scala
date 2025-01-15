@@ -47,10 +47,8 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
     )
     .build()
 
-  private val seqOfCodes                    = Seq(400, 403, 404, 422, 500, 501, 502, 503, 504)
   lazy val connector: SubscriptionConnector = application.injector.instanceOf[SubscriptionConnector]
   private val subscriptionUrl               = "/crs-fatca-registration/subscription"
-  private val errorCodes: Gen[Int]          = Gen.oneOf(seqOfCodes)
 
   "SubscriptionConnector" - {
     "readSubscription" - {
@@ -191,7 +189,8 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
           ),
           secondaryContact = None
         )
-        val errorCode = errorCodes.sample.value
+        val seqOfCodes     = Seq(400, 403, 404, 500, 501, 502, 503, 504)
+        val errorCode: Int = Gen.oneOf(seqOfCodes).sample.value
 
         val subscriptionErrorResponse: String =
           s"""
