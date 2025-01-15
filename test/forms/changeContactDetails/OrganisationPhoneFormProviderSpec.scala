@@ -21,8 +21,8 @@ import play.api.data.FormError
 
 class OrganisationPhoneFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "organisationPhone.error.required"
-  val lengthKey   = "organisationPhone.error.length"
+  val requiredKey = "organisationContactPhone.error.required"
+  val lengthKey   = "organisationContactPhone.error.length"
   val maxLength   = 24
 
   val form = new OrganisationPhoneFormProvider()()
