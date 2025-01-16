@@ -35,7 +35,7 @@
     @formHelper(action = controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onSubmit()) {
         @heading(messages(if(hasChanges) "checkOrganisationContactDetails.heading" else "changeOrganisationContactDetails.heading"))
 
-        @heading(messages("changeOrganisationContactDetails.primary.heading"), "m")
+        @heading(messages("changeOrganisationContactDetails.primary.heading"), "m", "h2")
 
         @govukSummaryList(primary)
 
