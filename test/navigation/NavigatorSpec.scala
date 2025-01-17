@@ -681,17 +681,28 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode))
       }
 
-      "must go from HaveTradingNamePage to NonUKBusinessAddressWithoutIDController when user says No" in {
+      "must go from HaveTradingNamePage to CheckYourAnswersController when user says No" in {
         val userAnswers = emptyUserAnswers.withPage(HaveTradingNamePage, false)
         navigator
           .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
-          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
+          .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "must go from BusinessTradingNameWithoutIDPage to NonUKBusinessAddressWithoutIDPage" in {
+      "must go from BusinessTradingNameWithoutIDPage to CheckYourAnswersPage if there is an address" in {
+        val userAnswers = emptyUserAnswers
+          .set(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+          .success
+          .value
+
+        navigator
+          .nextPage(BusinessTradingNameWithoutIDPage, CheckMode, userAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "must go from BusinessTradingNameWithoutIDPage to NonUKBusinessAddressWithoutIDPage if there is no address" in {
         navigator
           .nextPage(BusinessTradingNameWithoutIDPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
+          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode))
       }
 
       "must go from IndWhereDoYouLivePage to IndWhatIsYourPostcodePage when user answers Yes" in {

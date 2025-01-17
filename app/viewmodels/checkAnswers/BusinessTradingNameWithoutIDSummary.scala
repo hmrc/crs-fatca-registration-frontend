@@ -37,7 +37,7 @@ object BusinessTradingNameWithoutIDSummary {
           actions = Seq(
             changeAction(
               BusinessTradingNameWithoutIDPage.toString,
-              routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode).url
+              routes.HaveTradingNameController.onPageLoad(CheckMode).url
             )
           )
         )
