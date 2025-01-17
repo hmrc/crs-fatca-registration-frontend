@@ -259,14 +259,19 @@ class Navigator @Inject() () extends Logging {
     case ContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
     case HaveSecondContactPage =>
       userAnswers =>
-        yesNoPage(
-          userAnswers,
-          HaveSecondContactPage,
-          controllers.organisation.routes.SecondContactNameController.onPageLoad(CheckMode),
-          controllers.routes.CheckYourAnswersController.onPageLoad()
+        yesNoNavigate(
+          userAnswers.get(HaveSecondContactPage).exists(_ != true) || userAnswers.get(SecondContactNamePage).isDefined,
+          controllers.routes.CheckYourAnswersController.onPageLoad(),
+          controllers.organisation.routes.SecondContactNameController.onPageLoad(CheckMode)
         )
-    case SecondContactNamePage  => _ => controllers.organisation.routes.SecondContactEmailController.onPageLoad(CheckMode)
-    case SecondContactEmailPage => _ => controllers.organisation.routes.SecondContactHavePhoneController.onPageLoad(CheckMode)
+    case SecondContactNamePage =>
+      userAnswers =>
+        yesNoNavigate(
+          userAnswers.get(SecondContactEmailPage).isDefined,
+          controllers.routes.CheckYourAnswersController.onPageLoad(),
+          controllers.organisation.routes.SecondContactEmailController.onPageLoad(CheckMode)
+        )
+    case SecondContactEmailPage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
     case SecondContactHavePhonePage =>
       userAnswers =>
         yesNoPage(
@@ -338,6 +343,8 @@ class Navigator @Inject() () extends Logging {
     ua.get(fromPage)
       .map(if (_) yesCall else noCall)
       .getOrElse(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+  private def yesNoNavigate(check: => Boolean, yesCall: => Call, noCall: => Call): Call = if (check) yesCall else noCall
 
   private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ReporterTypePage), mode) match {
