@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("dateOfBirthWithoutId.title"))) {
 
-    @formHelper(action = controllers.individual.routes.IndDateOfBirthWithoutIdController.onSubmit(mode), Symbol("id")-> "dobForm") {
+    @formHelper(action = controllers.individual.routes.IndDateOfBirthWithoutIdController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(
