@@ -53,7 +53,7 @@ class OrganisationHaveSecondContactController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, getFirstContactName(request.userAnswers), mode))
+      Ok(view(preparedForm, getOrganisationContactName(request.userAnswers), mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForOrgOrAgent().async {
@@ -61,7 +61,7 @@ class OrganisationHaveSecondContactController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, getFirstContactName(request.userAnswers), mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, getOrganisationContactName(request.userAnswers), mode))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(OrganisationHaveSecondContactPage, value))
