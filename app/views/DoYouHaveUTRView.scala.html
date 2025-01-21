@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import components._
 @import config.FrontendAppConfig
 
 @this(
@@ -21,6 +22,8 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
+    heading: Heading,
+    para: Paragraph,
     govukButton: GovukButton,
     link: components.Link,
     appConfig: FrontendAppConfig
@@ -36,8 +39,8 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("doYouHaveUniqueTaxPayerReference.heading")</h1>
-        <p class="govuk-body">@Html(messages("doYouHaveUniqueTaxPayerReference.p1" , link(appConfig.lostUTRUrl, "doYouHaveUniqueTaxPayerReference.p1.link")))</p>
+        @heading(messages("doYouHaveUniqueTaxPayerReference.heading"))
+        @para(Html(messages("doYouHaveUniqueTaxPayerReference.p1" , link(appConfig.lostUTRUrl, "doYouHaveUniqueTaxPayerReference.p1.link", openInNewWindow = true))))
 
         @govukRadios(
             RadiosViewModel.yesNo(
