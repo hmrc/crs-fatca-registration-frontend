@@ -26,7 +26,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.mockito.MockitoSugar
-import pages.ContactNamePage
+import pages.changeContactDetails.OrganisationContactNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -49,7 +49,7 @@ class OrganisationHaveSecondContactControllerSpec extends SpecBase with MockitoS
 
     "must return OK and the correct view for a GET" in {
 
-      val userAnswers = emptyUserAnswers.withPage(ContactNamePage, name.fullName)
+      val userAnswers = emptyUserAnswers.withPage(OrganisationContactNamePage, name.fullName)
 
       when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
       val application = applicationBuilder(userAnswers = Some(userAnswers))
@@ -89,7 +89,7 @@ class OrganisationHaveSecondContactControllerSpec extends SpecBase with MockitoS
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val userAnswers = emptyUserAnswers.withPage(ContactNamePage, name.fullName)
+      val userAnswers = emptyUserAnswers.withPage(OrganisationContactNamePage, name.fullName)
 
       when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(userAnswers)))
 
