@@ -60,11 +60,15 @@ class ReporterTypeController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
+          value => {
+            val current = request.userAnswers.get(ReporterTypePage).filter(_ == value)
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ReporterTypePage, value))
-              _              <- sessionRepository.set(updatedAnswers)
+              updatedAnswers <- current.fold(Future.fromTry(request.userAnswers.set(ReporterTypePage, value)))(
+                _ => Future.successful(request.userAnswers)
+              )
+              _ <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(ReporterTypePage, mode, updatedAnswers))
+          }
         )
   }
 
