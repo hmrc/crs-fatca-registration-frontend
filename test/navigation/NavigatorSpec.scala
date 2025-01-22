@@ -951,9 +951,9 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(SecondContactNamePage, CheckMode, userAnswers) mustBe SecondContactEmailController.onPageLoad(CheckMode)
       }
 
-      "must go from SecondContactEmailPage to CheckYourAnswersPage" in {
+      "must go from SecondContactEmailPage to SecondContactHavePhonePage" in {
 
-        navigator.nextPage(SecondContactEmailPage, CheckMode, emptyUserAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
+        navigator.nextPage(SecondContactEmailPage, CheckMode, emptyUserAnswers) mustBe SecondContactHavePhoneController.onPageLoad(CheckMode)
       }
 
       "must go from SecondContactHavePhonePage to SecondContactPhonePage when user answers yes" in {

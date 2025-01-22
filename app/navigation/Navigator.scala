@@ -271,7 +271,7 @@ class Navigator @Inject() () extends Logging {
           controllers.routes.CheckYourAnswersController.onPageLoad(),
           controllers.organisation.routes.SecondContactEmailController.onPageLoad(CheckMode)
         )
-    case SecondContactEmailPage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
+    case SecondContactEmailPage => _ => controllers.organisation.routes.SecondContactHavePhoneController.onPageLoad(CheckMode)
     case SecondContactHavePhonePage =>
       userAnswers =>
         yesNoPage(
