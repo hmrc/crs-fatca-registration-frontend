@@ -24,6 +24,7 @@ import generators.{Generators, UserAnswersGenerator}
 import helpers.JsonFixtures._
 import models.ReporterType.{Individual, LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models._
+import models.matching.{IndRegistrationInfo, SafeId}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -35,7 +36,8 @@ import java.time.{Clock, LocalDate}
 
 class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generators with UserAnswersGenerator {
 
-  val navigator = new Navigator
+  val navigator           = new Navigator
+  val indRegistrationInfo = IndRegistrationInfo(SafeId("safe-id"))
 
   "Navigator" - {
 
@@ -604,13 +606,18 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       }
 
       "must go from ReporterTypePage" - {
-        val ua = emptyUserAnswers.withPage(ReporterTypePage, Individual)
+        val ua = emptyUserAnswers
         "to Check Your Answers if Individual is unchanged" in {
-          val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
+          val answers = ua.withPage(ReporterTypePage, Individual).withPage(RegistrationInfoPage, indRegistrationInfo)
           navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
         }
         "to IndDoYouHaveNINumber if reportYpe changed to Individual" in {
-          navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
+          val answers = ua.withPage(ReporterTypePage, Individual)
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
+        }
+        "to Check Your Answers if Agent is unchanged" in {
+          val answers = ua.withPage(ReporterTypePage, Sole).withPage(RegistrationInfoPage, indRegistrationInfo)
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
         }
       }
 
