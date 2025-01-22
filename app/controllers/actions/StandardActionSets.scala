@@ -40,6 +40,9 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
   def identifiedUserWithEnrolmentCheckAndCtUtrRetrieval(): ActionBuilder[IdentifierRequest, AnyContent] =
     identify() andThen checkEnrolment andThen retrieveCtUTR()
 
+  def identifiedWithoutEnrolmentCheckAndWithoutRedirect(): ActionBuilder[DataRequest, AnyContent] =
+    identify(redirect = false) andThen getData() andThen requireData
+
   def identifiedWithoutEnrolmentCheck(): ActionBuilder[DataRequest, AnyContent] =
     identify() andThen getData() andThen requireData
 

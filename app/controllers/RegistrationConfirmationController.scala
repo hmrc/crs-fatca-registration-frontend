@@ -40,7 +40,7 @@ class RegistrationConfirmationController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheck() async {
+  def onPageLoad: Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckAndWithoutRedirect() async {
     implicit request =>
       sessionRepository.set(request.userAnswers.copy(data = Json.obj())).flatMap {
         case true => Future.successful(Ok(view()))
