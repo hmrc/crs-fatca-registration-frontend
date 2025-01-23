@@ -105,9 +105,9 @@ class ControllerHelper @Inject() (
     request: DataRequest[AnyContent]
   ): Future[Result] =
     for {
+      result         <- createEnrolment(safeId, request.userAnswers, subscriptionId)
       updatedAnswers <- Future.fromTry(request.userAnswers.set(SubscriptionIDPage, subscriptionId))
       _              <- sessionRepository.set(updatedAnswers)
-      result         <- createEnrolment(safeId, request.userAnswers, subscriptionId)
     } yield result
 
 }

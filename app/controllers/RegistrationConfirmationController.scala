@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions._
-import play.api.i18n.Lang.logger
+import pages.SubscriptionIDPage
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -42,11 +42,12 @@ class RegistrationConfirmationController @Inject() (
 
   def onPageLoad: Action[AnyContent] = standardActionSets.identifiedWithoutEnrolmentCheckAndWithoutRedirect() async {
     implicit request =>
-      sessionRepository.set(request.userAnswers.copy(data = Json.obj())).flatMap {
-        case true => Future.successful(Ok(view()))
-        case false =>
-          logger.error(s"Failed to clear user answers after adding registering user: [${request.userId}]")
-          Future.successful(Ok(errorView()))
+      for {
+        subscriptionId <- Future.successful(request.userAnswers.get(SubscriptionIDPage))
+        clearSession   <- sessionRepository.set(request.userAnswers.copy(data = Json.obj()))
+      } yield (subscriptionId, clearSession) match {
+        case (Some(fatcaId), true)  => Ok(view(fatcaId.value))
+        case (None, _) | (_, false) => Ok(errorView())
       }
   }
 
