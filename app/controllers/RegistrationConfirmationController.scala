@@ -46,8 +46,8 @@ class RegistrationConfirmationController @Inject() (
         subscriptionId <- Future.successful(request.userAnswers.get(SubscriptionIDPage))
         clearSession   <- sessionRepository.set(request.userAnswers.copy(data = Json.obj()))
       } yield (subscriptionId, clearSession) match {
-        case (Some(fatcaId), true)  => Ok(view(fatcaId.value))
-        case (None, _) | (_, false) => Ok(errorView())
+        case (Some(fatcaId), true) => Ok(view(fatcaId.value))
+        case _                     => Ok(errorView())
       }
   }
 
