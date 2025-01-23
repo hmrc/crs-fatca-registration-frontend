@@ -45,10 +45,12 @@ class ControllerHelper @Inject() (
     with I18nSupport
     with Logging {
 
-  private def indAlreadyRegistered(implicit request: DataRequest[AnyContent]) =
-    request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains) ||
-      request.affinityGroup == AffinityGroup.Individual ||
-      (request.affinityGroup == AffinityGroup.Agent && request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains))
+  private def indAlreadyRegistered(implicit request: DataRequest[AnyContent]) = {
+
+    val isNonOrgReporter: Boolean = request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains)
+
+    isNonOrgReporter || request.affinityGroup == AffinityGroup.Individual
+  }
 
   private def createEnrolment(safeId: SafeId, userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
