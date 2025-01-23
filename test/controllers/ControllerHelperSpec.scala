@@ -118,7 +118,7 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }
 
-    "Redirect to Business already registered with ID when tax enrolments returns EnrolmentExists error" in {
+    "Redirect to Business already registered when tax enrolments returns EnrolmentExists error" in {
       val affinityGroup: AffinityGroup = AffinityGroup.Organisation
       val addressResponse              = AddressResponse("line1", None, None, None, None, "UK")
       val userAnswers2 = userAnswers
@@ -133,25 +133,7 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some(routes.PreRegisteredController.onPageLoad(withId = true).url)
-
-      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
-    }
-
-    "Redirect to Business already registered without ID when tax enrolments returns EnrolmentExists error" in {
-      val affinityGroup: AffinityGroup = AffinityGroup.Organisation
-
-      val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers)
-
-      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
-        .thenReturn(Future.successful(Left(EnrolmentExistsError(mock[GroupIds]))))
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
-      when(mockSubscriptionRepository.set(any())).thenReturn(Future.successful(true))
-
-      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
-
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some(routes.PreRegisteredController.onPageLoad(withId = false).url)
+      redirectLocation(result) shouldBe Some(routes.PreRegisteredController.onPageLoad().url)
 
       verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
     }

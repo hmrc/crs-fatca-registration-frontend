@@ -20,12 +20,13 @@ import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingE
 import models.matching.SafeId
 import models.requests.DataRequest
 import models.{ReporterType, SubscriptionID, UserAnswers, UserSubscription}
-import pages.{ReporterTypePage, SubscriptionIDPage}
+import pages.{RegistrationInfoPage, ReporterTypePage, SubscriptionIDPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Result}
 import repositories.{SessionRepository, SubscriptionRepository}
 import services.TaxEnrolmentService
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ThereIsAProblemView
@@ -45,7 +46,9 @@ class ControllerHelper @Inject() (
     with Logging {
 
   private def indAlreadyRegistered(implicit request: DataRequest[AnyContent]) =
-    request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains)
+    request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains) ||
+      request.affinityGroup == AffinityGroup.Individual ||
+      (request.affinityGroup == AffinityGroup.Agent && request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains))
 
   private def createEnrolment(safeId: SafeId, userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
