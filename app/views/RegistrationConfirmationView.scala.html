@@ -27,7 +27,7 @@
         appConfig: FrontendAppConfig
 )
 
-@(userId: String = "ABCD123456")(implicit request: Request[_], messages: Messages)
+@(fatcaId: String)(implicit request: Request[_], messages: Messages)
 
 @addFILink = {@link(appConfig.addFinancialInstitutionUrl, messages("registrationConfirmation.link.addFI"))}
 @surveyLink = {@link(appConfig.exitSurveyUrl, messages("registrationConfirmation.link.survey"))}
@@ -36,7 +36,7 @@
 
     @govukPanel(Panel(
         title = Text(messages("registrationConfirmation.heading")),
-        content = HtmlContent(s"Your CRS and FATCA user ID \n <b>$userId</b>")
+        content = HtmlContent(s"Your CRS and FATCA user ID \n <b>$fatcaId</b>")
 
         )
     )
