@@ -45,9 +45,12 @@ class ControllerHelper @Inject() (
     with I18nSupport
     with Logging {
 
-  private def indAlreadyRegistered(implicit request: DataRequest[AnyContent]) =
-    request.affinityGroup == AffinityGroup.Individual ||
-      (request.affinityGroup == AffinityGroup.Agent && request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains))
+  private def indAlreadyRegistered(implicit request: DataRequest[AnyContent]) = {
+
+    val isNonOrgReporter: Boolean = request.userAnswers.get(ReporterTypePage).exists(ReporterType.nonOrgReporterTypes.contains)
+
+    isNonOrgReporter || request.affinityGroup == AffinityGroup.Individual
+  }
 
   private def createEnrolment(safeId: SafeId, userAnswers: UserAnswers, subscriptionId: SubscriptionID)(implicit
     hc: HeaderCarrier,
@@ -66,17 +69,10 @@ class ControllerHelper @Inject() (
           )
       case Left(EnrolmentExistsError(groupIds)) =>
         logger.info(s"ControllerHelper: EnrolmentExistsError for the the groupIds $groupIds")
-        if (request.userAnswers.get(RegistrationInfoPage).isDefined) {
-          subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
-            .map(
-              _ => Redirect(routes.PreRegisteredController.onPageLoad(true))
-            )
-        } else {
-          subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
-            .map(
-              _ => Redirect(routes.PreRegisteredController.onPageLoad(false))
-            )
-        }
+        subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))
+          .map(
+            _ => Redirect(routes.PreRegisteredController.onPageLoad())
+          )
       case Left(MandatoryInformationMissingError(_)) =>
         logger.warn(s"ControllerHelper: Mandatory information is missing")
         subscriptionRepository.set(UserSubscription(safeId.value, subscriptionId))

@@ -537,38 +537,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe controllers.routes.PreRegisteredController.onPageLoad(withId = false).url
-        }
-      }
-
-      "must redirect to BusinessAlreadyRegisteredPage when EnrolmentExistsError occurs in registration with Id" in {
-
-        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(Right(SubscriptionID(UserAnswersId))))
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockTaxEnrolmentsService.checkAndCreateEnrolment(any(), any())(any(), any()))
-          .thenReturn(Future.successful(Left(EnrolmentExistsError(GroupIds(Seq(UserAnswersId), Seq.empty)))))
-
-        val userAnswers = emptyUserAnswers
-          .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
-          .withPage(RegistrationInfoPage, IndRegistrationInfo(safeId))
-
-        val application = applicationBuilder(Option(userAnswers), AffinityGroup.Organisation)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SubscriptionService].toInstance(mockSubscriptionService),
-            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
-          )
-          .build()
-
-        running(application) {
-          val request = FakeRequest(POST, submitRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe controllers.routes.PreRegisteredController.onPageLoad(withId = true).url
+          redirectLocation(result).value mustBe controllers.routes.PreRegisteredController.onPageLoad().url
         }
       }
 

@@ -439,11 +439,11 @@ contactDetailsMissing.p1 = You must provide this information to update your cont
 
 preRegistered.title = Your organisation is already registered to use this service
 preRegistered.heading = Your organisation is already registered to use this service
-preRegistered.withOutID.information = You can access the service using the Government Gateway details that were used to register for CRS and FATCA.
-preRegistered.withOutID.GGLink = Sign in using Government Gateway
 preRegistered.help = You can email {0} if you’re having problems accessing the service.
 preRegistered.help.linkLocation = mailto:aeoi.enquiries@hmrc.gov.uk
-preRegistered.withID.information = You will need to contact your administrator to give you access via the ‘Manage account’ settings within their business tax account.
+preRegistered.withID.information = Your administrator needs to give you permission to use the CRS and FATCA service through the tax and scheme management service.
+preRegistered.withID.information2 = If your administrator does not have the link for the tax and scheme management service, then you can share this link with them. The link will only work for your administrator:
+preRegistered.withID.information.link = www.tax.service.gov.uk/tax-and-scheme-management/services
 
 individualAlreadyRegistered.title = You are already registered to use this service
 individualAlreadyRegistered.heading = You are already registered to use this service

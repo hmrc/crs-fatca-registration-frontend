@@ -28,8 +28,7 @@ GET         /account/signed-out                                                 
 
 GET         /unauthorised                                                        controllers.UnauthorisedController.onPageLoad
 
-GET         /register/problem/organisation-without-utr-pre-registered            controllers.PreRegisteredController.onPageLoad(withId: Boolean = false)
-GET         /register/problem/organisation-with-utr-pre-registered               controllers.PreRegisteredController.onPageLoad(withId: Boolean = true)
+GET         /register/problem/organisation-already-registered           controllers.PreRegisteredController.onPageLoad()
 
 GET         /register/problem/individual-pre-registered                          controllers.individual.IndividualAlreadyRegisteredController.onPageLoad()
 
