@@ -406,13 +406,7 @@ isThisYourAddress.error.required = Select yes if this is your address
 
 
 whatIsYourUTR.checkYourAnswersLabel = whatIsYourUTR
-whatIsYourUTR.error.selfAssessment = Self Assessment
-whatIsYourUTR.error.corporationTax = Corporation Tax
-whatIsYourUTR.error.partnership = Partnership
-
-
 whatIsYourUTR.hint = Your UTR can be 10 or 13 digits long.
-
 whatIsYourUTR.soleTrader.title = Your Self Assessment Unique Taxpayer Reference (UTR)
 whatIsYourUTR.soleTrader.paragraph = You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 whatIsYourUTR.soleTrader.link = Get more help to find your UTR (opens in new tab)
