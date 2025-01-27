@@ -25,7 +25,7 @@ appConfig: FrontendAppConfig
 
 @(emailLink: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("preRegistered.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("preRegistered.title")), showBackLink = true) {
 
       <h1 class="govuk-heading-l">@messages("preRegistered.heading")</h1>
 
