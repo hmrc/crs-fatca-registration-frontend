@@ -19,7 +19,7 @@ package controllers.organisation
 import base.SpecBase
 import forms.WhatIsYourUTRFormProvider
 import generators.UserAnswersGenerator
-import models.ReporterType.{LimitedCompany, Sole, UnincorporatedAssociation}
+import models.ReporterType.{LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models.{NormalMode, ReporterType, UniqueTaxpayerReference, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -45,37 +45,39 @@ class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar with UserAn
   val UtrValue                     = "1234567890"
   val utr: UniqueTaxpayerReference = UniqueTaxpayerReference(UtrValue)
 
+  private def getTaxTypeMessage(userAnswers: UserAnswers) =
+    userAnswers.get(ReporterTypePage) match {
+      case Some(LimitedCompany) | Some(UnincorporatedAssociation) => "whatIsYourUTR.corporation"
+      case Some(Partnership) | Some(LimitedPartnership)           => "whatIsYourUTR.partnership"
+      case Some(Sole)                                             => "whatIsYourUTR.soleTrader"
+    }
+
   "WhatIsYourUTR Controller" - {
 
-    "must return OK and the correct view for a GET when self assessment" in {
+    "must return OK and the correct view for a GET when FI is self assessment" in {
+      val userAnswers = emptyUserAnswers.set(ReporterTypePage, Sole).success.value
 
-      forAll(orgWithId.arbitrary) {
-        (userAnswers: UserAnswers) =>
-          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-          when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
 
-          running(application) {
-            val request = FakeRequest(GET, loadRoute)
+      running(application) {
+        val request = FakeRequest(GET, loadRoute)
 
-            val result = route(application, request).value
+        val result = route(application, request).value
 
-            val taxType = userAnswers.get(ReporterTypePage) match {
-              case Some(LimitedCompany) | Some(UnincorporatedAssociation) => "Corporation Tax"
-              case _                                                      => "Self Assessment"
-            }
-            val form        = new WhatIsYourUTRFormProvider().apply(taxType)
-            val view        = application.injector.instanceOf[WhatIsYourUTRView]
-            val updatedForm = userAnswers.get(WhatIsYourUTRPage).map(form.fill).getOrElse(form)
+        val form              = new WhatIsYourUTRFormProvider().apply(taxType)
+        val view              = application.injector.instanceOf[WhatIsYourUTRView]
+        val updatedForm       = userAnswers.get(WhatIsYourUTRPage).map(form.fill).getOrElse(form)
+        val taxTypeMessageKey = getTaxTypeMessage(userAnswers)
 
-            status(result) mustEqual OK
-            contentAsString(result) mustEqual view(updatedForm, NormalMode, taxType)(request, messages(application)).toString
-          }
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(updatedForm, NormalMode, taxTypeMessageKey)(request, messages(application)).toString
       }
     }
 
-    "must return OK and the correct view for a GET when corporation tax" in {
-
+    "must return OK and the correct view for a GET when FI is a corporation" in {
       val userAnswers = emptyUserAnswers.set(ReporterTypePage, ReporterType.LimitedCompany).success.value
+
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -85,10 +87,31 @@ class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar with UserAn
 
         val view = application.injector.instanceOf[WhatIsYourUTRView]
 
-        val taxType = "Corporation Tax"
+        val taxTypeMessageKey = getTaxTypeMessage(userAnswers)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, taxType)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, taxTypeMessageKey)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when is FI is a partnership" in {
+      val userAnswers = emptyUserAnswers.set(ReporterTypePage, Partnership).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
+
+      running(application) {
+        val request = FakeRequest(GET, loadRoute)
+
+        val result = route(application, request).value
+
+        val form              = new WhatIsYourUTRFormProvider().apply(taxType)
+        val view              = application.injector.instanceOf[WhatIsYourUTRView]
+        val updatedForm       = userAnswers.get(WhatIsYourUTRPage).map(form.fill).getOrElse(form)
+        val taxTypeMessageKey = getTaxTypeMessage(userAnswers)
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(updatedForm, NormalMode, taxTypeMessageKey)(request, messages(application)).toString
       }
     }
 
@@ -111,10 +134,11 @@ class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar with UserAn
         val view      = application.injector.instanceOf[WhatIsYourUTRView]
         val boundForm = form.bind(Map("value" -> utr.uniqueTaxPayerReference))
 
-        val result = route(application, request).value
+        val result            = route(application, request).value
+        val taxTypeMessageKey = getTaxTypeMessage(userAnswers)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(boundForm, NormalMode, taxType)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, taxTypeMessageKey)(request, messages(application)).toString
       }
     }
 
@@ -167,10 +191,11 @@ class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar with UserAn
 
         val view = application.injector.instanceOf[WhatIsYourUTRView]
 
-        val result = route(application, request).value
+        val result            = route(application, request).value
+        val taxTypeMessageKey = getTaxTypeMessage(userAnswers)
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, taxType)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, taxTypeMessageKey)(request, messages(application)).toString
       }
     }
 

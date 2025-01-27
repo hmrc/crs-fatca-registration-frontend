@@ -404,19 +404,34 @@ isThisYourAddress.title = Is this your address?
 isThisYourAddress.heading = Is this your address?
 isThisYourAddress.error.required = Select yes if this is your address
 
-whatIsYourUTR.title = What is your {0} Unique Taxpayer Reference (UTR)?
-whatIsYourUTR.heading = What is your {0} Unique Taxpayer Reference (UTR)?
-whatIsYourUTR.p1 = You can {0}.
-whatIsYourUTR.p1.link = find a lost UTR
-whatIsYourUTR.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+
 whatIsYourUTR.checkYourAnswersLabel = whatIsYourUTR
 whatIsYourUTR.error.selfAssessment = Self Assessment
 whatIsYourUTR.error.corporationTax = Corporation Tax
+whatIsYourUTR.error.partnership = Partnership
+
+
+whatIsYourUTR.hint = Your UTR can be 10 or 13 digits long.
+
+whatIsYourUTR.soleTrader.title = Your Self Assessment Unique Taxpayer Reference (UTR)
+whatIsYourUTR.soleTrader.paragraph = You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+whatIsYourUTR.soleTrader.link = Get more help to find your UTR (opens in new tab)
+whatIsYourUTR.soleTrader.subtitle = What is your Self Assessment UTR?
+
+whatIsYourUTR.partnership.title = Your Partnership Unique Taxpayer Reference (UTR)
+whatIsYourUTR.partnership.paragraph = You can find it in your Business Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+whatIsYourUTR.partnership.link = Get more help to find your UTR (opens in new tab)
+whatIsYourUTR.partnership.subtitle = What is your Partnership UTR?
+
+whatIsYourUTR.corporation.title = Your Corporation Tax Unique Taxpayer Reference (UTR)
+whatIsYourUTR.corporation.paragraph = It will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+whatIsYourUTR.corporation.link = Ask for a copy of your Corporation Tax UTR (opens in new tab)
+whatIsYourUTR.corporation.subtitle = What is your Corporation Tax UTR?
+
 whatIsYourUTR.error.required = Enter your Unique Taxpayer Reference
-whatIsYourUTR.error.invalidFormat = Unique Taxpayer Reference must include 10 numbers, for example 1234567890
+whatIsYourUTR.error.invalidFormat = Enter the Unique Taxpayer Reference in the right format
 whatIsYourUTR.error.invalid = Unique Taxpayer Reference must only include numbers 0 to 9
 whatIsYourUTR.change.hidden = WhatIsYourUTR
-
 
 
 sessionExpired.title = For your security, we signed you out
