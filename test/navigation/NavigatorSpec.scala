@@ -1264,6 +1264,31 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         }
       }
 
+      "Organisation without ID" - {
+        "ReporterTypePage returns to CYA when there are no missing answers" in {
+          val ua = emptyUserAnswers
+            .withPage(ReporterTypePage, LimitedCompany)
+            .withPage(RegisteredAddressInUKPage, false)
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, false)
+            .withPage(BusinessNameWithoutIDPage, "test")
+            .withPage(HaveTradingNamePage, false)
+            .withPage(
+              NonUKBusinessAddressWithoutIDPage,
+              Address(addressLine1 = "test", addressLine2 = None, addressLine3 = "test", addressLine4 = None, postCode = None, country = Country.GB)
+            )
+            .withPage(ContactNamePage, "test")
+            .withPage(ContactEmailPage, "test@x.com")
+            .withPage(ContactHavePhonePage, false)
+            .withPage(HaveSecondContactPage, false)
+
+          navigator.nextPage(ReporterTypePage,
+                             CheckMode,
+                             ua
+                               .withPage(ReporterTypePage, Partnership)
+          ) mustBe controllers.routes.CheckYourAnswersController.onPageLoad()
+
+        }
+      }
     }
   }
 
