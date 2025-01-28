@@ -41,7 +41,7 @@
             )
             .withWidth(ThreeQuarters)
             .withHint(HintViewModel(Text(messages("contactName.hint"))))
-            .withAttribute("name" -> "name")
+            .asContactName()
         )
 
         @govukButton(

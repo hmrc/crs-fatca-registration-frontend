@@ -40,7 +40,7 @@
                 label = LabelViewModel(messages(s"individualPhone.heading")).asPageHeading()
             ).withHint(HintViewModel(HtmlContent(messages("individualPhone.hint"))))
             .withWidth(Fixed20)
-            .withAttribute("tel" -> "tel")
+            .asTelephone()
         )
 
         @govukButton(

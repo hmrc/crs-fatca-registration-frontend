@@ -43,7 +43,7 @@
                 label = LabelViewModel(messages("secondContactEmail.heading", contactName)).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Full)
-            .withAttribute("email" -> "email")
+            .asEmail()
         )
 
         @govukButton(

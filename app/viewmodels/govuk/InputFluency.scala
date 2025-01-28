@@ -95,6 +95,18 @@ trait InputFluency {
     def withWidth(inputWidth: InputWidth): Input =
       input.withCssClass(inputWidth.toString)
 
+    def asContactName(): Input =
+      input
+        .withAutocomplete("name")
+        .withSpellcheck(on = false)
+
+    def asTelephone(): Input =
+      input
+        .withInputMode("tel")
+        .withPattern("[0-9]*")
+        .withAutocomplete("tel")
+        .withSpellcheck(on = false)
+
   }
 
 }
