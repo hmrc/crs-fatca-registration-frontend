@@ -107,6 +107,7 @@ trait InputFluency {
 
     def asTelephone(): Input =
       input
+        .withInputType("tel")
         .withInputMode("tel")
         .withPattern("[0-9]*")
         .withAutocomplete("tel")
