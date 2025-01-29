@@ -933,6 +933,12 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
         navigator.nextPage(HaveSecondContactPage, CheckMode, userAnswers) mustBe SecondContactNameController.onPageLoad(CheckMode)
       }
 
+      "must go from HaveSecondContactPage to CheckYourAnswersPage when user answers yes and contact name is already found" in {
+
+        val userAnswers = emptyUserAnswers.withPage(SecondContactNamePage, "Test").withPage(HaveSecondContactPage, true)
+        navigator.nextPage(HaveSecondContactPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
+      }
+
       "must go from HaveSecondContactPage to CheckYourAnswersPage when user answers no" in {
 
         val userAnswers = emptyUserAnswers.withPage(HaveSecondContactPage, false)
