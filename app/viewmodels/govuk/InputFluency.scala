@@ -100,6 +100,11 @@ trait InputFluency {
         .withAutocomplete("name")
         .withSpellcheck(on = false)
 
+    def asOrganisation(): Input =
+      input
+        .withAutocomplete("name")
+        .withSpellcheck(on = false)
+
     def asTelephone(): Input =
       input
         .withInputMode("tel")
