@@ -16,12 +16,13 @@
 
 package generators
 
-import java.time.{Instant, LocalDate, ZoneOffset}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen._
 import org.scalacheck.{Gen, Shrink}
 import utils.RegexConstants
 import wolfendale.scalacheck.regexp.RegexpGen
+
+import java.time.{Instant, LocalDate, ZoneOffset}
 
 trait Generators extends RegexConstants {
 
@@ -186,7 +187,7 @@ trait Generators extends RegexConstants {
       districtLength <- Gen.choose(1, 2)
       district       <- Gen.listOfN(districtLength, Gen.choose(0, 9)).map(_.mkString)
 
-      subDistrict <- if (districtLength == 1) Gen.oneOf(Gen.const(""), Gen.alphaChar) else Gen.const("")
+      subDistrict <- if (districtLength == 1) Gen.oneOf(Gen.const(""), Gen.alphaChar.map(_.toString)) else Gen.const("")
 
       space <- Gen.oneOf("", " ")
 
@@ -209,6 +210,16 @@ trait Generators extends RegexConstants {
     length    <- Gen.chooseNum(1, maxLength).suchThat(_ != givenLength)
     chars     <- listOfN(length, Gen.numChar)
   } yield chars.mkString
+
+  def stringsNotOfFixedLengthsNumeric(validLengths: Set[Int]): Gen[String] =
+    Gen
+      .choose(1, 50)
+      .suchThat(
+        len => !validLengths.contains(len)
+      )
+      .flatMap(
+        len => Gen.listOfN(len, Gen.numChar).map(_.mkString)
+      )
 
   val safeIDRegex              = "^[0-9A-Za-z]{1,15}"
   def validSafeID: Gen[String] = RegexpGen.from(safeIDRegex)

@@ -92,7 +92,7 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       .build()
 
   override def beforeEach(): Unit = {
-    Seq(mockMatchingService, mockSubscriptionService, mockTaxEnrolmentService, mockDataRetrievalAction).foreach(reset(_))
+    Seq[AnyRef](mockMatchingService, mockSubscriptionService, mockTaxEnrolmentService, mockDataRetrievalAction).foreach(reset(_))
     super.beforeEach()
   }
 

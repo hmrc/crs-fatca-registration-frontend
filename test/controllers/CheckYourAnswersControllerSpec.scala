@@ -22,7 +22,6 @@ import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures._
 import models.enrolment.GroupIds
 import models.error.ApiError._
-import models.matching.IndRegistrationInfo
 import models.{Address, Country, SubscriptionID, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
