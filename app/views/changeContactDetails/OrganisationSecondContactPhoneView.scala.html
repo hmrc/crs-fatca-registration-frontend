@@ -41,6 +41,7 @@
                 label = LabelViewModel(messages("organisationSecondContactPhone.heading", secondContactName)).asPageHeading()
             ).withHint(HintViewModel(HtmlContent(Html(messages("organisationSecondContactPhone.hint")))))
             .withWidth(Fixed20)
+            .asTelephone()
         )
 
         @govukButton(
