@@ -102,7 +102,7 @@ trait InputFluency {
 
     def asOrganisation(): Input =
       input
-        .withAutocomplete("name")
+        .withAutocomplete("organization")
         .withSpellcheck(on = false)
 
     def asTelephone(): Input =
