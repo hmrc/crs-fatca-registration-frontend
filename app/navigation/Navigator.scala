@@ -355,7 +355,7 @@ class Navigator @Inject() () extends Logging {
     (ua.get(ReporterTypePage), mode) match {
       case (Some(Individual), NormalMode) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
       case (Some(Individual), CheckMode) =>
-        ua.get(IndDoYouHaveNINumberPage)
+        ua.get(RegistrationInfoPage)
           .fold(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode))(
             _ => controllers.routes.CheckYourAnswersController.onPageLoad()
           )
