@@ -359,11 +359,6 @@ class Navigator @Inject() () extends Logging {
           .fold(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode))(
             _ => controllers.routes.CheckYourAnswersController.onPageLoad()
           )
-      case (Some(Sole), CheckMode) =>
-        ua.get(RegistrationInfoPage)
-          .fold(controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode))(
-            _ => controllers.routes.CheckYourAnswersController.onPageLoad()
-          )
       case (Some(_), _) => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
       case (None, _)    => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
