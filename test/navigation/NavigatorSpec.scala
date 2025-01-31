@@ -615,9 +615,9 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           val answers = ua.withPage(ReporterTypePage, Individual)
           navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
         }
-        "to Check Your Answers if Agent is unchanged" in {
+        "to RegisteredAddressInUK if Agent is unchanged" in {
           val answers = ua.withPage(ReporterTypePage, Sole).withPage(RegistrationInfoPage, indRegistrationInfo)
-          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(CheckMode)
         }
       }
 
