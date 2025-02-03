@@ -21,10 +21,10 @@ import play.api.data.FormError
 
 class WhatIsYourUTRFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey      = "whatIsYourUTR.error.required"
-  val invalidFormatKey = "whatIsYourUTR.error.invalidFormat"
-  val invalidKey       = "whatIsYourUTR.error.invalid"
-  val fixedLength      = 10
+  val requiredKey               = "whatIsYourUTR.error.required"
+  val invalidFormatKey          = "whatIsYourUTR.error.invalidFormat"
+  val invalidKey                = "whatIsYourUTR.error.invalid"
+  val acceptedLengths: Set[Int] = Set(10, 13)
 
   val form = new WhatIsYourUTRFormProvider()("")
 
@@ -38,10 +38,10 @@ class WhatIsYourUTRFormProviderSpec extends StringFieldBehaviours {
       validUtr
     )
 
-    behave like fieldWithFixedLengthNumeric(
+    behave like fieldWithFixedLengthsNumeric(
       form,
       fieldName,
-      fixedLength,
+      acceptedLengths,
       lengthError = FormError(fieldName, invalidFormatKey)
     )
 

@@ -49,6 +49,7 @@ class WhatIsYourUTRControllerSpec extends SpecBase with MockitoSugar with UserAn
       case Some(LimitedCompany) | Some(UnincorporatedAssociation) => "whatIsYourUTR.corporation"
       case Some(Partnership) | Some(LimitedPartnership)           => "whatIsYourUTR.partnership"
       case Some(Sole)                                             => "whatIsYourUTR.soleTrader"
+      case _                                                      => ""
     }
 
   "WhatIsYourUTR Controller" - {
