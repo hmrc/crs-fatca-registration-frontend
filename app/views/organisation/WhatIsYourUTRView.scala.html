@@ -27,9 +27,9 @@
     appConfig: FrontendAppConfig
 )
 
-@(form: Form[_], mode: Mode, taxType: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, taxTypeMessageKey: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("whatIsYourUTR.title", taxType))) {
+@layout(pageTitle = title(form, messages(s"$taxTypeMessageKey.title"))) {
 
     @formHelper(action = controllers.organisation.routes.WhatIsYourUTRController.onSubmit(mode)) {
 
@@ -37,19 +37,27 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("whatIsYourUTR.heading", taxType)</h1>
+        <h1 class="govuk-heading-l">@messages(s"$taxTypeMessageKey.title")</h1>
 
-        <p class="govuk-body">@Html(messages("whatIsYourUTR.p1" , link(appConfig.lostUTRUrl, "whatIsYourUTR.p1.link")))</p>
+        <p class="govuk-body">@messages(s"$taxTypeMessageKey.paragraph")</p>
+
+         @if(taxTypeMessageKey.contains("corporation")){
+             <p class="govuk-body">@link(appConfig.findCorpTaxUTRUrl, s"$taxTypeMessageKey.link", openInNewWindow = true)</p>
+         }else {
+             <p class="govuk-body">@link(appConfig.findUTRUrl, s"$taxTypeMessageKey.link", openInNewWindow = true)</p>
+         }
+
+        <h2 class="govuk-label govuk-label--m">@messages(s"$taxTypeMessageKey.subtitle", taxTypeMessageKey)</h2>
 
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("whatIsYourUTR.heading", taxType)).withCssClass("govuk-visually-hidden")
+                label = LabelViewModel(messages(s"$taxTypeMessageKey.title")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Fixed10)
             .withHint(
                 HintViewModel(
-                    HtmlContent(Html(messages("whatIsYourUTR.hint", taxType)))
+                    HtmlContent(Html(messages("whatIsYourUTR.hint")))
                 )
             )
         )

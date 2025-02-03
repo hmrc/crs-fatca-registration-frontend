@@ -291,9 +291,7 @@ class Navigator @Inject() () extends Logging {
           controllers.organisation.routes.SecondContactPhoneController.onPageLoad(CheckMode),
           controllers.routes.CheckYourAnswersController.onPageLoad()
         )
-    case SecondContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
-
-    // ChangeContactDetails ->
+    case SecondContactPhonePage       => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
     case OrganisationContactNamePage  => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
     case OrganisationContactEmailPage => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
     case OrganisationContactHavePhonePage =>
@@ -356,6 +354,8 @@ class Navigator @Inject() () extends Logging {
     ua.get(fromPage)
       .map(if (_) yesCall else noCall)
       .getOrElse(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+  private def yesNoNavigate(check: => Boolean, yesCall: => Call, noCall: => Call): Call = if (check) yesCall else noCall
 
   private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ReporterTypePage), mode) match {

@@ -18,18 +18,17 @@ package controllers.organisation
 
 import controllers.actions._
 import forms.WhatIsYourUTRFormProvider
-import models.ReporterType.{LimitedCompany, UnincorporatedAssociation}
-
-import javax.inject.Inject
+import models.ReporterType.{LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models.{Mode, UserAnswers}
 import navigation.Navigator
 import pages.{ReporterTypePage, WhatIsYourUTRPage}
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.organisation.WhatIsYourUTRView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class WhatIsYourUTRController @Inject() (
@@ -47,7 +46,7 @@ class WhatIsYourUTRController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
-      val taxType = getTaxType(request.userAnswers)
+      val taxType = getTaxTypeMessageKey(request.userAnswers)
       val form    = formProvider(taxType)
 
       val preparedForm = request.userAnswers.get(WhatIsYourUTRPage) match {
@@ -60,7 +59,7 @@ class WhatIsYourUTRController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
     implicit request =>
-      val taxType = getTaxType(request.userAnswers)
+      val taxType = getTaxTypeMessageKey(request.userAnswers)
       val form    = formProvider(taxType)
 
       form
@@ -75,10 +74,11 @@ class WhatIsYourUTRController @Inject() (
         )
   }
 
-  private def getTaxType(userAnswers: UserAnswers)(implicit messages: Messages): String =
+  private def getTaxTypeMessageKey(userAnswers: UserAnswers): String =
     userAnswers.get(ReporterTypePage) match {
-      case Some(LimitedCompany) | Some(UnincorporatedAssociation) => messages("whatIsYourUTR.error.corporationTax")
-      case _                                                      => messages("whatIsYourUTR.error.selfAssessment")
+      case Some(LimitedCompany) | Some(UnincorporatedAssociation) => "whatIsYourUTR.corporation"
+      case Some(Partnership) | Some(LimitedPartnership)           => "whatIsYourUTR.partnership"
+      case Some(Sole)                                             => "whatIsYourUTR.soleTrader"
     }
 
 }

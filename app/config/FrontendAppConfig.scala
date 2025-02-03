@@ -45,6 +45,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val crsFatcaFIManagementFrontendUrl: String = configuration.get[String]("urls.crsFatcaFIManagementFrontend")
   val addFinancialInstitutionUrl: String      = configuration.get[String]("urls.addFinancialInstitution")
   lazy val lostUTRUrl: String                 = configuration.get[String]("urls.lostUTR")
+  lazy val findUTRUrl: String                 = configuration.get[String]("urls.findUTR")
+  lazy val findCorpTaxUTRUrl: String          = configuration.get[String]("urls.findCorporationTaxUTR")
   lazy val findCompanyName: String            = configuration.get[String]("urls.findCompanyName")
 
   lazy val businessMatchingUrl: String =
