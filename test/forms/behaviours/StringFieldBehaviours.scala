@@ -81,7 +81,6 @@ trait StringFieldBehaviours extends FieldBehaviours {
 
       forAll(stringsNotOfFixedLengthsNumeric(acceptedLengths) -> "invalidString") {
         string =>
-          println(string)
           val result = form.bind(Map(fieldName -> string)).apply(fieldName)
           result.errors mustEqual Seq(lengthError)
       }
