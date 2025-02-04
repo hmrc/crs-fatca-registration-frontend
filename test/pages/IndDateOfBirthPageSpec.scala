@@ -51,9 +51,11 @@ class IndDateOfBirthPageSpec extends PageBehaviours {
     }
     "must not clear RegistrationInfo" - {
       "when there is no change in answers" in {
-        val ua     = createUserAnswersForIndividualCleanup.sample.get
-        val dob    = ua.get(IndDateOfBirthPage)
-        val result = IndDateOfBirthPage.cleanup(dob, ua).success.value
+        val ua = createUserAnswersForIndividualCleanup.sample.get
+        val result = IndDateOfBirthPage.cleanup(
+          ua.get(IndDateOfBirthPage),
+          ua.withPage(IdMatchInfoPage, IdMatchInfo(dob = ua.get(IndDateOfBirthPage))) // use same generated dob
+        ).success.value
 
         result.get(RegistrationInfoPage) must not be empty
       }

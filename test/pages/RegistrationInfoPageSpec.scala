@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,21 @@
 
 package pages
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import base.TestValues
+import models.matching.IndRegistrationInfo
+import pages.behaviours.PageBehaviours
 import uk.gov.hmrc.domain.Nino
 
-import scala.util.Try
+class RegistrationInfoPageSpec extends PageBehaviours with TestValues {
 
-case object IndWhatIsYourNINumberPage extends QuestionPage[Nino] {
+  "cleanUp" - {
+    "must clear IdMatchedInfoPage when set" - {
+      val ua     = emptyUserAnswers.withPage(IdMatchInfoPage, IdMatchInfo(nino = Some(Nino(TestNiNumber))))
+      val result = RegistrationInfoPage.cleanup(Some(IndRegistrationInfo(safeId)), ua).success.value
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "indWhatIsYourNINumber"
-
-  override def cleanup(value: Option[Nino], userAnswers: UserAnswers): Try[UserAnswers] =
-    if (userAnswers.get(IdMatchInfoPage).flatMap(_.nino) != value) {
-      userAnswers.remove(RegistrationInfoPage)
-    } else {
-      super.cleanup(value, userAnswers)
+      result.get(RegistrationInfoPage) mustBe empty
     }
+
+  }
 
 }

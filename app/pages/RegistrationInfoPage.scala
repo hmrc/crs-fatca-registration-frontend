@@ -18,10 +18,19 @@ package pages
 
 import models.matching.RegistrationInfo
 import play.api.libs.json.JsPath
+import models.UserAnswers
+import scala.util.Try
 
 case object RegistrationInfoPage extends QuestionPage[RegistrationInfo] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "registrationInfo"
+
+  override def cleanup(value: Option[RegistrationInfo], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(_) => userAnswers.remove(IdMatchInfoPage)
+      case None    => super.cleanup(value, userAnswers)
+    }
+
 }

@@ -27,15 +27,11 @@ case object IndContactNamePage extends QuestionPage[Name] {
 
   override def toString: String = "indContactName"
 
-  override def cleanup(value: Option[Name], userAnswers: UserAnswers): Try[UserAnswers] = {
-    val storedValue         = userAnswers.get(IndContactNamePage)
-    val hasChanged: Boolean = storedValue != value
-
-    if (hasChanged) {
+  override def cleanup(value: Option[Name], userAnswers: UserAnswers): Try[UserAnswers] =
+    if (userAnswers.get(IdMatchInfoPage).flatMap(_.name) != value) {
       userAnswers.remove(RegistrationInfoPage)
     } else {
       super.cleanup(value, userAnswers)
     }
-  }
 
 }

@@ -59,16 +59,16 @@ class IndWhatIsYourNINumberController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
     implicit request =>
-      val oldValue: Option[Nino] = request.userAnswers.get(IndWhatIsYourNINumberPage)
+      val currentValue: Option[Nino] = request.userAnswers.get(IndWhatIsYourNINumberPage)
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              answersWithOldValue <- Future.fromTry(request.userAnswers.set(IdMatchInfoPage, IdMatchInfo(nino = oldValue)))
-              updatedAnswers      <- Future.fromTry(answersWithOldValue.set(IndWhatIsYourNINumberPage, Nino(value)))
-              _                   <- sessionRepository.set(updatedAnswers)
+              storedCurrentValue <- Future.fromTry(request.userAnswers.set(IdMatchInfoPage, IdMatchInfo(nino = currentValue)))
+              updatedAnswers     <- Future.fromTry(storedCurrentValue.set(IndWhatIsYourNINumberPage, Nino(value)))
+              _                  <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndWhatIsYourNINumberPage, mode, updatedAnswers))
         )
   }

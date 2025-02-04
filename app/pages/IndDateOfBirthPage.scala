@@ -28,15 +28,11 @@ case object IndDateOfBirthPage extends QuestionPage[LocalDate] {
 
   override def toString: String = "indDateOfBirth"
 
-  override def cleanup(value: Option[LocalDate], userAnswers: UserAnswers): Try[UserAnswers] = {
-    val storedValue         = userAnswers.get(IndDateOfBirthPage)
-    val hasChanged: Boolean = storedValue != value
-
-    if (hasChanged) {
+  override def cleanup(value: Option[LocalDate], userAnswers: UserAnswers): Try[UserAnswers] =
+    if (userAnswers.get(IdMatchInfoPage).flatMap(_.dob) != value) {
       userAnswers.remove(RegistrationInfoPage)
     } else {
       super.cleanup(value, userAnswers)
     }
-  }
 
 }

@@ -49,9 +49,12 @@ class IndContactNamePageSpec extends PageBehaviours {
     }
     "must not clear RegistrationInfo" - {
       "when there is no change in answers" in {
-        val ua     = createUserAnswersForIndividualCleanup.sample.get
-        val name   = ua.get(IndContactNamePage)
-        val result = IndContactNamePage.cleanup(name, ua).success.value
+        val ua = createUserAnswersForIndividualCleanup.sample.get
+
+        val result = IndContactNamePage.cleanup(
+          ua.get(IndContactNamePage),
+          ua.withPage(IdMatchInfoPage, IdMatchInfo(name = ua.get(IndContactNamePage))) // use same generated name
+        ).success.value
 
         result.get(RegistrationInfoPage) must not be empty
       }
