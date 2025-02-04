@@ -18,9 +18,9 @@ package controllers.individual
 
 import controllers.actions._
 import forms.IndWhatIsYourNINumberFormProvider
-import models.Mode
+import models.{CheckMode, Mode}
 import navigation.Navigator
-import pages.IndWhatIsYourNINumberPage
+import pages.{IndWhatIsYourNINumberPage, RegistrationInfoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -48,6 +48,7 @@ class IndWhatIsYourNINumberController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
+      // if (mode == CheckMode) request.userAnswers.set(RegistrationInfoPage, false) .map(sessionRepository.set)
       val preparedForm = request.userAnswers.get(IndWhatIsYourNINumberPage) match {
         case None       => form
         case Some(nino) => form.fill(nino.nino)

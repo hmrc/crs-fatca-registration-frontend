@@ -65,6 +65,17 @@ trait SummaryListFluency {
         actions = Some(Actions(items = actions))
       )
 
+    def apply(
+      key: Key,
+      value: Value,
+      classes: String = ""
+    ): SummaryListRow =
+      SummaryListRow(
+        key = key,
+        value = value,
+        classes = classes
+      )
+
   }
 
   implicit class FluentSummaryListRow(row: SummaryListRow) {

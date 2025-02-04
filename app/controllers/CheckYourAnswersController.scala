@@ -92,7 +92,7 @@ class CheckYourAnswersController @Inject() (
       case Some(registration) =>
         val safeId = registration match {
           case OrgRegistrationInfo(safeId, _, _) => safeId
-          case IndRegistrationInfo(safeId)       => safeId
+          case IndRegistrationInfo(safeId, _)    => safeId
         }
         Future.successful(Right(safeId))
       case _ =>

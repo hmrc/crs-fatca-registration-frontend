@@ -55,7 +55,7 @@ class BusinessMatchingWithIdService @Inject() (registrationConnector: Registrati
         response =>
           response.safeId
             .map {
-              safeId => IndRegistrationInfo(safeId)
+              safeId => IndRegistrationInfo(safeId, verified = true)
             }
             .toRight(MandatoryInformationMissingError())
       }

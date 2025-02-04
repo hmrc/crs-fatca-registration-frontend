@@ -41,7 +41,7 @@ import scala.concurrent.Future
 class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFixtures with ModelGenerators {
   private val SafeIdValue = "XE0000123456789"
   val safeId: SafeId      = SafeId(SafeIdValue)
-  val registrationInfo    = IndRegistrationInfo(safeId)
+  val registrationInfo    = IndRegistrationInfo(safeId, verified = true)
   val TestNiNumber        = "CC123456C"
   val FirstName           = "Fred"
   val LastName            = "Flintstone"
