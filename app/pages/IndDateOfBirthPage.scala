@@ -16,13 +16,27 @@
 
 package pages
 
-import java.time.LocalDate
-
+import models.UserAnswers
 import play.api.libs.json.JsPath
+
+import java.time.LocalDate
+import scala.util.Try
 
 case object IndDateOfBirthPage extends QuestionPage[LocalDate] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "indDateOfBirth"
+
+  override def cleanup(value: Option[LocalDate], userAnswers: UserAnswers): Try[UserAnswers] = {
+    val storedValue         = userAnswers.get(IndDateOfBirthPage)
+    val hasChanged: Boolean = storedValue != value
+
+    if (hasChanged) {
+      userAnswers.remove(RegistrationInfoPage)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+  }
+
 }

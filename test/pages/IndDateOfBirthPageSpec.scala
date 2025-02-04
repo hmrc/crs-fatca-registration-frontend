@@ -16,33 +16,34 @@
 
 package pages
 
-import models.UserAnswers
+import models.{Name, UserAnswers}
 import models.matching.RegistrationInfo
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 
-class IndWhatIsYourNINumberPageSpec extends PageBehaviours {
+import java.time.LocalDate
+
+class IndDateOfBirthPageSpec extends PageBehaviours {
 
   private val testParamGenerator = for {
-    nino             <- arbitrary[Nino]
+    dob              <- arbitrary[LocalDate]
     registrationInfo <- arbitrary[RegistrationInfo]
 
-  } yield (nino, registrationInfo)
+  } yield (dob, registrationInfo)
 
   def createUserAnswersForIndividualCleanup: Gen[UserAnswers] =
     for {
-      (nino, registrationInfo) <- testParamGenerator
+      (dob, registrationInfo) <- testParamGenerator
     } yield emptyUserAnswers
-      .withPage(IndWhatIsYourNINumberPage, nino)
+      .withPage(IndDateOfBirthPage, dob)
       .withPage(RegistrationInfoPage, registrationInfo)
 
   "cleanUp" - {
     "must clear answers" - {
       "when details are changed in change journey'" in {
         val ua     = createUserAnswersForIndividualCleanup.sample.get
-        val result = IndWhatIsYourNINumberPage.cleanup(Some(Nino("AA111111A")), ua).success.value
+        val result = IndDateOfBirthPage.cleanup(Some(LocalDate.now()), ua).success.value
 
         result.get(RegistrationInfoPage) mustBe empty
 
@@ -51,8 +52,8 @@ class IndWhatIsYourNINumberPageSpec extends PageBehaviours {
     "must not clear RegistrationInfo" - {
       "when there is no change in answers" in {
         val ua     = createUserAnswersForIndividualCleanup.sample.get
-        val nino   = ua.get(IndWhatIsYourNINumberPage)
-        val result = IndWhatIsYourNINumberPage.cleanup(nino, ua).success.value
+        val dob    = ua.get(IndDateOfBirthPage)
+        val result = IndDateOfBirthPage.cleanup(dob, ua).success.value
 
         result.get(RegistrationInfoPage) must not be empty
       }

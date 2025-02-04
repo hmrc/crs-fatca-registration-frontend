@@ -39,13 +39,13 @@ import java.time.LocalDate
 import scala.concurrent.Future
 
 class IndIdentityConfirmedControllerSpec extends SpecBase with ControllerMockFixtures with ModelGenerators {
-  private val SafeIdValue = "XE0000123456789"
-  val safeId: SafeId      = SafeId(SafeIdValue)
+  private val SafeIdValue                   = "XE0000123456789"
+  val safeId: SafeId                        = SafeId(SafeIdValue)
   val registrationInfo: IndRegistrationInfo = IndRegistrationInfo(safeId)
-  val TestNiNumber        = "CC123456C"
-  val FirstName           = "Fred"
-  val LastName            = "Flintstone"
-  val name: Name          = Name(FirstName, LastName)
+  val TestNiNumber                          = "CC123456C"
+  val FirstName                             = "Fred"
+  val LastName                              = "Flintstone"
+  val name: Name                            = Name(FirstName, LastName)
 
   val validUserAnswers: UserAnswers = emptyUserAnswers
     .set(IndWhatIsYourNINumberPage, Nino(TestNiNumber))
