@@ -18,9 +18,9 @@ package controllers.individual
 
 import controllers.actions._
 import forms.IndWhatIsYourNINumberFormProvider
-import models.{CheckMode, Mode}
+import models.Mode
 import navigation.Navigator
-import pages.{IndWhatIsYourNINumberPage, RegistrationInfoPage}
+import pages.{IdMatchInfo, IdMatchInfoPage, IndWhatIsYourNINumberPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -59,14 +59,16 @@ class IndWhatIsYourNINumberController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
     implicit request =>
+      val oldValue: Option[Nino] = request.userAnswers.get(IndWhatIsYourNINumberPage)
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndWhatIsYourNINumberPage, Nino(value)))
-              _              <- sessionRepository.set(updatedAnswers)
+              answersWithOldValue <- Future.fromTry(request.userAnswers.set(IdMatchInfoPage, IdMatchInfo(nino = oldValue)))
+              updatedAnswers      <- Future.fromTry(answersWithOldValue.set(IndWhatIsYourNINumberPage, Nino(value)))
+              _                   <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndWhatIsYourNINumberPage, mode, updatedAnswers))
         )
   }

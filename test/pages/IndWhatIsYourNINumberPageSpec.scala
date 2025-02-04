@@ -50,11 +50,14 @@ class IndWhatIsYourNINumberPageSpec extends PageBehaviours {
     }
     "must not clear RegistrationInfo" - {
       "when there is no change in answers" in {
-        val ua     = createUserAnswersForIndividualCleanup.sample.get
-        val nino   = ua.get(IndWhatIsYourNINumberPage)
-        val result = IndWhatIsYourNINumberPage.cleanup(nino, ua).success.value
+        val ua = createUserAnswersForIndividualCleanup.sample.get
+        val result = IndWhatIsYourNINumberPage.cleanup(
+          ua.get(IndWhatIsYourNINumberPage),
+          ua.withPage(IdMatchInfoPage, IdMatchInfo(nino = ua.get(IndWhatIsYourNINumberPage))) // use same generated Nino
+        ).success.value
 
         result.get(RegistrationInfoPage) must not be empty
+
       }
     }
   }

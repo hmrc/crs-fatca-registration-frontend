@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,25 @@
 
 package pages
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import models.Name
+import play.api.libs.json.{JsPath, Json, OFormat}
 import uk.gov.hmrc.domain.Nino
 
-import scala.util.Try
+import java.time.LocalDate
 
-case object IndWhatIsYourNINumberPage extends QuestionPage[Nino] {
+case object IdMatchInfoPage extends QuestionPage[IdMatchInfo] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "indWhatIsYourNINumber"
+  override def toString: String = "IdMatchInfoPage"
+}
 
-  override def cleanup(value: Option[Nino], userAnswers: UserAnswers): Try[UserAnswers] = {
-    val oldNino: Option[Nino] = userAnswers.get(IdMatchInfoPage).flatMap(_.nino)
-    val hasChanged: Boolean   = oldNino != value
+case class IdMatchInfo(
+  nino: Option[Nino] = None,
+  name: Option[Name] = None,
+  dob: Option[LocalDate] = None
+)
 
-    if (hasChanged) {
-      userAnswers.remove(RegistrationInfoPage)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
-  }
-
+object IdMatchInfo {
+  implicit val format: OFormat[IdMatchInfo] = Json.format[IdMatchInfo]
 }

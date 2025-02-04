@@ -592,7 +592,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
         navigator
           .nextPage(IndContactHavePhonePage, NormalMode, userAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
     }
 
@@ -974,20 +974,10 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "must go from IndWhatIsYourNINumberPage to IndContactNamePage when IndDoYouHaveNINumberPage is true but no IndContactNamePage" in {
+      "must go from IndWhatIsYourNINumberPage to IndContactNamePage when IndDoYouHaveNINumberPage is true" in {
         navigator
           .nextPage(IndWhatIsYourNINumberPage, CheckMode, emptyUserAnswers.withPage(IndDoYouHaveNINumberPage, true))
           .mustBe(controllers.individual.routes.IndContactNameController.onPageLoad(CheckMode))
-      }
-
-      "must go from IndWhatIsYourNINumberPage to CheckYourAnswersPage when IndDoYouHaveNINumberPage is true and IndContactNamePage exists" in {
-        ScalaCheckPropertyChecks.forAll(arbitrary[Name]) {
-          name =>
-            val answers = emptyUserAnswers.withPage(IndDoYouHaveNINumberPage, true).withPage(IndContactNamePage, name)
-            navigator
-              .nextPage(IndWhatIsYourNINumberPage, CheckMode, answers)
-              .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
-        }
       }
 
       "must go from IndWhatIsYourNINumberPage to JourneyRecoveryPage when there is no IndDoYouHaveNINumberPage" in {
@@ -1002,20 +992,18 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
 
-      "must go from IndContactNamePage to IndDateOfBirthPage when IndDoYouHaveNINumberPage is true but no IndDateOfBirthPage" in {
+      "must go from IndContactNamePage to IndDateOfBirthPage when IndDoYouHaveNINumberPage is true" in {
         navigator
           .nextPage(IndContactNamePage, CheckMode, emptyUserAnswers.withPage(IndDoYouHaveNINumberPage, true))
           .mustBe(controllers.individual.routes.IndDateOfBirthController.onPageLoad(CheckMode))
       }
 
-      "must go from IndContactNamePage to IndDateOfBirthPage when CheckYourAnswersPage is true and IndDateOfBirthPage exists" in {
-        val answers = emptyUserAnswers
-          .withPage(IndDoYouHaveNINumberPage, true)
-          .withPage(IndDateOfBirthPage, LocalDate.now())
+      "must go from IndDateOfBirthPage to IndIdentityConfirmedPage if Nino" in {
 
-        navigator
-          .nextPage(IndContactNamePage, CheckMode, answers)
-          .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
+        val userAnswers = emptyUserAnswers
+          .withPage(IndDoYouHaveNINumberPage, true)
+
+        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad(NormalMode)
       }
 
       "must go from IndContactNamePage to JourneyRecoveryPage when IndDoYouHaveNINumberPage is false" in {
