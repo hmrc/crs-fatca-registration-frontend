@@ -70,7 +70,7 @@ class BusinessMatchingWithIdServiceSpec extends SpecBase {
         val result: Future[Either[ApiError, RegistrationInfo]] =
           service.sendIndividualRegistrationInformation(RegisterWithID(name, Some(LocalDate.now()), NINO, TestNiNumber))
 
-        result.futureValue mustBe Right(IndRegistrationInfo(safeId, verified = true))
+        result.futureValue mustBe Right(IndRegistrationInfo(safeId))
       }
 
       "must return an error when when safeId or subscriptionId can't be recovered" in {

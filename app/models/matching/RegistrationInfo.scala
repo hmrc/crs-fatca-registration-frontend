@@ -32,7 +32,7 @@ object OrgRegistrationInfo {
   implicit val format: OFormat[OrgRegistrationInfo] = Json.format[OrgRegistrationInfo]
 }
 
-case class IndRegistrationInfo(safeId: SafeId, verified: Boolean) extends RegistrationInfo
+case class IndRegistrationInfo(safeId: SafeId) extends RegistrationInfo
 
 object IndRegistrationInfo {
 

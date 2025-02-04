@@ -16,12 +16,27 @@
 
 package pages
 
+import models.UserAnswers
 import play.api.libs.json.JsPath
 import uk.gov.hmrc.domain.Nino
+
+import scala.util.Try
 
 case object IndWhatIsYourNINumberPage extends QuestionPage[Nino] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "indWhatIsYourNINumber"
+
+  override def cleanup(value: Option[Nino], userAnswers: UserAnswers): Try[UserAnswers] = {
+    val storedValue         = userAnswers.get(IndWhatIsYourNINumberPage)
+    val hasChanged: Boolean = storedValue != value
+
+    if (hasChanged) {
+      userAnswers.remove(RegistrationInfoPage)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+  }
+
 }

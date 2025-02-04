@@ -182,7 +182,7 @@ trait ModelGenerators extends RegexConstants with Generators {
     arbitrary[String]
       .suchThat(_.nonEmpty)
       .map(
-        idNumber => IndRegistrationInfo(SafeId(idNumber), verified = true)
+        idNumber => IndRegistrationInfo(SafeId(idNumber))
       )
   }
 

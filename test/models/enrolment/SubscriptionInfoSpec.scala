@@ -81,7 +81,7 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
     "contains postCode for ind registration info" in {
       forAll {
         (address: Address, subscriptionId: SubscriptionID) =>
-          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId, verified = true)).success.value
+          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId)).success.value
             .set(IndUKAddressWithoutIdPage, address).success.value
           val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
 
@@ -92,7 +92,7 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
     "contains abroadFlag as N for ind registration info" in {
       forAll {
         (address: Address, subscriptionId: SubscriptionID) =>
-          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId, verified = true)).success.value
+          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId)).success.value
             .set(IndUKAddressWithoutIdPage, address.copy(country = Country.GB)).success.value
           val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
 
@@ -103,7 +103,7 @@ class SubscriptionInfoSpec extends AnyFreeSpec with Matchers with ModelGenerator
     "contains abroadFlag as Y for ind registration info" in {
       forAll {
         (address: Address, subscriptionId: SubscriptionID) =>
-          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId, verified = true)).success.value
+          val userAnswers = emptyUserAnswers.set(RegistrationInfoPage, IndRegistrationInfo(safeId)).success.value
             .set(IndNonUKAddressWithoutIdPage, address).success.value
           val subscriptionInfo = SubscriptionInfo(userAnswers, subscriptionId)
 
