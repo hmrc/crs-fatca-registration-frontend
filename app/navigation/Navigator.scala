@@ -423,9 +423,19 @@ class Navigator @Inject() () extends Logging {
   private def doYouHaveNINORoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
       case Some(true) =>
-        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNINumberPage, controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode))
+        checkNextPagesForValueThenRoute(
+          mode,
+          ua,
+          List(IndWhatIsYourNINumberPage, RegistrationInfoPage),
+          controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(mode)
+        )
       case Some(false) =>
-        checkNextPageForValueThenRoute(mode, ua, IndWhatIsYourNamePage, controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode))
+        checkNextPagesForValueThenRoute(
+          mode,
+          ua,
+          List(IndWhatIsYourNamePage, RegistrationInfoPage),
+          controllers.individual.routes.IndWhatIsYourNameController.onPageLoad(mode)
+        )
       case _ =>
         logger.warn("NI Number answer not found when routing from IndDoYouHaveNINumberPage")
         controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -443,8 +453,12 @@ class Navigator @Inject() () extends Logging {
   private def contactNameRoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
       case Some(true) =>
-        controllers.individual.routes.IndDateOfBirthController.onPageLoad(mode)
-
+        checkNextPagesForValueThenRoute(
+          mode,
+          ua,
+          List(IndContactNamePage, RegistrationInfoPage),
+          controllers.individual.routes.IndContactNameController.onPageLoad(mode)
+        )
       case _ =>
         logger.warn("Have NI Number answer not found or false when routing from IndContactNamePage")
         controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -453,13 +467,11 @@ class Navigator @Inject() () extends Logging {
   private def whatIsYourDateOfBirthRoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
       case Some(true) =>
-        controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
-      case Some(false) =>
-        checkNextPageForValueThenRoute(
+        checkNextPagesForValueThenRoute(
           mode,
           ua,
-          IndWhereDoYouLivePage,
-          controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(mode)
+          List(IndDateOfBirthPage, RegistrationInfoPage),
+          controllers.individual.routes.IndDateOfBirthController.onPageLoad(mode)
         )
       case _ =>
         logger.warn("NI Number answer not found when routing from DateOfBirthPage")
@@ -491,6 +503,23 @@ class Navigator @Inject() () extends Logging {
   )(implicit rds: Reads[A]): Call = {
     val answerExists = mode.equals(CheckMode) && userAnswers.get(page).fold(false)(
       _ => true
+    )
+    if (answerExists) {
+      callWhenAlreadyAnswered
+    } else {
+      callWhenNotAnswered
+    }
+  }
+
+  private def checkNextPagesForValueThenRoute[_](
+    mode: Mode,
+    userAnswers: UserAnswers,
+    pages: List[QuestionPage[_]],
+    callWhenNotAnswered: Call,
+    callWhenAlreadyAnswered: Call = routes.CheckYourAnswersController.onPageLoad()
+  ): Call = {
+    val answerExists = mode.equals(CheckMode) && pages.forall(
+      p => userAnswers.containsValue(p)
     )
     if (answerExists) {
       callWhenAlreadyAnswered

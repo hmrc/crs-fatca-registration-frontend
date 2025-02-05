@@ -20,7 +20,7 @@ import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingE
 import models.matching.SafeId
 import models.requests.DataRequest
 import models.{ReporterType, SubscriptionID, UserAnswers, UserSubscription}
-import pages.{RegistrationInfoPage, ReporterTypePage, SubscriptionIDPage}
+import pages.{ReporterTypePage, SubscriptionIDPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Result}

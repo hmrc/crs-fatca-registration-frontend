@@ -52,6 +52,8 @@ final case class UserAnswers(
     }
   }
 
+  def containsValue(page: Gettable[_]): Boolean = data.keys.exists(_.startsWith(page.path.path.mkString.substring(1)))
+
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
 
     val updatedData = data.removeObject(page.path) match {
