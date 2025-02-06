@@ -18,17 +18,17 @@ package controllers.individual
 
 import controllers.actions._
 import forms.IndDateOfBirthFormProvider
-
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.IndDateOfBirthPage
+import pages.{IdMatchInfo, IdMatchInfoPage, IndDateOfBirthPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.individual.IndDateOfBirthView
 
+import java.time.LocalDate
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IndDateOfBirthController @Inject() (
@@ -58,14 +58,16 @@ class IndDateOfBirthController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
     implicit request =>
+      val currentValue: Option[LocalDate] = request.userAnswers.get(IndDateOfBirthPage)
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndDateOfBirthPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
+              storedCurrentValue <- Future.fromTry(request.userAnswers.set(IdMatchInfoPage, IdMatchInfo(dob = currentValue)))
+              updatedAnswers     <- Future.fromTry(storedCurrentValue.set(IndDateOfBirthPage, value))
+              _                  <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndDateOfBirthPage, mode, updatedAnswers))
         )
   }

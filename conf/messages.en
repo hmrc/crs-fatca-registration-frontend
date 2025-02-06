@@ -43,6 +43,8 @@ index.guidance = Welcome to your new frontend. Please see the README file for a 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
 checkYourAnswers.notProvided = Not provided
+checkYourAnswers.changeDetails = Change details
+checkYourAnswers.changeDetails.hidden = Change your National Insurance number, name and date of birth
 
 default.firstContact.name = your first contact
 default.secondContact.name = your second contact

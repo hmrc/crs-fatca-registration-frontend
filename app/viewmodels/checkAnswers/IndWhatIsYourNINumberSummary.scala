@@ -16,12 +16,11 @@
 
 package viewmodels.checkAnswers
 
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.IndWhatIsYourNINumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -33,12 +32,7 @@ object IndWhatIsYourNINumberSummary {
         SummaryListRowViewModel(
           key = s"$IndWhatIsYourNINumberPage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer.nino).toString),
-          actions = Seq(
-            changeAction(
-              IndWhatIsYourNINumberPage.toString,
-              controllers.individual.routes.IndWhatIsYourNINumberController.onPageLoad(CheckMode).url
-            )
-          )
+          classes = "govuk-summary-list__row--no-border"
         )
     }
 

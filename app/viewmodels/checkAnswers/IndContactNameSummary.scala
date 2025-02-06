@@ -16,14 +16,12 @@
 
 package viewmodels.checkAnswers
 
-import controllers.individual.routes
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.IndContactNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
@@ -37,9 +35,7 @@ object IndContactNameSummary {
         SummaryListRowViewModel(
           key = s"$IndContactNamePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            changeAction(IndContactNamePage.toString, routes.IndContactNameController.onPageLoad(CheckMode).url)
-          )
+          classes = "govuk-summary-list__row--no-border"
         )
     }
 

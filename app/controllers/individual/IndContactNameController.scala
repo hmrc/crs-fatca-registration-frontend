@@ -18,10 +18,12 @@ package controllers.individual
 
 import controllers.actions._
 import forms.IndContactNameFormProvider
+
 import javax.inject.Inject
-import models.Mode
+import models.{Mode, Name}
 import navigation.Navigator
-import pages.IndContactNamePage
+import pages.{IdMatchInfo, IdMatchInfoPage, IndContactNamePage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -43,7 +45,7 @@ class IndContactNameController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[Name] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
@@ -57,14 +59,16 @@ class IndContactNameController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
     implicit request =>
+      val currentValue: Option[Name] = request.userAnswers.get(IndContactNamePage)
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndContactNamePage, value))
-              _              <- sessionRepository.set(updatedAnswers)
+              storedCurrentValue <- Future.fromTry(request.userAnswers.set(IdMatchInfoPage, IdMatchInfo(name = currentValue)))
+              updatedAnswers     <- Future.fromTry(storedCurrentValue.set(IndContactNamePage, value))
+              _                  <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndContactNamePage, mode, updatedAnswers))
         )
   }
