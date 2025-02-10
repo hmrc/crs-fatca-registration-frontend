@@ -444,7 +444,13 @@ class Navigator @Inject() () extends Logging {
   private def whatIsYourNINumberRoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
       case Some(true) =>
-        controllers.individual.routes.IndContactNameController.onPageLoad(mode)
+        checkNextPagesForValueThenRoute(
+          mode,
+          ua,
+          List(IndContactNamePage, RegistrationInfoPage),
+          controllers.individual.routes.IndContactNameController.onPageLoad(mode),
+          controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
+        )
       case _ =>
         logger.warn("Have NI Number answer not found or false when routing from WhatIsYourNINumberPage")
         controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -456,8 +462,9 @@ class Navigator @Inject() () extends Logging {
         checkNextPagesForValueThenRoute(
           mode,
           ua,
-          List(IndContactNamePage, RegistrationInfoPage),
-          controllers.individual.routes.IndContactNameController.onPageLoad(mode)
+          List(IndDateOfBirthPage, RegistrationInfoPage),
+          controllers.individual.routes.IndDateOfBirthController.onPageLoad(mode),
+          controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
         )
       case _ =>
         logger.warn("Have NI Number answer not found or false when routing from IndContactNamePage")
@@ -466,12 +473,16 @@ class Navigator @Inject() () extends Logging {
 
   private def whatIsYourDateOfBirthRoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
-      case Some(true) =>
+      case Some(haveNINumber) =>
         checkNextPagesForValueThenRoute(
           mode,
           ua,
           List(IndDateOfBirthPage, RegistrationInfoPage),
-          controllers.individual.routes.IndDateOfBirthController.onPageLoad(mode)
+          if (haveNINumber) {
+            controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
+          } else {
+            controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(mode)
+          }
         )
       case _ =>
         logger.warn("NI Number answer not found when routing from DateOfBirthPage")

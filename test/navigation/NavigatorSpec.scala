@@ -996,7 +996,7 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
               .withPage(RegistrationInfoPage, indRegistrationInfo)
             navigator
               .nextPage(IndWhatIsYourNINumberPage, CheckMode, answers)
-              .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
+              .mustBe(controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(CheckMode))
         }
       }
 
@@ -1026,7 +1026,11 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
       "must go from IndContactNamePage to IndDateOfBirthPage when IndDoYouHaveNINumberPage is true" in {
         navigator
-          .nextPage(IndContactNamePage, CheckMode, emptyUserAnswers.withPage(IndDoYouHaveNINumberPage, true))
+          .nextPage(IndContactNamePage,
+                    CheckMode,
+                    emptyUserAnswers
+                      .withPage(IndDoYouHaveNINumberPage, true)
+          )
           .mustBe(controllers.individual.routes.IndDateOfBirthController.onPageLoad(CheckMode))
       }
 
@@ -1036,13 +1040,13 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .withPage(IndDateOfBirthPage, LocalDate.now())
           .withPage(RegistrationInfoPage, indRegistrationInfo)
 
-        navigator.nextPage(IndDateOfBirthPage, NormalMode, answers) mustBe IndIdentityConfirmedController.onPageLoad(NormalMode)
+        navigator.nextPage(IndContactNamePage, CheckMode, answers) mustBe controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(CheckMode)
       }
 
       "must go from IndContactNamePage to IndDateOfBirthPage when IndDoYouHaveNINumberPage is true but no RegistrationInfo" in {
         val answers = emptyUserAnswers
           .withPage(IndDoYouHaveNINumberPage, true)
-          .withPage(IndDateOfBirthPage, LocalDate.now())
+          .withPage(IndContactNamePage, Name(FirstName, LastName))
 
         navigator
           .nextPage(IndContactNamePage, CheckMode, answers)
