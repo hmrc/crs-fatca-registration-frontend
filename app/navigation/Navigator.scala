@@ -84,7 +84,7 @@ class Navigator @Inject() () extends Logging {
           userAnswers,
           HaveSecondContactPage,
           controllers.organisation.routes.SecondContactNameController.onPageLoad(NormalMode),
-          controllers.routes.CheckYourAnswersController.onPageLoad
+          controllers.routes.CheckYourAnswersController.onPageLoad()
         )
     case SecondContactNamePage  => _ => controllers.organisation.routes.SecondContactEmailController.onPageLoad(NormalMode)
     case SecondContactEmailPage => _ => controllers.organisation.routes.SecondContactHavePhoneController.onPageLoad(NormalMode)
@@ -94,9 +94,9 @@ class Navigator @Inject() () extends Logging {
           userAnswers,
           SecondContactHavePhonePage,
           controllers.organisation.routes.SecondContactPhoneController.onPageLoad(NormalMode),
-          controllers.routes.CheckYourAnswersController.onPageLoad
+          controllers.routes.CheckYourAnswersController.onPageLoad()
         )
-    case SecondContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad
+    case SecondContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
 
     // individual
     case IndDoYouHaveNINumberPage =>
@@ -442,6 +442,25 @@ class Navigator @Inject() () extends Logging {
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
+  private def whatIsYourNINumberRoutes(mode: Mode)(ua: UserAnswers): Call =
+    ua.get(IndDoYouHaveNINumberPage) match {
+      case Some(true) =>
+        controllers.individual.routes.IndContactNameController.onPageLoad(mode)
+      case _ =>
+        logger.warn("Have NI Number answer not found or false when routing from WhatIsYourNINumberPage")
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def contactNameRoutes(mode: Mode)(ua: UserAnswers): Call =
+    ua.get(IndDoYouHaveNINumberPage) match {
+      case Some(true) =>
+        controllers.individual.routes.IndDateOfBirthController.onPageLoad(mode)
+
+      case _ =>
+        logger.warn("Have NI Number answer not found or false when routing from IndContactNamePage")
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+
   private def whatIsYourDateOfBirthRoutes(mode: Mode)(ua: UserAnswers): Call =
     ua.get(IndDoYouHaveNINumberPage) match {
       case Some(true) =>
@@ -455,34 +474,6 @@ class Navigator @Inject() () extends Logging {
         )
       case _ =>
         logger.warn("NI Number answer not found when routing from DateOfBirthPage")
-        controllers.routes.JourneyRecoveryController.onPageLoad()
-    }
-
-  private def whatIsYourNINumberRoutes(mode: Mode)(ua: UserAnswers): Call =
-    ua.get(IndDoYouHaveNINumberPage) match {
-      case Some(true) =>
-        checkNextPageForValueThenRoute(
-          mode,
-          ua,
-          IndContactNamePage,
-          controllers.individual.routes.IndContactNameController.onPageLoad(mode)
-        )
-      case _ =>
-        logger.warn("Have NI Number answer not found or false when routing from WhatIsYourNINumberPage")
-        controllers.routes.JourneyRecoveryController.onPageLoad()
-    }
-
-  private def contactNameRoutes(mode: Mode)(ua: UserAnswers): Call =
-    ua.get(IndDoYouHaveNINumberPage) match {
-      case Some(true) =>
-        checkNextPageForValueThenRoute(
-          mode,
-          ua,
-          IndDateOfBirthPage,
-          controllers.individual.routes.IndDateOfBirthController.onPageLoad(mode)
-        )
-      case _ =>
-        logger.warn("Have NI Number answer not found or false when routing from IndContactNamePage")
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 

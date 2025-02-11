@@ -35,6 +35,17 @@ object Util {
       href = href
     )
 
+  def changeDetailsAction(messageKey: String, href: String)(implicit messages: Messages): ActionItem =
+    ActionItemViewModel(
+      content = HtmlContent(
+        s"""
+           |<span aria-hidden="true">${messages(messageKey + ".changeDetails")}</span>
+           |<span class="govuk-visually-hidden"> ${messages(messageKey + ".changeDetails.hidden")}</span>
+           |""".stripMargin
+      ),
+      href = href
+    )
+
   def yesOrNo(answer: Boolean): String = if (answer) "site.yes" else "site.no"
 
   def formatAddress(answer: Address): Value =

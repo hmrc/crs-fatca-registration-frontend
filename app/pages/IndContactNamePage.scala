@@ -16,12 +16,22 @@
 
 package pages
 
-import models.Name
+import models.{Name, UserAnswers}
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object IndContactNamePage extends QuestionPage[Name] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "indContactName"
+
+  override def cleanup(value: Option[Name], userAnswers: UserAnswers): Try[UserAnswers] =
+    if (userAnswers.get(IdMatchInfoPage).flatMap(_.name) != value) {
+      userAnswers.remove(RegistrationInfoPage)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+
 }
