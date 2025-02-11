@@ -24,6 +24,7 @@ import pages.changeContactDetails._
 import play.api.Logging
 import play.api.libs.json.Reads
 import play.api.mvc.Call
+import utils.CheckYourAnswersValidator
 
 import javax.inject.{Inject, Singleton}
 
@@ -154,8 +155,14 @@ class Navigator @Inject() () extends Logging {
         yesNoPage(
           userAnswers,
           RegisteredAddressInUKPage,
-          controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(CheckMode),
-          controllers.routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode)
+          routeToAnswersIfNextPageIsDefined(userAnswers,
+                                            RegisteredAddressInUKPage,
+                                            controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(CheckMode)
+          ),
+          routeToAnswersIfNextPageIsDefined(userAnswers,
+                                            DoYouHaveUniqueTaxPayerReferencePage,
+                                            controllers.routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode)
+          )
         )
     case DoYouHaveUniqueTaxPayerReferencePage => doYouHaveUniqueTaxPayerReference(CheckMode)
     case WhatIsYourUTRPage                    => isSoleProprietor(CheckMode)
@@ -259,23 +266,22 @@ class Navigator @Inject() () extends Logging {
     case ContactPhonePage => _ => controllers.routes.CheckYourAnswersController.onPageLoad()
     case HaveSecondContactPage =>
       userAnswers =>
-        yesNoNavigate(
-          userAnswers.get(HaveSecondContactPage).exists(_ != true) || userAnswers.get(SecondContactNamePage).isDefined,
-          controllers.routes.CheckYourAnswersController.onPageLoad(),
-          controllers.organisation.routes.SecondContactNameController.onPageLoad(CheckMode)
+        yesNoPage(
+          userAnswers,
+          HaveSecondContactPage,
+          routeToAnswersIfNextPageIsDefined(userAnswers,
+                                            SecondContactNamePage,
+                                            controllers.organisation.routes.SecondContactNameController.onPageLoad(CheckMode)
+          ),
+          controllers.routes.CheckYourAnswersController.onPageLoad()
         )
     case SecondContactNamePage =>
-      userAnswers =>
-        yesNoNavigate(
-          userAnswers.get(SecondContactEmailPage).isDefined,
-          controllers.routes.CheckYourAnswersController.onPageLoad(),
-          controllers.organisation.routes.SecondContactEmailController.onPageLoad(CheckMode)
-        )
-    case SecondContactEmailPage => userAnswers =>
-        yesNoNavigate(
-          userAnswers.get(SecondContactHavePhonePage).isDefined,
-          controllers.routes.CheckYourAnswersController.onPageLoad(),
-          controllers.organisation.routes.SecondContactHavePhoneController.onPageLoad(CheckMode)
+      ua => routeToAnswersIfNextPageIsDefined(ua, SecondContactEmailPage, controllers.organisation.routes.SecondContactEmailController.onPageLoad(CheckMode))
+    case SecondContactEmailPage =>
+      ua =>
+        routeToAnswersIfNextPageIsDefined(ua,
+                                          SecondContactHavePhonePage,
+                                          controllers.organisation.routes.SecondContactHavePhoneController.onPageLoad(CheckMode)
         )
     case SecondContactHavePhonePage =>
       userAnswers =>
@@ -359,15 +365,20 @@ class Navigator @Inject() () extends Logging {
           .fold(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode))(
             _ => controllers.routes.CheckYourAnswersController.onPageLoad()
           )
-      case (Some(_), _) => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
-      case (None, _)    => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case (Some(_), _) =>
+        val missingAnswers = CheckYourAnswersValidator(ua).validate.nonEmpty
+        if (missingAnswers) controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
+        else controllers.routes.CheckYourAnswersController.onPageLoad()
+      case (None, _) => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def doYouHaveUniqueTaxPayerReference(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(DoYouHaveUniqueTaxPayerReferencePage), ua.get(ReporterTypePage)) match {
       case (Some(true), _)           => controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(mode)
       case (Some(false), Some(Sole)) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case (Some(false), Some(_))    => controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(mode)
+      case (Some(false), Some(_)) => if (mode == CheckMode) {
+          routeToAnswersIfNextPageIsDefined(ua, BusinessNameWithoutIDPage, controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(mode))
+        } else { controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(mode) }
       case (None, Some(_)) =>
         logger.warn("DoYouHaveUniqueTaxPayerReference answer not found when routing from DoYouHaveUniqueTaxPayerReferencePage")
         routes.JourneyRecoveryController.onPageLoad()
@@ -498,5 +509,13 @@ class Navigator @Inject() () extends Logging {
       callWhenNotAnswered
     }
   }
+
+  // Checkmode only
+  private def routeToAnswersIfNextPageIsDefined[A](ua: UserAnswers, page: QuestionPage[A], isNotDefinedRoute: Call)(implicit reads: Reads[A]): Call =
+    if (ua.get(page).isDefined) {
+      controllers.routes.CheckYourAnswersController.onPageLoad()
+    } else {
+      isNotDefinedRoute
+    }
 
 }
