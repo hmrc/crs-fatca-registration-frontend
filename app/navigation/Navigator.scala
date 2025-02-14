@@ -480,8 +480,10 @@ class Navigator @Inject() () extends Logging {
           List(IndDateOfBirthPage, RegistrationInfoPage),
           if (haveNINumber) {
             controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
-          } else {
+          } else if (mode == NormalMode) {
             controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(mode)
+          } else {
+            controllers.routes.CheckYourAnswersController.onPageLoad()
           }
         )
       case _ =>

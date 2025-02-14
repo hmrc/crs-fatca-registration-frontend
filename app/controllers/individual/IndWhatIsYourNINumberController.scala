@@ -20,7 +20,7 @@ import controllers.actions._
 import forms.IndWhatIsYourNINumberFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.{IdMatchInfo, IdMatchInfoPage, IndWhatIsYourNINumberPage}
+import pages.{IdMatchInfo, IdMatchInfoPage, IndWhatIsYourNINumberPage, RegistrationInfoPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -66,9 +66,10 @@ class IndWhatIsYourNINumberController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              storedCurrentValue <- Future.fromTry(request.userAnswers.set(IdMatchInfoPage, IdMatchInfo(nino = currentValue)))
-              updatedAnswers     <- Future.fromTry(storedCurrentValue.set(IndWhatIsYourNINumberPage, Nino(value)))
-              _                  <- sessionRepository.set(updatedAnswers)
+              storedCurrentValue <- Future.fromTry(request.userAnswers.set(IdMatchInfoPage, IdMatchInfo(nino = currentValue))
+                .flatMap(_.remove(RegistrationInfoPage)))
+              updatedAnswers <- Future.fromTry(storedCurrentValue.set(IndWhatIsYourNINumberPage, Nino(value)))
+              _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndWhatIsYourNINumberPage, mode, updatedAnswers))
         )
   }
