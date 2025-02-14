@@ -32,7 +32,7 @@
 
 @layout(pageTitle = title(form, messages("whatIsYourName.title"))) {
 
-    @formHelper(action = controllers.organisation.routes.WhatIsYourNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.organisation.routes.WhatIsYourNameController.onSubmit(mode), Symbol("autoComplete") -> "on") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
