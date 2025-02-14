@@ -480,7 +480,7 @@ class Navigator @Inject() () extends Logging {
           List(IndDateOfBirthPage, RegistrationInfoPage),
           if (haveNINumber) {
             controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(mode)
-          } else if (mode == NormalMode) {
+          } else if (mode == NormalMode || ua.get(IndWhereDoYouLivePage).isEmpty) {
             controllers.individual.routes.IndWhereDoYouLiveController.onPageLoad(mode)
           } else {
             controllers.routes.CheckYourAnswersController.onPageLoad()
