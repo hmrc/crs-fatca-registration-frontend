@@ -24,6 +24,7 @@ import generators.{Generators, UserAnswersGenerator}
 import helpers.JsonFixtures._
 import models.ReporterType.{Individual, LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models._
+import models.matching.{IndRegistrationInfo, SafeId}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -35,7 +36,8 @@ import java.time.{Clock, LocalDate}
 
 class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generators with UserAnswersGenerator {
 
-  val navigator = new Navigator
+  val navigator           = new Navigator
+  val indRegistrationInfo = IndRegistrationInfo(SafeId("safe-id"))
 
   "Navigator" - {
 
@@ -604,13 +606,18 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
       }
 
       "must go from ReporterTypePage" - {
-        val ua = emptyUserAnswers.withPage(ReporterTypePage, Individual)
+        val ua = emptyUserAnswers
         "to Check Your Answers if Individual is unchanged" in {
-          val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
+          val answers = ua.withPage(ReporterTypePage, Individual).withPage(RegistrationInfoPage, indRegistrationInfo)
           navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
         }
         "to IndDoYouHaveNINumber if reportYpe changed to Individual" in {
-          navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
+          val answers = ua.withPage(ReporterTypePage, Individual)
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
+        }
+        "to RegisteredAddressInUK if Agent is unchanged" in {
+          val answers = ua.withPage(ReporterTypePage, Sole).withPage(RegistrationInfoPage, indRegistrationInfo)
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(CheckMode)
         }
       }
 
@@ -980,6 +987,31 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
           .mustBe(controllers.individual.routes.IndContactNameController.onPageLoad(CheckMode))
       }
 
+      "must go from IndWhatIsYourNINumberPage to CheckYourAnswersPage when IndDoYouHaveNINumberPage is true and IndContactNamePage exists" in {
+        ScalaCheckPropertyChecks.forAll(arbitrary[Name]) {
+          name =>
+            val answers = emptyUserAnswers
+              .withPage(IndDoYouHaveNINumberPage, true)
+              .withPage(IndContactNamePage, name)
+              .withPage(RegistrationInfoPage, indRegistrationInfo)
+            navigator
+              .nextPage(IndWhatIsYourNINumberPage, CheckMode, answers)
+              .mustBe(controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(CheckMode))
+        }
+      }
+
+      "must go from IndWhatIsYourNINumberPage to CheckYourAnswersPage when IndDoYouHaveNINumberPage is true but no RegistrationInfo" in {
+        ScalaCheckPropertyChecks.forAll(arbitrary[Name]) {
+          name =>
+            val answers = emptyUserAnswers
+              .withPage(IndDoYouHaveNINumberPage, true)
+              .withPage(IndContactNamePage, name)
+            navigator
+              .nextPage(IndWhatIsYourNINumberPage, CheckMode, answers)
+              .mustBe(controllers.individual.routes.IndContactNameController.onPageLoad(CheckMode))
+        }
+      }
+
       "must go from IndWhatIsYourNINumberPage to JourneyRecoveryPage when there is no IndDoYouHaveNINumberPage" in {
         navigator
           .nextPage(IndWhatIsYourNINumberPage, CheckMode, emptyUserAnswers)
@@ -994,16 +1026,31 @@ class NavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generat
 
       "must go from IndContactNamePage to IndDateOfBirthPage when IndDoYouHaveNINumberPage is true" in {
         navigator
-          .nextPage(IndContactNamePage, CheckMode, emptyUserAnswers.withPage(IndDoYouHaveNINumberPage, true))
+          .nextPage(IndContactNamePage,
+                    CheckMode,
+                    emptyUserAnswers
+                      .withPage(IndDoYouHaveNINumberPage, true)
+          )
           .mustBe(controllers.individual.routes.IndDateOfBirthController.onPageLoad(CheckMode))
       }
 
-      "must go from IndDateOfBirthPage to IndIdentityConfirmedPage if Nino" in {
-
-        val userAnswers = emptyUserAnswers
+      "must go from IndContactNamePage to CheckYourAnswersPage when IndDoYouHaveNINumberPage is true and IndDateOfBirthPage exists" in {
+        val answers = emptyUserAnswers
           .withPage(IndDoYouHaveNINumberPage, true)
+          .withPage(IndDateOfBirthPage, LocalDate.now())
+          .withPage(RegistrationInfoPage, indRegistrationInfo)
 
-        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad(NormalMode)
+        navigator.nextPage(IndContactNamePage, CheckMode, answers) mustBe controllers.individual.routes.IndIdentityConfirmedController.onPageLoad(CheckMode)
+      }
+
+      "must go from IndContactNamePage to IndDateOfBirthPage when IndDoYouHaveNINumberPage is true but no RegistrationInfo" in {
+        val answers = emptyUserAnswers
+          .withPage(IndDoYouHaveNINumberPage, true)
+          .withPage(IndContactNamePage, Name(FirstName, LastName))
+
+        navigator
+          .nextPage(IndContactNamePage, CheckMode, answers)
+          .mustBe(controllers.individual.routes.IndDateOfBirthController.onPageLoad(CheckMode))
       }
 
       "must go from IndContactNamePage to JourneyRecoveryPage when IndDoYouHaveNINumberPage is false" in {

@@ -83,7 +83,8 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
     SecondContactNamePage,
     SecondContactEmailPage,
     SecondContactHavePhonePage,
-    SecondContactPhonePage
+    SecondContactPhonePage,
+    RegistrationInfoPage
   )
 
   override def path: JsPath = JsPath \ toString
