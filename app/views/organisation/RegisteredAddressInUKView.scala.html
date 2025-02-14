@@ -26,7 +26,7 @@
 
 @layout(pageTitle = title(form, messages("registeredAddressInUK.title"))) {
 
-    @formHelper(action = controllers.organisation.routes.RegisteredAddressInUKController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = controllers.organisation.routes.RegisteredAddressInUKController.onSubmit(mode), Symbol("autocomplete") -> "on") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

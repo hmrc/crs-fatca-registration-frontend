@@ -27,7 +27,7 @@
 
 @layout(pageTitle = title(form, messages("reporterType.title"))) {
 
-    @formHelper(action = routes.ReporterTypeController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.ReporterTypeController.onSubmit(mode), Symbol("autocomplete") -> "on") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
