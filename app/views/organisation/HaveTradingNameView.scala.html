@@ -26,7 +26,7 @@
 
 @layout(pageTitle = title(form, messages("haveTradingName.title"))) {
 
-    @formHelper(action = controllers.organisation.routes.HaveTradingNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.organisation.routes.HaveTradingNameController.onSubmit(mode), Symbol("autoComplete") -> "on") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
