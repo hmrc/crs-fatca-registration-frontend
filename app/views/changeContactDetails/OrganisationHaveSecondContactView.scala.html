@@ -30,7 +30,7 @@
 
 @layout(pageTitle = title(form, messages("organisationHaveSecondContact.title"))) {
 
-    @formHelper(action = controllers.changeContactDetails.routes.OrganisationHaveSecondContactController.onSubmit(mode), Symbol("autocomplete") -> "on") {
+    @formHelper(action = controllers.changeContactDetails.routes.OrganisationHaveSecondContactController.onSubmit(mode), Symbol("autoComplete") -> "on") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
