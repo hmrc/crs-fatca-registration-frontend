@@ -30,7 +30,7 @@
 
 @layout(pageTitle = title(form, messages("doYouHaveUniqueTaxPayerReference.title"))) {
 
-    @formHelper(action = routes.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.DoYouHaveUniqueTaxPayerReferenceController.onSubmit(mode), Symbol("autoComplete") -> "on") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

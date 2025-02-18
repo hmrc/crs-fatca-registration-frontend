@@ -10,7 +10,7 @@
 
 @layout(pageTitle = title(form, messages("$className;format="decap"$.title"))) {
 
-    @formHelper(action = controllers.$packageName$.routes.$className$Controller.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.$packageName$.routes.$className$Controller.onSubmit(mode), Symbol("autoComplete") -> "on") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

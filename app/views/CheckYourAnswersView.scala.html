@@ -47,7 +47,7 @@
         <p class="govuk-body">@messages("checkYourAnswers.information.p")</p>
     </div>
 
-    @formHelper(action = routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "on") {
         @govukButton(
             ButtonViewModel(messages("checkYourAnswers.button")).withAttribute("id" -> "submit").preventingDoubleClick()
         )
