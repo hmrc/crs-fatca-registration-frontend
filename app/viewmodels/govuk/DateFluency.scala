@@ -113,7 +113,7 @@ trait DateFluency {
     ): (String, String, String) = {
 
       val anySpecificError = dayError || realDayError || monthError || realMonthError || yearError
-      val allFieldsError   = field.error.isDefined && !anySpecificError
+      val allFieldsError   = field.error.isDefined && !anySpecificError || (realDayError && realMonthError)
 
       val dayErrorClass   = if (dayError || realDayError || allFieldsError) "govuk-input--error" else ""
       val monthErrorClass = if (monthError || realMonthError || allFieldsError) "govuk-input--error" else ""
