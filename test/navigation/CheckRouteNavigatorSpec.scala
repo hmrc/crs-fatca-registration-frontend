@@ -123,8 +123,16 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
           .mustBe(controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode))
       }
 
-      "must go from HaveTradingNamePage to CheckYourAnswersController when user says No" in {
+      "must go from HaveTradingNamePage to NonUKBusinessAddressWithoutIDPage when user says No and NonUKBusinessAddressWithoutIDPage is not populated" in {
         val userAnswers = emptyUserAnswers.withPage(HaveTradingNamePage, false)
+        navigator
+          .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
+      }
+      "must go from HaveTradingNamePage to CheckYourAnswersController when user says No and NonUKBusinessAddressWithoutIDPage is populated" in {
+        val userAnswers = emptyUserAnswers
+          .withPage(HaveTradingNamePage, false)
+          .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
         navigator
           .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
           .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
@@ -144,7 +152,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
       "must go from BusinessTradingNameWithoutIDPage to NonUKBusinessAddressWithoutIDPage if there is no address" in {
         navigator
           .nextPage(BusinessTradingNameWithoutIDPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)) // NM
+          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
       }
 
       "must go from IndWhereDoYouLivePage to IndWhatIsYourPostcodePage when user answers Yes" in {
@@ -183,7 +191,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
       "must go from IndNonUKAddressWithoutIdPage to IndContactEmailPage if there is no contact email" in {
         navigator
           .nextPage(IndNonUKAddressWithoutIdPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) // NM
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) 
       }
 
       "must go from IndWhatIsYourPostcodePage to IsThisYourAddressPage when there is only one matching address" in {
@@ -226,7 +234,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
       "must go from IndSelectAddressPage to IndContactEmailPage when there is no contact email" in {
         navigator
           .nextPage(IndSelectAddressPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) // NM
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) 
       }
 
       "must go from IsThisYourAddressPage" - {
@@ -258,7 +266,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
           navigator
             .nextPage(IsThisYourAddressPage, CheckMode, userAnswers)
-            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) // NM
+            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) 
         }
 
       }
@@ -277,7 +285,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
       "must go from IndUKAddressWithoutIdPage to IndContactEmailPage if there is no contact email" in {
         navigator
           .nextPage(IndUKAddressWithoutIdPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) // NM
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) 
       }
 
       "must go from NonUKBusinessAddressWithoutIDPage" - {
@@ -304,7 +312,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
           navigator
             .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
-            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) // NM
+            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) 
         }
 
         "to CheckYourAnswersPage if there is a contact name for any other reporter type" in {
@@ -445,7 +453,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         val userAnswers = emptyUserAnswers
           .withPage(IndDoYouHaveNINumberPage, true)
 
-        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad(NormalMode) // NM
+        navigator.nextPage(IndDateOfBirthPage, NormalMode, userAnswers) mustBe IndIdentityConfirmedController.onPageLoad(NormalMode) 
       }
 
       "must go from IndContactNamePage to JourneyRecoveryPage when IndDoYouHaveNINumberPage is false" in {
@@ -503,7 +511,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
           navigator
             .nextPage(IsThisYourBusinessPage, CheckMode, answers)
-            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) // NM
+            .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) 
         }
 
         "to SoleTraderNotIdentifiedPage when No is selected for a Sole Trader" in {
@@ -598,7 +606,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
       "must go from RegistrationInfoPage to IndContactEmailPage if there is no contact email" in {
         navigator
           .nextPage(RegistrationInfoPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) // NM
+          .mustBe(controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)) 
 
       }
 

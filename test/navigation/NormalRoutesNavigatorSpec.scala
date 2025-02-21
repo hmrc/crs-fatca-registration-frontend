@@ -213,7 +213,7 @@ class NormalRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks 
         navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe BusinessTradingNameWithoutIDController.onPageLoad(NormalMode)
       }
 
-      "must go from HaveTradingNamePage to BusinessAddressWithoutIDPage when user answers yes" in {
+      "must go from HaveTradingNamePage to BusinessAddressWithoutIDPage when user answers no" in {
 
         val userAnswers = emptyUserAnswers.set(HaveTradingNamePage, false).success.value
         navigator.nextPage(HaveTradingNamePage, NormalMode, userAnswers) mustBe NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)

@@ -25,8 +25,6 @@ import play.api.Logging
 import play.api.libs.json.Reads
 import play.api.mvc.Call
 
-import javax.inject.{Inject, Singleton}
-
 trait CheckRoutesNavigator extends Logging {
 
   val checkRoutes: Page => UserAnswers => Call = {
@@ -50,7 +48,12 @@ trait CheckRoutesNavigator extends Logging {
           userAnswers,
           HaveTradingNamePage,
           controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode),
-          controllers.routes.CheckYourAnswersController.onPageLoad()
+          checkNextPageForValueThenRoute(
+            CheckMode,
+            userAnswers,
+            page = NonUKBusinessAddressWithoutIDPage,
+            callWhenNotAnswered = controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode)
+          )
         )
     case BusinessTradingNameWithoutIDPage =>
       userAnswers =>
@@ -58,7 +61,7 @@ trait CheckRoutesNavigator extends Logging {
           CheckMode,
           userAnswers,
           NonUKBusinessAddressWithoutIDPage,
-          controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(NormalMode)
+          controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode)
         )
     case NonUKBusinessAddressWithoutIDPage => businessAddressWithoutIdRouting(CheckMode)
     case IndDoYouHaveNINumberPage          => doYouHaveNINORoutes(CheckMode)
