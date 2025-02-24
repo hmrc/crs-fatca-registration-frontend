@@ -42,9 +42,16 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field  = form("value"),
-                legend = LegendViewModel(messages("organisationHaveSecondContact.heading", contactName)).withCssClass("govuk-visually-hidden govuk-!-display-block")
+                legend = LegendViewModel(
+                    HtmlContent(
+                        s"""<span class="govuk-visually-hidden govuk-!-display-block">
+                                ${messages("organisationHaveSecondContact.heading", contactName)}
+                            </span>"""
+                    )
+                )
             )
         )
+
 
         @govukButton(
             ButtonViewModel(messages("site.continue")).withAttribute("id" -> "submit")
