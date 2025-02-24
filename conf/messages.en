@@ -230,7 +230,6 @@ businessWithIDName.change.hidden = Change your business
 indDoYouHaveNINumber.title = Do you have a National Insurance number?
 indDoYouHaveNINumber.heading = Do you have a National Insurance number?
 indDoYouHaveNINumber.p1 = Find your National Insurance number (opens in new tab)
-indDoYouHaveNINumber.link =
 indDoYouHaveNINumber.checkYourAnswersLabel = Do you have a National Insurance number?
 indDoYouHaveNINumber.change.hidden = Change if you have a National Insurance number
 indDoYouHaveNINumber.error.required = Select yes if you have a National Insurance number

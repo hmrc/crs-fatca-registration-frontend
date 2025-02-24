@@ -38,7 +38,7 @@
         }
 
         <h1 class="govuk-heading-l">@messages("indDoYouHaveNINumber.heading")</h1>
-        <p class="govuk-body">@link(appConfig.findNINumberUrl, "informationSent.p1", openInNewWindow = true)</p>
+        <p class="govuk-body">@link(appConfig.findNINumberUrl, "indDoYouHaveNINumber.p1", openInNewWindow = true)</p>
 
         @govukRadios(
             RadiosViewModel.yesNo(
