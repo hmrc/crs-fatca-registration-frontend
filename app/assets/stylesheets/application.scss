@@ -23,6 +23,14 @@ body:not(.js-enabled) .js-enabled {
   pointer-events: none;
 }
 
+//amended fieldset__legend css to allow for display block to work
+.govuk-fieldset__legend {
+    width: 100% !important;
+    overflow: hidden !important;
+    white-space: normal !important; /* Ensures text wraps properly */
+    clip: auto !important;
+}
+
 // Constrain the input (and drop-down) so they site with the other address inputs
 // important to do this on the wrapper rather than the input itself otherwise the down-arrow will be floating by itself
 @media (min-width: 40.0625em){
