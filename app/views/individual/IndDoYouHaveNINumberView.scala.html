@@ -14,12 +14,17 @@
  * limitations under the License.
  *@
 
+@import components._
+@import config.FrontendAppConfig
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    link: Link,
+    appConfig: FrontendAppConfig
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -32,12 +37,14 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-heading-l">@messages("indDoYouHaveNINumber.heading")</h1>
+        <p class="govuk-body">@link(appConfig.findNINumberUrl, "informationSent.p1", openInNewWindow = true)</p>
+
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("indDoYouHaveNINumber.heading")).asPageHeading()
+                legend = LegendViewModel(messages("indDoYouHaveNINumber.heading")).withCssClass("govuk-visually-hidden")
             )
-            .withHint(HintViewModel(Text(messages("indDoYouHaveNINumber.hint"))))
         )
 
         @govukButton(

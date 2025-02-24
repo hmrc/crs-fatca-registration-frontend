@@ -210,9 +210,9 @@ indWhatIsYourNINumber.title = What is your National Insurance number?
 indWhatIsYourNINumber.heading = What is your National Insurance number?
 indWhatIsYourNINumber.checkYourAnswersLabel = Your National Insurance number
 indWhatIsYourNINumber.change.hidden = Change your National Insurance number
-indWhatIsYourNINumber.hint = It’s on your National Insurance card, benefit letter, payslip or P60.  For example, ‘QQ 12 34 56 C’.
+indWhatIsYourNINumber.hint = It’s on your National Insurance card, benefit letter, payslip or P60 — for example, ‘QQ 12 34 56 C’.
 indWhatIsYourNINumber.error.required = Enter your National Insurance number
-indWhatIsYourNINumber.error.format.invalid = Enter your National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ123456C
+indWhatIsYourNINumber.error.format.invalid = Enter your National Insurance number in the right format
 indWhatIsYourNINumber.error.invalid = Enter a real National Insurance number
 indWhatIsYourNINumber.error.length = Your National Insurance Number must be 9 characters or less
 
@@ -229,7 +229,8 @@ businessWithIDName.change.hidden = Change your business
 
 indDoYouHaveNINumber.title = Do you have a National Insurance number?
 indDoYouHaveNINumber.heading = Do you have a National Insurance number?
-indDoYouHaveNINumber.hint = You can find your National Insurance number on your payslip, P60 or letters about tax, pensions and benefits.
+indDoYouHaveNINumber.p1 = Find your National Insurance number (opens in new tab)
+indDoYouHaveNINumber.link =
 indDoYouHaveNINumber.checkYourAnswersLabel = Do you have a National Insurance number?
 indDoYouHaveNINumber.change.hidden = Change if you have a National Insurance number
 indDoYouHaveNINumber.error.required = Select yes if you have a National Insurance number
