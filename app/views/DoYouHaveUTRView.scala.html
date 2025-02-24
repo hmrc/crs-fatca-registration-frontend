@@ -37,13 +37,13 @@
         }
 
         <h1 class="govuk-heading-l">@messages("doYouHaveUniqueTaxPayerReference.heading")</h1>
-        <p class="govuk-body">@Html(messages("doYouHaveUniqueTaxPayerReference.p1" , link(appConfig.lostUTRUrl, "doYouHaveUniqueTaxPayerReference.p1.link")))</p>
+        <p class="govuk-body">@link(appConfig.lostUTRUrl, "doYouHaveUniqueTaxPayerReference.p1.link")</p>
 
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
                 legend = LegendViewModel(messages("doYouHaveUniqueTaxPayerReference.heading")).withCssClass("govuk-visually-hidden")
-            ).withHint(HintViewModel(Text(messages("doYouHaveUniqueTaxPayerReference.hint"))))
+            )
         )
 
         @govukButton(
