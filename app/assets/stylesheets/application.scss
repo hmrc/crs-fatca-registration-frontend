@@ -17,6 +17,10 @@ body:not(.js-enabled) .js-enabled {
   border-color: #d4351c;
 }
 
+.wrap {
+    overflow-wrap: break-word;
+}
+
 // Raise index of dropdown arrow on accessible autocomplete
 .autocomplete__dropdown-arrow-down {
   z-index: 0;
