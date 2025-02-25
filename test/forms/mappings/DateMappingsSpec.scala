@@ -72,6 +72,22 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
     }
   }
 
+  "must bind data that contains hyphens and spaces as it is valid data" in {
+
+    forAll(validData -> "valid date") {
+      date =>
+        val data = Map(
+          "value.day"   -> (" " + date.getDayOfMonth.toString + "-"),
+          "value.month" -> ("-" + date.getMonthValue.toString + "-"),
+          "value.year"  -> (" " + date.getYear.toString + " ")
+        )
+
+        val result = form.bind(data)
+
+        result.value.value mustEqual date
+    }
+  }
+
   "must fail to bind an empty date" in {
 
     val result = form.bind(Map.empty[String, String])

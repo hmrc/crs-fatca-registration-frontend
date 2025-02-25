@@ -47,12 +47,10 @@
              <p class="govuk-body">@link(appConfig.findUTRUrl, s"$taxTypeMessageKey.link", openInNewWindow = true)</p>
          }
 
-        <h2 class="govuk-label govuk-label--m">@messages(s"$taxTypeMessageKey.subtitle", taxTypeMessageKey)</h2>
-
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages(s"$taxTypeMessageKey.title")).withCssClass("govuk-visually-hidden")
+                label = LabelViewModel(messages(s"$taxTypeMessageKey.hint")).withCssClass("govuk-label--m")
             )
             .withWidth(Fixed10)
             .withHint(

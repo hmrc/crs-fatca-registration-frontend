@@ -408,16 +408,19 @@ isThisYourAddress.error.required = Select yes if this is your address
 whatIsYourUTR.checkYourAnswersLabel = whatIsYourUTR
 whatIsYourUTR.hint = Your UTR can be 10 or 13 digits long.
 whatIsYourUTR.soleTrader.title = Your Self Assessment Unique Taxpayer Reference (UTR)
+whatIsYourUTR.soleTrader.hint = What is your Self Assessment UTR?
 whatIsYourUTR.soleTrader.paragraph = You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 whatIsYourUTR.soleTrader.link = Get more help to find your UTR (opens in new tab)
 whatIsYourUTR.soleTrader.subtitle = What is your Self Assessment UTR?
 
 whatIsYourUTR.partnership.title = Your Partnership Unique Taxpayer Reference (UTR)
+whatIsYourUTR.partnership.hint = What is your Partnership UTR?
 whatIsYourUTR.partnership.paragraph = You can find it in your Business Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 whatIsYourUTR.partnership.link = Get more help to find your UTR (opens in new tab)
 whatIsYourUTR.partnership.subtitle = What is your Partnership UTR?
 
 whatIsYourUTR.corporation.title = Your Corporation Tax Unique Taxpayer Reference (UTR)
+whatIsYourUTR.corporation.hint = What is your Corporation Tax UTR?
 whatIsYourUTR.corporation.paragraph = It will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 whatIsYourUTR.corporation.link = Ask for a copy of your Corporation Tax UTR (opens in new tab)
 whatIsYourUTR.corporation.subtitle = What is your Corporation Tax UTR?
