@@ -37,7 +37,7 @@
         }
 
         <h1 class="govuk-heading-l">@messages("doYouHaveUniqueTaxPayerReference.heading")</h1>
-        <p class="govuk-body">@link(appConfig.lostUTRUrl, "doYouHaveUniqueTaxPayerReference.p1.link")</p>
+        <p class="govuk-body">@link(appConfig.lostUTRUrl, "doYouHaveUniqueTaxPayerReference.link", openInNewWindow = true)</p>
 
         @govukRadios(
             RadiosViewModel.yesNo(
