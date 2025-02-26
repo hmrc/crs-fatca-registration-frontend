@@ -356,7 +356,7 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
     val result = form.bind(data)
 
     result.errors must contain(
-      FormError("value", "error.notRealDate", List.empty)
+      FormError("value", "error.notRealDate", Seq("day"))
     )
   }
 

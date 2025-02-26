@@ -48,7 +48,7 @@ private[mappings] class LocalDateFormatter(
       case Success(date) =>
         Right(date)
       case Failure(_) =>
-        Left(Seq(FormError(key, notRealDateKey, args)))
+        Left(Seq(FormError(key, notRealDateKey, getErrorArgs(day, month))))
     }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
@@ -94,7 +94,9 @@ private[mappings] class LocalDateFormatter(
 
   private def noMissingField(key: String, data: Map[String, String]) =
     formatDate(key, data).left
-      .map(_.map(_.copy(key = key, args = args)))
+      .map(_.map(
+        e => e.copy(key = key, args = e.args ++ args)
+      ))
       .flatMap {
         case validDate if validDate.isAfter(maxDate) =>
           Left(List(FormError(key, futureDateKey, List(formatDateToString(maxDate)) ++ args)))
@@ -119,6 +121,15 @@ private[mappings] class LocalDateFormatter(
       Left(List(FormError(key, monthRequiredKey, missingFields ++ args)))
     } else {
       Left(List(FormError(key, yearRequiredKey, missingFields ++ args)))
+    }
+
+  private def getErrorArgs(day: Int, month: Int): Seq[String] =
+    if (day < 1 || day > 31) {
+      Seq("day")
+    } else if (month < 1 || month > 12) {
+      Seq("month")
+    } else {
+      Seq("day")
     }
 
   override def unbind(key: String, value: LocalDate): Map[String, String] =
