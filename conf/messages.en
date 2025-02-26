@@ -334,13 +334,11 @@ indWhatIsYourPostcode.error.invalid = Enter a real postcode or enter the address
 indWhatIsYourPostcode.error.chars = Postcode must only include letters a to z and numbers 0 to 9
 indWhatIsYourPostcode.error.notFound = No addresses found — enter a different postcode or enter the address manually
 
-doYouHaveUniqueTaxPayerReference.title = Do you have a UK Unique Taxpayer Reference (UTR)?
-doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel = Do you have a UK Unique Taxpayer Reference?
-doYouHaveUniqueTaxPayerReference.change.hidden = Change if you have a UK Unique Taxpayer Reference
-doYouHaveUniqueTaxPayerReference.heading = Do you have a UK Unique Taxpayer Reference (UTR)?
-doYouHaveUniqueTaxPayerReference.p1 = You can {0}.
-doYouHaveUniqueTaxPayerReference.p1.link = find a lost UTR
-doYouHaveUniqueTaxPayerReference.hint = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax and Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+doYouHaveUniqueTaxPayerReference.title = Do you have a Unique Taxpayer Reference (UTR)?
+doYouHaveUniqueTaxPayerReference.checkYourAnswersLabel = Do you have a Unique Taxpayer Reference?
+doYouHaveUniqueTaxPayerReference.change.hidden = Change if you have a Unique Taxpayer Reference
+doYouHaveUniqueTaxPayerReference.heading = Do you have a Unique Taxpayer Reference (UTR)?
+doYouHaveUniqueTaxPayerReference.link = Find your UTR (opens in new tab)
 doYouHaveUniqueTaxPayerReference.error.required = Select yes if you have a Unique Taxpayer Reference
 
 
