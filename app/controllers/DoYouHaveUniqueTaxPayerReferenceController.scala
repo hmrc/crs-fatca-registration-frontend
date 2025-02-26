@@ -33,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DoYouHaveUniqueTaxPayerReferenceController @Inject() (
   override val messagesApi: MessagesApi,
-  appConfig: FrontendAppConfig,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
