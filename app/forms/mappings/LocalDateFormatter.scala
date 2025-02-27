@@ -50,9 +50,7 @@ private[mappings] class LocalDateFormatter(
       case Failure(_) =>
         val errorArgs = getErrorArgs(day, month)
 
-        val finalArgs = if (errorArgs.isEmpty) Seq("day", "month", "year") else errorArgs
-
-        Left(Seq(FormError(key, notRealDateKey, finalArgs)))
+        Left(Seq(FormError(key, notRealDateKey, errorArgs)))
     }
 
   private def getErrorArgs(day: Int, month: Int): Seq[String] = {
@@ -62,7 +60,7 @@ private[mappings] class LocalDateFormatter(
     (isDayError, isMonthError) match {
       case (true, false) => Seq("day")
       case (false, true) => Seq("month")
-      case (_, _)        => Seq()
+      case (_, _)        => Seq("day", "month", "year")
     }
   }
 
@@ -159,10 +157,9 @@ private[mappings] class LocalDateFormatter(
         .bind(key, data)
         .flatMap {
           str =>
-            val normalizedStr = str.replaceFirst("^0+(?!$)", "")
             months
               .find(
-                m => m.getValue.toString == normalizedStr || m.toString == str.toUpperCase || m.toString.take(3) == str.toUpperCase
+                m => m.toString == str.toUpperCase || m.toString.take(3) == str.toUpperCase
               )
               .map(
                 x => Right(x.getValue)
