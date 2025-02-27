@@ -345,11 +345,41 @@ class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Gener
     }
   }
 
-  "must fail to bind an invalid date" in {
+  "must fail to bind an invalid date e.g - 30th February" in {
 
     val data = Map(
       "value.day"   -> "30",
       "value.month" -> "2",
+      "value.year"  -> "2018"
+    )
+
+    val result = form.bind(data)
+
+    result.errors must contain(
+      FormError("value", "error.notRealDate", Seq("day", "month", "year"))
+    )
+  }
+
+  "must fail to bind an invalid date e.g - 13th month" in {
+
+    val data = Map(
+      "value.day"   -> "10",
+      "value.month" -> "13",
+      "value.year"  -> "2018"
+    )
+
+    val result = form.bind(data)
+
+    result.errors must contain(
+      FormError("value", "error.notRealDate", Seq("month"))
+    )
+  }
+
+  "must fail to bind an invalid date e.g - 32nd day" in {
+
+    val data = Map(
+      "value.day"   -> "32",
+      "value.month" -> "01",
       "value.year"  -> "2018"
     )
 

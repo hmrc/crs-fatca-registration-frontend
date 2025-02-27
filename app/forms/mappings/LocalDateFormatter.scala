@@ -48,8 +48,23 @@ private[mappings] class LocalDateFormatter(
       case Success(date) =>
         Right(date)
       case Failure(_) =>
-        Left(Seq(FormError(key, notRealDateKey, getErrorArgs(day, month))))
+        val errorArgs = getErrorArgs(day, month)
+
+        val finalArgs = if (errorArgs.isEmpty) Seq("day", "month", "year") else errorArgs
+
+        Left(Seq(FormError(key, notRealDateKey, finalArgs)))
     }
+
+  private def getErrorArgs(day: Int, month: Int): Seq[String] = {
+    val isDayError   = if (day < 1 || day > 31) true else false
+    val isMonthError = if (month < 1 || month > 12) true else false
+
+    (isDayError, isMonthError) match {
+      case (true, false) => Seq("day")
+      case (false, true) => Seq("month")
+      case (_, _) => Seq()
+    }
+  }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
@@ -121,15 +136,6 @@ private[mappings] class LocalDateFormatter(
       Left(List(FormError(key, monthRequiredKey, missingFields ++ args)))
     } else {
       Left(List(FormError(key, yearRequiredKey, missingFields ++ args)))
-    }
-
-  private def getErrorArgs(day: Int, month: Int): Seq[String] =
-    if (day < 1 || day > 31) {
-      Seq("day")
-    } else if (month < 1 || month > 12) {
-      Seq("month")
-    } else {
-      Seq("day")
     }
 
   override def unbind(key: String, value: LocalDate): Map[String, String] =
