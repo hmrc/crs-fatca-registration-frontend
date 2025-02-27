@@ -22,8 +22,6 @@ if (backLink !== null) {
 // Everything below should be added to play-frontend-hmrc eventually and then this can all be removed
 //
 function updateAccessibleAutocompleteStyling(originalSelect) {
-    // var originalSelect = document.querySelector('[data-module="hmrc-accessible-autocomplete"]');
-
     // =====================================================
     // Polyfill autocomplete once loaded
     // =====================================================
