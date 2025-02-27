@@ -48,11 +48,23 @@ private[mappings] class LocalDateFormatter(
       case Success(date) =>
         Right(date)
       case Failure(_) =>
-        Left(Seq(FormError(key, notRealDateKey, args)))
+        Left(Seq(FormError(key, notRealDateKey, getErrorArgs(day, month))))
     }
+
+  private def getErrorArgs(day: Int, month: Int): Seq[String] = {
+    val isDayError   = if (day < 1 || day > 31) true else false
+    val isMonthError = if (month < 1 || month > 12) true else false
+
+    (isDayError, isMonthError) match {
+      case (true, false) => Seq("day")
+      case (false, true) => Seq("month")
+      case (_, _)        => Seq("day", "month", "year")
+    }
+  }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
+    val monthVal = s"$key.month"
     val int = intFormatter(
       requiredKey = invalidKey,
       wholeNumberKey = invalidKey,
@@ -63,10 +75,13 @@ private[mappings] class LocalDateFormatter(
     val month = new MonthFormatter(invalidKey, args)
 
     for {
-      day   <- int.bind(s"$key.day", data)
-      month <- month.bind(s"$key.month", data)
-      year  <- int.bind(s"$key.year", data)
-      date  <- toDate(key, day, month, year)
+      day <- int.bind(s"$key.day", data)
+      month <- data(monthVal).toIntOption match {
+        case Some(_) => int.bind(monthVal, data)
+        case _       => month.bind(monthVal, data)
+      }
+      year <- int.bind(s"$key.year", data)
+      date <- toDate(key, day, month, year)
     } yield date
   }
 
@@ -96,7 +111,9 @@ private[mappings] class LocalDateFormatter(
 
   private def noMissingField(key: String, data: Map[String, String]) =
     formatDate(key, data).left
-      .map(_.map(_.copy(key = key, args = args)))
+      .map(_.map(
+        e => e.copy(key = key, args = e.args ++ args)
+      ))
       .flatMap {
         case validDate if validDate.isAfter(maxDate) =>
           Left(List(FormError(key, futureDateKey, List(formatDateToString(maxDate)) ++ args)))
@@ -142,10 +159,9 @@ private[mappings] class LocalDateFormatter(
         .bind(key, data)
         .flatMap {
           str =>
-            val normalizedStr = str.replaceFirst("^0+(?!$)", "")
             months
               .find(
-                m => m.getValue.toString == normalizedStr || m.toString == str.toUpperCase || m.toString.take(3) == str.toUpperCase
+                m => m.toString == str.toUpperCase || m.toString.take(3) == str.toUpperCase
               )
               .map(
                 x => Right(x.getValue)

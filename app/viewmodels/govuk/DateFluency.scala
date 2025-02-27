@@ -43,17 +43,16 @@ trait DateFluency {
       fieldset: Fieldset
     )(implicit messages: Messages): DateInput = {
 
-      val errorClass = "govuk-input--error"
+      val realError: Boolean = field.error.exists(_.message.contains("notRealDate"))
 
-      val dayError         = field.error.exists(_.args.contains("day"))
-      val monthError       = field.error.exists(_.args.contains("month"))
-      val yearError        = field.error.exists(_.args.contains("year"))
-      val anySpecificError = dayError || monthError || yearError
-      val allFieldsError   = field.error.isDefined && !anySpecificError
+      val dayError   = getErrorForField(field, "day")
+      val monthError = getErrorForField(field, "month")
+      val yearError  = getErrorForField(field, "year")
 
-      val dayErrorClass   = if (dayError || allFieldsError) errorClass else ""
-      val monthErrorClass = if (monthError || allFieldsError) errorClass else ""
-      val yearErrorClass  = if (yearError || allFieldsError) errorClass else ""
+      val realDayError   = isRealDateError(field, "day", realError)
+      val realMonthError = isRealDateError(field, "month", realError)
+
+      val (dayErrorClass, monthErrorClass, yearErrorClass) = getErrorClasses(dayError, realDayError, monthError, realMonthError, yearError, field)
 
       val items = Seq(
         InputItem(
@@ -85,6 +84,42 @@ trait DateFluency {
         id = field.id,
         errorMessage = errorMessage(field)
       )
+    }
+
+    private def getErrorForField(field: Field, fieldName: String): Boolean =
+      field.error.exists(_.args.contains(fieldName))
+
+    private def isRealDateError(field: Field, fieldName: String, realError: Boolean): Boolean =
+      if (realError) {
+        val fieldValue = field(fieldName).value
+        fieldValue.flatMap(_.toIntOption).exists(
+          d =>
+            fieldName match {
+              case "day"   => d < 1 || d > 31
+              case "month" => d < 1 || d > 12
+              case _       => false
+            }
+        )
+      } else {
+        false
+      }
+
+    private def getErrorClasses(dayError: Boolean,
+                                realDayError: Boolean,
+                                monthError: Boolean,
+                                realMonthError: Boolean,
+                                yearError: Boolean,
+                                field: Field
+    ): (String, String, String) = {
+
+      val anySpecificError = dayError || realDayError || monthError || realMonthError || yearError
+      val allFieldsError   = field.error.isDefined && !anySpecificError || (realDayError && realMonthError)
+
+      val dayErrorClass   = if (dayError || realDayError || allFieldsError) "govuk-input--error" else ""
+      val monthErrorClass = if (monthError || realMonthError || allFieldsError) "govuk-input--error" else ""
+      val yearErrorClass  = if (yearError || allFieldsError) "govuk-input--error" else ""
+
+      (dayErrorClass, monthErrorClass, yearErrorClass)
     }
 
   }
