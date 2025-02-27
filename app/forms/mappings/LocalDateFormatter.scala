@@ -62,7 +62,7 @@ private[mappings] class LocalDateFormatter(
     (isDayError, isMonthError) match {
       case (true, false) => Seq("day")
       case (false, true) => Seq("month")
-      case (_, _) => Seq()
+      case (_, _)        => Seq()
     }
   }
 
