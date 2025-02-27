@@ -42,6 +42,13 @@ function updateAccessibleAutocompleteStyling(originalSelect) {
                 }
             }
         }
+        if (originalSelect && originalSelect.getAttribute('autocomplete') > "") {
+            if (parentForm) {
+                if (combo) {
+                    combo.setAttribute('autocomplete', originalSelect.getAttribute('autocomplete'));
+                }
+            }
+        }
         // =====================================================
         // Update autocomplete once loaded with error styling if needed
         // This won't work if the autocomplete css is loaded after the frontend library css because
