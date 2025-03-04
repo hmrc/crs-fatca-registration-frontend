@@ -232,7 +232,7 @@ trait CheckRoutesNavigator extends Logging {
   private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ReporterTypePage), mode) match {
       case (Some(Individual), NormalMode) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case (Some(Individual), CheckMode) =>
+      case (Some(Individual), CheckMode) | (Some(Sole), CheckMode) =>
         ua.get(IndDoYouHaveNINumberPage)
           .fold(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode))(
             _ => controllers.routes.CheckYourAnswersController.onPageLoad()
