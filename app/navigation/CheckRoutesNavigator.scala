@@ -231,14 +231,15 @@ trait CheckRoutesNavigator extends Logging {
 
   private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ReporterTypePage), mode) match {
-      case (Some(Individual), NormalMode) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case (Some(Individual), CheckMode) | (Some(Sole), CheckMode) =>
-        ua.get(IndDoYouHaveNINumberPage)
-          .fold(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode))(
-            _ => controllers.routes.CheckYourAnswersController.onPageLoad()
-          )
-      case (Some(_), _) => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
-      case (None, _)    => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case (Some(Individual), _) =>
+        checkNextPageForValueThenRoute(CheckMode, ua, IndDoYouHaveNINumberPage, controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode))
+      case (Some(_), _) =>
+        checkNextPageForValueThenRoute(CheckMode,
+                                       ua,
+                                       RegisteredAddressInUKPage,
+                                       controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
+        )
+      case (None, _) => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def doYouHaveUniqueTaxPayerReference(mode: Mode)(ua: UserAnswers): Call =

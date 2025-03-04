@@ -56,14 +56,14 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         }
       }
 
-      "must go from ReporterTypePage - Sole " - {
+      "must go from ReporterTypePage - Non Individual " - {
         val ua = emptyUserAnswers.withPage(ReporterTypePage, Sole)
-        "to Check Your Answers if ReporterType is unchanged" in {
-          val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
+        "to Check Your Answers if ReporterType is unchanged for sole" in {
+          val answers = ua.withPage(RegisteredAddressInUKPage, true)
           navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
         }
-        "to IndDoYouHaveNINumber if ReporterType changed to Sole" in {
-          navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
+        "to RegisteredAddressInUKController if ReporterType changed to Sole" in {
+          navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(CheckMode)
         }
       }
 
