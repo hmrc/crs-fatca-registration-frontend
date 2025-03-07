@@ -110,10 +110,10 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         }
       }
 
-      "must go from BusinessNameWithoutIDPage to HaveTradingNamePage" in {
+      "must go from BusinessNameWithoutIDPage to CheckYourAnswers" in {
         navigator
           .nextPage(BusinessNameWithoutIDPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.organisation.routes.HaveTradingNameController.onPageLoad(CheckMode))
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 
       "must go from HaveTradingNamePage to BusinessTradingNameWithoutID when user says Yes" in {

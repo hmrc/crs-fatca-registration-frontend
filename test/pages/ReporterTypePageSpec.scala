@@ -73,6 +73,7 @@ class ReporterTypePageSpec extends PageBehaviours {
           result.get(SecondContactEmailPage) mustBe empty
           result.get(SecondContactHavePhonePage) mustBe empty
           result.get(SecondContactPhonePage) mustBe empty
+          result.get(WhatIsYourNamePage) mustBe empty
 
         }
 
@@ -98,6 +99,8 @@ class ReporterTypePageSpec extends PageBehaviours {
           result.get(IndContactHavePhonePage) mustBe empty
           result.get(IndContactPhonePage) mustBe empty
           result.get(IndDoYouHaveNINumberPage) mustBe empty
+          result.get(WhatIsYourNamePage) mustBe empty
+
         }
       }
       "when answer changes to 'An individual not connected to a business'" in {
@@ -176,6 +179,7 @@ class ReporterTypePageSpec extends PageBehaviours {
       .withPage(HaveTradingNamePage, booleanField)
       .withPage(BusinessTradingNameWithoutIDPage, stringField)
       .withPage(NonUKBusinessAddressWithoutIDPage, address)
+      .withPage(WhatIsYourNamePage, name)
       .withPage(ContactNamePage, stringField)
       .withPage(ContactEmailPage, stringField)
       .withPage(ContactHavePhonePage, booleanField)
