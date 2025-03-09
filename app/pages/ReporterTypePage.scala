@@ -16,7 +16,8 @@
 
 package pages
 
-import models.ReporterType.{orgReporterTypes, Individual, Sole}
+import models.ReporterType.{Individual, Sole, orgReporterTypes}
+import models.matching.{IndRegistrationInfo, OrgRegistrationInfo}
 import models.{ReporterType, UserAnswers}
 import play.api.libs.json.JsPath
 
@@ -43,15 +44,13 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
     SecondContactHavePhonePage,
     SecondContactPhonePage,
     RegisteredAddressInUKPage,
-    DoYouHaveUniqueTaxPayerReferencePage,
-    RegistrationInfoPage
+    DoYouHaveUniqueTaxPayerReferencePage
   )
 
   private val otherBusinessTypeCleanup = List(
     IndWhatIsYourNINumberPage,
     IndContactNamePage,
     IndDateOfBirthPage,
-    RegistrationInfoPage,
     IndWhatIsYourNamePage,
     DateOfBirthWithoutIdPage,
     IndWhereDoYouLivePage,
@@ -85,7 +84,6 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
     SecondContactEmailPage,
     SecondContactHavePhonePage,
     SecondContactPhonePage,
-    RegistrationInfoPage,
     WhatIsYourNamePage,
     IndDoYouHaveNINumberPage
   )
@@ -94,11 +92,35 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
 
   override def toString: String = "reporterType"
 
-  override def cleanup(value: Option[ReporterType], userAnswers: UserAnswers): Try[UserAnswers] = value match {
-    case Some(Individual)                                              => individualCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case Some(Sole)                                                    => soleTraderTypeCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case Some(reporterType) if orgReporterTypes.contains(reporterType) => otherBusinessTypeCleanup.foldLeft(Try(userAnswers))(PageLists.removePage)
-    case _                                                             => super.cleanup(value, userAnswers)
-  }
+  override def cleanup(value: Option[ReporterType], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(Individual) =>
+        cleanupPages(userAnswers, individualCleanup)
+          .flatMap(registrationInfoCleanup(_, Individual))
+
+      case Some(Sole) =>
+        cleanupPages(userAnswers, soleTraderTypeCleanup)
+          .flatMap(registrationInfoCleanup(_, Sole))
+
+      case Some(reporterType) if orgReporterTypes.contains(reporterType) =>
+        cleanupPages(userAnswers, otherBusinessTypeCleanup)
+          .flatMap(registrationInfoCleanup(_, reporterType))
+
+      case _ => super.cleanup(value, userAnswers)
+    }
+
+  private def cleanupPages(userAnswers: UserAnswers, pages: Seq[QuestionPage[_]]): Try[UserAnswers] =
+    pages.foldLeft(Try(userAnswers))(PageLists.removePage)
+
+  private def registrationInfoCleanup(userAnswers: UserAnswers, reporterType: ReporterType): Try[UserAnswers] =
+    userAnswers.get(RegistrationInfoPage) match {
+      case Some(_: OrgRegistrationInfo) if reporterType == Individual =>
+        userAnswers.remove(RegistrationInfoPage)
+
+      case Some(_: IndRegistrationInfo) if orgReporterTypes.contains(reporterType) =>
+        userAnswers.remove(RegistrationInfoPage)
+
+      case _ => Try(userAnswers)
+    }
 
 }
