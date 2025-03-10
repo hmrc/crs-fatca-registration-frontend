@@ -66,7 +66,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val corporationTaxEnquiriesLink: String = configuration.get[String]("urls.corporationTaxEnquiries")
   lazy val selfAssessmentEnquiriesLink: String = configuration.get[String]("urls.selfAssessmentEnquiries")
   lazy val emailEnquiries: String              = configuration.get[String]("urls.emailEnquiries")
-  lazy val crsFatcaFrontendUrl: String         = configuration.get[String]("urls.crsFatcaFrontendUrl")
   lazy val findNINumberUrl: String             = configuration.get[String]("urls.findNINumberUrl")
 
   val languageTranslationEnabled: Boolean =
