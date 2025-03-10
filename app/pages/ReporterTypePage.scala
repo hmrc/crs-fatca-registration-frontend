@@ -16,7 +16,7 @@
 
 package pages
 
-import models.ReporterType.{Individual, Sole, orgReporterTypes}
+import models.ReporterType.{orgReporterTypes, Individual, Sole}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo}
 import models.{ReporterType, UserAnswers}
 import play.api.libs.json.JsPath
