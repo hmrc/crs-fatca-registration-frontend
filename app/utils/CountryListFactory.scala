@@ -83,7 +83,7 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
           isSelected
         )
     }.toSeq.sortBy(_.text)
-    SelectItem(None, "Select a country", selected = false) +: countryJsonList
+    SelectItem(Some(""), "Select a country", selected = false) +: countryJsonList
   }
 
 }
