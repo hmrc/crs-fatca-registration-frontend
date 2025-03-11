@@ -14,9 +14,9 @@
    /* Hide unnecessary elements */
    .cbanner-govuk-cookie-banner,
    .govuk-skip-link,
-   .govuk-header,
    .govuk-footer,
    .govuk-button,
+   .hmrc-sign-out-nav__link,
    .govuk-phase-banner,
    .govuk-back-link,
    .govuk-caption-xl,
