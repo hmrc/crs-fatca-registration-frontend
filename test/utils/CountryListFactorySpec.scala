@@ -158,7 +158,7 @@ class CountryListFactorySpec extends SpecBase {
       )
 
       factory.countrySelectList(Map.empty, countries) must contain theSameElementsAs Seq(
-        SelectItem(None, ""),
+        SelectItem(Some(""), "Select a country"),
         SelectItem(value = Some("AB"), text = "Country_1", selected = false),
         SelectItem(value = Some("BC"), text = "Country_2", selected = false)
       )
@@ -174,7 +174,7 @@ class CountryListFactorySpec extends SpecBase {
       val selectedCountry = Map("country" -> "BC")
 
       factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
-        SelectItem(value = None, text = ""),
+        SelectItem(value = Some(""), text = "Select a country"),
         SelectItem(value = Some("AB"), text = "Country_1:Country_1_2", selected = false),
         SelectItem(value = Some("BC"), text = "Country_2", selected = true)
       )
@@ -190,7 +190,7 @@ class CountryListFactorySpec extends SpecBase {
       val selectedCountry = Map("country" -> "Country_1_2")
 
       factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
-        SelectItem(value = None, text = ""),
+        SelectItem(value = Some(""), text = "Select a country"),
         SelectItem(value = Some("AB"), text = "Country_1:Country_1_2", selected = false),
         SelectItem(value = Some("BC"), text = "Country_2", selected = false)
       )

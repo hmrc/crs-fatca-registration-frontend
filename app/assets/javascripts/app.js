@@ -140,7 +140,6 @@ if (countrySelect !== null) {
         selectElement: countrySelect,
         showAllValues: true,
         autoSelect: false,
-        preserveNullOptions: true,
         templates: {
             suggestion: function (suggestion) {
                 if (suggestion) {
