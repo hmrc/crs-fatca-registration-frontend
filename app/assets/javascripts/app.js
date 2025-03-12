@@ -159,3 +159,49 @@ if (countrySelect !== null) {
 
     updateAccessibleAutocompleteStyling(countrySelect);
 }
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Watching for autocomplete enhancement...");
+
+    function removeSelectACountry() {
+        var autoCompleteInput = document.querySelector("[role='combobox']");
+        var dropdownOptions = document.querySelectorAll(".autocomplete__option");
+
+        if (autoCompleteInput) {
+            console.log("Found autocomplete input:", autoCompleteInput);
+
+            setTimeout(function () {
+                if (autoCompleteInput.value.trim() === "Select a country") {
+                    console.log("Clearing autocomplete input value...");
+                    autoCompleteInput.value = "";
+                    autoCompleteInput.setAttribute("placeholder", "");
+                }
+            }, 100);
+
+            // Remove "Select a country" from the dropdown list
+            dropdownOptions.forEach((option) => {
+                if (option.textContent.trim() === "Select a country") {
+                    console.log("Removing 'Select a country' from dropdown...");
+                    option.remove();
+                }
+            });
+        }
+    }
+
+    // Watch for changes in the DOM
+    const observer = new MutationObserver((mutationsList, observer) => {
+        const autoCompleteInput = document.querySelector("[role='combobox']");
+        const dropdownOptions = document.querySelectorAll(".autocomplete__option");
+
+        if (autoCompleteInput && dropdownOptions.length > 0) {
+            console.log("Autocomplete initialized, running fix...");
+            removeSelectACountry();
+            observer.disconnect(); // Stop observing once we've found it
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
+});
+
