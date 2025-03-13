@@ -45,7 +45,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad
       }
 
-      "must go from ReporterTypePage" - {
+      "must go from ReporterTypePage - Individual" - {
         val ua = emptyUserAnswers.withPage(ReporterTypePage, Individual)
         "to Check Your Answers if Individual is unchanged" in {
           val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
@@ -53,6 +53,17 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         }
         "to IndDoYouHaveNINumber if reportYpe changed to Individual" in {
           navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
+        }
+      }
+
+      "must go from ReporterTypePage - Non Individual " - {
+        val ua = emptyUserAnswers.withPage(ReporterTypePage, Sole)
+        "to Check Your Answers if ReporterType is unchanged for sole" in {
+          val answers = ua.withPage(RegisteredAddressInUKPage, true)
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
+        }
+        "to RegisteredAddressInUKController if ReporterType changed to Sole" in {
+          navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(CheckMode)
         }
       }
 
@@ -110,10 +121,10 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         }
       }
 
-      "must go from BusinessNameWithoutIDPage to HaveTradingNamePage" in {
+      "must go from BusinessNameWithoutIDPage to CheckYourAnswers" in {
         navigator
           .nextPage(BusinessNameWithoutIDPage, CheckMode, emptyUserAnswers)
-          .mustBe(controllers.organisation.routes.HaveTradingNameController.onPageLoad(CheckMode))
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 
       "must go from HaveTradingNamePage to BusinessTradingNameWithoutID when user says Yes" in {
