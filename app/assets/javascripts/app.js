@@ -139,7 +139,7 @@ if (countrySelect !== null) {
         defaultValue: '',
         selectElement: countrySelect,
         showAllValues: true,
-        autoSelect: true,
+        autoSelect: false,
         templates: {
             suggestion: function (suggestion) {
                 if (suggestion) {
@@ -158,3 +158,4 @@ if (countrySelect !== null) {
 
     updateAccessibleAutocompleteStyling(countrySelect);
 }
+
