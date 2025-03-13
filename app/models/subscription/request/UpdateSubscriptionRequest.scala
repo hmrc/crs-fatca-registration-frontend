@@ -62,7 +62,7 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
     primaryContact map {
       primaryContact =>
         UpdateSubscriptionRequest(
-          IdentifierType.FATCAID,
+          IdentifierType.ZCRF,
           displaySubscriptionResponse.subscriptionId.value,
           response.crfaSubscriptionDetails.tradingName,
           response.crfaSubscriptionDetails.gbUser,
@@ -106,7 +106,7 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
     individualContact map {
       contact =>
         UpdateSubscriptionRequest(
-          IdentifierType.FATCAID,
+          IdentifierType.ZCRF,
           displaySubscriptionResponse.subscriptionId.value,
           response.crfaSubscriptionDetails.tradingName,
           response.crfaSubscriptionDetails.gbUser,
