@@ -18,7 +18,7 @@ package controllers.changeContactDetails
 
 import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
-import forms.changeContactDetails.OrganisationEmailFormProvider
+import forms.changeContactDetails.OrganisationContactEmailFormProvider
 import models.NormalMode
 import models.subscription.response.OrganisationRegistrationType
 import navigation.{FakeNavigator, Navigator}
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class OrganisationContactEmailControllerSpec extends SpecBase with TestValues with MockitoSugar {
 
-  val formProvider = new OrganisationEmailFormProvider()
+  val formProvider = new OrganisationContactEmailFormProvider()
   val form         = formProvider()
 
   private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
