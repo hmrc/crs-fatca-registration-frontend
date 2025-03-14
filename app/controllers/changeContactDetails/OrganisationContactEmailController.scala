@@ -17,7 +17,7 @@
 package controllers.changeContactDetails
 
 import controllers.actions._
-import forms.changeContactDetails.OrganisationEmailFormProvider
+import forms.changeContactDetails.OrganisationContactEmailFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.changeContactDetails.OrganisationContactEmailPage
@@ -36,7 +36,7 @@ class OrganisationContactEmailController @Inject() (
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,
-  formProvider: OrganisationEmailFormProvider,
+  formProvider: OrganisationContactEmailFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: OrganisationContactEmailView
 )(implicit ec: ExecutionContext)

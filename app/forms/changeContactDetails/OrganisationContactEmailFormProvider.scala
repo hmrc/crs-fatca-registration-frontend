@@ -22,16 +22,16 @@ import utils.RegexConstants
 
 import javax.inject.Inject
 
-class OrganisationEmailFormProvider @Inject() extends Mappings with RegexConstants {
+class OrganisationContactEmailFormProvider @Inject() extends Mappings with RegexConstants {
 
   private val maxLength = 132
 
   def apply(): Form[String] =
     Form(
       "value" -> validatedText(
-        "organisationEmail.error.required",
-        "organisationEmail.error.invalid",
-        "organisationEmail.error.length",
+        "organisationContactEmail.error.required",
+        "organisationContactEmail.error.invalid",
+        "organisationContactEmail.error.length",
         emailRegex,
         maxLength
       )

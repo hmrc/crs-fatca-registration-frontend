@@ -19,14 +19,14 @@ package forms.changeContactDetails
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
-class OrganisationEmailFormProviderSpec extends StringFieldBehaviours {
+class OrganisationContactEmailFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "organisationEmail.error.required"
-  val lengthKey   = "organisationEmail.error.length"
-  val invalidKey  = "organisationEmail.error.invalid"
+  val requiredKey = "organisationContactEmail.error.required"
+  val lengthKey   = "organisationContactEmail.error.length"
+  val invalidKey  = "organisationContactEmail.error.invalid"
   val maxLength   = 132
 
-  val form = new OrganisationEmailFormProvider()()
+  val form = new OrganisationContactEmailFormProvider()()
 
   ".value" - {
 
