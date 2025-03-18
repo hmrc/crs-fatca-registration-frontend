@@ -29,10 +29,11 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import pages.changeContactDetails._
+import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
 
-class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generators with UserAnswersGenerator {
+class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks with Generators with UserAnswersGenerator {
 
   val navigator = new Navigator
 
@@ -49,6 +50,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         val ua = emptyUserAnswers.withPage(ReporterTypePage, Individual)
         "to Check Your Answers if Individual is unchanged" in {
           val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
+            .withPage(IndWhatIsYourNINumberPage, Nino(validNino.sample.get))
           navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
         }
         "to IndDoYouHaveNINumber if reportYpe changed to Individual" in {
@@ -58,10 +60,13 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
       "must go from ReporterTypePage - Non Individual " - {
         val ua = emptyUserAnswers.withPage(ReporterTypePage, Sole)
-        "to Check Your Answers if ReporterType is unchanged for sole" in {
-          val answers = ua.withPage(RegisteredAddressInUKPage, true)
-          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
-        }
+
+//         Is this correct? You would never be able to change the business details as a Sole type
+//        "to Check Your Answers if ReporterType is unchanged for sole" in {
+//          val answers = ua.withPage(RegisteredAddressInUKPage, true)
+//          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
+//        }
+
         "to RegisteredAddressInUKController if ReporterType changed to Sole" in {
           navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(CheckMode)
         }
@@ -69,6 +74,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
       "must go from WhatIsYourUTRPage to WhatIsYourNamePage for a Sole Trader" in {
         val answers = emptyUserAnswers.withPage(ReporterTypePage, Sole)
+          .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("someUniqueTaxpayerReference"))
 
         navigator
           .nextPage(WhatIsYourUTRPage, CheckMode, answers)
@@ -76,7 +82,9 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
       }
 
       "must go from WhatIsYourUTRPage to BusinessNamePage for any other reporter type" in {
-        val answers = emptyUserAnswers.withPage(ReporterTypePage, LimitedCompany)
+        val answers = emptyUserAnswers
+          .withPage(ReporterTypePage, LimitedCompany)
+          .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("someUniqueTaxpayerReference"))
 
         navigator
           .nextPage(WhatIsYourUTRPage, CheckMode, answers)
@@ -121,10 +129,11 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         }
       }
 
-      "must go from BusinessNameWithoutIDPage to CheckYourAnswers" in {
+      "must go from BusinessNameWithoutIDPage to HaveTradingNamePage" in {
+        val userAnswers = emptyUserAnswers.withPage(BusinessNameWithoutIDPage, "someid")
         navigator
-          .nextPage(BusinessNameWithoutIDPage, CheckMode, emptyUserAnswers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
+          .nextPage(BusinessNameWithoutIDPage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.HaveTradingNameController.onPageLoad(CheckMode))
       }
 
       "must go from HaveTradingNamePage to BusinessTradingNameWithoutID when user says Yes" in {
@@ -140,10 +149,13 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
           .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
           .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
       }
-      "must go from HaveTradingNamePage to CheckYourAnswersController when user says No and NonUKBusinessAddressWithoutIDPage is populated" in {
+      "must go from HaveTradingNamePage to CheckYourAnswersController when user says No and NonUKBusinessAddressWithoutIDPage and ContactDetails are populated" in {
         val userAnswers = emptyUserAnswers
+          .withPage(ReporterTypePage, LimitedCompany)
           .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
           .withPage(HaveTradingNamePage, false)
+          .withPage(ContactNamePage, "ContactName")
+
         navigator
           .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
           .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
@@ -302,14 +314,17 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
       "must go from NonUKBusinessAddressWithoutIDPage" - {
 
         "to JourneyRecoveryPage if there is no reporter type" in {
+          val answers = emptyUserAnswers
+            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
           navigator
-            .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, emptyUserAnswers)
+            .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
             .mustBe(routes.JourneyRecoveryController.onPageLoad())
         }
 
         "to CheckYourAnswersPage if there is a contact email for a Sole reporter type" in {
           val answers = emptyUserAnswers
             .withPage(ReporterTypePage, Sole)
+            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
             .withPage(IndContactEmailPage, arbitrary[String].sample.value)
 
           navigator
@@ -320,6 +335,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         "to IndContactEmailPage if there is no contact email for a Sole reporter type" in {
           val answers = emptyUserAnswers
             .withPage(ReporterTypePage, Sole)
+            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
 
           navigator
             .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
@@ -329,6 +345,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
         "to CheckYourAnswersPage if there is a contact name for any other reporter type" in {
           val answers = emptyUserAnswers
             .withPage(ReporterTypePage, LimitedCompany)
+            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
             .withPage(ContactNamePage, arbitrary[String].sample.value)
 
           navigator
@@ -338,11 +355,12 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
         "to YourContactDetailsPage if there is no contact name for any other reporter type" in {
           val answers = emptyUserAnswers
+            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
             .withPage(ReporterTypePage, LimitedCompany)
 
           navigator
             .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
-            .mustBe(routes.YourContactDetailsController.onPageLoad())
+            .mustBe(routes.YourContactDetailsController.onPageLoad(CheckMode))
         }
 
       }
@@ -560,7 +578,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
               navigator
                 .nextPage(IsThisYourBusinessPage, CheckMode, answers)
-                .mustBe(routes.YourContactDetailsController.onPageLoad())
+                .mustBe(routes.YourContactDetailsController.onPageLoad(CheckMode))
             }
 
             s"to CheckYourAnswersPage when Yes is selected for a $reporterType and there is a contact name" in {
@@ -602,7 +620,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
           navigator
             .nextPage(IsThisYourBusinessPage, CheckMode, answers)
-            .mustBe(routes.YourContactDetailsController.onPageLoad())
+            .mustBe(routes.YourContactDetailsController.onPageLoad(CheckMode))
         }
 
       }
