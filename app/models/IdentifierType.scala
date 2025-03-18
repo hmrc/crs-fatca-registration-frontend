@@ -24,6 +24,7 @@ object IdentifierType {
   val FATCAID = "FATCAID"
   val SAFEID  = "SAFEID"
   val SAFE    = "SAFE"
+  val ZCRF    = "ZCRF"
 
   val NINO = "NINO"
 }

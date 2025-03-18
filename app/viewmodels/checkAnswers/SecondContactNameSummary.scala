@@ -20,7 +20,7 @@ import controllers.organisation.routes
 import models.{CheckMode, UserAnswers}
 import pages.SecondContactNamePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
@@ -33,7 +33,7 @@ object SecondContactNameSummary {
       answer =>
         SummaryListRowViewModel(
           key = s"$SecondContactNamePage.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value = ValueViewModel(Text(answer)),
           actions = Seq(
             changeAction(
               SecondContactNamePage.toString,
