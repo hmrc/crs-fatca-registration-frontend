@@ -155,18 +155,11 @@ trait NormalRoutesNavigator extends Logging {
       .map(if (_) yesCall else noCall)
       .getOrElse(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-//  private def yesNoNavigate(check: => Boolean, yesCall: => Call, noCall: => Call): Call = if (check) yesCall else noCall
-
   private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ReporterTypePage), mode) match {
-      case (Some(Individual), NormalMode) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case (Some(Individual), CheckMode) =>
-        ua.get(IndDoYouHaveNINumberPage)
-          .fold(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode))(
-            _ => controllers.routes.CheckYourAnswersController.onPageLoad()
-          )
-      case (Some(_), _) => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
-      case (None, _)    => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case (Some(Individual), _) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
+      case (Some(_), _)          => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
+      case (None, _)             => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def doYouHaveUniqueTaxPayerReference(mode: Mode)(ua: UserAnswers): Call =
@@ -197,7 +190,7 @@ trait NormalRoutesNavigator extends Logging {
           mode,
           ua,
           ContactNamePage,
-          routes.YourContactDetailsController.onPageLoad()
+          routes.YourContactDetailsController.onPageLoad(NormalMode)
         )
       case _ =>
         logger.warn(s"ReporterType answer not found when routing from NonUKBusinessAddressWithoutIDPage in mode $mode")
@@ -214,7 +207,7 @@ trait NormalRoutesNavigator extends Logging {
           controllers.individual.routes.IndContactEmailController.onPageLoad(NormalMode)
         )
       case (Some(true), _, _) =>
-        checkNextPageForValueThenRoute(mode, ua, ContactNamePage, routes.YourContactDetailsController.onPageLoad())
+        checkNextPageForValueThenRoute(mode, ua, ContactNamePage, routes.YourContactDetailsController.onPageLoad(NormalMode))
       case (Some(false), _, true)       => controllers.organisation.routes.DifferentBusinessController.onPageLoad()
       case (Some(false), Some(Sole), _) => controllers.routes.SoleTraderNotIdentifiedController.onPageLoad
       case _                            => controllers.organisation.routes.BusinessNotIdentifiedController.onPageLoad()

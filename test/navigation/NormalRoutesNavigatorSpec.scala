@@ -355,7 +355,7 @@ class NormalRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks 
 
                   navigator
                     .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
-                    .mustBe(routes.YourContactDetailsController.onPageLoad())
+                    .mustBe(routes.YourContactDetailsController.onPageLoad(NormalMode))
               }
             }
         }
@@ -398,7 +398,7 @@ class NormalRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks 
 
               navigator
                 .nextPage(IsThisYourBusinessPage, NormalMode, updatedAnswers)
-                .mustBe(routes.YourContactDetailsController.onPageLoad())
+                .mustBe(routes.YourContactDetailsController.onPageLoad(NormalMode))
           }
         }
 

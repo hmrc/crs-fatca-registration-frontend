@@ -17,18 +17,16 @@
 package pages
 
 import base.TestValues
-import models.matching.IndRegistrationInfo
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 
-class RegistrationInfoPageSpec extends PageBehaviours with TestValues {
+class IndWhatIsYourPostcodePageSpec extends PageBehaviours with TestValues {
 
   "cleanUp" - {
-    "must clear IdMatchedInfoPage when set" in {
-      val ua     = emptyUserAnswers.withPage(IdMatchInfoPage, IdMatchInfo(nino = Some(Nino(TestNiNumber))))
-      val result = RegistrationInfoPage.cleanup(Some(IndRegistrationInfo(safeId)), ua).success.value
+    "must clear IsThisYourAddressPage when a postcode submitted" in {
+      val ua     = emptyUserAnswers.withPage(IsThisYourAddressPage, false)
+      val result = IndWhatIsYourPostcodePage.cleanup(Some(TestPostCode), ua).success.value
 
-      result.get(RegistrationInfoPage) mustBe empty
+      result.get(IsThisYourAddressPage) mustBe empty
     }
 
   }
