@@ -49,7 +49,7 @@
 
     @formHelper(action = routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "on") {
         @govukButton(
-            ButtonViewModel(messages("checkYourAnswers.button")).withAttribute("id" -> "submit").preventingDoubleClick()
+            ButtonViewModel(messages("checkYourAnswers.button")).withAttribute("id" -> "submit").withCssClass("govuk-!-display-none-print").preventingDoubleClick()
         )
     }
 }
