@@ -24,7 +24,7 @@ import org.mockito.MockitoSugar.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{BeforeAndAfterEach, EitherValues, OptionValues, TryValues}
+import org.scalatest._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -52,7 +52,8 @@ trait SpecBase
     with OptionValues
     with ScalaFutures
     with BeforeAndAfterEach
-    with IntegrationPatience {
+    with IntegrationPatience
+    with PrivateMethodTester {
 
   val userAnswersId: String = "id"
 

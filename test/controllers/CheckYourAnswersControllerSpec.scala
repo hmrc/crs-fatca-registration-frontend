@@ -605,6 +605,28 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         }
       }
 
+      "must redirect to PreRegistered page when user is already registered" in {
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(AlreadyRegisteredError)))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+
+        val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), AffinityGroup.Organisation)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService)
+          )
+          .build()
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.PreRegisteredController.onPageLoad().url
+        }
+      }
+
       "must redirect to InformationMissingPage if both individual and organisation are not present" in {
         when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Left(UnableToCreateEMTPSubscriptionError)))
