@@ -19,7 +19,8 @@ package viewmodels.checkAnswers
 import models.UserAnswers
 import pages.IndContactNamePage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -29,7 +30,7 @@ object IndContactNameSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndContactNamePage).map {
       answer =>
-        val value = Text(answer.firstName) + " " + Text(answer.lastName)
+        val value = HtmlFormat.escape(answer.firstName).toString + " " + HtmlFormat.escape(answer.lastName).toString
 
         SummaryListRowViewModel(
           key = s"$IndContactNamePage.checkYourAnswersLabel",
