@@ -42,7 +42,7 @@ trait CheckRoutesNavigator extends Logging {
     case WhatIsYourNamePage                   => _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode)
     case BusinessNamePage                     => _ => controllers.organisation.routes.IsThisYourBusinessController.onPageLoad(CheckMode)
     case IsThisYourBusinessPage               => isThisYourBusiness(CheckMode)
-    case BusinessNameWithoutIDPage            => _ => routes.CheckYourAnswersController.onPageLoad()
+    case BusinessNameWithoutIDPage            => _ => controllers.organisation.routes.HaveTradingNameController.onPageLoad(CheckMode)
     case HaveTradingNamePage => userAnswers =>
         yesNoPage(
           userAnswers,
@@ -231,6 +231,7 @@ trait CheckRoutesNavigator extends Logging {
 
   private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(ReporterTypePage), mode) match {
+      case (Some(Individual), NormalMode) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
       case (Some(Individual), CheckMode) =>
         ua.get(IndDoYouHaveNINumberPage)
           .fold(controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode))(
@@ -240,24 +241,11 @@ trait CheckRoutesNavigator extends Logging {
       case (None, _)    => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
-//  private def whatAreYouReportingAs(mode: Mode)(ua: UserAnswers): Call =
-//    (ua.get(ReporterTypePage), mode) match {
-//      case (Some(Individual), CheckMode) =>
-//        checkNextPageForValueThenRoute(mode,
-//                                       ua,
-//                                       RegistrationInfoPage,
-//                                       controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-//        ) // could this be correct?
-//      case (Some(_), _) => controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(mode)
-//      case (None, _)    => controllers.routes.JourneyRecoveryController.onPageLoad()
-//    }
-
   private def doYouHaveUniqueTaxPayerReference(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(DoYouHaveUniqueTaxPayerReferencePage), ua.get(ReporterTypePage)) match {
       case (Some(true), _)           => controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(mode)
       case (Some(false), Some(Sole)) => controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(mode)
-      case (Some(false), Some(_)) =>
-        checkNextPageForValueThenRoute(mode, ua, BusinessNameWithoutIDPage, controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(mode))
+      case (Some(false), Some(_))    => controllers.organisation.routes.BusinessNameWithoutIDController.onPageLoad(mode)
       case (None, Some(_)) =>
         logger.warn("DoYouHaveUniqueTaxPayerReference answer not found when routing from DoYouHaveUniqueTaxPayerReferencePage")
         routes.JourneyRecoveryController.onPageLoad()

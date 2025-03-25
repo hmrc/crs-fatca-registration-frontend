@@ -16,10 +16,9 @@
 
 package pages
 
-import helpers.RegisterHelper
 import models.ReporterType._
 import models._
-import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, RegistrationInfo, SafeId}
+import models.matching.RegistrationInfo
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import pages.behaviours.PageBehaviours
@@ -43,9 +42,6 @@ class ReporterTypePageSpec extends PageBehaviours {
     stringField      <- Gen.alphaStr.suchThat(_.nonEmpty)
     utr              <- arbitrary[UniqueTaxpayerReference]
   } yield (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr)
-
-  private val orgRegInfo = OrgRegistrationInfo(SafeId("safeId"), name = "name", address = RegisterHelper.addressResponse)
-  private val indRegInfo = IndRegistrationInfo(SafeId("safeId"))
 
   "ReporterTypePage" - {
 
@@ -77,12 +73,11 @@ class ReporterTypePageSpec extends PageBehaviours {
           result.get(SecondContactEmailPage) mustBe empty
           result.get(SecondContactHavePhonePage) mustBe empty
           result.get(SecondContactPhonePage) mustBe empty
-          result.get(WhatIsYourNamePage) mustBe empty
 
         }
 
         "when answer changes to anything other than 'An individual not connected to a business' or 'Sole Trader'" in {
-          val ua     = generateUserAnswers(LimitedCompany).withPage(RegistrationInfoPage, indRegInfo)
+          val ua     = generateUserAnswers(LimitedCompany)
           val result = ReporterTypePage.cleanup(Some(LimitedCompany), ua).success.value
 
           result.get(IndWhatIsYourNINumberPage) mustBe empty
@@ -103,66 +98,33 @@ class ReporterTypePageSpec extends PageBehaviours {
           result.get(IndContactHavePhonePage) mustBe empty
           result.get(IndContactPhonePage) mustBe empty
           result.get(IndDoYouHaveNINumberPage) mustBe empty
-          result.get(WhatIsYourNamePage) mustBe empty
-
-        }
-
-        "when answer changes to 'An individual not connected to a business'" in {
-          val ua     = generateUserAnswers(LimitedCompany).withPage(RegistrationInfoPage, orgRegInfo)
-          val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
-
-          result.get(WhatIsYourUTRPage) mustBe empty
-          result.get(RegistrationInfoPage) mustBe empty
-          result.get(WhatIsYourNamePage) mustBe empty
-          result.get(BusinessNamePage) mustBe empty
-          result.get(IsThisYourBusinessPage) mustBe empty
-          result.get(BusinessNameWithoutIDPage) mustBe empty
-          result.get(HaveTradingNamePage) mustBe empty
-          result.get(BusinessTradingNameWithoutIDPage) mustBe empty
-          result.get(NonUKBusinessAddressWithoutIDPage) mustBe empty
-          result.get(ContactNamePage) mustBe empty
-          result.get(ContactEmailPage) mustBe empty
-          result.get(ContactHavePhonePage) mustBe empty
-          result.get(ContactPhonePage) mustBe empty
-          result.get(HaveSecondContactPage) mustBe empty
-          result.get(SecondContactNamePage) mustBe empty
-          result.get(SecondContactEmailPage) mustBe empty
-          result.get(SecondContactHavePhonePage) mustBe empty
-          result.get(SecondContactPhonePage) mustBe empty
-          result.get(RegisteredAddressInUKPage) mustBe empty
-          result.get(DoYouHaveUniqueTaxPayerReferencePage) mustBe empty
-
         }
       }
-      "OrgRegistrationInfo" - {
-        "clears when ReporterType is Individual" in {
-          val ua = generateUserAnswers(LimitedCompany).withPage(RegistrationInfoPage,
-                                                                OrgRegistrationInfo(SafeId("safeId"), name = "name", address = RegisterHelper.addressResponse)
-          )
-          val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
+      "when answer changes to 'An individual not connected to a business'" in {
+        val ua     = generateUserAnswers(Individual)
+        val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
 
-          result.get(RegistrationInfoPage) mustBe empty
-        }
-        "does not clear when ReporterType is an Organisation type" in {
-          val ua     = generateUserAnswers(LimitedCompany).withPage(RegistrationInfoPage, orgRegInfo)
-          val result = ReporterTypePage.cleanup(Some(LimitedPartnership), ua).success.value
+        result.get(WhatIsYourUTRPage) mustBe empty
+        result.get(RegistrationInfoPage) mustBe empty
+        result.get(WhatIsYourNamePage) mustBe empty
+        result.get(BusinessNamePage) mustBe empty
+        result.get(IsThisYourBusinessPage) mustBe empty
+        result.get(BusinessNameWithoutIDPage) mustBe empty
+        result.get(HaveTradingNamePage) mustBe empty
+        result.get(BusinessTradingNameWithoutIDPage) mustBe empty
+        result.get(NonUKBusinessAddressWithoutIDPage) mustBe empty
+        result.get(ContactNamePage) mustBe empty
+        result.get(ContactEmailPage) mustBe empty
+        result.get(ContactHavePhonePage) mustBe empty
+        result.get(ContactPhonePage) mustBe empty
+        result.get(HaveSecondContactPage) mustBe empty
+        result.get(SecondContactNamePage) mustBe empty
+        result.get(SecondContactEmailPage) mustBe empty
+        result.get(SecondContactHavePhonePage) mustBe empty
+        result.get(SecondContactPhonePage) mustBe empty
+        result.get(RegisteredAddressInUKPage) mustBe empty
+        result.get(DoYouHaveUniqueTaxPayerReferencePage) mustBe empty
 
-          result.get(RegistrationInfoPage) must not be empty
-        }
-      }
-      "IndRegistrationInfo" - {
-        "clears when ReporterType is an Organisation type" in {
-          val ua     = generateUserAnswers(Individual).withPage(RegistrationInfoPage, indRegInfo)
-          val result = ReporterTypePage.cleanup(Some(LimitedPartnership), ua).success.value
-
-          result.get(RegistrationInfoPage) mustBe empty
-        }
-        "does not clear when ReporterType is Individual" in {
-          val ua     = generateUserAnswers(Individual).withPage(RegistrationInfoPage, IndRegistrationInfo(SafeId("safeId")))
-          val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
-
-          result.get(RegistrationInfoPage) must not be empty
-        }
       }
     }
   }
@@ -189,7 +151,7 @@ class ReporterTypePageSpec extends PageBehaviours {
       .withPage(IsThisYourBusinessPage, booleanField)
       .withPage(BusinessNameWithoutIDPage, stringField)
       .withPage(HaveTradingNamePage, booleanField)
-      .withPage(RegistrationInfoPage, indRegInfo)
+      .withPage(RegistrationInfoPage, registrationInfo)
       .withPage(BusinessTradingNameWithoutIDPage, stringField)
       .withPage(NonUKBusinessAddressWithoutIDPage, address)
       .withPage(ContactNamePage, stringField)
@@ -214,7 +176,6 @@ class ReporterTypePageSpec extends PageBehaviours {
       .withPage(HaveTradingNamePage, booleanField)
       .withPage(BusinessTradingNameWithoutIDPage, stringField)
       .withPage(NonUKBusinessAddressWithoutIDPage, address)
-      .withPage(WhatIsYourNamePage, name)
       .withPage(ContactNamePage, stringField)
       .withPage(ContactEmailPage, stringField)
       .withPage(ContactHavePhonePage, booleanField)
@@ -232,7 +193,7 @@ class ReporterTypePageSpec extends PageBehaviours {
       .withPage(IndWhatIsYourNINumberPage, nino)
       .withPage(IndContactNamePage, name)
       .withPage(IndDateOfBirthPage, dob)
-      .withPage(RegistrationInfoPage, orgRegInfo)
+      .withPage(RegistrationInfoPage, registrationInfo)
       .withPage(IndWhatIsYourNamePage, name)
       .withPage(DateOfBirthWithoutIdPage, dob)
       .withPage(IndWhereDoYouLivePage, booleanField)
