@@ -34,7 +34,7 @@ class IndDateOfBirthPageSpec extends PageBehaviours {
 
   def createUserAnswersForIndividualCleanup: Gen[UserAnswers] =
     for {
-      (dob, registrationInfo) <- testParamGenerator
+      (dob, registrationInfo) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(IndDateOfBirthPage, dob)
       .withPage(RegistrationInfoPage, registrationInfo)
