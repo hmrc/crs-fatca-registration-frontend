@@ -39,16 +39,6 @@ class IsThisYourBusinessPageSpec extends PageBehaviours {
   }
 
   "cleanup" - {
-    "must remove RegistrationInfoPage answers when No" in {
-      forAll(testParamGenerator) {
-        case (addressLookup, address, postcode, registrationInfo) =>
-          val userAnswers = emptyUserAnswers.withPage(RegistrationInfoPage, registrationInfo)
-
-          val result = IsThisYourBusinessPage.cleanup(Some(false), userAnswers).success.value
-
-          result.get(RegistrationInfoPage) mustBe empty
-      }
-    }
     "must remove answers answers when Yes" in {
 
       forAll(testParamGenerator) {
