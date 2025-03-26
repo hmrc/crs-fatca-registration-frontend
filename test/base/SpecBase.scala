@@ -105,7 +105,6 @@ trait SpecBase
 
   }
 
-  val testCountry: Country = Country("FR", "France", Option("France"))
-  val testAddress: Address = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), testCountry)
+  val testAddress: Address = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("FR", "France", Option("France")))
 
 }
