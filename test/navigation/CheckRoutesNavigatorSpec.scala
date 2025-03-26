@@ -72,25 +72,62 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
         }
       }
 
-      "must go from WhatIsYourUTRPage to WhatIsYourNamePage for a Sole Trader" in {
-        val answers = emptyUserAnswers.withPage(ReporterTypePage, Sole)
-          .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("someUniqueTaxpayerReference"))
+      "RegisteredAddressInUKPage" - {
+        "to WhatIsYourUtr for a Orgs when Yes" in {
+          val answers = emptyUserAnswers.withPage(ReporterTypePage, LimitedCompany)
+            .withPage(RegisteredAddressInUKPage, true)
 
-        navigator
-          .nextPage(WhatIsYourUTRPage, CheckMode, answers)
-          .mustBe(controllers.organisation.routes.WhatIsYourNameController.onPageLoad(CheckMode))
+          navigator
+            .nextPage(RegisteredAddressInUKPage, CheckMode, answers)
+            .mustBe(controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(CheckMode))
+        }
+        "to DoYouHaveUniqueTaxPayerReference for a Orgs when No" in {
+          val answers = emptyUserAnswers.withPage(ReporterTypePage, LimitedCompany)
+            .withPage(RegisteredAddressInUKPage, false)
+
+          navigator
+            .nextPage(RegisteredAddressInUKPage, CheckMode, answers)
+            .mustBe(routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode))
+        }
+        "to WhatIsYourUTR for a Sole trader when Yes" in {
+          val answers = emptyUserAnswers.withPage(ReporterTypePage, Sole)
+            .withPage(RegisteredAddressInUKPage, true)
+
+          navigator
+            .nextPage(RegisteredAddressInUKPage, CheckMode, answers)
+            .mustBe(controllers.organisation.routes.WhatIsYourUTRController.onPageLoad(CheckMode))
+        }
+        "to DoYouHaveUtr for a Sole trader when No" in {
+          val answers = emptyUserAnswers.withPage(ReporterTypePage, Sole)
+            .withPage(RegisteredAddressInUKPage, false)
+
+          navigator
+            .nextPage(RegisteredAddressInUKPage, CheckMode, answers)
+            .mustBe(routes.DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode))
+        }
+
       }
 
-      "must go from WhatIsYourUTRPage to BusinessNamePage for any other reporter type" in {
-        val answers = emptyUserAnswers
-          .withPage(ReporterTypePage, LimitedCompany)
-          .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("someUniqueTaxpayerReference"))
+      "must go from WhatIsYourUTRPage" - {
+        "to WhatIsYourNamePage for a Sole Trader" in {
+          val answers = emptyUserAnswers.withPage(ReporterTypePage, Sole)
+            .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("someUniqueTaxpayerReference"))
 
-        navigator
-          .nextPage(WhatIsYourUTRPage, CheckMode, answers)
-          .mustBe(controllers.organisation.routes.BusinessNameController.onPageLoad(CheckMode))
+          navigator
+            .nextPage(WhatIsYourUTRPage, CheckMode, answers)
+            .mustBe(controllers.organisation.routes.WhatIsYourNameController.onPageLoad(CheckMode))
+        }
+
+        "to BusinessNamePage for any other reporter type" in {
+          val answers = emptyUserAnswers
+            .withPage(ReporterTypePage, LimitedCompany)
+            .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("someUniqueTaxpayerReference"))
+
+          navigator
+            .nextPage(WhatIsYourUTRPage, CheckMode, answers)
+            .mustBe(controllers.organisation.routes.BusinessNameController.onPageLoad(CheckMode))
+        }
       }
-
       "must go from WhatIsYourNamePage to IsThisYourBusinessPage" in {
         navigator
           .nextPage(WhatIsYourNamePage, CheckMode, emptyUserAnswers)

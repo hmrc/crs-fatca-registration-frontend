@@ -34,7 +34,7 @@ trait CheckRoutesNavigator extends Logging {
     case RegisteredAddressInUKPage            => registeredAddressInUKRoutes()
     case DoYouHaveUniqueTaxPayerReferencePage => doYouHaveUniqueTaxPayerReferenceRoutes()
     case WhatIsYourUTRPage                    => whatIsYourUTRRoutes()
-    case WhatIsYourNamePage                   => _ => IsThisYourBusinessController.onPageLoad(CheckMode) // should this page be cleared?
+    case WhatIsYourNamePage                   => _ => IsThisYourBusinessController.onPageLoad(CheckMode)
     case BusinessNamePage                     => _ => IsThisYourBusinessController.onPageLoad(CheckMode)
     case IsThisYourBusinessPage               => isThisYourBusinessRoutes()
     case BusinessNameWithoutIDPage            => businessNameWithoutIDRoutes()
@@ -214,13 +214,13 @@ trait CheckRoutesNavigator extends Logging {
     ua.get(ReporterTypePage) match {
       case Some(Individual) => checkRoutes(IndDoYouHaveNINumberPage)(ua)
 
-      case Some(_) => RegisteredAddressInUKController.onPageLoad(CheckMode) // needs to hit here even if its pre-popped
-      case None    => JourneyRecoveryController.onPageLoad() // is this needed in case they dont submit a reportertype and url hack?
+      case Some(_) => RegisteredAddressInUKController.onPageLoad(CheckMode)
+      case None    => JourneyRecoveryController.onPageLoad()
     }
 
-  private def registeredAddressInUKRoutes()(ua: UserAnswers): Call =
+  private def registeredAddressInUKRoutes()(ua: UserAnswers): Call = // TEST
     ua.get(RegisteredAddressInUKPage) match {
-      case Some(true)  => whatIsYourUTRRoutes()(ua) // run the routes? for org? what about sole
+      case Some(true)  => WhatIsYourUTRController.onPageLoad(CheckMode)
       case Some(false) => DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode)
       case _           => RegisteredAddressInUKController.onPageLoad(CheckMode)
     }
