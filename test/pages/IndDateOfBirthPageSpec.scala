@@ -16,7 +16,7 @@
 
 package pages
 
-import models.{Name, UserAnswers}
+import models.UserAnswers
 import models.matching.RegistrationInfo
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen

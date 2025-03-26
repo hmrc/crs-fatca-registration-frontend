@@ -315,7 +315,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
 
         "to JourneyRecoveryPage if there is no reporter type" in {
           val answers = emptyUserAnswers
-            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+            .withPage(NonUKBusinessAddressWithoutIDPage, testAddress)
           navigator
             .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
             .mustBe(routes.JourneyRecoveryController.onPageLoad())
@@ -324,7 +324,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
         "to CheckYourAnswersPage if there is a contact email for a Sole reporter type" in {
           val answers = emptyUserAnswers
             .withPage(ReporterTypePage, Sole)
-            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+            .withPage(NonUKBusinessAddressWithoutIDPage, testAddress)
             .withPage(IndContactEmailPage, arbitrary[String].sample.value)
 
           navigator
@@ -335,7 +335,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
         "to IndContactEmailPage if there is no contact email for a Sole reporter type" in {
           val answers = emptyUserAnswers
             .withPage(ReporterTypePage, Sole)
-            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+            .withPage(NonUKBusinessAddressWithoutIDPage, testAddress)
 
           navigator
             .nextPage(NonUKBusinessAddressWithoutIDPage, CheckMode, answers)
@@ -345,7 +345,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
         "to CheckYourAnswersPage if there is a contact name for any other reporter type" in {
           val answers = emptyUserAnswers
             .withPage(ReporterTypePage, LimitedCompany)
-            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+            .withPage(NonUKBusinessAddressWithoutIDPage, testAddress)
             .withPage(ContactNamePage, arbitrary[String].sample.value)
 
           navigator
@@ -355,7 +355,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
 
         "to YourContactDetailsPage if there is no contact name for any other reporter type" in {
           val answers = emptyUserAnswers
-            .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+            .withPage(NonUKBusinessAddressWithoutIDPage, testAddress)
             .withPage(ReporterTypePage, LimitedCompany)
 
           navigator

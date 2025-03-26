@@ -227,10 +227,10 @@ trait CheckRoutesNavigator extends Logging {
 
   private def doYouHaveUniqueTaxPayerReferenceRoutes()(ua: UserAnswers): Call =
     (ua.get(DoYouHaveUniqueTaxPayerReferencePage), ua.get(ReporterTypePage)) match {
-      case (Some(true), _)           => checkRoutes(WhatIsYourUTRPage)(ua)
+      case (Some(true), _)           => WhatIsYourUTRController.onPageLoad(CheckMode)
       case (Some(false), Some(Sole)) => IndDoYouHaveNINumberController.onPageLoad(CheckMode)
       case (Some(false), Some(_))    => checkRoutes(BusinessNameWithoutIDPage)(ua)
-      case (None, _)                 => DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode)
+      case _                         => DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode)
     }
 
   private def businessAddressWithoutIdRoutes()(ua: UserAnswers): Call = {
