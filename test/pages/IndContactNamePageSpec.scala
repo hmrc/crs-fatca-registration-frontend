@@ -32,7 +32,7 @@ class IndContactNamePageSpec extends PageBehaviours {
 
   def createUserAnswersForIndividualCleanup: Gen[UserAnswers] =
     for {
-      (name, registrationInfo) <- testParamGenerator
+      (name, registrationInfo) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(IndContactNamePage, name)
       .withPage(RegistrationInfoPage, registrationInfo)

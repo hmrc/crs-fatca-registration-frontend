@@ -181,7 +181,7 @@ class ReporterTypePageSpec extends PageBehaviours {
 
   def createUserAnswersForIndividualCleanup: Gen[UserAnswers] =
     for {
-      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
+      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(WhatIsYourUTRPage, utr)
       .withPage(WhatIsYourNamePage, name)
@@ -206,7 +206,7 @@ class ReporterTypePageSpec extends PageBehaviours {
 
   def createUserAnswersForSoleTraderCleanup: Gen[UserAnswers] =
     for {
-      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
+      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(BusinessNamePage, stringField)
       .withPage(IsThisYourBusinessPage, booleanField)
@@ -227,7 +227,7 @@ class ReporterTypePageSpec extends PageBehaviours {
 
   def createUserAnswersForLimitedCompanyCleanup: Gen[UserAnswers] =
     for {
-      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
+      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(IndWhatIsYourNINumberPage, nino)
       .withPage(IndContactNamePage, name)
