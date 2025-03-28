@@ -17,18 +17,40 @@
 package pages
 
 import base.TestValues
+import models.{AddressLookup, UserAnswers}
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen
 import pages.behaviours.PageBehaviours
 
 class IndWhatIsYourPostcodePageSpec extends PageBehaviours with TestValues {
 
   "cleanUp" - {
-    "must clear IsThisYourAddressPage when a postcode submitted" in {
-      val ua     = emptyUserAnswers.withPage(IsThisYourAddressPage, false)
+    "must clear ind address pages when a postcode submitted" in {
+      val ua     = createUserAnswersForCleanup.sample.get
       val result = IndWhatIsYourPostcodePage.cleanup(Some(TestPostCode), ua).success.value
 
       result.get(IsThisYourAddressPage) mustBe empty
+      result.get(IndSelectAddressPage) mustBe empty
+      result.get(IndSelectedAddressLookupPage) mustBe empty
     }
 
+  }
+
+  def createUserAnswersForCleanup: Gen[UserAnswers] = {
+
+    val testParamGenerator = for {
+      bool          <- arbitrary[Boolean]
+      string        <- arbitrary[String]
+      addressLookup <- arbitrary[AddressLookup]
+
+    } yield (bool, string, addressLookup)
+
+    for {
+      (bool, string, addressLookup) <- testParamGenerator.suchThat(_ != null)
+    } yield emptyUserAnswers
+      .withPage(IsThisYourAddressPage, bool)
+      .withPage(IndSelectAddressPage, string)
+      .withPage(IndSelectedAddressLookupPage, addressLookup)
   }
 
 }

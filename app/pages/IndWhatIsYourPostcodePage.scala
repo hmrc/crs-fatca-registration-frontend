@@ -17,6 +17,7 @@
 package pages
 
 import models.UserAnswers
+import pages.PageLists.removePage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
@@ -29,8 +30,9 @@ case object IndWhatIsYourPostcodePage extends QuestionPage[String] {
 
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {
-      case Some(_) => userAnswers.remove(IsThisYourAddressPage)
+      case Some(_) => cleanupPages.foldLeft(Try(userAnswers))(removePage)
       case None    => super.cleanup(value, userAnswers)
     }
 
+  private val cleanupPages = List(IsThisYourAddressPage, IndSelectAddressPage, IndSelectedAddressLookupPage)
 }
