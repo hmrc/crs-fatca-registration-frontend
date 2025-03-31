@@ -46,17 +46,14 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
 
     val hasSecondContact  = userAnswers.get(OrganisationHaveSecondContactPage)
     val secondContactName = userAnswers.get(OrganisationSecondContactNamePage)
-    val secondaryContact = (hasSecondContact, response.crfaSubscriptionDetails.secondaryContact, secondContactName) match {
-      case (Some(true), Some(contactDetails), Some(secondContactName)) =>
-        contactDetails.contactInformation match {
-          case _: OrganisationDetails =>
-            getOrgContactInformation[ChangeOrganisationSecondaryContactDetailsPages](
-              OrganisationDetails(secondContactName),
-              userAnswers
-            )
-          case _ => None
-        }
-      case _ => None
+
+    val secondaryContact = if (hasSecondContact.contains(true) || secondContactName.isDefined) {
+      getOrgContactInformation[ChangeOrganisationSecondaryContactDetailsPages](
+        OrganisationDetails(secondContactName.getOrElse("")),
+        userAnswers
+      )
+    } else {
+      None
     }
 
     primaryContact map {
