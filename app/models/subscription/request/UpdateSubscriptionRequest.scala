@@ -44,12 +44,11 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
       userAnswers
     )
 
-    val hasSecondContact  = userAnswers.get(OrganisationHaveSecondContactPage)
-    val secondContactName = userAnswers.get(OrganisationSecondContactNamePage)
+    val hasSecondContact = userAnswers.get(OrganisationHaveSecondContactPage)
 
-    val secondaryContact = if (hasSecondContact.contains(true) || secondContactName.isDefined) {
+    val secondaryContact = if (hasSecondContact.contains(true)) {
       getOrgContactInformation[ChangeOrganisationSecondaryContactDetailsPages](
-        OrganisationDetails(secondContactName.getOrElse("")),
+        OrganisationDetails(userAnswers.get(OrganisationSecondContactNamePage).getOrElse("")),
         userAnswers
       )
     } else {
