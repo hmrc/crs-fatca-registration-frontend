@@ -19,12 +19,12 @@ package base
 import connectors.AddressLookupConnector
 import controllers.actions._
 import helpers.JsonFixtures.UserAnswersId
-import models.{UUIDGen, UUIDGenImpl, UserAnswers}
+import models.{Address, Country, UUIDGen, UUIDGenImpl, UserAnswers}
 import org.mockito.MockitoSugar.when
+import org.scalatest._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -73,6 +73,7 @@ trait SpecBase
   final val mockCtUtrRetrievalAction: CtUtrRetrievalAction = mock[CtUtrRetrievalAction]
 
   def emptyUserAnswers: UserAnswers = UserAnswers(UserAnswersId, Json.obj(), Instant.now(fixedClock))
+  val testAddress: Address          = Address("line1", Some("line2"), "line3", Some("line4"), Some("postcode"), Country("DE", "Germany"))
 
   protected def retrieveNoData(): Unit =
     when(mockDataRetrievalAction.apply()).thenReturn(new FakeDataRetrievalAction(None))
