@@ -20,9 +20,10 @@ import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
+import models.ReporterType.Sole
 import models.UserAnswers
 import models.error.ApiError
-import models.error.ApiError.{AlreadyRegisteredError, MandatoryInformationMissingError, ServiceUnavailableError, UnprocessableEntityError}
+import models.error.ApiError.{AlreadyRegisteredError, MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, SafeId}
 import models.requests.DataRequest
 import pages._
@@ -71,10 +72,15 @@ class CheckYourAnswersController @Inject() (
         result         <- EitherT.right[ApiError](controllerHelper.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionID))
       } yield result
 
-      handleResult(result)
+      handleErrorResult(result, request.userAnswers)
   }
 
-  private def handleResult(result: EitherT[Future, ApiError, Result])(implicit messages: Messages, rh: RequestHeader) =
+  private def handleErrorResult(result: EitherT[Future, ApiError, Result], userAnswers: UserAnswers)(implicit
+    messages: Messages,
+    rh: RequestHeader
+  ): Future[Result] = {
+    val isSoleTrader: Boolean = userAnswers.get(ReporterTypePage).contains(Sole)
+
     result.valueOrF {
       case MandatoryInformationMissingError(_) =>
         logger.warn("CheckYourAnswersController: Mandatory information is missing")
@@ -83,10 +89,12 @@ class CheckYourAnswersController @Inject() (
         Future.successful(ServiceUnavailable(errorView()(rh, messages)))
       case AlreadyRegisteredError =>
         logger.warn("CheckYourAnswersController: Already Registered")
-        Future.successful(Redirect(controllers.routes.PreRegisteredController.onPageLoad()))
+        if (isSoleTrader) Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad())) // test
+        else Future.successful(Redirect(controllers.routes.PreRegisteredController.onPageLoad()))
       case _ =>
         Future.successful(InternalServerError(errorView()(rh, messages)))
     }
+  }
 
   private def getSafeIdFromRegistration()(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Either[ApiError, SafeId]] =
     request.userAnswers.get(RegistrationInfoPage) match {
