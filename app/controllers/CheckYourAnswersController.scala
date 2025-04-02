@@ -60,7 +60,6 @@ class CheckYourAnswersController @Inject() (
       getMissingAnswers(request.userAnswers) match {
         case Nil => Ok(view(CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)))
         case pages =>
-          println(Console.RED + pages + Console.RESET)
           Redirect(routes.InformationMissingController.onPageLoad())
       }
   }
