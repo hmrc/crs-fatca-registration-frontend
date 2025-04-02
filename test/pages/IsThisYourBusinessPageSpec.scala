@@ -16,9 +16,18 @@
 
 package pages
 
+import models.matching.RegistrationInfo
+import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
 class IsThisYourBusinessPageSpec extends PageBehaviours {
+
+  private val testParamGenerator = for {
+    addressLookup    <- arbitrary[models.AddressLookup]
+    address          <- arbitrary[models.Address]
+    postcode         <- arbitrary[String]
+    registrationInfo <- arbitrary[RegistrationInfo]
+  } yield (addressLookup, address, postcode, registrationInfo)
 
   "IsThisYourBusinessPage" - {
 
@@ -27,6 +36,30 @@ class IsThisYourBusinessPageSpec extends PageBehaviours {
     beSettable[Boolean](IsThisYourBusinessPage)
 
     beRemovable[Boolean](IsThisYourBusinessPage)
+  }
+
+  "cleanup" - {
+    "must remove answers answers when Yes" in {
+
+      forAll(testParamGenerator) {
+        case (addressLookup, address, postcode, registrationInfo) =>
+          val userAnswers = emptyUserAnswers
+            .withPage(IndWhatIsYourPostcodePage, postcode)
+            .withPage(IndSelectAddressPage, "someString")
+            .withPage(IndUKAddressWithoutIdPage, address)
+            .withPage(AddressLookupPage, Seq(addressLookup))
+            .withPage(NonUKBusinessAddressWithoutIDPage, address)
+
+          val result = IsThisYourBusinessPage.cleanup(Some(true), userAnswers).success.value
+
+          result.get(IndWhatIsYourPostcodePage) mustBe empty
+          result.get(IndSelectAddressPage) mustBe empty
+          result.get(IndUKAddressWithoutIdPage) mustBe empty
+          result.get(AddressLookupPage) mustBe empty
+          result.get(NonUKBusinessAddressWithoutIDPage) mustBe empty
+      }
+    }
+
   }
 
 }

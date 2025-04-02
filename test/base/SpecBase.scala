@@ -19,7 +19,7 @@ package base
 import connectors.AddressLookupConnector
 import controllers.actions._
 import helpers.JsonFixtures.UserAnswersId
-import models.{UUIDGen, UUIDGenImpl, UserAnswers}
+import models.{Address, Country, UUIDGen, UUIDGenImpl, UserAnswers}
 import org.mockito.MockitoSugar.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -104,5 +104,7 @@ trait SpecBase
       userAnswers.set(page, value).success.value
 
   }
+
+  val testAddress: Address = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("FR", "France", Option("France")))
 
 }
