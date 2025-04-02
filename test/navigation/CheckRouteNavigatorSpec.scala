@@ -131,7 +131,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
       }
       "must go from HaveTradingNamePage to CheckYourAnswersController when user says No and NonUKBusinessAddressWithoutIDPage is populated" in {
         val userAnswers = emptyUserAnswers
-          .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+          .withPage(NonUKBusinessAddressWithoutIDPage, testAddress)
           .withPage(HaveTradingNamePage, false)
         navigator
           .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
@@ -140,7 +140,7 @@ class CheckRouteNavigatorSpec extends SpecBase with TableDrivenPropertyChecks wi
 
       "must go from BusinessTradingNameWithoutIDPage to CheckYourAnswersPage if there is an address" in {
         val userAnswers = emptyUserAnswers
-          .set(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+          .set(NonUKBusinessAddressWithoutIDPage, testAddress)
           .success
           .value
 

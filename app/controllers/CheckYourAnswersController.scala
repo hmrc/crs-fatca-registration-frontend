@@ -20,15 +20,16 @@ import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
+import models.ReporterType.Sole
 import models.UserAnswers
 import models.error.ApiError
-import models.error.ApiError.{MandatoryInformationMissingError, ServiceUnavailableError}
+import models.error.ApiError.{AlreadyRegisteredError, MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, SafeId}
 import models.requests.DataRequest
 import pages._
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc._
 import services.{BusinessMatchingWithoutIdService, SubscriptionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -71,20 +72,28 @@ class CheckYourAnswersController @Inject() (
         result         <- EitherT.right[ApiError](controllerHelper.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionID))
       } yield result
 
-      result.valueOrF {
-        case MandatoryInformationMissingError(_) =>
-          logger.warn("CheckYourAnswersController: Mandatory information is missing")
-          Future.successful(Redirect(routes.InformationMissingController.onPageLoad()))
-        case error =>
-          logger.warn(s"Error received from API: $error")
-          error match {
-            case ServiceUnavailableError =>
-              Future.successful(ServiceUnavailable(errorView()))
-            case _ =>
-              Future.successful(InternalServerError(errorView()))
-          }
-      }
+      handleErrorResult(result, request.userAnswers)
+  }
 
+  private def handleErrorResult(result: EitherT[Future, ApiError, Result], userAnswers: UserAnswers)(implicit
+    messages: Messages,
+    rh: RequestHeader
+  ): Future[Result] = {
+    val isSoleTrader: Boolean = userAnswers.get(ReporterTypePage).contains(Sole)
+
+    result.valueOrF {
+      case MandatoryInformationMissingError(_) =>
+        logger.warn("CheckYourAnswersController: Mandatory information is missing")
+        Future.successful(Redirect(routes.InformationMissingController.onPageLoad()))
+      case ServiceUnavailableError =>
+        Future.successful(ServiceUnavailable(errorView()(rh, messages)))
+      case AlreadyRegisteredError =>
+        logger.warn("CheckYourAnswersController: Already Registered")
+        if (isSoleTrader) Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad())) // test
+        else Future.successful(Redirect(controllers.routes.PreRegisteredController.onPageLoad()))
+      case _ =>
+        Future.successful(InternalServerError(errorView()(rh, messages)))
+    }
   }
 
   private def getSafeIdFromRegistration()(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Either[ApiError, SafeId]] =

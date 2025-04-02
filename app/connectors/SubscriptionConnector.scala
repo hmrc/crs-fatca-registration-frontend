@@ -20,11 +20,10 @@ import cats.data.EitherT
 import config.FrontendAppConfig
 import models.SubscriptionID
 import models.error.ApiError
-import models.error.ApiError.{BadRequestError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError, UnprocessableEntityError}
+import models.error.ApiError.{AlreadyRegisteredError, UnableToCreateEMTPSubscriptionError}
 import models.subscription.request.{CreateSubscriptionRequest, ReadSubscriptionRequest, UpdateSubscriptionRequest}
 import models.subscription.response.{CreateSubscriptionResponse, DisplaySubscriptionResponse}
 import play.api.Logging
-import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, SERVICE_UNAVAILABLE, UNPROCESSABLE_ENTITY}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: HttpClientV2) extends Logging {
 
@@ -61,32 +61,6 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
       }
   }
 
-  def createSubscription(
-    createSubscriptionRequest: CreateSubscriptionRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, SubscriptionID] = {
-
-    val submissionUrl = url"${config.businessMatchingUrl}/subscription/create-subscription"
-    EitherT {
-      http
-        .post(submissionUrl)
-        .withBody(Json.toJson(createSubscriptionRequest))
-        .execute[HttpResponse]
-        .map {
-          case response if is2xx(response.status) =>
-            response.json.asOpt[CreateSubscriptionResponse] match {
-              case Some(response) => Right(response.subscriptionId)
-              case _              => Left(UnableToCreateEMTPSubscriptionError)
-            }
-          case response if response.status equals UNPROCESSABLE_ENTITY =>
-            logger.warn(s"Duplicate submission to ETMP. ${response.status} response status")
-            Left(UnprocessableEntityError)
-          case response =>
-            logger.warn(s"Unable to create a subscription to ETMP. ${response.status} response status")
-            handleError(response)
-        }
-    }
-  }
-
   def updateSubscription(requestDetail: UpdateSubscriptionRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
     val updateSubscriptionUrl = url"${config.businessMatchingUrl}/subscription/update-subscription"
     http
@@ -100,18 +74,42 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
       }
   }
 
-  private def handleError[A](responseMessage: HttpResponse): Either[ApiError, A] =
-    responseMessage.status match {
-      case NOT_FOUND =>
-        Left(NotFoundError)
-      case BAD_REQUEST =>
-        Left(BadRequestError)
-      case SERVICE_UNAVAILABLE =>
-        Left(ServiceUnavailableError)
-      case UNPROCESSABLE_ENTITY =>
-        Left(UnprocessableEntityError)
+  def createSubscription(
+    createSubscriptionRequest: CreateSubscriptionRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, SubscriptionID] = {
+
+    val submissionUrl = url"${config.businessMatchingUrl}/subscription/create-subscription"
+
+    EitherT {
+      http
+        .post(submissionUrl)
+        .withBody(Json.toJson(createSubscriptionRequest))
+        .execute[HttpResponse]
+        .map {
+          response =>
+            if (is2xx(response.status)) {
+              response.json.asOpt[CreateSubscriptionResponse] match {
+                case Some(successResponse) => Right(successResponse.subscriptionId)
+                case None                  => Left(UnableToCreateEMTPSubscriptionError)
+              }
+            } else {
+              handleErrorResponse(response)
+            }
+        }
+    }
+  }
+
+  private def handleErrorResponse(response: HttpResponse): Either[ApiError, SubscriptionID] = {
+    val jsonBody = Try(Json.parse(response.body)).toOption.getOrElse(Json.obj())
+    (jsonBody \ "status").asOpt[String] match {
+      case Some("already_registered") =>
+        logger.warn("Subscription already exists.")
+        Left(AlreadyRegisteredError)
+
       case _ =>
+        logger.warn(s"Received error response from backend: ${response.status}")
         Left(UnableToCreateEMTPSubscriptionError)
     }
+  }
 
 }

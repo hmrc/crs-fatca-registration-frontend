@@ -16,7 +16,7 @@
 
 package pages
 
-import models.{Name, UserAnswers}
+import models.UserAnswers
 import models.matching.RegistrationInfo
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -34,7 +34,7 @@ class IndDateOfBirthPageSpec extends PageBehaviours {
 
   def createUserAnswersForIndividualCleanup: Gen[UserAnswers] =
     for {
-      (dob, registrationInfo) <- testParamGenerator
+      (dob, registrationInfo) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(IndDateOfBirthPage, dob)
       .withPage(RegistrationInfoPage, registrationInfo)

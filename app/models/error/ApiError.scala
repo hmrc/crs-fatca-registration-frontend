@@ -17,10 +17,9 @@
 package models.error
 
 import models.enrolment.GroupIds
-import play.api.http.Status
 import play.api.http.Status.SERVICE_UNAVAILABLE
-import uk.gov.hmrc.http.HttpReads
 import uk.gov.hmrc.http.HttpErrorFunctions.{is4xx, is5xx}
+import uk.gov.hmrc.http.HttpReads
 
 sealed trait ApiError
 
@@ -39,19 +38,13 @@ object ApiError {
         }
     }
 
-  def convertToErrorCode(apiError: ApiError): Int =
-    apiError match {
-      case NotFoundError           => Status.NOT_FOUND
-      case BadRequestError         => Status.BAD_REQUEST
-      case ServiceUnavailableError => Status.SERVICE_UNAVAILABLE
-      case _                       => Status.INTERNAL_SERVER_ERROR
-    }
-
   case object BadRequestError extends ApiError
 
   case object NotFoundError extends ApiError
 
   case object UnprocessableEntityError extends ApiError
+
+  case object AlreadyRegisteredError extends ApiError
 
   case object ServiceUnavailableError extends ApiError
 
