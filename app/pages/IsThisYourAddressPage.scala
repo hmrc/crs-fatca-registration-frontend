@@ -16,11 +16,24 @@
 
 package pages
 
+import models.UserAnswers
+import pages.PageLists.removePage
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object IsThisYourAddressPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "isThisYourAddress"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = value match {
+    case Some(false) =>
+      falseCleanupPages.foldLeft(Try(userAnswers))(removePage)
+    case _ =>
+      super.cleanup(value, userAnswers)
+  }
+
+  private val falseCleanupPages = List(IndSelectAddressPage, IndSelectedAddressLookupPage)
 }

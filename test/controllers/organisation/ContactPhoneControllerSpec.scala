@@ -30,6 +30,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.SessionRepository
 import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.organisation.ContactPhoneView
 
@@ -99,7 +100,8 @@ class ContactPhoneControllerSpec extends SpecBase with MockitoSugar with TableDr
               bind[DataRequiredAction].to[DataRequiredActionImpl],
               bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
               bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, affinityGroup)),
-              bind[DataRetrievalAction].toInstance(mockDataRetrievalAction)
+              bind[DataRetrievalAction].toInstance(mockDataRetrievalAction),
+              bind[SessionRepository].toInstance(mockSessionRepository)
             )
             .build()
 

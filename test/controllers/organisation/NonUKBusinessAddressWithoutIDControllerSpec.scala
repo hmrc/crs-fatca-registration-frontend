@@ -42,7 +42,7 @@ class NonUKBusinessAddressWithoutIDControllerSpec extends SpecBase with MockitoS
   val testCountryList: Seq[Country] = Seq(testCountry)
   val formProvider                  = new NonUKAddressWithoutIdFormProvider()
   val form: Form[Address]           = formProvider(testCountryList)
-  val address: Address              = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), testCountry)
+  val address: Address              = testAddress.copy(country = testCountry)
 
   val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 

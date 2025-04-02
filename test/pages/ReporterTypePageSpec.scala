@@ -44,6 +44,9 @@ class ReporterTypePageSpec extends PageBehaviours {
     utr              <- arbitrary[UniqueTaxpayerReference]
   } yield (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr)
 
+  private val orgRegInfo = OrgRegistrationInfo(SafeId("safeId"), name = "name", address = RegisterHelper.addressResponse)
+  private val indRegInfo = IndRegistrationInfo(SafeId("safeId"))
+
   "ReporterTypePage" - {
 
     beRetrievable[ReporterType](ReporterTypePage)
@@ -79,7 +82,7 @@ class ReporterTypePageSpec extends PageBehaviours {
         }
 
         "when answer changes to anything other than 'An individual not connected to a business' or 'Sole Trader'" in {
-          val ua     = generateUserAnswers(LimitedCompany)
+          val ua     = generateUserAnswers(LimitedCompany).withPage(RegistrationInfoPage, indRegInfo)
           val result = ReporterTypePage.cleanup(Some(LimitedCompany), ua).success.value
 
           result.get(IndWhatIsYourNINumberPage) mustBe empty
@@ -105,7 +108,7 @@ class ReporterTypePageSpec extends PageBehaviours {
         }
 
         "when answer changes to 'An individual not connected to a business'" in {
-          val ua     = generateUserAnswers(Individual)
+          val ua     = generateUserAnswers(LimitedCompany).withPage(RegistrationInfoPage, orgRegInfo)
           val result = ReporterTypePage.cleanup(Some(Individual), ua).success.value
 
           result.get(WhatIsYourUTRPage) mustBe empty
@@ -141,9 +144,7 @@ class ReporterTypePageSpec extends PageBehaviours {
           result.get(RegistrationInfoPage) mustBe empty
         }
         "does not clear when ReporterType is an Organisation type" in {
-          val ua = generateUserAnswers(LimitedCompany).withPage(RegistrationInfoPage,
-                                                                OrgRegistrationInfo(SafeId("safeId"), name = "name", address = RegisterHelper.addressResponse)
-          )
+          val ua     = generateUserAnswers(LimitedCompany).withPage(RegistrationInfoPage, orgRegInfo)
           val result = ReporterTypePage.cleanup(Some(LimitedPartnership), ua).success.value
 
           result.get(RegistrationInfoPage) must not be empty
@@ -151,7 +152,7 @@ class ReporterTypePageSpec extends PageBehaviours {
       }
       "IndRegistrationInfo" - {
         "clears when ReporterType is an Organisation type" in {
-          val ua     = generateUserAnswers(Individual).withPage(RegistrationInfoPage, IndRegistrationInfo(SafeId("safeId")))
+          val ua     = generateUserAnswers(Individual).withPage(RegistrationInfoPage, indRegInfo)
           val result = ReporterTypePage.cleanup(Some(LimitedPartnership), ua).success.value
 
           result.get(RegistrationInfoPage) mustBe empty
@@ -180,7 +181,7 @@ class ReporterTypePageSpec extends PageBehaviours {
 
   def createUserAnswersForIndividualCleanup: Gen[UserAnswers] =
     for {
-      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
+      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(WhatIsYourUTRPage, utr)
       .withPage(WhatIsYourNamePage, name)
@@ -188,7 +189,7 @@ class ReporterTypePageSpec extends PageBehaviours {
       .withPage(IsThisYourBusinessPage, booleanField)
       .withPage(BusinessNameWithoutIDPage, stringField)
       .withPage(HaveTradingNamePage, booleanField)
-      .withPage(RegistrationInfoPage, registrationInfo)
+      .withPage(RegistrationInfoPage, indRegInfo)
       .withPage(BusinessTradingNameWithoutIDPage, stringField)
       .withPage(NonUKBusinessAddressWithoutIDPage, address)
       .withPage(ContactNamePage, stringField)
@@ -205,7 +206,7 @@ class ReporterTypePageSpec extends PageBehaviours {
 
   def createUserAnswersForSoleTraderCleanup: Gen[UserAnswers] =
     for {
-      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
+      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(BusinessNamePage, stringField)
       .withPage(IsThisYourBusinessPage, booleanField)
@@ -226,12 +227,12 @@ class ReporterTypePageSpec extends PageBehaviours {
 
   def createUserAnswersForLimitedCompanyCleanup: Gen[UserAnswers] =
     for {
-      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator
+      (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob, stringField, utr) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(IndWhatIsYourNINumberPage, nino)
       .withPage(IndContactNamePage, name)
       .withPage(IndDateOfBirthPage, dob)
-      .withPage(RegistrationInfoPage, registrationInfo)
+      .withPage(RegistrationInfoPage, orgRegInfo)
       .withPage(IndWhatIsYourNamePage, name)
       .withPage(DateOfBirthWithoutIdPage, dob)
       .withPage(IndWhereDoYouLivePage, booleanField)
