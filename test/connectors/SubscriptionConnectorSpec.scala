@@ -24,7 +24,7 @@ import generators.ModelGenerators
 import helpers.JsonFixtures.{safeId, TestEmail, TestPhoneNumber}
 import helpers.WireMockServerHandler
 import models.error.ApiError
-import models.error.ApiError.{BadRequestError, NotFoundError, ServiceUnavailableError, UnableToCreateEMTPSubscriptionError, UnprocessableEntityError}
+import models.error.ApiError.{AlreadyRegisteredError, UnableToCreateEMTPSubscriptionError}
 import models.subscription.request.{ContactInformation, CreateSubscriptionRequest, IndividualDetails, ReadSubscriptionRequest}
 import models.subscription.response.DisplaySubscriptionResponse
 import models.{IdentifierType, SubscriptionID}
@@ -35,6 +35,7 @@ import play.api.Application
 import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -119,34 +120,34 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
         result.value.futureValue mustBe Left(UnableToCreateEMTPSubscriptionError)
       }
 
-      "must return NotFoundError for not found response" in {
+      "must return UnableToCreateEMTPSubscriptionError for not found response" in {
         val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
 
         stubPostResponse("/create-subscription", NOT_FOUND, "")
 
         val result: EitherT[Future, ApiError, SubscriptionID] = connector.createSubscription(createSubscriptionRequest)
-        result.value.futureValue mustBe Left(NotFoundError)
+        result.value.futureValue mustBe Left(UnableToCreateEMTPSubscriptionError)
       }
 
-      "must return BadRequestError for bad request response" in {
+      "must return UnableToCreateEMTPSubscriptionError for bad request response" in {
         val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
 
         stubPostResponse("/create-subscription", BAD_REQUEST, "")
 
         val result: EitherT[Future, ApiError, SubscriptionID] = connector.createSubscription(createSubscriptionRequest)
-        result.value.futureValue mustBe Left(BadRequestError)
+        result.value.futureValue mustBe Left(UnableToCreateEMTPSubscriptionError)
       }
 
-      "must return ServiceUnavailableError for service unavailable response" in {
+      "must return UnableToCreateEMTPSubscriptionError for service unavailable response" in {
         val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
 
         stubPostResponse("/create-subscription", SERVICE_UNAVAILABLE, "")
 
         val result: EitherT[Future, ApiError, SubscriptionID] = connector.createSubscription(createSubscriptionRequest)
-        result.value.futureValue mustBe Left(ServiceUnavailableError)
+        result.value.futureValue mustBe Left(UnableToCreateEMTPSubscriptionError)
       }
 
-      "must return DuplicateSubmissionError when tried to submit the same request" in {
+      "must return UnprocessableEntityError when tried to submit the same request" in {
         val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
 
         val subscriptionErrorResponse: String =
@@ -170,7 +171,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
         stubPostResponse("/create-subscription", UNPROCESSABLE_ENTITY, subscriptionErrorResponse)
 
         val result = connector.createSubscription(createSubscriptionRequest)
-        result.value.futureValue mustBe Left(UnprocessableEntityError)
+        result.value.futureValue mustBe Left(UnableToCreateEMTPSubscriptionError)
       }
 
       "must return UnableToCreateEMTPSubscriptionError when submission to backend fails" in {
@@ -194,37 +195,102 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         val subscriptionErrorResponse: String =
           s"""
-               | {
-               | "errorDetail": {
-               |    "timestamp": "2016-08-16T18:15:41Z",
-               |    "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
-               |    "errorCode": "$errorCode",
-               |    "errorMessage": "Internal error",
-               |    "source": "Internal error"
-               |  }
-               |  }
-               |""".stripMargin
+             | {
+             | "errorDetail": {
+             |    "timestamp": "2016-08-16T18:15:41Z",
+             |    "correlationId": "f058ebd6-02f7-4d3f-942e-904344e8cde5",
+             |    "errorCode": "$errorCode",
+             |    "errorMessage": "Internal error",
+             |    "source": "Internal error"
+             |  }
+             |  }
+             |""".stripMargin
 
         stubPostResponse("/create-subscription", errorCode, subscriptionErrorResponse)
 
         val result = connector.createSubscription(createSubscriptionRequest)
-        result.value.futureValue mustBe Left(getApiError(errorCode))
+        result.value.futureValue mustBe Left(UnableToCreateEMTPSubscriptionError)
+      }
+
+      "must return AlreadyRegisteredError when status : already_registered is received" in {
+        val createSubscriptionRequest = arbitrary[CreateSubscriptionRequest].sample.value
+
+        val subscriptionErrorResponse: String =
+          s"""{
+             |  "errorDetail": {
+             |    "errorCode": "007",
+             |    "errorMessage": "Business Partner already has a Subscription for this regime",
+             |    "source": "EIS",
+             |    "sourceFaultDetail": {
+             |      "detail": [
+             |        "Business Partner already has a Subscription for this regime"
+             |      ]
+             |    },
+             |    "timestamp": "2023-08-31T13:00:21.655Z",
+             |    "correlationId": "d60de98c-f499-47f5-b2d6-e80966e8d19e"
+             |  },
+             |    "status": "already_registered"
+             |}
+             |""".stripMargin
+
+        stubPostResponse("/create-subscription", UNPROCESSABLE_ENTITY, subscriptionErrorResponse)
+
+        val result = connector.createSubscription(createSubscriptionRequest)
+        result.value.futureValue mustBe Left(AlreadyRegisteredError)
+      }
+
+    }
+
+    "handleErrorResponse" - {
+      val privateParseErrorResponse = PrivateMethod[Either[ApiError, SubscriptionID]](Symbol("handleErrorResponse"))
+
+      def isAlreadyRegistered(json: String): Boolean = {
+        val response = HttpResponse(UNPROCESSABLE_ENTITY, json)
+        connector.invokePrivate(privateParseErrorResponse(response)) match {
+          case Left(AlreadyRegisteredError) => true
+          case _                            => false
+        }
+      }
+
+      "return true for a valid JSON containing status already_registered" in {
+        val json = """{
+                     |  "errorDetail": {
+                     |    "errorCode": "007",
+                     |    "errorMessage": "Business Partner already has a Subscription for this regime",
+                     |    "source": "EIS",
+                     |    "sourceFaultDetail": {
+                     |      "detail": ["Business Partner already has a Subscription for this regime"]
+                     |    },
+                     |    "timestamp": "2023-08-31T13:00:21.655Z",
+                     |    "correlationId": "d60de98c-f499-47f5-b2d6-e80966e8d19e"
+                     |  },
+                     |  "status": "already_registered"
+                     |}""".stripMargin
+
+        isAlreadyRegistered(json) mustBe true
+      }
+
+      "return false for JSON without status already_registered" in {
+        val json = """{
+                     |  "errorDetail": {
+                     |    "errorCode": "008",
+                     |    "errorMessage": "Another error message"
+                     |  }
+                     |}""".stripMargin
+
+        isAlreadyRegistered(json) mustBe false
+      }
+
+      "return false for invalid JSON" in {
+        val invalidPayloads = Seq(
+          """{ "invalid": "data" }""",
+          "{}"
+        )
+        for (json <- invalidPayloads)
+          isAlreadyRegistered(json) mustBe false
       }
     }
-
   }
-
-  def getApiError(status: Int): ApiError =
-    status match {
-      case NOT_FOUND =>
-        NotFoundError
-      case BAD_REQUEST =>
-        BadRequestError
-      case SERVICE_UNAVAILABLE =>
-        ServiceUnavailableError
-      case _ =>
-        UnableToCreateEMTPSubscriptionError
-    }
 
   private def stubPostResponse(expectedEndpoint: String, expectedStatus: Int, expectedBody: String): StubMapping =
     server.stubFor(
