@@ -50,7 +50,7 @@ class UnableToChangeBusinessControllerSpec extends ControllerMockFixtures {
         val view = application.injector.instanceOf[UnableToChangeBusinessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(loginURL, Some(OrgName), Some(List("line1", ""))).toString
+        contentAsString(result) mustEqual view(loginURL, Some(OrgName), Some(List("line1"))).toString
       }
     }
 

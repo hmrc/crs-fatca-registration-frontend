@@ -50,7 +50,7 @@ class DifferentBusinessControllerSpec extends ControllerMockFixtures {
         val view = application.injector.instanceOf[DifferentBusinessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(loginURL, Some(OrgName), Some(List("line1", ""))).toString
+        contentAsString(result) mustEqual view(loginURL, Some(OrgName), Some(List("line1"))).toString
       }
     }
 
