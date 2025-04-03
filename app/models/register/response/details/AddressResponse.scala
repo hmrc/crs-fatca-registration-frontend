@@ -16,6 +16,7 @@
 
 package models.register.response.details
 
+import models.Country
 import play.api.libs.json.{Format, Json}
 
 case class AddressResponse(
@@ -24,13 +25,12 @@ case class AddressResponse(
   addressLine3: Option[String],
   addressLine4: Option[String],
   postalCode: Option[String],
-  countryCode: String
+  countryCode: String,
+  country: Option[Country] = None
 ) {
 
   val asList: List[String] =
-    List(Option(addressLine1), addressLine2, addressLine3, addressLine4, postCodeFormatter(postalCode), Option(countryCode).filterNot(_ == "GB"))
-      .filter(_.isDefined)
-      .map(_.get)
+    List(Option(addressLine1), addressLine2, addressLine3, addressLine4, postCodeFormatter(postalCode), country.map(_.description)).flatten
 
   def postCodeFormatter(postcode: Option[String]): Option[String] =
     postcode match {
