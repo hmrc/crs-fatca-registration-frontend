@@ -16,7 +16,7 @@
 
 package pages
 
-import models.ReporterType.{orgReporterTypes, Individual, Sole}
+import models.ReporterType.{Individual, Sole, orgReporterTypes}
 import models.{ReporterType, UserAnswers}
 import play.api.libs.json.JsPath
 
@@ -65,7 +65,8 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
     IndContactEmailPage,
     IndContactHavePhonePage,
     IndContactPhonePage,
-    IndDoYouHaveNINumberPage
+    IndDoYouHaveNINumberPage,
+    WhatIsYourNamePage
   )
 
   private val soleTraderTypeCleanup = List(
@@ -84,6 +85,8 @@ case object ReporterTypePage extends QuestionPage[ReporterType] {
     SecondContactEmailPage,
     SecondContactHavePhonePage,
     SecondContactPhonePage,
+    WhatIsYourNamePage,
+    IndDoYouHaveNINumberPage,
     RegistrationInfoPage
   )
 

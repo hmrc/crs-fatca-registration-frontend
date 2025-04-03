@@ -44,18 +44,12 @@ object UpdateSubscriptionRequest extends UserAnswersHelper with Logging {
       userAnswers
     )
 
-    val hasSecondContact  = userAnswers.get(OrganisationHaveSecondContactPage)
-    val secondContactName = userAnswers.get(OrganisationSecondContactNamePage)
-    val secondaryContact = (hasSecondContact, response.crfaSubscriptionDetails.secondaryContact, secondContactName) match {
-      case (Some(true), Some(contactDetails), Some(secondContactName)) =>
-        contactDetails.contactInformation match {
-          case _: OrganisationDetails =>
-            getOrgContactInformation[ChangeOrganisationSecondaryContactDetailsPages](
-              OrganisationDetails(secondContactName),
-              userAnswers
-            )
-          case _ => None
-        }
+    val secondaryContact = (userAnswers.get(OrganisationHaveSecondContactPage), userAnswers.get(OrganisationSecondContactNamePage)) match {
+      case (Some(true), Some(name)) =>
+        getOrgContactInformation[ChangeOrganisationSecondaryContactDetailsPages](
+          OrganisationDetails(name),
+          userAnswers
+        )
       case _ => None
     }
 

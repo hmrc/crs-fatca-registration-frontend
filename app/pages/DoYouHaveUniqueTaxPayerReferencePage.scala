@@ -16,6 +16,7 @@
 
 package pages
 
+import models.ReporterType.Sole
 import models.UserAnswers
 import play.api.libs.json.JsPath
 import utils.UserAnswersHelper
@@ -28,20 +29,29 @@ case object DoYouHaveUniqueTaxPayerReferencePage extends QuestionPage[Boolean] w
 
   override def toString: String = "doYouHaveUniqueTaxPayerReference"
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+  override def cleanup(value: Option[Boolean], ua: UserAnswers): Try[UserAnswers] = {
+    ua.get(ReporterTypePage).contains(Sole)
     value match {
-      case Some(true)  => trueCleanupPages.foldLeft(Try(userAnswers))(removePage)
-      case Some(false) => falseCleanupPages.foldLeft(Try(userAnswers))(removePage)
-      case _           => super.cleanup(value, userAnswers)
+      case Some(true)  => trueCleanupPages.foldLeft(Try(ua))(removePage)
+      case Some(false) => falseCleanupPages(ua).foldLeft(Try(ua))(removePage)
+      case _           => super.cleanup(value, ua)
     }
+  }
 
-  private val falseCleanupPages: Seq[QuestionPage[_]] = List(
-    WhatIsYourUTRPage,
-    WhatIsYourNamePage,
-    BusinessNamePage,
-    IsThisYourBusinessPage,
-    RegistrationInfoPage
-  )
+  private def falseCleanupPages(userAnswers: UserAnswers): Seq[QuestionPage[_]] = {
+    val basePages = List(
+      WhatIsYourUTRPage,
+      WhatIsYourNamePage,
+      BusinessNamePage,
+      IsThisYourBusinessPage
+    )
+
+    if (userAnswers.get(ReporterTypePage).contains(Sole)) {
+      basePages
+    } else {
+      basePages :+ RegistrationInfoPage
+    }
+  }
 
   private val trueCleanupPages: Seq[QuestionPage[_]] = List(
     IndWhatIsYourNamePage,

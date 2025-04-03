@@ -24,7 +24,7 @@ import uk.gov.hmrc.domain.Nino
 class RegistrationInfoPageSpec extends PageBehaviours with TestValues {
 
   "cleanUp" - {
-    "must clear IdMatchedInfoPage when set" - {
+    "must clear IdMatchedInfoPage when set" in {
       val ua     = emptyUserAnswers.withPage(IdMatchInfoPage, IdMatchInfo(nino = Some(Nino(TestNiNumber))))
       val result = RegistrationInfoPage.cleanup(Some(IndRegistrationInfo(safeId)), ua).success.value
 

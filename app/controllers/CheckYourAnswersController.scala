@@ -20,7 +20,7 @@ import cats.data.EitherT
 import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import controllers.actions.{CheckForSubmissionAction, StandardActionSets}
-import models.ReporterType.Sole
+import models.ReporterType.{Individual, Sole}
 import models.UserAnswers
 import models.error.ApiError
 import models.error.ApiError.{AlreadyRegisteredError, MandatoryInformationMissingError, ServiceUnavailableError}
@@ -60,7 +60,8 @@ class CheckYourAnswersController @Inject() (
     implicit request =>
       getMissingAnswers(request.userAnswers) match {
         case Nil => Ok(view(CheckYourAnswersViewModel.buildPages(request.userAnswers, countryFactory)))
-        case _   => Redirect(routes.InformationMissingController.onPageLoad())
+        case pages =>
+          Redirect(routes.InformationMissingController.onPageLoad())
       }
   }
 
@@ -79,7 +80,10 @@ class CheckYourAnswersController @Inject() (
     messages: Messages,
     rh: RequestHeader
   ): Future[Result] = {
-    val isSoleTrader: Boolean = userAnswers.get(ReporterTypePage).contains(Sole)
+    val isNotOrg: Boolean = userAnswers.get(ReporterTypePage) match {
+      case Some(rt) => Seq(Sole, Individual).contains(rt)
+      case None     => false
+    }
 
     result.valueOrF {
       case MandatoryInformationMissingError(_) =>
@@ -89,11 +93,15 @@ class CheckYourAnswersController @Inject() (
         Future.successful(ServiceUnavailable(errorView()(rh, messages)))
       case AlreadyRegisteredError =>
         logger.warn("CheckYourAnswersController: Already Registered")
-        if (isSoleTrader) Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad())) // test
-        else Future.successful(Redirect(controllers.routes.PreRegisteredController.onPageLoad()))
+        redirectToAlreadyRegistered(isNotOrg)
       case _ =>
         Future.successful(InternalServerError(errorView()(rh, messages)))
     }
+  }
+
+  private def redirectToAlreadyRegistered(isNotOrg: Boolean) = {
+    if (isNotOrg) Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad()))
+    else Future.successful(Redirect(controllers.routes.PreRegisteredController.onPageLoad()))
   }
 
   private def getSafeIdFromRegistration()(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Either[ApiError, SafeId]] =

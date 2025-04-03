@@ -22,7 +22,7 @@ import cats.implicits._
 import connectors.AddressLookupConnector
 import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures._
-import models.ReporterType.{LimitedCompany, Sole}
+import models.ReporterType.{Individual, LimitedCompany, Sole}
 import models.enrolment.GroupIds
 import models.error.ApiError
 import models.error.ApiError._
@@ -104,6 +104,14 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         val errorResult: EitherT[Future, ApiError, Result] = EitherT.leftT[Future, Result](AlreadyRegisteredError)
         val result =
           callHandleErrorResult(errorResult, Sole)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url)
+      }
+      "redirect to IndividualAlreadyRegistered when AlreadyRegisteredError occurs for a Individual" in {
+        val errorResult: EitherT[Future, ApiError, Result] = EitherT.leftT[Future, Result](AlreadyRegisteredError)
+        val result =
+          callHandleErrorResult(errorResult, Individual)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url)
