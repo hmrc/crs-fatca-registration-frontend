@@ -30,7 +30,13 @@ case class AddressResponse(
 ) {
 
   val asList: List[String] =
-    List(Option(addressLine1), addressLine2, addressLine3, addressLine4, postCodeFormatter(postalCode), country.map(_.description)).flatten
+    List(Option(addressLine1),
+         addressLine2,
+         addressLine3,
+         addressLine4,
+         postCodeFormatter(postalCode),
+         country.filterNot(_.code == "GB").map(_.description)
+    ).flatten
 
   def postCodeFormatter(postcode: Option[String]): Option[String] =
     postcode match {
