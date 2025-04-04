@@ -18,7 +18,7 @@ package controllers.organisation
 
 import controllers.actions._
 import forms.WhatIsYourUTRFormProvider
-import models.ReporterType.{LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
+import models.ReporterType.{LimitedCompany, LimitedPartnership, Partnership, UnincorporatedAssociation}
 import models.{Mode, UserAnswers}
 import navigation.Navigator
 import pages.{ReporterTypePage, WhatIsYourUTRPage}
@@ -78,7 +78,7 @@ class WhatIsYourUTRController @Inject() (
     userAnswers.get(ReporterTypePage) match {
       case Some(LimitedCompany) | Some(UnincorporatedAssociation) => "whatIsYourUTR.corporation"
       case Some(Partnership) | Some(LimitedPartnership)           => "whatIsYourUTR.partnership"
-      case Some(Sole)                                             => "whatIsYourUTR.soleTrader"
+      case _                                                      => "whatIsYourUTR.soleTrader"
     }
 
 }
