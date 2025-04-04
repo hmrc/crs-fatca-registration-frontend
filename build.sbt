@@ -6,7 +6,9 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport
 
 lazy val appName: String = "crs-fatca-registration-frontend"
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.16"
+
+Global / excludeLintKeys += update / evictionWarningOptions
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)

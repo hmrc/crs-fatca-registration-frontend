@@ -36,7 +36,10 @@ trait ControllerMockFixtures extends SpecBase with JsonMatchers {
   implicit def messages: Messages                      = messagesApi.preferred(fakeRequest)
 
   override def beforeEach(): Unit = {
-    Seq(mockSessionRepository, mockDataRetrievalAction).foreach(reset(_))
+    Seq(mockSessionRepository.asInstanceOf[AnyRef], mockDataRetrievalAction.asInstanceOf[AnyRef])
+      .foreach(
+        mock => reset(mock)
+      )
     super.beforeEach()
   }
 
