@@ -77,36 +77,6 @@ function updateAccessibleAutocompleteStyling(originalSelect) {
             }
         }
 
-        // =====================================================
-        // Ensure when user replaces valid answer with a non-valid answer, then valid answer is not retained
-        // =====================================================
-        var holdSubmit = true;
-        parentForm.addEventListener('submit', function (e) {
-            if (holdSubmit) {
-                e.preventDefault()
-                if (originalSelect.querySelectorAll('[selected]').length > 0 || originalSelect.value > "") {
-
-                    var resetSelect = false;
-
-                    if (originalSelect.value) {
-                        if (combo.value != originalSelect.querySelector('option[value="' + originalSelect.value + '"]').text) {
-                            resetSelect = true;
-                        }
-                    }
-                    if (resetSelect) {
-                        originalSelect.value = "";
-                        if (originalSelect.querySelectorAll('[selected]').length > 0) {
-                            originalSelect.querySelectorAll('[selected]')[0].removeAttribute('selected');
-                        }
-                    }
-                }
-
-                holdSubmit = false;
-                //parentForm.submit();
-                HTMLFormElement.prototype.submit.call(parentForm); // because submit buttons have id of "submit" which masks the form's natural form.submit() function
-            }
-        })
-
     }
 
     function checkForAutocompleteLoad() {
