@@ -166,6 +166,16 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
         }
       }
 
+      "must go from BusinessNameWithoutIDPage to NonUKBusinessAddressWithoutIDPage when BusinessTradingNameWithoutID is populated" in {
+        val userAnswers = emptyUserAnswers
+          .withPage(BusinessNameWithoutIDPage, "somebusinessname")
+          .withPage(HaveTradingNamePage, true)
+          .withPage(BusinessTradingNameWithoutIDPage, "sometradingname")
+        navigator
+          .nextPage(BusinessNameWithoutIDPage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.NonUKBusinessAddressWithoutIDController.onPageLoad(CheckMode))
+      }
+
       "must go from BusinessNameWithoutIDPage to HaveTradingNamePage" in {
         val userAnswers = emptyUserAnswers.withPage(BusinessNameWithoutIDPage, "someid")
         navigator

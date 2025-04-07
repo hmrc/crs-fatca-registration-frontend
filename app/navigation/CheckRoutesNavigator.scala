@@ -318,11 +318,19 @@ trait CheckRoutesNavigator extends Logging {
 
   private def haveTradingNameRoutes()(ua: UserAnswers): Call =
     ua.get(HaveTradingNamePage) match {
-      case Some(true) => BusinessTradingNameWithoutIDController.onPageLoad(CheckMode)
+      case Some(true) => businessTradingNameWithoutIDRoutes()(ua)
       case Some(false) =>
         businessAddressWithoutIdRoutes()(ua)
       case _ =>
         HaveTradingNameController.onPageLoad(CheckMode)
+    }
+
+  private def businessTradingNameWithoutIDRoutes()(ua: UserAnswers): Call =
+    ua.get(BusinessTradingNameWithoutIDPage) match {
+      case Some(_) =>
+        businessAddressWithoutIdRoutes()(ua)
+      case _ =>
+        BusinessTradingNameWithoutIDController.onPageLoad(CheckMode)
     }
 
   private def whatIsYourDateOfBirthRoutes()(ua: UserAnswers): Call =
