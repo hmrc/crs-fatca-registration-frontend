@@ -311,14 +311,15 @@ trait CheckRoutesNavigator extends Logging {
   private def businessNameWithoutIDRoutes()(ua: UserAnswers): Call =
     ua.get(BusinessNameWithoutIDPage) match {
       case Some(_) =>
-        haveTradingNameRoutes()(ua)
+        haveTradingNameRoutes(fromBusinessName = true)(ua)
       case _ =>
         BusinessNameWithoutIDController.onPageLoad(CheckMode)
     }
 
-  private def haveTradingNameRoutes()(ua: UserAnswers): Call =
+  private def haveTradingNameRoutes(fromBusinessName: Boolean = false)(ua: UserAnswers): Call =
     ua.get(HaveTradingNamePage) match {
-      case Some(true) => businessTradingNameWithoutIDRoutes()(ua)
+      case Some(true) => if (fromBusinessName) { businessTradingNameWithoutIDRoutes()(ua) }
+        else { BusinessTradingNameWithoutIDController.onPageLoad(CheckMode) }
       case Some(false) =>
         businessAddressWithoutIdRoutes()(ua)
       case _ =>
