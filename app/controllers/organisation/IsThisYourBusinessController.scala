@@ -25,7 +25,7 @@ import models.error.ApiError.NotFoundError
 import models.matching.{AutoMatchedRegistrationRequest, OrgRegistrationInfo, RegistrationRequest}
 import models.register.request.RegisterWithID
 import models.requests.DataRequest
-import models.{Mode, UUIDGen, UniqueTaxpayerReference}
+import models.{Country, Mode, UUIDGen, UniqueTaxpayerReference}
 import navigation.Navigator
 import pages._
 import play.api.Logging
@@ -35,6 +35,7 @@ import play.api.mvc._
 import repositories.SessionRepository
 import services.{BusinessMatchingWithIdService, SubscriptionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CountryListFactory
 import views.html.organisation.IsThisYourBusinessView
 import views.html.ThereIsAProblemView
 
@@ -52,6 +53,7 @@ class IsThisYourBusinessController @Inject() (
   checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   matchingService: BusinessMatchingWithIdService,
+  countryListFactory: CountryListFactory,
   subscriptionService: SubscriptionService,
   controllerHelper: ControllerHelper,
   uuidGen: UUIDGen,
@@ -111,7 +113,9 @@ class IsThisYourBusinessController @Inject() (
   private def result(mode: Mode, form: Form[Boolean], registrationInfo: OrgRegistrationInfo)(implicit
     ec: ExecutionContext,
     request: DataRequest[AnyContent]
-  ): Future[Result] =
+  ): Future[Result] = {
+    val enrichedAddressInfo = addressWithCountryDescription(registrationInfo)
+
     subscriptionService.getSubscription(registrationInfo.safeId) flatMap {
       case Some(subscriptionId) =>
         controllerHelper.updateSubscriptionIdAndCreateEnrolment(registrationInfo.safeId, subscriptionId)
@@ -120,8 +124,22 @@ class IsThisYourBusinessController @Inject() (
           case None        => form
           case Some(value) => form.fill(value)
         }
-        Future.successful(Ok(view(preparedForm, registrationInfo, mode)))
+        Future.successful(Ok(view(preparedForm, enrichedAddressInfo, mode)))
     }
+  }
+
+  private def addressWithCountryDescription(regInfo: OrgRegistrationInfo): OrgRegistrationInfo = {
+    val countryDescription = countryListFactory.getDescriptionFromCode(regInfo.address.countryCode)
+
+    val enrichedAddress = regInfo.address.copy(
+      country = countryDescription.map {
+        desc =>
+          Country(code = regInfo.address.countryCode, description = desc)
+      }
+    )
+
+    regInfo.copy(address = enrichedAddress)
+  }
 
   private def handleRegistrationFound(
     mode: Mode,
