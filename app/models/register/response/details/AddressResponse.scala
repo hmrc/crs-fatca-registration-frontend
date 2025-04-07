@@ -36,7 +36,7 @@ case class AddressResponse(
          addressLine4,
          postCodeFormatter(postalCode),
          country.filterNot(_.code == "GB").map(_.description)
-    ).flatten
+    ).flatten.map(_.trim).filter(_.nonEmpty)
 
   def postCodeFormatter(postcode: Option[String]): Option[String] =
     postcode match {
