@@ -105,6 +105,14 @@ function upTo(el, tagName) {
 
 var countrySelect = document.querySelector('select#country');
 if (countrySelect !== null) {
+    var options = countrySelect.querySelectorAll("option");
+    for (var i = 0; i < options.length; i++) {
+        var option = options[i];
+        var dataText = option.getAttribute('data-text');
+        if (dataText) {
+            option.text = dataText;
+        }
+    }
     HMRCAccessibleAutocomplete.enhanceSelectElement({
         defaultValue: '',
         selectElement: countrySelect,

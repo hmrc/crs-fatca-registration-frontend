@@ -79,8 +79,9 @@ class CountryListFactory @Inject() (environment: Environment, appConfig: Fronten
         val isSelected = value.get("country").contains(country.code)
         SelectItem(
           Some(country.code),
-          if (isSelected) country.description else names.mkString(":"),
-          isSelected
+          country.description,
+          isSelected,
+          attributes = Map("data-text" -> (if (isSelected) country.description else names.mkString(":")))
         )
     }.toSeq.sortBy(_.text)
     SelectItem(Some(""), "Select a country", selected = false) +: countryJsonList
