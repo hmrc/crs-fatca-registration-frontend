@@ -46,6 +46,7 @@ class WhatIsYourUTRController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
+      request.request.
       val taxType = getTaxTypeMessageKey(request.userAnswers)
       val form    = formProvider(taxType)
 
