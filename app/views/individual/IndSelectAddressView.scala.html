@@ -42,7 +42,7 @@ appConfig: FrontendAppConfig
        @govukRadios(
          RadiosViewModel.apply(
             field = form("value"),
-            legend = LegendViewModel(messages("indSelectAddress.heading")).withCssClass("govuk-visually-hidden"),
+            legend = LegendViewModel(messages("indSelectAddress.heading")).withCssClass("govuk-visually-hidden govuk-!-display-block"),
             items = radios
             )
         )
