@@ -53,7 +53,7 @@ lazy val root = (project in file("."))
     retrieveManaged := true,
     update / evictionWarningOptions :=
       EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    resolvers ++= Seq(Resolver.jcenterRepo),
+    resolvers ++= Seq(Resolver.mavenCentral),
     // concatenate js
     Concat.groups := Seq(
       "javascripts/application.js" ->
