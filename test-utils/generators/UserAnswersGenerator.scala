@@ -16,12 +16,11 @@
 
 package generators
 
-import models.{RichJsObject, UserAnswers}
+import models._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
-import pages.{RegistrationInfoPage, _}
-import models._
+import pages._
 import pages.changeContactDetails._
 import play.api.libs.json.{JsObject, JsPath, JsValue, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup
