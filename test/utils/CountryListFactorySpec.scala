@@ -159,8 +159,8 @@ class CountryListFactorySpec extends SpecBase {
 
       factory.countrySelectList(Map.empty, countries) must contain theSameElementsAs Seq(
         SelectItem(Some(""), "Select a country"),
-        SelectItem(value = Some("AB"), text = "Country_1", selected = false),
-        SelectItem(value = Some("BC"), text = "Country_2", selected = false)
+        SelectItem(value = Some("AB"), text = "Country_1", selected = false, attributes = Map("data-text" -> "Country_1")),
+        SelectItem(value = Some("BC"), text = "Country_2", selected = false, attributes = Map("data-text" -> "Country_2"))
       )
     }
 
@@ -175,8 +175,8 @@ class CountryListFactorySpec extends SpecBase {
 
       factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
         SelectItem(value = Some(""), text = "Select a country"),
-        SelectItem(value = Some("AB"), text = "Country_1:Country_1_2", selected = false),
-        SelectItem(value = Some("BC"), text = "Country_2", selected = true)
+        SelectItem(value = Some("AB"), text = "Country_1", selected = false, attributes = Map("data-text" -> "Country_1:Country_1_2")),
+        SelectItem(value = Some("BC"), text = "Country_2", selected = true, attributes = Map("data-text" -> "Country_2"))
       )
     }
 
@@ -191,8 +191,8 @@ class CountryListFactorySpec extends SpecBase {
 
       factory.countrySelectList(selectedCountry, countries) must contain theSameElementsAs Seq(
         SelectItem(value = Some(""), text = "Select a country"),
-        SelectItem(value = Some("AB"), text = "Country_1:Country_1_2", selected = false),
-        SelectItem(value = Some("BC"), text = "Country_2", selected = false)
+        SelectItem(value = Some("AB"), text = "Country_1", selected = false, attributes = Map("data-text" -> "Country_1:Country_1_2")),
+        SelectItem(value = Some("BC"), text = "Country_2", selected = false, attributes = Map("data-text" -> "Country_2"))
       )
     }
   }

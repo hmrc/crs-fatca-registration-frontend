@@ -12,8 +12,8 @@ GET         /refresh-session                                                    
 
 GET         /register/problem/there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad()
 
-GET         /register/check-your-answers                                         controllers.CheckYourAnswersController.onPageLoad()
-POST        /register/check-your-answers                                         controllers.CheckYourAnswersController.onSubmit()
+GET         /register/check-answers                                         controllers.CheckYourAnswersController.onPageLoad()
+POST        /register/check-answers                                         controllers.CheckYourAnswersController.onSubmit()
 
 GET         /register/problem/sole-trader-not-identified                         controllers.SoleTraderNotIdentifiedController.onPageLoad
 

@@ -17,12 +17,16 @@
 package controllers
 
 import base.{ControllerMockFixtures, SpecBase}
+import cats.data.EitherT
+import cats.implicits._
 import connectors.AddressLookupConnector
 import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures._
+import models.ReporterType.{Individual, LimitedCompany, Sole}
 import models.enrolment.GroupIds
+import models.error.ApiError
 import models.error.ApiError._
-import models.{Address, Country, SubscriptionID, UserAnswers}
+import models.{Address, Country, ReporterType, SubscriptionID, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{reset, when}
@@ -30,13 +34,18 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
+import play.api.Application
+import play.api.i18n.Messages
 import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.{RequestHeader, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{BusinessMatchingWithoutIdService, SubscriptionService, TaxEnrolmentService}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.ThereIsAProblemView
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixtures with BeforeAndAfterEach with TableDrivenPropertyChecks
@@ -66,6 +75,71 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
   val address: Address = Address("line 1", Some("line 2"), "line 3", Some("line 4"), Some(""), Country.GB)
 
   "CheckYourAnswers Controller" - {
+
+    "handleErrorResult" - {
+      lazy val application: Application          = new GuiceApplicationBuilder().build()
+      val controller: CheckYourAnswersController = application.injector.instanceOf[CheckYourAnswersController]
+
+      def callHandleErrorResult(errorResult: EitherT[Future, ApiError, Result], reporterType: ReporterType) = {
+        val messages: Messages           = stubMessages()
+        val requestHeader: RequestHeader = FakeRequest()
+        val handleErrorResult            = PrivateMethod[Future[Result]](Symbol("handleErrorResult"))
+
+        controller.invokePrivate(handleErrorResult(
+          errorResult,
+          emptyUserAnswers.withPage(ReporterTypePage, reporterType),
+          messages,
+          requestHeader
+        ))
+      }
+
+      "redirect to InformationMissing when MandatoryInformationMissingError occurs" in {
+        val errorResult: EitherT[Future, ApiError, Result] = EitherT.leftT[Future, Result](MandatoryInformationMissingError(""))
+        val result                                         = callHandleErrorResult(errorResult, LimitedCompany)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.InformationMissingController.onPageLoad().url)
+      }
+      "redirect to IndividualAlreadyRegistered when AlreadyRegisteredError occurs for a Sole Trader" in {
+        val errorResult: EitherT[Future, ApiError, Result] = EitherT.leftT[Future, Result](AlreadyRegisteredError)
+        val result =
+          callHandleErrorResult(errorResult, Sole)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url)
+      }
+      "redirect to IndividualAlreadyRegistered when AlreadyRegisteredError occurs for a Individual" in {
+        val errorResult: EitherT[Future, ApiError, Result] = EitherT.leftT[Future, Result](AlreadyRegisteredError)
+        val result =
+          callHandleErrorResult(errorResult, Individual)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad().url)
+      }
+      "redirect to PreRegistered when AlreadyRegisteredError occurs for an Organisation" in {
+        val errorResult: EitherT[Future, ApiError, Result] = EitherT.leftT[Future, Result](AlreadyRegisteredError)
+        val result =
+          callHandleErrorResult(errorResult, LimitedCompany)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.PreRegisteredController.onPageLoad().url)
+      }
+      "return ServiceUnavailable when ServiceUnavailableError occurs" in {
+        val errorResult: EitherT[Future, ApiError, Result] = EitherT.leftT[Future, Result](ServiceUnavailableError)
+        val result =
+          callHandleErrorResult(errorResult, LimitedCompany)
+
+        status(result) mustBe SERVICE_UNAVAILABLE
+      }
+      "return InternalServerError for any other ApiError" in {
+        val errorResult: EitherT[Future, ApiError, Result] = EitherT.leftT[Future, Result](InternalServerError)
+        val result =
+          callHandleErrorResult(errorResult, LimitedCompany)
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+
+    }
 
     "onPageLoad" - {
       "when affinity group is Individual" - {
@@ -602,6 +676,28 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
 
           status(result) mustEqual SERVICE_UNAVAILABLE
           contentAsString(result) mustEqual view()(request, messages).toString
+        }
+      }
+
+      "must redirect to PreRegistered page when user is already registered" in {
+        when(mockSubscriptionService.checkAndCreateSubscription(any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(Left(AlreadyRegisteredError)))
+        when(mockRegistrationService.registerWithoutId()(any(), any()))
+          .thenReturn(Future.successful(Right(safeId)))
+
+        val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), AffinityGroup.Organisation)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService)
+          )
+          .build()
+        running(application) {
+          val request = FakeRequest(POST, submitRoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.PreRegisteredController.onPageLoad().url
         }
       }
 
