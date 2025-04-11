@@ -113,27 +113,29 @@ if (countrySelect !== null) {
             option.text = dataText;
         }
     }
-    HMRCAccessibleAutocomplete.enhanceSelectElement({
-        defaultValue: '',
-        selectElement: countrySelect,
-        showAllValues: true,
-        autoSelect: false,
-        templates: {
-            suggestion: function (suggestion) {
-                if (suggestion) {
-                    return suggestion.split(':')[0];
+    setTimeout(function(){
+        HMRCAccessibleAutocomplete.enhanceSelectElement({
+            defaultValue: '',
+            selectElement: countrySelect,
+            showAllValues: true,
+            autoSelect: false,
+            templates: {
+                suggestion: function (suggestion) {
+                    if (suggestion) {
+                        return suggestion.split(':')[0];
+                    }
+                    return suggestion;
+                },
+                inputValue: function (suggestion) {
+                    if (suggestion) {
+                        return suggestion.split(':')[0];
+                    }
+                    return suggestion;
                 }
-                return suggestion;
-            },
-            inputValue: function (suggestion) {
-                if (suggestion) {
-                    return suggestion.split(':')[0];
-                }
-                return suggestion;
             }
-        }
-    });
+        });
 
-    updateAccessibleAutocompleteStyling(countrySelect);
+        updateAccessibleAutocompleteStyling(countrySelect);
+    }, 100)
 }
 
