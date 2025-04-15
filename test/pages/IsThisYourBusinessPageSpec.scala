@@ -41,7 +41,7 @@ class IsThisYourBusinessPageSpec extends PageBehaviours {
   "cleanup" - {
     "must remove answers answers when Yes" in {
 
-      forAll(testParamGenerator) {
+      forAll(testParamGenerator.suchThat(_ != null)) {
         case (addressLookup, address, postcode, registrationInfo) =>
           val userAnswers = emptyUserAnswers
             .withPage(IndWhatIsYourPostcodePage, postcode)

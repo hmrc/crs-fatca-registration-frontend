@@ -47,7 +47,7 @@ class RegisteredAddressInUKPageSpec extends PageBehaviours {
 
     "cleanup" - {
       "must remove business without Id answers when true" in {
-        forAll(businessWithoutIdTestParamGenerator) {
+        forAll(businessWithoutIdTestParamGenerator.suchThat(_ != null)) {
           case (addressLookup, address, postcode, name, booleanField, nino, date, stringField, registrationInfo) =>
             val userAnswers = emptyUserAnswers
               .withPage(DateOfBirthWithoutIdPage, LocalDate.now())
