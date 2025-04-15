@@ -68,7 +68,6 @@ trait SpecBase
 
   def onwardRoute: Call                                    = Call("GET", "/foo")
   final val mockDataRetrievalAction: DataRetrievalAction   = mock[DataRetrievalAction]
-  final val mockSignOutAction: SignOutAction               = mock[SignOutAction]
   final val mockSessionRepository: SessionRepository       = mock[SessionRepository]
   final val mockAddressLookupConnector                     = mock[AddressLookupConnector]
   final val mockCtUtrRetrievalAction: CtUtrRetrievalAction = mock[CtUtrRetrievalAction]
@@ -95,7 +94,6 @@ trait SpecBase
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].toInstance(new FakeIdentifierAction(injectedParsers, affinityGroup)),
-        bind[SignOutAction].toInstance(new FakeSignOutAction(injectedParsers, affinityGroup)),
         bind[DataRetrievalAction].toInstance(mockDataRetrievalAction),
         bind[SessionRepository].toInstance(mockSessionRepository)
       )
