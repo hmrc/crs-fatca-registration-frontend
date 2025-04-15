@@ -61,12 +61,6 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
       "must go from ReporterTypePage - Non Individual " - {
         val ua = emptyUserAnswers.withPage(ReporterTypePage, Sole)
 
-//         Is this correct? You would never be able to change the business details as a Sole type
-//        "to Check Your Answers if ReporterType is unchanged for sole" in {
-//          val answers = ua.withPage(RegisteredAddressInUKPage, true)
-//          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
-//        }
-
         "to RegisteredAddressInUKController if ReporterType changed to Sole" in {
           navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.organisation.routes.RegisteredAddressInUKController.onPageLoad(CheckMode)
         }
@@ -201,7 +195,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
       "must go from HaveTradingNamePage to CheckYourAnswersController when user says No and NonUKBusinessAddressWithoutIDPage and ContactDetails are populated" in {
         val userAnswers = emptyUserAnswers
           .withPage(ReporterTypePage, LimitedCompany)
-          .withPage(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
+          .withPage(NonUKBusinessAddressWithoutIDPage, testAddress)
           .withPage(HaveTradingNamePage, false)
           .withPage(ContactNamePage, "ContactName")
         navigator
@@ -211,9 +205,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
 
       "must go from BusinessTradingNameWithoutIDPage to CheckYourAnswersPage if there is an address" in {
         val userAnswers = emptyUserAnswers
-          .set(NonUKBusinessAddressWithoutIDPage, arbitrary[Address].sample.value)
-          .success
-          .value
+          .withPage(NonUKBusinessAddressWithoutIDPage, testAddress)
 
         navigator
           .nextPage(BusinessTradingNameWithoutIDPage, CheckMode, userAnswers)
