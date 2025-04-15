@@ -169,9 +169,9 @@ class ReporterTypePageSpec extends PageBehaviours {
 
   def generateUserAnswers(cleanupType: ReporterType): UserAnswers = {
     val answers = cleanupType match {
-      case Individual => createUserAnswersForIndividualCleanup
-      case Sole       => createUserAnswersForSoleTraderCleanup
-      case _          => createUserAnswersForLimitedCompanyCleanup
+      case Individual => createUserAnswersForIndividualCleanup.suchThat(_ != null)
+      case Sole       => createUserAnswersForSoleTraderCleanup.suchThat(_ != null)
+      case _          => createUserAnswersForLimitedCompanyCleanup.suchThat(_ != null)
     }
     answers.sample match {
       case Some(value) => value

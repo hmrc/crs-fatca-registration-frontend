@@ -49,7 +49,7 @@ class IndDoYouHaveNINumberPageSpec extends PageBehaviours {
 
     "cleanup" - {
       "must remove individual without Id answers when true" in {
-        forAll(individualWithoutIdTestParamGenerator) {
+        forAll(individualWithoutIdTestParamGenerator.suchThat(_ != null)) {
           case (addressLookup, address, postcode, name, booleanField) =>
             val userAnswers = emptyUserAnswers
               .withPage(IndWhatIsYourNamePage, name)
@@ -79,7 +79,7 @@ class IndDoYouHaveNINumberPageSpec extends PageBehaviours {
       }
 
       "must remove individual with Id answers when false" in {
-        forAll(individualWithIdTestParamGenerator) {
+        forAll(individualWithIdTestParamGenerator.suchThat(_ != null)) {
           case (name, nino, registrationInfo) =>
             val userAnswers = emptyUserAnswers
               .withPage(IndWhatIsYourNINumberPage, nino)
