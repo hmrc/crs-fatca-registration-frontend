@@ -155,7 +155,7 @@ sealed trait OrgAnswersValidator {
     } else {
       if (reporterType.contains(ReporterType.Sole)) checkPage(WhatIsYourNamePage) else checkPage(BusinessNamePage)
     },
-    checkPage(IsThisYourBusinessPage),
+    checkPageWithAnswer(IsThisYourBusinessPage, true),
     checkPage(RegistrationInfoPage)
   ).flatten ++ checkContactDetailsMissingAnswers
 
@@ -184,6 +184,13 @@ class CheckYourAnswersValidator(val userAnswers: UserAnswers) extends Individual
     userAnswers.get(page) match {
       case None => Some(page)
       case _    => None
+    }
+
+  private[utils] def checkPageWithAnswer[A](page: QuestionPage[A], answer: A)(implicit rds: Reads[A]): Option[Page] =
+    userAnswers.get(page) match {
+      case None                   => Some(page)
+      case Some(a) if a != answer => Some(page)
+      case _                      => None
     }
 
   private[utils] def any(checkPages: Option[Page]*): Option[Page] = checkPages.find(_.isEmpty).getOrElse(checkPages.last)
