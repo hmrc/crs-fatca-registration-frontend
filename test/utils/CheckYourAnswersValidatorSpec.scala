@@ -104,6 +104,7 @@ class CheckYourAnswersValidatorSpec extends AnyFreeSpec with Matchers with Model
           (userAnswers: UserAnswers) =>
             userAnswers.get(ReporterTypePage) mustNot be(Some(ReporterType.Individual))
             userAnswers.get(RegisteredAddressInUKPage) mustBe Some(true)
+            userAnswers.get(IsThisYourBusinessPage) mustNot be(Some(false))
 
             val result = CheckYourAnswersValidator(userAnswers).validate
             result mustBe Nil
