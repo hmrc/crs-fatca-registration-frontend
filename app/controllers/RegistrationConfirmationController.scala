@@ -18,15 +18,14 @@ package controllers
 
 import controllers.actions._
 import pages.SubscriptionIDPage
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{PageUnavailableView, RegistrationConfirmationView, ThereIsAProblemView}
+import views.html.{PageUnavailableView, RegistrationConfirmationView}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationConfirmationController @Inject() (

@@ -24,7 +24,7 @@
 
 @(continueUrl: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("pageUnavailable.title"))) {
+@layout(pageTitle = titleNoForm(messages("pageUnavailable.title")), showBackLink = false) {
 
  <h1 class="govuk-heading-l">@messages("pageUnavailable.heading")</h1>
 
