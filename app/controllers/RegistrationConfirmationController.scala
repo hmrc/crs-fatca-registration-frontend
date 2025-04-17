@@ -25,7 +25,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{RegistrationConfirmationView, ThereIsAProblemView}
+import views.html.{PageUnavailableView, RegistrationConfirmationView, ThereIsAProblemView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +35,7 @@ class RegistrationConfirmationController @Inject() (
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
   view: RegistrationConfirmationView,
-  errorView: ThereIsAProblemView
+  errorView: PageUnavailableView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -47,7 +47,7 @@ class RegistrationConfirmationController @Inject() (
         clearSession   <- sessionRepository.set(request.userAnswers.copy(data = Json.obj()))
       } yield (subscriptionId, clearSession) match {
         case (Some(fatcaId), true) => Ok(view(fatcaId.value))
-        case _                     => Ok(errorView())
+        case _                     => Ok(errorView(routes.IndexController.onPageLoad.url))
       }
   }
 
