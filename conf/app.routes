@@ -150,7 +150,7 @@ POST        /register/without-id/change-business-address                        
 
 GET         /register/problem/sign-in-problem                                    controllers.UnauthorisedStandardUserController.onPageLoad()
 
-GET         /register/problem/information-sent                                   controllers.InformationSentController.onPageLoad()
+GET         /register/problem/page-unavailable                                   controllers.PageUnavailableController.onPageLoad()
 
 GET         /register/without-id/name                                            controllers.individual.IndWhatIsYourNameController.onPageLoad(mode: models.Mode = models.NormalMode)
 POST        /register/without-id/name                                            controllers.individual.IndWhatIsYourNameController.onSubmit(mode: models.Mode = models.NormalMode)

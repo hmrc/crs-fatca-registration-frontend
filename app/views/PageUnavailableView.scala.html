@@ -14,22 +14,20 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
+@import components.Link
 
 @this(
-layout: templates.Layout,
-appConfig: FrontendAppConfig,
-link: components.Link
+ layout: templates.Layout,
+ govukButton: GovukButton,
+ link: Link
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(continueUrl: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("informationSent.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("pageUnavailable.title")), showBackLink = false) {
 
-    <h1 class="govuk-heading-l">@messages("informationSent.heading")</h1>
+ <h1 class="govuk-heading-l">@messages("pageUnavailable.heading")</h1>
 
-    <p class="govuk-body">@messages("informationSent.p1")</p>
-
-    <p class="govuk-body">@link(appConfig.crsFatcaFIManagementFrontendUrl, "informationSent.link")</p>
+ @{link(continueUrl, messages("pageUnavailable.link.text"), classes = "govuk-link govuk-body")}
 
 }

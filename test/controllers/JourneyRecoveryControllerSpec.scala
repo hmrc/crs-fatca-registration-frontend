@@ -19,13 +19,13 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.ThereIsAProblemView
+import views.html.PageUnavailableView
 
 class JourneyRecoveryControllerSpec extends SpecBase {
 
   "JourneyRecovery Controller" - {
 
-    "must return OK and the ThereIsAProblem view" in {
+    "must return OK and the PageUnavailable view" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -34,10 +34,10 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val problemView = application.injector.instanceOf[ThereIsAProblemView]
+        val problemView = application.injector.instanceOf[PageUnavailableView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual problemView()(request, messages(application)).toString
+        contentAsString(result) mustEqual problemView(routes.IndexController.onPageLoad.url)(request, messages(application)).toString()
       }
     }
   }

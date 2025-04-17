@@ -21,14 +21,14 @@ import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ThereIsAProblemView
+import views.html.PageUnavailableView
 
 import javax.inject.Inject
 
 class JourneyRecoveryController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
-  problemView: ThereIsAProblemView
+  view: PageUnavailableView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -36,7 +36,7 @@ class JourneyRecoveryController @Inject() (
   def onPageLoad(): Action[AnyContent] = identify() {
     implicit request =>
       logger.info("Something went wrong")
-      Ok(problemView())
+      Ok(view(routes.IndexController.onPageLoad.url))
   }
 
 }

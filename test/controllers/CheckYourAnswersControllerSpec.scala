@@ -233,7 +233,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           }
         }
 
-        "must redirect to Information sent when UserAnswers is empty" in {
+        "must redirect to PageUnavailable when UserAnswers is empty" in {
           val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), AffinityGroup.Individual)
             .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
             .build()
@@ -244,7 +244,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
+            redirectLocation(result).value mustBe routes.PageUnavailableController.onPageLoad().url
           }
         }
       }
@@ -341,7 +341,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           }
         }
 
-        "must redirect to Information sent when UserAnswers is empty and affinity group is non-individual" in {
+        "must redirect to PageUnavailable when UserAnswers is empty and affinity group is non-individual" in {
           forAll(arbitraryOrgAffinityGroup.arbitrary) {
             affinityGroup =>
               val application = applicationBuilder(userAnswers = Option(emptyUserAnswers), affinityGroup)
@@ -354,7 +354,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
                 val result = route(application, request).value
 
                 status(result) mustEqual SEE_OTHER
-                redirectLocation(result).value mustBe routes.InformationSentController.onPageLoad().url
+                redirectLocation(result).value mustBe routes.PageUnavailableController.onPageLoad().url
               }
           }
         }
