@@ -302,11 +302,6 @@ pageNotFound.p1 = If you typed the web address, check it is correct.
 pageNotFound.p2 = If you pasted the web address, check you copied the entire address.
 pageNotFound.link = You can email {0} if you have any questions about this service.
 
-informationSent.title = You have already sent this information
-informationSent.heading = You have already sent this information
-informationSent.p1 = We will contact you if we have any questions about the details you have provided.
-informationSent.link = Send a CRS or FATCA report
-
 enquiries.email = aeoi.enquiries@hmrc.gov.uk
 
 indWhatIsYourName.title = What is your name?
@@ -440,10 +435,6 @@ signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We did not save your answers.
 signedOut.link = Sign in again using Government Gateway
-
-informationMissing.title = Some information is missing
-informationMissing.heading = Some information is missing
-informationMissing.p1 = You must provide this information to register.
 
 contactDetailsMissing.title = Some information is missing
 contactDetailsMissing.heading = Some information is missing
@@ -684,3 +675,8 @@ changeIndividualContactDetails.title = Change your contact details
 checkIndividualContactDetails.title = Check your contact details
 changeIndividualContactDetails.heading = Change your contact details
 checkIndividualContactDetails.heading = Check your contact details
+
+pageUnavailable.title = This page is no longer available
+pageUnavailable.heading = This page is no longer available
+pageUnavailable.link.text = Back to manage your CRS and FATCA reports
+

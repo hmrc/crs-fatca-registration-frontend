@@ -64,7 +64,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Ta
         }
     }
 
-    "must redirect to Information sent when UserAnswers is empty" in {
+    "must redirect to PageUnavailable when UserAnswers is empty" in {
       val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
 
       running(application) {
@@ -73,7 +73,7 @@ class HaveSecondContactControllerSpec extends SpecBase with MockitoSugar with Ta
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
+        redirectLocation(result).value mustBe controllers.routes.PageUnavailableController.onPageLoad().url
       }
     }
 
