@@ -19,25 +19,25 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.InformationSentView
+import views.html.PageUnavailableView
 
-class InformationSentControllerSpec extends SpecBase {
+class PageUnavailableControllerSpec extends SpecBase {
 
-  "InformationSent Controller" - {
+  "PageUnavailable Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.InformationSentController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.PageUnavailableController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[InformationSentView]
+        val view = application.injector.instanceOf[PageUnavailableView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(routes.IndexController.onPageLoad.url)(request, messages(application)).toString
       }
     }
   }

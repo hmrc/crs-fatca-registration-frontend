@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.NormalMode
 import models.ReporterType.LimitedCompany
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -32,7 +33,7 @@ import scala.concurrent.Future
 
 class YourContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val yourContactDetailsRoute = routes.YourContactDetailsController.onPageLoad().url
+  lazy val yourContactDetailsRoute = routes.YourContactDetailsController.onPageLoad(NormalMode).url
 
   "YourContactDetails Controller" - {
 
@@ -51,7 +52,7 @@ class YourContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[YourContactDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -76,7 +77,7 @@ class YourContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
-    "must redirect to Information sent when UserAnswers is empty" in {
+    "must redirect to PageUnavailable when UserAnswers is empty" in {
       val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
 
       running(application) {
@@ -85,7 +86,7 @@ class YourContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
+        redirectLocation(result).value mustBe controllers.routes.PageUnavailableController.onPageLoad().url
       }
     }
   }

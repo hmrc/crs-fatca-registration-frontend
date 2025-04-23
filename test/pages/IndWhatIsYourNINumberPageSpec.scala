@@ -33,7 +33,7 @@ class IndWhatIsYourNINumberPageSpec extends PageBehaviours {
 
   def createUserAnswersForIndividualCleanup: Gen[UserAnswers] =
     for {
-      (nino, registrationInfo) <- testParamGenerator
+      (nino, registrationInfo) <- testParamGenerator.suchThat(_ != null)
     } yield emptyUserAnswers
       .withPage(IndWhatIsYourNINumberPage, nino)
       .withPage(RegistrationInfoPage, registrationInfo)

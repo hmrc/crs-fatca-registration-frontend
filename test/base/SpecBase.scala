@@ -19,12 +19,12 @@ package base
 import connectors.AddressLookupConnector
 import controllers.actions._
 import helpers.JsonFixtures.UserAnswersId
-import models.{UUIDGen, UUIDGenImpl, UserAnswers}
+import models.{Address, Country, UUIDGen, UUIDGenImpl, UserAnswers}
 import org.mockito.MockitoSugar.when
+import org.scalatest._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{BeforeAndAfterEach, EitherValues, OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -52,7 +52,8 @@ trait SpecBase
     with OptionValues
     with ScalaFutures
     with BeforeAndAfterEach
-    with IntegrationPatience {
+    with IntegrationPatience
+    with PrivateMethodTester {
 
   val userAnswersId: String = "id"
 
@@ -104,5 +105,7 @@ trait SpecBase
       userAnswers.set(page, value).success.value
 
   }
+
+  val testAddress: Address = Address("value 1", Some("value 2"), "value 3", Some("value 4"), Some("XX9 9XX"), Country("FR", "France", Option("France")))
 
 }

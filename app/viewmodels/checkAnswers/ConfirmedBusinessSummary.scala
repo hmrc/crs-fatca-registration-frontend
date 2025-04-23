@@ -67,7 +67,7 @@ object ConfirmedBusinessSummary {
       |${addressLine(address.addressLine3)}
       |${addressLine(address.addressLine4)}
       |<p class=$ParagraphClass>${address.postCodeFormatter(address.postalCode).getOrElse("")}</p>
-      |${if (address.countryCode.toUpperCase != GBCountryCode) s"<p $ParagraphClass>$countryName</p>" else ""}
+      |${if (address.countryCode.toUpperCase != GBCountryCode) s"<p class=$ParagraphClass>$countryName</p>" else ""}
       |""".stripMargin
     )
 

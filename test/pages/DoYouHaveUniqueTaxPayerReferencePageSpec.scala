@@ -48,7 +48,7 @@ class DoYouHaveUniqueTaxPayerReferencePageSpec extends PageBehaviours {
 
   "cleanup" - {
     "if answer is false" in {
-      forAll(testParamGenerator) {
+      forAll(testParamGenerator.suchThat(_ != null)) {
         case (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob) =>
           val ua = emptyUserAnswers
             .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("utr12345"))
@@ -69,7 +69,7 @@ class DoYouHaveUniqueTaxPayerReferencePageSpec extends PageBehaviours {
     }
 
     "if answer is true" in {
-      forAll(testParamGenerator) {
+      forAll(testParamGenerator.suchThat(_ != null)) {
         case (addressLookup, address, postcode, name, booleanField, nino, registrationInfo, dob) =>
           val ua = emptyUserAnswers
             .withPage(BusinessNameWithoutIDPage, "BusinessNameWithoutID")

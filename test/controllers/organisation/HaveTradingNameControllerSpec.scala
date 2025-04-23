@@ -88,7 +88,7 @@ class HaveTradingNameControllerSpec extends SpecBase with MockitoSugar with User
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.InformationSentController.onPageLoad().url
+        redirectLocation(result).value mustBe controllers.routes.PageUnavailableController.onPageLoad().url
       }
     }
 

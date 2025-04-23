@@ -31,7 +31,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Key, 
 
 class CheckYourAnswersHelperSpec extends SpecBase with GuiceOneAppPerSuite {
 
-  val addressResponse: AddressResponse = AddressResponse("line1", Some("line2"), None, None, Some("AB00 0CC"), "GB")
+  val addressResponse: AddressResponse = AddressResponse("line1", Some("line2"), None, None, Some("AB00 0CC"), "DE")
 
   val mockCountryListFactory: CountryListFactory = mock[CountryListFactory]
 
@@ -48,7 +48,7 @@ class CheckYourAnswersHelperSpec extends SpecBase with GuiceOneAppPerSuite {
         .success
         .value
 
-      when(mockCountryListFactory.getDescriptionFromCode(any())).thenReturn(Some("United Kingdom"))
+      when(mockCountryListFactory.getDescriptionFromCode(any())).thenReturn(Some("Germany"))
 
       val service = new CheckYourAnswersHelper(userAnswers, mockCountryListFactory)(Helpers.stubMessages())
 
@@ -69,7 +69,7 @@ class CheckYourAnswersHelperSpec extends SpecBase with GuiceOneAppPerSuite {
         .success
         .value
 
-      when(mockCountryListFactory.getDescriptionFromCode(any())).thenReturn(Some("United Kingdom"))
+      when(mockCountryListFactory.getDescriptionFromCode(any())).thenReturn(Some("Germany"))
 
       val service = new CheckYourAnswersHelper(userAnswers, mockCountryListFactory)(Helpers.stubMessages())
 
@@ -113,7 +113,7 @@ class CheckYourAnswersHelperSpec extends SpecBase with GuiceOneAppPerSuite {
             |
             |
             |<p class=govuk-!-margin-0>AB00  0CC</p>
-            |
+            |<p class=govuk-!-margin-0>Germany</p>
             |""".stripMargin
         )
       ),
