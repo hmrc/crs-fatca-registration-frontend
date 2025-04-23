@@ -10,7 +10,7 @@ GET         /language/:lang                                                     
 
 GET         /refresh-session                                                     controllers.KeepAliveController.keepAlive
 
-GET         /register/problem/there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad()
+GET         /register/problem/page-unavailable                                 controllers.JourneyRecoveryController.onPageLoad()
 
 GET         /register/check-answers                                         controllers.CheckYourAnswersController.onPageLoad()
 POST        /register/check-answers                                         controllers.CheckYourAnswersController.onSubmit()
