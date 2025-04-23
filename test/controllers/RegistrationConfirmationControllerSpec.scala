@@ -27,7 +27,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AffinityGroup
-import views.html.{RegistrationConfirmationView, ThereIsAProblemView}
+import views.html.{PageUnavailableView, RegistrationConfirmationView, ThereIsAProblemView}
 
 import scala.concurrent.Future
 
@@ -73,7 +73,7 @@ class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGe
       }
     }
 
-    "must return OK and the there-is-a-problem view for a GET when unable to empty user answers data" in {
+    "must return OK and PageUnavailable view for a GET when unable to empty user answers data" in {
       forAll(orgWithId.arbitrary, arbitrarySubscriptionID.arbitrary) {
         (userAnswers: UserAnswers, subscriptionId: SubscriptionID) =>
           val application = applicationBuilder(userAnswers = Some(userAnswers.withPage(SubscriptionIDPage, subscriptionId)), AffinityGroup.Organisation).build()
@@ -85,15 +85,15 @@ class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGe
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[ThereIsAProblemView]
+            val view = application.injector.instanceOf[PageUnavailableView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view()(request, messages(application)).toString
+            contentAsString(result) mustEqual view(routes.IndexController.onPageLoad.url)(request, messages(application)).toString
           }
       }
     }
 
-    "must return OK and the there-is-a-problem view for a GET when unable to find subscriptionId in user answers data" in {
+    "must return OK and the PageUnavailable view for a GET when unable to find subscriptionId in user answers data" in {
       forAll(orgWithId.arbitrary) {
         (userAnswers: UserAnswers) =>
           val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Organisation).build()
@@ -105,10 +105,10 @@ class RegistrationConfirmationControllerSpec extends SpecBase with UserAnswersGe
 
             val result = route(application, request).value
 
-            val view = application.injector.instanceOf[ThereIsAProblemView]
+            val view = application.injector.instanceOf[PageUnavailableView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view()(request, messages(application)).toString
+            contentAsString(result) mustEqual view(routes.IndexController.onPageLoad.url)(request, messages(application)).toString
           }
       }
     }
