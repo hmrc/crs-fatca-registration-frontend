@@ -27,7 +27,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AffinityGroup
-import views.html.{PageUnavailableView, RegistrationConfirmationView, ThereIsAProblemView}
+import views.html.{PageUnavailableView, RegistrationConfirmationView}
 
 import scala.concurrent.Future
 
