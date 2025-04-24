@@ -64,8 +64,6 @@ if (countrySelect !== null) {
                 }
             }
         });
-
-        updateAccessibleAutocompleteStyling(countrySelect);
     }, 100)
 }
 
