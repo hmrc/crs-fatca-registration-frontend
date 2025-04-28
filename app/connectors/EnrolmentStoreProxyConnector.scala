@@ -48,11 +48,11 @@ class EnrolmentStoreProxyConnector @Inject() (val config: FrontendAppConfig, val
             case NO_CONTENT    => Future.successful(Right(()))
             case s if is2xx(s) => parseAndAssertNoExisting(response.json).value
             case other =>
-              logger.error(s"Enrolment Store Proxy error: ${response.status} - ${response.body}")
+              logger.error(s"ES1: Enrolment Store Proxy error: ${response.status} - ${response.body}")
               Future.successful(Left(MalformedError(other)))
           }
         case Left(error) =>
-          logger.error(s"Enrolment Store Proxy error: $error")
+          logger.error(s"ES1: Enrolment Store Proxy error: $error")
           Future.successful(Left(error))
       }
     }
@@ -62,34 +62,38 @@ class EnrolmentStoreProxyConnector @Inject() (val config: FrontendAppConfig, val
     json.asOpt[GroupIds] match {
       case None                                                 => EitherT.rightT(())
       case Some(groupIds) if groupIds.principalGroupIds.isEmpty => EitherT.rightT(())
-      case Some(groupIds) => EitherT {
-          checkGroupEnrolments(groupIds.principalGroupIds).map {
-            case true =>
-              logger.warn(s"Enrolment already exists for groupIds: ${groupIds.principalGroupIds}")
-              Left(EnrolmentExistsError(groupIds))
-            case false => Right(())
-          }
+      case Some(groupIds) => checkGroupEnrolments(groupIds.principalGroupIds).flatMap {
+          case true =>
+            logger.warn(s"Enrolment already exists for groupIds: ${groupIds.principalGroupIds}")
+            EitherT.leftT(EnrolmentExistsError(groupIds))
+          case false => EitherT.rightT(())
         }
     }
 
-  private def checkGroupEnrolments(groupIds: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
+  private def checkGroupEnrolments(groupIds: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, Boolean] = {
     val groups = groupIds.toSet
-    val calls: Set[Future[Boolean]] = groups.map {
+    val calls: Set[EitherT[Future, ApiError, Boolean]] = groups.map {
       groupId =>
-        val url = url"${config.enrolmentStoreProxyUrl}/enrolment-store/enrolments/$groupId/groups"
-        http
+        val url = url"${config.enrolmentStoreProxyUrl}/enrolment-store/groups/$groupId/enrolments?service=${config.enrolmentKey}"
+        val f = http
           .get(url)
           .execute[HttpResponse]
           .map {
             case response if is2xx(response.status) =>
-              response.json
-                .asOpt[EnrolmentResponse].exists(_.enrolments.nonEmpty)
+              val hasEnrolment = response.json.asOpt[EnrolmentResponse].exists(_.enrolments.nonEmpty)
+              Right(hasEnrolment)
             case response =>
-              logger.warn(s"Enrolment response not formed. ${response.status} response status")
-              false
+              Left(MalformedError(response.status))
           }
+        EitherT(f)
     }
-    Future.foldLeft(calls)(false)(_ || _)
+    calls.foldLeft(EitherT.rightT[Future, ApiError](false)) {
+      (accEt, callEt) =>
+        for {
+          acc  <- accEt
+          call <- callEt
+        } yield acc || call
+    }
   }
 
 }
