@@ -17,22 +17,15 @@
 package pages
 
 import models.matching.RegistrationInfo
-import models.UniqueTaxpayerReference
+import models.{Name, UniqueTaxpayerReference}
 import pages.behaviours.PageBehaviours
-import org.scalacheck.Arbitrary.arbitrary
 
 class BusinessNamePageTest extends PageBehaviours {
 
-  private val testParamGenerator = for {
-    name             <- arbitrary[models.Name]
-    registrationInfo <- arbitrary[RegistrationInfo]
-    booleanField     <- arbitrary[Boolean]
-  } yield (name, registrationInfo, booleanField)
-
   "cleanup" - {
     "if answer have value" in {
-      forAll(testParamGenerator) {
-        case (name, registrationInfo, booleanField) =>
+      forAll {
+        (name: Name, registrationInfo: RegistrationInfo, booleanField: Boolean) =>
           val ua = emptyUserAnswers
             .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("utr12345"))
             .withPage(WhatIsYourNamePage, name)

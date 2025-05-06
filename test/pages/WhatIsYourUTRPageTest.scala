@@ -16,23 +16,16 @@
 
 package pages
 
-import models.UniqueTaxpayerReference
 import models.matching.RegistrationInfo
-import org.scalacheck.Arbitrary.arbitrary
+import models.{Name, UniqueTaxpayerReference}
 import pages.behaviours.PageBehaviours
 
 class WhatIsYourUTRPageTest extends PageBehaviours {
 
-  private val testParamGenerator = for {
-    name             <- arbitrary[models.Name]
-    registrationInfo <- arbitrary[RegistrationInfo]
-    booleanField     <- arbitrary[Boolean]
-  } yield (name, registrationInfo, booleanField)
-
   "cleanup" - {
     "if answer have value" in {
-      forAll(testParamGenerator) {
-        case (name, registrationInfo, booleanField) =>
+      forAll {
+        (name: Name, registrationInfo: RegistrationInfo, booleanField: Boolean) =>
           val ua = emptyUserAnswers
             .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("utr12345"))
             .withPage(WhatIsYourNamePage, name)
@@ -47,7 +40,6 @@ class WhatIsYourUTRPageTest extends PageBehaviours {
           result.get(IsThisYourBusinessPage) must not be empty
           result.get(WhatIsYourNamePage) must not be empty
           result.get(BusinessNamePage) must not be empty
-
       }
     }
   }
