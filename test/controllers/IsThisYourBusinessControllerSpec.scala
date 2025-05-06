@@ -184,10 +184,10 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
       val registrationInfo              = OrgRegistrationInfo(safeId, businessName, address)
       val userAnswersWithAutoMatchedUtr = validUserAnswers.set(AutoMatchedUTRPage, autoMatchedUtr).success.value
       val updatedUserAnswer = userAnswersWithAutoMatchedUtr
-        .set(RegistrationInfoPage, registrationInfo)
+        .set(WhatIsYourUTRPage, autoMatchedUtr)
         .success
         .value
-        .set(WhatIsYourUTRPage, autoMatchedUtr)
+        .set(RegistrationInfoPage, registrationInfo)
         .success
         .value
 

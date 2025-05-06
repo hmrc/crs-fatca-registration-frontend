@@ -16,12 +16,20 @@
 
 package pages
 
-import models.UniqueTaxpayerReference
+import models.{UniqueTaxpayerReference, UserAnswers}
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object WhatIsYourUTRPage extends QuestionPage[UniqueTaxpayerReference] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "whatIsYourUTR"
+
+  override def cleanup(value: Option[UniqueTaxpayerReference], userAnswers: UserAnswers): Try[UserAnswers] = value match {
+    case Some(_) => userAnswers.remove(RegistrationInfoPage)
+    case _       => super.cleanup(value, userAnswers)
+  }
+
 }
