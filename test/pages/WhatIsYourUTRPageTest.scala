@@ -31,7 +31,7 @@ class WhatIsYourUTRPageTest extends PageBehaviours {
 
   "cleanup" - {
     "if answer have value" in {
-      forAll(testParamGenerator.suchThat(_ != null)) {
+      forAll(testParamGenerator) {
         case (name, registrationInfo, booleanField) =>
           val ua = emptyUserAnswers
             .withPage(WhatIsYourUTRPage, UniqueTaxpayerReference("utr12345"))
