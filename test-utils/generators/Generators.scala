@@ -84,8 +84,7 @@ trait Generators extends RegexConstants {
       .suchThat(_ != "true")
       .suchThat(_ != "false")
 
-  def nonEmptyString: Gen[String] =
-    arbitrary[String] suchThat (_.nonEmpty)
+  def nonEmptyString: Gen[String] = Gen.nonEmptyListOf(Gen.alphaChar).map(_.mkString)
 
   def stringsWithMaxLength(maxLength: Int): Gen[String] =
     for {
