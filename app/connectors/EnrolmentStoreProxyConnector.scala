@@ -19,11 +19,12 @@ package connectors
 import cats.data.EitherT
 import config.FrontendAppConfig
 import models.SubscriptionID
-import models.enrolment.GroupIds
+import models.enrolment.{EnrolmentResponse, GroupIds}
 import models.error.ApiError
 import models.error.ApiError.{EnrolmentExistsError, MalformedError}
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -38,30 +39,60 @@ class EnrolmentStoreProxyConnector @Inject() (val config: FrontendAppConfig, val
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): EitherT[Future, ApiError, Unit] = {
-    val serviceEnrolmentPattern = s"HMRC-FATCA-ORG~FATCAID~${subscriptionID.value}"
-    val submissionUrl           = url"${config.enrolmentStoreProxyUrl}/enrolment-store/enrolments/$serviceEnrolmentPattern/groups"
+    val serviceEnrolmentPattern                             = s"HMRC-FATCA-ORG~FATCAID~${subscriptionID.value}"
+    val espUrl                                              = url"${config.enrolmentStoreProxyUrl}/enrolment-store/enrolments/$serviceEnrolmentPattern/groups"
+    val esResponse: EitherT[Future, ApiError, HttpResponse] = EitherT.right(http.get(espUrl).execute[HttpResponse])
     EitherT {
-      http
-        .get(submissionUrl)
-        .execute[HttpResponse]
-        .map {
-          case response if response.status == NO_CONTENT => Right(())
-          case response if is2xx(response.status) =>
-            response.json
-              .asOpt[GroupIds]
-              .map(
-                groupIds =>
-                  if (groupIds.principalGroupIds.nonEmpty) {
-                    Left(EnrolmentExistsError(groupIds))
-                  } else {
-                    Right(())
-                  }
-              )
-              .getOrElse(Right(()))
-          case response =>
-            logger.warn(s"Enrolment response not formed. ${response.status} response status")
-            Left(MalformedError(response.status))
+      esResponse.value.flatMap {
+        case Right(response) => response.status match {
+            case NO_CONTENT    => Future.successful(Right(()))
+            case s if is2xx(s) => parseAndAssertNoExisting(response.json).value
+            case other =>
+              logger.error(s"ES1: Enrolment Store Proxy error: ${response.status} - ${response.body}")
+              Future.successful(Left(MalformedError(other)))
+          }
+        case Left(error) =>
+          logger.error(s"ES1: Enrolment Store Proxy error: $error")
+          Future.successful(Left(error))
+      }
+    }
+  }
+
+  private def parseAndAssertNoExisting(json: JsValue)(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, Unit] =
+    json.asOpt[GroupIds] match {
+      case None                                                 => EitherT.rightT(())
+      case Some(groupIds) if groupIds.principalGroupIds.isEmpty => EitherT.rightT(())
+      case Some(groupIds) => checkGroupEnrolments(groupIds.principalGroupIds).flatMap {
+          case true =>
+            logger.warn(s"Enrolment already exists for groupIds: ${groupIds.principalGroupIds}")
+            EitherT.leftT(EnrolmentExistsError(groupIds))
+          case false => EitherT.rightT(())
         }
+    }
+
+  private def checkGroupEnrolments(groupIds: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, Boolean] = {
+    val groups = groupIds.toSet
+    val calls: Set[EitherT[Future, ApiError, Boolean]] = groups.map {
+      groupId =>
+        val url = url"${config.enrolmentStoreProxyUrl}/enrolment-store/groups/$groupId/enrolments?service=${config.enrolmentKey}"
+        val f = http
+          .get(url)
+          .execute[HttpResponse]
+          .map {
+            case response if is2xx(response.status) =>
+              val hasEnrolment = response.json.asOpt[EnrolmentResponse].exists(_.enrolments.nonEmpty)
+              Right(hasEnrolment)
+            case response =>
+              Left(MalformedError(response.status))
+          }
+        EitherT(f)
+    }
+    calls.foldLeft(EitherT.rightT[Future, ApiError](false)) {
+      (accEt, callEt) =>
+        for {
+          acc  <- accEt
+          call <- callEt
+        } yield acc || call
     }
   }
 
