@@ -17,6 +17,7 @@
 package pages
 
 import models.{Name, UserAnswers}
+import pages.PageLists.removePage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
@@ -28,8 +29,14 @@ case object WhatIsYourNamePage extends QuestionPage[Name] {
   override def toString: String = "whatIsYourName"
 
   override def cleanup(value: Option[Name], userAnswers: UserAnswers): Try[UserAnswers] = value match {
-    case Some(_) => userAnswers.remove(BusinessNamePage)
+    case Some(_) => cleanUpPages.foldLeft(Try(userAnswers))(removePage)
     case _       => super.cleanup(value, userAnswers)
   }
+
+  private val cleanUpPages: Seq[QuestionPage[_]] = List(
+    BusinessNamePage,
+    RegistrationInfoPage,
+    IsThisYourBusinessPage
+  )
 
 }
