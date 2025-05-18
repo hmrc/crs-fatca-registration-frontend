@@ -99,8 +99,11 @@ class CheckYourAnswersController @Inject() (
   }
 
   private def redirectToAlreadyRegistered(isNotOrg: Boolean) =
-    if (isNotOrg) Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad()))
-    else Future.successful(Redirect(controllers.routes.PreRegisteredController.onPageLoad()))
+    if (isNotOrg) {
+      Future.successful(Redirect(controllers.individual.routes.IndividualAlreadyRegisteredController.onPageLoad()))
+    } else {
+      Future.successful(Redirect(controllers.routes.PreRegisteredController.onPageLoad()))
+    }
 
   private def getSafeIdFromRegistration()(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[Either[ApiError, SafeId]] =
     request.userAnswers.get(RegistrationInfoPage) match {

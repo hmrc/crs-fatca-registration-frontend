@@ -70,7 +70,7 @@ class EnrolmentStoreProxyConnector @Inject() (val config: FrontendAppConfig, val
         }
     }
 
-  private def checkGroupEnrolments(groupIds: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, Boolean] = {
+  def checkGroupEnrolments(groupIds: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): EitherT[Future, ApiError, Boolean] = {
     val groups = groupIds.toSet
     val calls: Set[EitherT[Future, ApiError, Boolean]] = groups.map {
       groupId =>
