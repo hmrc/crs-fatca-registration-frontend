@@ -96,10 +96,10 @@ class AuthenticatedIdentifierActionWithRegime @Inject() (
         Future.successful(Redirect(routes.UnauthorisedStandardUserController.onPageLoad()))
       case Some(internalID) ~ enrolments ~ Some(affinityGroup) ~ _ ~ Some(group) if groupCheck =>
         checkGroup(group, affinityGroup) {
-          block(IdentifierRequest(request, internalID, affinityGroup, enrolments.enrolments))
+          block(IdentifierRequest(request, internalID, affinityGroup, enrolments.enrolments, group = Some(group)))
         }
-      case Some(internalID) ~ enrolments ~ Some(affinityGroup) ~ _ ~ None =>
-        block(IdentifierRequest(request, internalID, affinityGroup, enrolments.enrolments))
+      case Some(internalID) ~ enrolments ~ Some(affinityGroup) ~ _ ~ group =>
+        block(IdentifierRequest(request, internalID, affinityGroup, enrolments.enrolments, group = group))
       case _ => throw new UnauthorizedException("Unable to retrieve internal Id")
     } recover {
       case _: NoActiveSession =>
