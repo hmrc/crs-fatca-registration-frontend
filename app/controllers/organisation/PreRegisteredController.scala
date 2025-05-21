@@ -17,7 +17,6 @@
 package controllers
 
 import config.FrontendAppConfig
-import controllers.actions._
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -27,14 +26,13 @@ import views.html.organisation.PreRegisteredView
 
 class PreRegisteredController @Inject() (
   override val messagesApi: MessagesApi,
-  standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
   view: PreRegisteredView,
   frontendAppConfig: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
+  def onPageLoad(): Action[AnyContent] = Action {
     implicit request =>
       Ok(view(frontendAppConfig.emailEnquiries))
   }

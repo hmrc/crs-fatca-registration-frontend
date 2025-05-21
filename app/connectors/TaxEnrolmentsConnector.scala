@@ -58,6 +58,11 @@ class TaxEnrolmentsConnector @Inject() (
             logger.error(s"Service error when creating enrolment  ${responseMessage.status} : ${responseMessage.body}")
             Left(ServiceUnavailableError)
         }
+        .recover {
+          case e: Exception =>
+            logger.error(s"Service error when creating enrolment  ${e.getMessage}")
+            Left(ServiceUnavailableError)
+        }
     }
   }
 
