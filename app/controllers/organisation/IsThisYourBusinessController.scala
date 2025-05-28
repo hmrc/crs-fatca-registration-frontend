@@ -104,28 +104,26 @@ class IsThisYourBusinessController @Inject() (
               },
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IsThisYourBusinessPage, mode, updatedAnswers))
+              registrationInfo  <- Future.successful(request.userAnswers.get(RegistrationInfoPage).get.asInstanceOf[OrgRegistrationInfo])
+              updatedAnswers    <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, value))
+              _                 <- sessionRepository.set(updatedAnswers)
+              optSubscriptionId <- subscriptionService.getSubscription(registrationInfo.safeId)
+              result <- optSubscriptionId match {
+                case Some(subscriptionId) if value => controllerHelper.updateSubscriptionIdAndCreateEnrolment(registrationInfo.safeId, subscriptionId)
+                case _                             => Future.successful(Redirect(navigator.nextPage(IsThisYourBusinessPage, mode, updatedAnswers)))
+              }
+            } yield result
         )
   }
 
-  private def result(mode: Mode, form: Form[Boolean], registrationInfo: OrgRegistrationInfo)(implicit
-    ec: ExecutionContext,
-    request: DataRequest[AnyContent]
-  ): Future[Result] = {
+  private def result(mode: Mode, form: Form[Boolean], registrationInfo: OrgRegistrationInfo)(implicit request: DataRequest[AnyContent]): Future[Result] = {
     val enrichedAddressInfo = addressWithCountryDescription(registrationInfo)
 
-    subscriptionService.getSubscription(registrationInfo.safeId) flatMap {
-      case Some(subscriptionId) =>
-        controllerHelper.updateSubscriptionIdAndCreateEnrolment(registrationInfo.safeId, subscriptionId)
-      case _ =>
-        val preparedForm = request.userAnswers.get(IsThisYourBusinessPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Future.successful(Ok(view(preparedForm, enrichedAddressInfo, mode)))
+    val preparedForm = request.userAnswers.get(IsThisYourBusinessPage) match {
+      case None        => form
+      case Some(value) => form.fill(value)
     }
+    Future.successful(Ok(view(preparedForm, enrichedAddressInfo, mode)))
   }
 
   private def addressWithCountryDescription(regInfo: OrgRegistrationInfo): OrgRegistrationInfo = {
@@ -151,7 +149,7 @@ class IsThisYourBusinessController @Inject() (
       updatedAnswers <- Future.fromTry(updatedAnswersWithUtrPage.flatMap(_.set(RegistrationInfoPage, registrationInfo)))
       updatedRequest = DataRequest(request.request, request.userId, request.affinityGroup, updatedAnswers)
       result <- sessionRepository.set(updatedAnswers).flatMap {
-        case true => result(mode, form, registrationInfo)(ec, updatedRequest)
+        case true => result(mode, form, registrationInfo)(updatedRequest)
         case false =>
           logger.error(s"Failed to update user answers after registration was found for userId: [${request.userId}]")
           Future.successful(InternalServerError(errorView()))
