@@ -33,7 +33,7 @@ function upTo(el, tagName) {
     return null;
 }
 
-var countrySelect = document.querySelector('select#country');
+var countryySelect = document.querySelector('select#country');
 if (countrySelect !== null) {
     var options = countrySelect.querySelectorAll("option");
     for (var i = 0; i < options.length; i++) {
