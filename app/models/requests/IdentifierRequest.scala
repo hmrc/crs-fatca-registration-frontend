@@ -25,6 +25,5 @@ case class IdentifierRequest[A](
   userId: String,
   affinityGroup: AffinityGroup,
   enrolments: Set[Enrolment] = Set.empty,
-  utr: Option[UniqueTaxpayerReference] = None,
-  group: Option[String] = None
+  utr: Option[UniqueTaxpayerReference] = None
 ) extends WrappedRequest[A](request)
