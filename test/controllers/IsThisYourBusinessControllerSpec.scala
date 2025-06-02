@@ -107,7 +107,6 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(validUserAnswers)
 
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, loadRoute)
@@ -150,7 +149,6 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(validUserAnswers)
 
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, loadRoute)
@@ -168,7 +166,6 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(validUserAnswers.withPage(ReporterTypePage, Sole).withPage(WhatIsYourNamePage, Name(FirstName, LastName)))
 
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, loadRoute)
@@ -199,7 +196,6 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(mockitoEq(updatedUserAnswer))) thenReturn Future.successful(true)
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(userAnswersWithAutoMatchedUtr)
 
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, loadRoute)
@@ -224,7 +220,6 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(userAnswersWithoutReporterType)
 
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, loadRoute)
@@ -251,7 +246,6 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(mockitoEq(userAnswersWithAutoMatchedFieldCleared))) thenReturn Future.successful(true)
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
       retrieveUserAnswersData(userAnswersWithAutoMatchedUtr)
 
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, loadRoute)
@@ -269,8 +263,6 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       val updatedUserAnswers: UserAnswers = emptyUserAnswers
         .set(ReporterTypePage, Sole)
@@ -297,15 +289,12 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
     "render technical difficulties page when there is an existing subscription and fails to create an enrolment" in {
       forAll(Arbitrary.arbitrary[SubscriptionID]) {
         subscription =>
-          when(mockMatchingService.sendBusinessRegistrationInformation(any())(any(), any()))
-            .thenReturn(Future.successful(Right(OrgRegistrationInfo(safeId, OrgName, address))))
-
           when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(Some(subscription)))
           when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Left(BadRequestError)))
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           retrieveUserAnswersData(validUserAnswers)
-          val request = FakeRequest(GET, loadRoute)
+          val request = FakeRequest(POST, submitRoute).withFormUrlEncodedBody(("value", "true"))
 
           val result = route(mockedApp, request).value
 
@@ -323,8 +312,6 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
 
       when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any())).thenReturn(Future.successful(Right(OK)))
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       val userAnswers: UserAnswers = validUserAnswers
         .set(IsThisYourBusinessPage, true)
@@ -346,8 +333,9 @@ class IsThisYourBusinessControllerSpec extends ControllerMockFixtures with Model
     "must redirect to the next page when valid data is submitted" in {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
-      retrieveUserAnswersData(emptyUserAnswers)
+      retrieveUserAnswersData(validUserAnswers)
       val request =
         FakeRequest(POST, submitRoute)
           .withFormUrlEncodedBody(("value", "true"))
