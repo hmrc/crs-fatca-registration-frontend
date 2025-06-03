@@ -20,7 +20,8 @@ import controllers.ControllerHelper
 import controllers.actions._
 import forms.IndContactEmailFormProvider
 import models.Mode
-import models.matching.IndRegistrationInfo
+import models.matching.{IndRegistrationInfo, OrgRegistrationInfo, SafeId}
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.{IndContactEmailPage, RegistrationInfoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -57,8 +58,8 @@ class IndContactEmailController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      request.userAnswers.get(RegistrationInfoPage).map(_.asInstanceOf[IndRegistrationInfo]) match {
-        case Some(IndRegistrationInfo(safeId)) => subscriptionService.getSubscription(safeId).flatMap {
+      getSafeIdFromRegistration() match {
+        case Some(safeId) => subscriptionService.getSubscription(safeId).flatMap {
             case Some(subscriptionID) =>
               controllerHelper.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionID)
             case _ => Future.successful(Ok(view(preparedForm, mode)))
@@ -81,5 +82,15 @@ class IndContactEmailController @Inject() (
             } yield Redirect(navigator.nextPage(IndContactEmailPage, mode, updatedAnswers))
         )
   }
+
+  private def getSafeIdFromRegistration()(implicit request: DataRequest[AnyContent]): Option[SafeId] =
+    request.userAnswers.get(RegistrationInfoPage) match {
+      case Some(registration) =>
+        registration match {
+          case OrgRegistrationInfo(safeId, _, _) => Some(safeId)
+          case IndRegistrationInfo(safeId)       => Some(safeId)
+        }
+      case _ => None
+    }
 
 }
