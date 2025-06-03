@@ -17,6 +17,7 @@
 package generators
 
 import models._
+import models.matching.{IndRegistrationInfo, RegistrationInfo, SafeId}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
@@ -236,22 +237,29 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
     )
   }
 
+  lazy val indRegistrationInfo: Arbitrary[IndRegistrationInfo] = Arbitrary {
+    for {
+      safeId <- nonEmptyString
+    } yield IndRegistrationInfo(SafeId(safeId))
+  }
+
   lazy val indWithId: Arbitrary[UserAnswers] = Arbitrary {
     for {
-      id             <- nonEmptyString
-      contactDetails <- indContactDetails.arbitrary
+      id               <- nonEmptyString
+      contactDetails   <- indContactDetails.arbitrary
+      registrationInfo <- indRegistrationInfo.arbitrary
       additionalData <- genJsObj(
         arbitrary[(IndWhatIsYourNINumberPage.type, JsValue)],
         arbitrary[(IndContactNamePage.type, JsValue)],
         arbitrary[(IndDateOfBirthPage.type, JsValue)],
-        arbitrary[(RegistrationInfoPage.type, JsValue)],
         arbitrary[(IndContactEmailPage.type, JsValue)]
       )
       obj =
         setFields(
           Json.obj(),
           ReporterTypePage.path         -> Json.toJson(ReporterType.Individual.asInstanceOf[ReporterType]),
-          IndDoYouHaveNINumberPage.path -> Json.toJson(true)
+          IndDoYouHaveNINumberPage.path -> Json.toJson(true),
+          RegistrationInfoPage.path     -> Json.toJson(registrationInfo.asInstanceOf[RegistrationInfo])
         ) ++ additionalData ++ contactDetails
     } yield UserAnswers(
       id = id,

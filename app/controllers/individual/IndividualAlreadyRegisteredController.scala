@@ -16,6 +16,7 @@
 
 package controllers.individual
 
+import controllers.actions._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -25,12 +26,13 @@ import javax.inject.Inject
 
 class IndividualAlreadyRegisteredController @Inject() (
   override val messagesApi: MessagesApi,
+  standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
   view: IndividualAlreadyRegisteredView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action {
+  def onPageLoad: Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
       Ok(view())
   }

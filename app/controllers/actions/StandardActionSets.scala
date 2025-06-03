@@ -55,8 +55,8 @@ class StandardActionSets @Inject() (identify: IdentifierAction,
   def identifiedUserWithInitializedData(): ActionBuilder[DataRequest, AnyContent] =
     identifiedUserWithEnrolmentCheck() andThen getData() andThen initializeData
 
-  def identifiedUserWithData(groupCheck: Boolean = true): ActionBuilder[DataRequest, AnyContent] =
-    identify(groupCheck = groupCheck) andThen getData() andThen requireData
+  def identifiedUserWithData(): ActionBuilder[DataRequest, AnyContent] =
+    identifiedUserWithEnrolmentCheck() andThen getData() andThen requireData
 
   def identifiedUserWithDependantAnswer[T](answer: Gettable[T])(implicit reads: Reads[T]): ActionBuilder[DataRequest, AnyContent] =
     identifiedUserWithData() andThen dependantAnswer(answer)
