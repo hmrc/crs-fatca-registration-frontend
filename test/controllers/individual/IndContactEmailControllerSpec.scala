@@ -17,9 +17,11 @@
 package controllers.individual
 
 import base.SpecBase
+import controllers.ControllerHelper
 import forms.IndContactEmailFormProvider
 import generators.UserAnswersGenerator
-import models.{NormalMode, UserAnswers}
+import models.matching.SafeId
+import models.{NormalMode, SubscriptionID, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -27,8 +29,10 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.IndContactEmailPage
 import play.api.inject.bind
+import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.SubscriptionService
 import views.html.individual.IndContactEmailView
 
 import scala.concurrent.Future
@@ -38,7 +42,11 @@ class IndContactEmailControllerSpec extends SpecBase with MockitoSugar with User
   val formProvider = new IndContactEmailFormProvider()
   val form         = formProvider()
 
-  lazy val indContactEmailRoute = routes.IndContactEmailController.onPageLoad(NormalMode).url
+  lazy val indContactEmailRoute                    = routes.IndContactEmailController.onPageLoad(NormalMode).url
+  val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
+  val mockControllerHelper: ControllerHelper       = mock[ControllerHelper]
+
+  private val subscriptionId = SubscriptionID("XE0000123456789")
 
   "IndContactEmail Controller" - {
 
@@ -46,8 +54,11 @@ class IndContactEmailControllerSpec extends SpecBase with MockitoSugar with User
 
       forAll(indWithId.arbitrary) {
         (userAnswers: UserAnswers) =>
-          val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService), bind[ControllerHelper].toInstance(mockControllerHelper))
+            .build()
           when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
+          when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
           running(application) {
             val request = FakeRequest(GET, indContactEmailRoute)
@@ -63,11 +74,36 @@ class IndContactEmailControllerSpec extends SpecBase with MockitoSugar with User
       }
     }
 
+    "must update subscription ID and create enrollment if Safe id found" in {
+
+      forAll(indWithId.arbitrary) {
+        (userAnswers: UserAnswers) =>
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService), bind[ControllerHelper].toInstance(mockControllerHelper))
+            .build()
+          when(mockSessionRepository.set(userAnswers.copy(data = userAnswers.data))).thenReturn(Future.successful(true))
+          when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(Some(subscriptionId)))
+          when(mockControllerHelper.updateSubscriptionIdAndCreateEnrolment(any(), any())(any(), any()))
+            .thenReturn(Future.successful(Redirect(onwardRoute)))
+
+          running(application) {
+            val request = FakeRequest(GET, indContactEmailRoute)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+          }
+      }
+    }
+
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId).set(IndContactEmailPage, "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService), bind[ControllerHelper].toInstance(mockControllerHelper))
+        .build()
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       running(application) {
         val request = FakeRequest(GET, indContactEmailRoute)
@@ -82,7 +118,10 @@ class IndContactEmailControllerSpec extends SpecBase with MockitoSugar with User
     }
 
     "must redirect to PageUnavailable when UserAnswers is empty" in {
-      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Option(emptyUserAnswers))
+        .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService), bind[ControllerHelper].toInstance(mockControllerHelper))
+        .build()
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       running(application) {
         val request = FakeRequest(GET, indContactEmailRoute)
@@ -101,9 +140,12 @@ class IndContactEmailControllerSpec extends SpecBase with MockitoSugar with User
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SubscriptionService].toInstance(mockSubscriptionService),
+            bind[ControllerHelper].toInstance(mockControllerHelper)
           )
           .build()
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       running(application) {
         val request =
@@ -119,7 +161,11 @@ class IndContactEmailControllerSpec extends SpecBase with MockitoSugar with User
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService), bind[ControllerHelper].toInstance(mockControllerHelper))
+        .build()
+
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       running(application) {
         val request =
@@ -139,7 +185,11 @@ class IndContactEmailControllerSpec extends SpecBase with MockitoSugar with User
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService), bind[ControllerHelper].toInstance(mockControllerHelper))
+        .build()
+
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       running(application) {
         val request = FakeRequest(GET, indContactEmailRoute)
@@ -153,7 +203,11 @@ class IndContactEmailControllerSpec extends SpecBase with MockitoSugar with User
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService), bind[ControllerHelper].toInstance(mockControllerHelper))
+        .build()
+
+      when(mockSubscriptionService.getSubscription(any[SafeId]())(any())).thenReturn(Future.successful(None))
 
       running(application) {
         val request =

@@ -17,22 +17,21 @@
 package controllers.individual
 
 import config.FrontendAppConfig
-import controllers.ControllerHelper
 import controllers.actions._
-import models.{IdentifierType, Mode, UUIDGen}
 import models.error.ApiError.NotFoundError
 import models.register.request.RegisterWithID
 import models.requests.DataRequest
+import models.{IdentifierType, Mode, UUIDGen}
 import navigation.Navigator
 import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.{BusinessMatchingWithIdService, SubscriptionService}
+import services.BusinessMatchingWithIdService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.individual.IndIdentityConfirmedView
 import views.html.ThereIsAProblemView
+import views.html.individual.IndIdentityConfirmedView
 
 import java.time.Clock
 import javax.inject.Inject
@@ -46,8 +45,6 @@ class IndIdentityConfirmedController @Inject() (
   navigator: Navigator,
   val controllerComponents: MessagesControllerComponents,
   matchingService: BusinessMatchingWithIdService,
-  subscriptionService: SubscriptionService,
-  controllerHelper: ControllerHelper,
   uuidGen: UUIDGen,
   clock: Clock,
   view: IndIdentityConfirmedView,
@@ -70,13 +67,8 @@ class IndIdentityConfirmedController @Inject() (
               .flatMap {
                 case Right(info) =>
                   request.userAnswers.set(RegistrationInfoPage, info).map(sessionRepository.set)
-                  subscriptionService.getSubscription(info.safeId) flatMap {
-                    case Some(subscriptionID) =>
-                      controllerHelper.updateSubscriptionIdAndCreateEnrolment(info.safeId, subscriptionID)
-                    case _ =>
-                      val action = navigator.nextPage(RegistrationInfoPage, mode, request.userAnswers).url
-                      Future.successful(Ok(view(mode, action)))
-                  }
+                  val action = navigator.nextPage(RegistrationInfoPage, mode, request.userAnswers).url
+                  Future.successful(Ok(view(mode, action)))
                 case Left(NotFoundError) =>
                   Future.successful(Redirect(routes.IndCouldNotConfirmIdentityController.onPageLoad()))
                 case _ =>

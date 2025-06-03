@@ -16,18 +16,21 @@
 
 package controllers.individual
 
+import controllers.ControllerHelper
 import controllers.actions._
 import forms.IndContactEmailFormProvider
-import javax.inject.Inject
 import models.Mode
+import models.matching.IndRegistrationInfo
 import navigation.Navigator
-import pages.IndContactEmailPage
+import pages.{IndContactEmailPage, RegistrationInfoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.individual.IndContactEmailView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IndContactEmailController @Inject() (
@@ -37,13 +40,15 @@ class IndContactEmailController @Inject() (
   standardActionSets: StandardActionSets,
   formProvider: IndContactEmailFormProvider,
   checkForSubmission: CheckForSubmissionAction,
+  subscriptionService: SubscriptionService,
+  controllerHelper: ControllerHelper,
   val controllerComponents: MessagesControllerComponents,
   view: IndContactEmailView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (standardActionSets.identifiedUserWithData() andThen checkForSubmission) async {
     implicit request =>
@@ -52,7 +57,15 @@ class IndContactEmailController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      Future.successful(Ok(view(preparedForm, mode)))
+      request.userAnswers.get(RegistrationInfoPage).map(_.asInstanceOf[IndRegistrationInfo]) match {
+        case Some(IndRegistrationInfo(safeId)) => subscriptionService.getSubscription(safeId).flatMap {
+            case Some(subscriptionID) =>
+              controllerHelper.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionID)
+            case _ => Future.successful(Ok(view(preparedForm, mode)))
+          }
+        case _ =>
+          Future.successful(Ok(view(preparedForm, mode)))
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
