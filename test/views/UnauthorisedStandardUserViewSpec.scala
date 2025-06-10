@@ -19,7 +19,7 @@ package views
 import base.SpecBase
 import controllers.routes
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, contentAsString, defaultAwaitTimeout, route, running, writeableOf_AnyContentAsEmpty}
+import play.api.test.Helpers.{contentAsString, defaultAwaitTimeout, route, running, writeableOf_AnyContentAsEmpty, GET}
 
 class UnauthorisedStandardUserViewSpec extends SpecBase {
 
