@@ -293,8 +293,8 @@ unauthorisedStandardUser.bullet1 = Sign in with their Government Gateway details
 unauthorisedStandardUser.bullet2 = Register for the CRS and FATCA service, if they have not done so already.
 unauthorisedStandardUser.bullet3 = Give you permission to use this service through the tax and scheme management service.
 unauthorisedStandardUser.paragraph2 = If your administrator does not have the link for the tax and scheme management service, then you can share this link with them. The link will only work for your administrator:
-unauthorisedStandardUser.paragraph3 = www.tax.service.gov.uk/tax-and-scheme-management/services
-unauthorisedStandardUser.paragraph4 = Once your administrator has completed these steps, you will then be able to sign in with your own Government Gateway details to use this service.
+unauthorisedStandardUser.link = www.tax.service.gov.uk/tax-and-scheme-management/services
+unauthorisedStandardUser.paragraph3 = Once your administrator has completed these steps, you will then be able to sign in with your own Government Gateway details to use this service.
 
 pageNotFound.title = Page not found
 pageNotFound.heading = Page not found
