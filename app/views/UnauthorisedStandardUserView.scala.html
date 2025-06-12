@@ -17,9 +17,11 @@
 @import config.FrontendAppConfig
 
 @this(
-layout: templates.Layout,
-link: components.Link,
-appConfig: FrontendAppConfig
+    layout: templates.Layout,
+    link: components.Link,
+    appConfig: FrontendAppConfig,
+    heading: components.Heading,
+    para: components.Paragraph
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -27,11 +29,11 @@ appConfig: FrontendAppConfig
 @layout(pageTitle = titleNoForm(messages("unauthorisedStandardUser.title")),
 showBackLink = true) {
 
-     <h1 class="govuk-heading-l">@messages("unauthorisedStandardUser.heading")</h1>
+    @heading(messages("unauthorisedStandardUser.heading"))
 
-     <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph1")</p>
+    @para(Html(messages("unauthorisedStandardUser.paragraph1")))
 
-    <h2 class="govuk-heading-m">@messages("unauthorisedStandardUser.subheading")</h2>
+    @heading(messages("unauthorisedStandardUser.subheading"),"m","h2")
 
     <ol class="govuk-list govuk-list--number">
         <li>@messages("unauthorisedStandardUser.bullet1")</li>
@@ -39,11 +41,11 @@ showBackLink = true) {
         <li>@messages("unauthorisedStandardUser.bullet3")</li>
     </ol>
 
-    <p class="govuk-body govuk-!-margin-bottom-1">@messages("unauthorisedStandardUser.paragraph2")</p>
-    <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph3")</p>
+    @para(Html(messages("unauthorisedStandardUser.paragraph2")),classes = "govuk-body govuk-!-margin-bottom-1")
 
-    <p class="govuk-body">@messages("unauthorisedStandardUser.paragraph4")</p>
+    @para(Html(messages("unauthorisedStandardUser.link")))
 
+    @para(Html(messages("unauthorisedStandardUser.paragraph3")))
 
 
 }
