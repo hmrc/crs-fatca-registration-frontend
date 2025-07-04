@@ -16,7 +16,7 @@
 
 package models.subscription.request
 
-import models.matching.SafeId
+import models.matching.{OrgRegistrationInfo, SafeId}
 import models.{IdentifierType, UserAnswers}
 import pages._
 import play.api.libs.json.{Json, Reads, Writes}
@@ -45,7 +45,12 @@ object CreateSubscriptionRequest extends UserAnswersHelper {
           CreateSubscriptionRequest(
             idType = IdentifierType.SAFE,
             idNumber = safeId.value,
-            tradingName = userAnswers.get(BusinessTradingNameWithoutIDPage),
+            tradingName = (userAnswers.get(BusinessNamePage), userAnswers.get(BusinessTradingNameWithoutIDPage), userAnswers.get(RegistrationInfoPage)) match {
+              case (Some(businessName), _, _)             => Some(businessName)
+              case (_, Some(tradingName), _)              => Some(tradingName)
+              case (_, _, Some(org: OrgRegistrationInfo)) => Some(org.name)
+              case _                                      => None
+            },
             gbUser = isGBUser(userAnswers),
             primaryContact = primaryContact,
             secondaryContact = value
