@@ -55,7 +55,43 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
           CreateSubscriptionRequest(
             idType = IdentifierType.SAFE,
             idNumber = safeId.value,
-            tradingName = None,
+            tradingName = Some(businessName),
+            gbUser = true,
+            primaryContact = ContactInformation(
+              contactInformation = OrganisationDetails(
+                name = contactName
+              ),
+              email = TestEmail,
+              phone = Some(TestPhoneNumber)
+            ),
+            secondaryContact = None
+          )
+        )
+
+      }
+
+      "for a business with id (org affinity group) registrationInfo" in {
+        val contactName      = nameGen.sample.value
+        val registrationInfo = arbitraryOrgRegistrationInfo.arbitrary.sample.value
+
+        val userAnswers = UserAnswers("")
+          .set(ReporterTypePage, ReporterType.LimitedCompany).success.value
+          .set(RegisteredAddressInUKPage, true).success.value
+          .set(WhatIsYourUTRPage, UniqueTaxpayerReference(validUtr.sample.value)).success.value
+          .set(ContactNamePage, contactName).success.value
+          .set(ContactEmailPage, TestEmail).success.value
+          .set(ContactHavePhonePage, true).success.value
+          .set(ContactPhonePage, TestPhoneNumber).success.value
+          .set(HaveSecondContactPage, false).success.value
+          .set(RegistrationInfoPage, registrationInfo).success.value
+
+        val result = CreateSubscriptionRequest.buildSubscriptionRequest(safeId, userAnswers, AffinityGroup.Organisation)
+
+        result mustBe Some(
+          CreateSubscriptionRequest(
+            idType = IdentifierType.SAFE,
+            idNumber = safeId.value,
+            tradingName = Some(registrationInfo.name),
             gbUser = true,
             primaryContact = ContactInformation(
               contactInformation = OrganisationDetails(
@@ -142,7 +178,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
           CreateSubscriptionRequest(
             idType = IdentifierType.SAFE,
             idNumber = safeId.value,
-            tradingName = None,
+            tradingName = Some(businessName),
             gbUser = true,
             primaryContact = ContactInformation(
               contactInformation = OrganisationDetails(
