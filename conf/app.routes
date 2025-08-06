@@ -28,7 +28,7 @@ GET         /account/signed-out                                                 
 
 GET         /unauthorised                                                        controllers.UnauthorisedController.onPageLoad
 
-GET         /register/problem/organisation-already-registered           controllers.PreRegisteredController.onPageLoad()
+GET         /register/problem/organisation-already-registered                    controllers.PreRegisteredController.onPageLoad()
 
 GET         /register/problem/individual-pre-registered                          controllers.individual.IndividualAlreadyRegisteredController.onPageLoad()
 

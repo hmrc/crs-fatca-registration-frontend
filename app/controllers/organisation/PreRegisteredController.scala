@@ -36,7 +36,7 @@ class PreRegisteredController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = standardActionSets.identifiedUserWithData() {
     implicit request =>
-      Ok(view(frontendAppConfig.emailEnquiries))
+      Ok(view())
   }
 
 }

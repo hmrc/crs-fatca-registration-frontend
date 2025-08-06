@@ -60,13 +60,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val taxEnrolmentsUrl2: String = s"${configuration.get[String]("microservice.services.tax-enrolments.url2")}"
 
-  private val exitSurveyBaseUrl: String        = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  val exitSurveyUrl: String                    = s"$exitSurveyBaseUrl/feedback/crs-fatca-registration-frontend"
-  lazy val businessTaxAccountLink: String      = configuration.get[String]("urls.btaLogin")
-  lazy val corporationTaxEnquiriesLink: String = configuration.get[String]("urls.corporationTaxEnquiries")
-  lazy val selfAssessmentEnquiriesLink: String = configuration.get[String]("urls.selfAssessmentEnquiries")
-  lazy val emailEnquiries: String              = configuration.get[String]("urls.emailEnquiries")
-  lazy val findNINumberUrl: String             = configuration.get[String]("urls.findNINumberUrl")
+  private val exitSurveyBaseUrl: String              = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  val exitSurveyUrl: String                          = s"$exitSurveyBaseUrl/feedback/crs-fatca-registration-frontend"
+  lazy val businessTaxAccountLink: String            = configuration.get[String]("urls.btaLogin")
+  lazy val corporationTaxEnquiriesLink: String       = configuration.get[String]("urls.corporationTaxEnquiries")
+  lazy val selfAssessmentEnquiriesLink: String       = configuration.get[String]("urls.selfAssessmentEnquiries")
+  lazy val emailEnquiries: String                    = configuration.get[String]("urls.emailEnquiries")
+  lazy val findNINumberUrl: String                   = configuration.get[String]("urls.findNINumberUrl")
+  lazy val taxAndSchemeManagementServicesUrl: String = configuration.get[String]("urls.taxAndSchemeManagementServices")
 
   val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")

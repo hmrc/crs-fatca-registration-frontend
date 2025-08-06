@@ -23,15 +23,18 @@ link: components.Link,
 appConfig: FrontendAppConfig
 )
 
-@(emailLink: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("preRegistered.title")), showBackLink = true) {
+@layout(pageTitle = titleNoForm(messages("preRegistered.title")), showBackLink = false) {
 
       <h1 class="govuk-heading-l">@messages("preRegistered.heading")</h1>
 
-      <p class="govuk-body">@messages("preRegistered.withID.information")</p>
-      <p class="govuk-body govuk-!-margin-bottom-1">@messages("preRegistered.withID.information2")</p>
-      <p class="govuk-body">@messages("preRegistered.withID.information.link")</p>
+      <p class="govuk-body govuk-!-margin-bottom-1">@messages("preRegistered.withID.information")</p>
 
-      <p class="govuk-body">@Html(messages("preRegistered.help" , link(s"mailto:$emailLink", "enquiries.email")))</p>
+      <ol class="govuk-list govuk-list--bullet">
+        <li>@messages("preRegistered.withID.bullet.1")</li>
+        <li>@Html(messages("preRegistered.withID.bullet.2", link(s"${appConfig.taxAndSchemeManagementServicesUrl}", "preRegistered.withID.bullet.link")))</li>
+      </ol>
+
+      <p class="govuk-body">@Html(messages("preRegistered.help" , link(s"mailto:${appConfig.emailEnquiries}", "enquiries.email")))</p>
 }
