@@ -459,7 +459,7 @@ individualAlreadyRegistered.title = You are already registered to use this servi
 individualAlreadyRegistered.heading = You are already registered to use this service
 individualAlreadyRegistered.p1 = You can access the service using the Government Gateway details that were used to register for CRS and FATCA.
 individualAlreadyRegistered.link = Sign in using Government Gateway
-individualAlreadyRegistered.p2 = You can email {0} if you’re having problems accessing the service.
+individualAlreadyRegistered.p2 = You can email {0} if you need support with accessing this service.
 
 indSelectAddress.title = What is your address?
 indSelectAddress.heading = What is your address?
