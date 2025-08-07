@@ -43,7 +43,7 @@ class PreRegisteredViewSpec extends SpecBase {
       }
       "a paragraph" in {
         htmlContent must include(
-          "You can email aeoi.enquiries@hmrc.gov.uk if you’re having problems accessing the service."
+          "You can email aeoi.enquiries@hmrc.gov.uk if you need support with accessing this service."
         )
       }
 
