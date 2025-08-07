@@ -446,7 +446,7 @@ contactDetailsMissing.p1 = You must provide this information to update your cont
 
 preRegistered.title = Your organisation is already registered to use this service
 preRegistered.heading = Your organisation is already registered to use this service
-preRegistered.help = You can email {0} if you’re having problems accessing the service.
+preRegistered.help = You can email {0} if you need support with accessing this service.
 preRegistered.help.linkLocation = mailto:aeoi.enquiries@hmrc.gov.uk
 preRegistered.withID.information = To access the CRS and FATCA service, you must either:
 preRegistered.withID.bullet.1 = sign in with the Government Gateway user ID used to register for this service
@@ -459,7 +459,7 @@ individualAlreadyRegistered.title = You are already registered to use this servi
 individualAlreadyRegistered.heading = You are already registered to use this service
 individualAlreadyRegistered.p1 = You can access the service using the Government Gateway details that were used to register for CRS and FATCA.
 individualAlreadyRegistered.link = Sign in using Government Gateway
-individualAlreadyRegistered.p2 = You can email {0} if you need support with accessing this service.
+individualAlreadyRegistered.p2 = You can email {0} if you’re having problems accessing the service.
 
 indSelectAddress.title = What is your address?
 indSelectAddress.heading = What is your address?
