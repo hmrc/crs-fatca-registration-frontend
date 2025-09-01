@@ -91,9 +91,9 @@ contactEmail.change.hidden = Change first contact email address
 contactHavePhone.title = Can we contact your first contact by telephone?
 contactHavePhone.heading = Can we contact {0} by telephone?
 contactHavePhone.p1 = We will call if we have any questions about your reports.
-contactHavePhone.checkYourAnswersLabel = Can we contact {0} by telephone?
+contactHavePhone.checkYourAnswersLabel = Can we contact the first contact by telephone?
 contactHavePhone.error.required = Select yes if they can be contacted by telephone
-contactHavePhone.change.hidden = Change can we contact {0} by telephone?
+contactHavePhone.change.hidden = Change if we can contact the first contact by telephone
 
 contactPhone.checkYourAnswersLabel = First contact telephone number
 contactPhone.title = What is the telephone number for the first contact?
@@ -131,6 +131,8 @@ secondContactName.change.hidden = Change second contact name
 
 secondContactHavePhone.title = Can we contact your second contact by telephone?
 secondContactHavePhone.heading = Can we contact {0} by telephone?
+secondContactHavePhone.checkYourAnswersLabel = Can we contact the second contact by telephone?
+secondContactHavePhone.change.hidden = Change if we can contact the second contact by telephone
 secondContactHavePhone.p1 = We will call if we have any questions about your reports.
 secondContactHavePhone.error.required = Select yes if they can be contacted by telephone
 
@@ -157,7 +159,7 @@ indContactHavePhone.heading = Can we contact you by telephone?
 indContactHavePhone.p1 = We will call if we have any questions about your reports.
 indContactHavePhone.checkYourAnswersLabel = Can we contact you by telephone?
 indContactHavePhone.error.required = Select yes if we can contact you by telephone
-indContactHavePhone.change.hidden = Change can we contact you by telephone?
+indContactHavePhone.change.hidden = Change if we contact you by telephone?
 
 indContactPhone.title = What is your telephone number?
 indContactPhone.heading = What is your telephone number?
@@ -236,6 +238,8 @@ indDoYouHaveNINumber.error.required = Select yes if you have a National Insuranc
 
 haveTradingName.title = Does your business trade under a different name?
 haveTradingName.heading = Does your business trade under a different name?
+haveTradingName.checkYourAnswersLabel = Does your organisation trade under a different name?
+haveTradingName.change.hidden = Change if your organisation trades under a different name
 haveTradingName.error.required = Select yes if your business trades under a different name
 
 businessTradingNameWithoutID.title = What is the trading name of your business?

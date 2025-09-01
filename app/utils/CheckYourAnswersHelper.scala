@@ -30,6 +30,8 @@ class CheckYourAnswersHelper(
 
   def whatIsTradingName: Option[SummaryListRow] = BusinessTradingNameWithoutIDSummary.row(userAnswers)
 
+  def haveTradingName: Option[SummaryListRow] = HaveTradingNameSummary.row(userAnswers)
+
   def selectAddress: Option[SummaryListRow] = IndSelectAddressSummary.row(userAnswers)
 
   def businessWithoutIDName: Option[SummaryListRow] = BusinessNameWithoutIDSummary.row(userAnswers)
@@ -60,6 +62,8 @@ class CheckYourAnswersHelper(
 
   def secondContactPhone: Option[SummaryListRow] = SecondContactPhoneSummary.row(userAnswers)
 
+  def secondContactHavePhone: Option[SummaryListRow] = SecondContactHavePhoneSummary.row(userAnswers)
+
   def secondContactEmail: Option[SummaryListRow] = SecondContactEmailSummary.row(userAnswers)
 
   def sndContactName: Option[SummaryListRow] = SecondContactNameSummary.row(userAnswers)
@@ -68,11 +72,15 @@ class CheckYourAnswersHelper(
 
   def contactPhone: Option[SummaryListRow] = ContactPhoneSummary.row(userAnswers)
 
+  def contactHavePhone: Option[SummaryListRow] = ContactHavePhoneSummary.row(userAnswers)
+
   def contactName: Option[SummaryListRow] = ContactNameSummary.row(userAnswers)
 
   def contactEmail: Option[SummaryListRow] = ContactEmailSummary.row(userAnswers)
 
   def individualContactEmail: Option[SummaryListRow] = IndContactEmailSummary.row(userAnswers)
+
+  def individualContactHavePhone: Option[SummaryListRow] = IndContactHavePhoneSummary.row(userAnswers)
 
   def individualContactPhone: Option[SummaryListRow] = IndContactPhoneSummary.row(userAnswers)
 

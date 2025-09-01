@@ -112,15 +112,8 @@ trait CheckRoutesNavigator extends Logging {
         )
     case IndContactPhonePage    => _ => CheckYourAnswersController.onPageLoad()
     case YourContactDetailsPage => _ => ContactNameController.onPageLoad(CheckMode)
-    case ContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          ContactHavePhonePage,
-          ContactPhoneController.onPageLoad(CheckMode),
-          CheckYourAnswersController.onPageLoad()
-        )
-    case ContactPhonePage => _ => CheckYourAnswersController.onPageLoad()
+    case ContactHavePhonePage   => contactHavePhoneCheckModeNavigation
+    case ContactPhonePage       => _ => CheckYourAnswersController.onPageLoad()
     case HaveSecondContactPage =>
       userAnswers =>
         yesNoNavigate(
@@ -318,8 +311,12 @@ trait CheckRoutesNavigator extends Logging {
 
   private def haveTradingNameRoutes(fromBusinessName: Boolean = false)(ua: UserAnswers): Call =
     ua.get(HaveTradingNamePage) match {
-      case Some(true) => if (fromBusinessName) { businessTradingNameWithoutIDRoutes()(ua) }
-        else { BusinessTradingNameWithoutIDController.onPageLoad(CheckMode) }
+      case Some(true) =>
+        if (fromBusinessName) {
+          businessTradingNameWithoutIDRoutes()(ua)
+        } else {
+          BusinessTradingNameWithoutIDController.onPageLoad(CheckMode)
+        }
       case Some(false) =>
         businessAddressWithoutIdRoutes()(ua)
       case _ =>
@@ -379,5 +376,20 @@ trait CheckRoutesNavigator extends Logging {
       callWhenNotAnswered
     }
   }
+
+  private def contactHavePhoneCheckModeNavigation(userAnswers: UserAnswers): Call =
+    userAnswers.get(ContactHavePhonePage) match {
+      case Some(true) =>
+        userAnswers.get(ContactPhonePage) match {
+          case Some(_) =>
+            CheckYourAnswersController.onPageLoad()
+          case None =>
+            ContactPhoneController.onPageLoad(CheckMode)
+        }
+      case Some(false) =>
+        CheckYourAnswersController.onPageLoad()
+      case None =>
+        JourneyRecoveryController.onPageLoad()
+    }
 
 }

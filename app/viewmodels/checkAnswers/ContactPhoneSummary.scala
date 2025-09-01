@@ -35,7 +35,7 @@ object ContactPhoneSummary {
           key = s"$ContactPhonePage.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            changeAction(ContactPhonePage.toString, routes.ContactHavePhoneController.onPageLoad(CheckMode).url)
+            changeAction(ContactPhonePage.toString, routes.ContactPhoneController.onPageLoad(CheckMode).url)
           )
         )
     }
