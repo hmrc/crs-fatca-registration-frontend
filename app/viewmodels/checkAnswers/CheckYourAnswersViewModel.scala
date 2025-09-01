@@ -116,7 +116,7 @@ object CheckYourAnswersViewModel {
         helper.contactHavePhone
       ).flatten ++ businessPhoneRow
     } else {
-      val individualPhoneRow = helper.userAnswers.get(pages.ContactHavePhonePage).flatMap {
+      val individualPhoneRow = helper.userAnswers.get(pages.IndContactHavePhonePage).flatMap {
         case true  => helper.individualContactPhone
         case false => None
       }
