@@ -116,7 +116,6 @@ object CheckYourAnswersViewModel {
         helper.contactHavePhone
       ).flatten ++ businessPhoneRow
     } else {
-      // This is the individual contact section with the conditional logic for the phone row
       val individualPhoneRow = helper.userAnswers.get(pages.ContactHavePhonePage).flatMap {
         case true  => helper.individualContactPhone
         case false => None
