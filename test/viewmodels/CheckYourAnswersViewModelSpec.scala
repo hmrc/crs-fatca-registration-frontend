@@ -72,7 +72,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
       result(1).rows.size mustBe 3
 
       result(2).sectionName mustBe "Second contact"
-      result(2).rows.size mustBe 4
+      result(2).rows.size mustBe 5
     }
 
     "must return required rows including second contact details for 'business-without-id' registration" in {
@@ -98,14 +98,14 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
         .buildPages(userAnswers, countryListFactory)
 
       result.size mustBe 3
-      result.head.rows.size mustBe 6
+      result.head.rows.size mustBe 7
       result.head.sectionName mustBe "Business details"
 
       result(1).sectionName mustBe "First contact"
       result(1).rows.size mustBe 3
 
       result(2).sectionName mustBe "Second contact"
-      result(2).rows.size mustBe 4
+      result(2).rows.size mustBe 5
     }
 
     "must return required rows including second contact details for auto-matched business" in {
@@ -135,7 +135,7 @@ class CheckYourAnswersViewModelSpec extends SpecBase with GuiceOneAppPerSuite wi
       result(1).rows.size mustBe 3
 
       result(2).sectionName mustBe "Second contact"
-      result(2).rows.size mustBe 4
+      result(2).rows.size mustBe 5
     }
 
     "must return required rows without second contact details for 'individual-with-id' registration" in {

@@ -16,34 +16,26 @@
 
 package viewmodels.checkAnswers
 
-import controllers.organisation.routes
 import models.{CheckMode, UserAnswers}
-import pages.SecondContactPhonePage
+import pages.IndContactHavePhonePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.Util.changeAction
+import viewmodels.checkAnswers.Util.{changeAction, yesOrNo}
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object SecondContactPhoneSummary {
+object IndContactHavePhoneSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(pages.SecondContactHavePhonePage).flatMap {
-      _ =>
-        answers.get(SecondContactPhonePage).orElse(Some("Not provided")).map {
-          answer =>
-            SummaryListRowViewModel(
-              key = s"$SecondContactPhonePage.checkYourAnswersLabel",
-              value = ValueViewModel(HtmlFormat.escape(answer).toString),
-              actions = Seq(
-                changeAction(
-                  SecondContactPhonePage.toString,
-                  routes.SecondContactPhoneController.onPageLoad(CheckMode).url
-                )
-              )
-            )
-        }
+    answers.get(IndContactHavePhonePage).map {
+      answer =>
+        SummaryListRowViewModel(
+          key = s"$IndContactHavePhonePage.checkYourAnswersLabel",
+          value = ValueViewModel(yesOrNo(answer)),
+          actions = Seq(
+            changeAction(IndContactHavePhonePage.toString, controllers.individual.routes.IndContactHavePhoneController.onPageLoad(CheckMode).url)
+          )
+        )
     }
 
 }

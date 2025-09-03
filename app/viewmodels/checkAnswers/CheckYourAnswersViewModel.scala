@@ -63,6 +63,15 @@ object CheckYourAnswersViewModel {
         helper.businessConfirmation
       ).flatten
     } else {
+      val tradingNameRows = if (isBusiness) {
+        val haveTradingNameRow = helper.haveTradingName
+        val whatIsTradingNameRow = userAnswers.get(pages.HaveTradingNamePage).flatMap {
+          case true  => helper.whatIsTradingName
+          case false => None
+        }
+        haveTradingNameRow ++ whatIsTradingNameRow
+      } else None
+
       Seq(
         helper.reporterType,
         helper.registeredAddressInUk,
@@ -74,26 +83,48 @@ object CheckYourAnswersViewModel {
         helper.nonUkName,
         helper.whatIsYourDateOfBirth,
         helper.dateOfBirthWithoutId,
-        helper.businessWithoutIDName,
-        if (isBusiness) helper.whatIsTradingName else None,
-        if (isBusiness) helper.businessAddressWithoutID else helper.individualAddressWithoutID,
-        helper.selectAddress
-      ).flatten
+        helper.businessWithoutIDName
+      ).flatten ++ tradingNameRows ++
+        Seq(
+          if (isBusiness) helper.businessAddressWithoutID else helper.individualAddressWithoutID,
+          helper.selectAddress
+        ).flatten
     }
 
-  private def buildSecondContact(helper: CheckYourAnswersHelper): Seq[SummaryListRow] =
+  private def buildSecondContact(helper: CheckYourAnswersHelper): Seq[SummaryListRow] = {
+    val secondContactPhoneRow = helper.userAnswers.get(pages.SecondContactHavePhonePage).flatMap {
+      case true  => helper.secondContactPhone
+      case false => None
+    }
     Seq(
       helper.secondContact,
       helper.sndContactName,
       helper.secondContactEmail,
-      helper.secondContactPhone
-    ).flatten
+      helper.secondContactHavePhone
+    ).flatten ++ secondContactPhoneRow
+  }
 
   private def buildFirstContact(helper: CheckYourAnswersHelper, isBusiness: Boolean): Seq[SummaryListRow] =
     if (isBusiness) {
-      Seq(helper.contactName, helper.contactEmail, helper.contactPhone).flatten
+      val businessPhoneRow = helper.userAnswers.get(pages.ContactHavePhonePage).flatMap {
+        case true  => helper.contactPhone
+        case false => None
+      }
+      Seq(
+        helper.contactName,
+        helper.contactEmail,
+        helper.contactHavePhone
+      ).flatten ++ businessPhoneRow
     } else {
-      Seq(helper.contactName, helper.individualContactEmail, helper.individualContactPhone).flatten
+      val individualPhoneRow = helper.userAnswers.get(pages.IndContactHavePhonePage).flatMap {
+        case true  => helper.individualContactPhone
+        case false => None
+      }
+      Seq(
+        helper.contactName,
+        helper.individualContactEmail,
+        helper.individualContactHavePhone
+      ).flatten ++ individualPhoneRow
     }
 
 }
