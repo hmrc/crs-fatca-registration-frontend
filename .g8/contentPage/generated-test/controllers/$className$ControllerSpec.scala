@@ -25,4 +25,5 @@ class $className$ControllerSpec extends SpecBase {
       }
     }
   }
+
 }
