@@ -34,7 +34,7 @@ object SecondContactHavePhoneSummary {
           key = s"$SecondContactHavePhonePage.checkYourAnswersLabel",
           value = ValueViewModel(yesOrNo(answer)),
           actions = Seq(
-            changeAction(SecondContactHavePhonePage.toString, routes.ContactHavePhoneController.onPageLoad(CheckMode).url)
+            changeAction(SecondContactHavePhonePage.toString, routes.SecondContactHavePhoneController.onPageLoad(CheckMode).url)
           )
         )
     }
