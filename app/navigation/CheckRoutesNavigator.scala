@@ -150,18 +150,11 @@ trait CheckRoutesNavigator extends Logging {
           CheckYourAnswersController.onPageLoad()
         )
     case SecondContactPhonePage => _ => CheckYourAnswersController.onPageLoad()
-    // org pages are these used?
-    case OrganisationContactNamePage  => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
-    case OrganisationContactEmailPage => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
-    case OrganisationContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          OrganisationContactHavePhonePage,
-          controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(CheckMode),
-          controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
-        )
-    case OrganisationContactPhonePage => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+
+    case OrganisationContactNamePage      => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
+    case OrganisationContactEmailPage     => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
+    case OrganisationContactHavePhonePage => orgContactHavePhoneRoutes()
+    case OrganisationContactPhonePage     => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
     case OrganisationHaveSecondContactPage =>
       userAnswers =>
         yesNoPage(
@@ -172,27 +165,12 @@ trait CheckRoutesNavigator extends Logging {
         )
     case OrganisationSecondContactNamePage  => _ => controllers.changeContactDetails.routes.OrganisationSecondContactEmailController.onPageLoad(CheckMode)
     case OrganisationSecondContactEmailPage => _ => controllers.changeContactDetails.routes.OrganisationSecondContactHavePhoneController.onPageLoad(CheckMode)
-    case OrganisationSecondContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          OrganisationSecondContactHavePhonePage,
-          controllers.changeContactDetails.routes.OrganisationSecondContactPhoneController.onPageLoad(CheckMode),
-          controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
-        )
-    case OrganisationSecondContactPhonePage => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
-    // org pages
+    case OrganisationSecondContactHavePhonePage => orgSecondContactHavePhoneRoutes()
+    case OrganisationSecondContactPhonePage     => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
 
-    case IndividualEmailPage => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(CheckMode)
-    case IndividualHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          IndividualHavePhonePage,
-          controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(CheckMode),
-          controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
-        )
-    case IndividualPhonePage => _ => controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
+    case IndividualEmailPage     => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(CheckMode)
+    case IndividualHavePhonePage => indContactHavePhoneRoutes()
+    case IndividualPhonePage     => _ => controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
 
     case _ => _ => CheckYourAnswersController.onPageLoad()
   }
@@ -210,6 +188,34 @@ trait CheckRoutesNavigator extends Logging {
 
   private def yesNoNavigate(check: => Boolean, yesCall: => Call, noCall: => Call): Call = if (check) yesCall else noCall
 
+  private def indContactHavePhoneRoutes()(ua: UserAnswers): Call =
+    yesNoPage(
+      ua,
+      IndividualHavePhonePage,
+      if (ua.get(IndividualPhonePage).isDefined) {
+        controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
+      } else { controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(CheckMode) },
+      controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
+    )
+
+  private def orgContactHavePhoneRoutes()(ua: UserAnswers): Call = yesNoPage(
+    ua,
+    OrganisationContactHavePhonePage,
+    if (ua.get(OrganisationContactPhonePage).isDefined) {
+      controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    } else { controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(CheckMode) },
+    controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+  )
+
+  private def orgSecondContactHavePhoneRoutes()(ua: UserAnswers): Call = yesNoPage(
+    ua,
+    OrganisationSecondContactHavePhonePage,
+    if (ua.get(OrganisationSecondContactPhonePage).isDefined) {
+      controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    } else { controllers.changeContactDetails.routes.OrganisationSecondContactPhoneController.onPageLoad(CheckMode) },
+    controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+  )
+
   private def whatAreYouReportingAsRoutes()(ua: UserAnswers): Call =
     ua.get(ReporterTypePage) match {
       case Some(Individual) => checkRoutes(IndDoYouHaveNINumberPage)(ua)
@@ -218,7 +224,7 @@ trait CheckRoutesNavigator extends Logging {
       case None    => JourneyRecoveryController.onPageLoad()
     }
 
-  private def registeredAddressInUKRoutes()(ua: UserAnswers): Call = // TEST
+  private def registeredAddressInUKRoutes()(ua: UserAnswers): Call =
     ua.get(RegisteredAddressInUKPage) match {
       case Some(true)  => WhatIsYourUTRController.onPageLoad(CheckMode)
       case Some(false) => DoYouHaveUniqueTaxPayerReferenceController.onPageLoad(CheckMode)
