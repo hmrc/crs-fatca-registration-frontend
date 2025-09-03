@@ -564,6 +564,7 @@ individualHavePhone.heading = Can we contact you by telephone?
 individualHavePhone.checkYourAnswersLabel = Can we contact you by telephone
 individualHavePhone.p1 = We will call if we have any questions about your reports.
 individualHavePhone.error.required = Select yes if we can contact you by telephone
+individualHavePhone.change.hidden = Change if we can contact you by telephone
 
 individualPhone.title = What is your telephone number?
 individualPhone.heading = What is your telephone number?
@@ -597,6 +598,7 @@ organisationContactHavePhone.heading = Can we contact {0} by telephone?
 organisationContactHavePhone.p1 = We will call if we have any questions about your reports.
 organisationContactHavePhone.error.required = Select yes if they can be contacted by telephone
 organisationContactHavePhone.checkYourAnswersLabel = Can we contact the first contact by telephone?
+organisationContactHavePhone.change.hidden = Change if we can contact the first contact by telephone
 
 organisationContactPhone.title = What is the telephone number for the first contact?
 organisationContactPhone.heading = What is the telephone number for {0}?
@@ -637,6 +639,8 @@ organisationSecondContactHavePhone.heading = Can we contact {0} by telephone?
 organisationSecondContactHavePhone.p1 = We will call if we have any questions about your reports.
 organisationSecondContactHavePhone.error.required = Select yes if they can be contacted by telephone
 organisationSecondContactHavePhone.checkYourAnswersLabel = Can we contact the second contact by telephone?
+organisationSecondContactHavePhone.change.hidden = Change if we can contact the second contact by telephone
+
 
 organisationSecondContactPhone.title = What is the telephone number for the second contact?
 organisationSecondContactPhone.heading = What is the telephone number for {0}?
