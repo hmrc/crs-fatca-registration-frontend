@@ -134,14 +134,7 @@ trait CheckRoutesNavigator extends Logging {
           CheckYourAnswersController.onPageLoad(),
           SecondContactHavePhoneController.onPageLoad(CheckMode)
         )
-    case SecondContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          SecondContactHavePhonePage,
-          SecondContactPhoneController.onPageLoad(CheckMode),
-          CheckYourAnswersController.onPageLoad()
-        )
+    case SecondContactHavePhonePage => secondContactHavePhoneCheckModeNavigation
     case SecondContactPhonePage => _ => CheckYourAnswersController.onPageLoad()
     // org pages are these used?
     case OrganisationContactNamePage  => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
@@ -315,7 +308,12 @@ trait CheckRoutesNavigator extends Logging {
         if (fromBusinessName) {
           businessTradingNameWithoutIDRoutes()(ua)
         } else {
-          BusinessTradingNameWithoutIDController.onPageLoad(CheckMode)
+          checkNextPageForValueThenRoute(
+            ua,
+            BusinessTradingNameWithoutIDPage,
+            BusinessTradingNameWithoutIDController.onPageLoad(CheckMode),
+            CheckYourAnswersController.onPageLoad()
+          )
         }
       case Some(false) =>
         businessAddressWithoutIdRoutes()(ua)
@@ -385,6 +383,21 @@ trait CheckRoutesNavigator extends Logging {
             CheckYourAnswersController.onPageLoad()
           case None =>
             ContactPhoneController.onPageLoad(CheckMode)
+        }
+      case Some(false) =>
+        CheckYourAnswersController.onPageLoad()
+      case None =>
+        JourneyRecoveryController.onPageLoad()
+    }
+
+  private def secondContactHavePhoneCheckModeNavigation(userAnswers: UserAnswers): Call =
+    userAnswers.get(SecondContactHavePhonePage) match {
+      case Some(true) =>
+        userAnswers.get(SecondContactPhonePage) match {
+          case Some(_) =>
+            CheckYourAnswersController.onPageLoad()
+          case None =>
+            SecondContactPhoneController.onPageLoad(CheckMode)
         }
       case Some(false) =>
         CheckYourAnswersController.onPageLoad()
