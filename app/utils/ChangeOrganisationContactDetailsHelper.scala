@@ -17,6 +17,7 @@
 package utils
 
 import models.UserAnswers
+import pages.changeContactDetails.{OrganisationContactHavePhonePage, OrganisationSecondContactHavePhonePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.changeContactDetails._
@@ -27,7 +28,13 @@ class ChangeOrganisationContactDetailsHelper(userAnswers: UserAnswers, countryLi
 
   def changeOrganisationContactEmail: Option[SummaryListRow] = OrganisationContactEmailSummary.row(userAnswers)
 
-  def changeOrganisationContactPhone: Option[SummaryListRow] = Option(OrganisationContactPhoneSummary.row(userAnswers))
+  def changeOrganisationContactHavePhone: Option[SummaryListRow] = OrganisationContactHavePhoneSummary.row(userAnswers)
+
+  def changeOrganisationContactPhone: Option[SummaryListRow] =
+    userAnswers.get(OrganisationContactHavePhonePage) match {
+      case Some(true) => Some(OrganisationContactPhoneSummary.row(userAnswers))
+      case _          => None
+    }
 
   def changeOrganisationHaveSecondContact: Option[SummaryListRow] = OrganisationHaveSecondContactSummary.row(userAnswers)
 
@@ -35,11 +42,17 @@ class ChangeOrganisationContactDetailsHelper(userAnswers: UserAnswers, countryLi
 
   def changeOrganisationSecondContactEmail: Option[SummaryListRow] = OrganisationSecondContactEmailSummary.row(userAnswers)
 
-  def changeOrganisationSecondContactPhone: Option[SummaryListRow] = OrganisationSecondContactPhoneSummary.row(userAnswers)
+  def changeOrganisationSecondContactHavePhone: Option[SummaryListRow] = OrganisationSecondContactHavePhoneSummary.row(userAnswers)
+
+  def changeOrganisationSecondContactPhone: Option[SummaryListRow] = userAnswers.get(OrganisationSecondContactHavePhonePage) match {
+    case Some(true) => OrganisationSecondContactPhoneSummary.row(userAnswers)
+    case _          => None
+  }
 
   def changeOrganisationPrimaryContactDetails: Seq[SummaryListRow] = Seq(
     changeOrganisationContactName,
     changeOrganisationContactEmail,
+    changeOrganisationContactHavePhone,
     changeOrganisationContactPhone
   ).flatten
 
@@ -47,6 +60,7 @@ class ChangeOrganisationContactDetailsHelper(userAnswers: UserAnswers, countryLi
     changeOrganisationHaveSecondContact,
     changeOrganisationSecondContactName,
     changeOrganisationSecondContactEmail,
+    changeOrganisationSecondContactHavePhone,
     changeOrganisationSecondContactPhone
   ).flatten
 
