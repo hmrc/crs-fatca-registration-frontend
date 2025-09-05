@@ -565,7 +565,7 @@ individualEmail.change.hidden = Change email address
 
 individualHavePhone.title = Can we contact you by telephone?
 individualHavePhone.heading = Can we contact you by telephone?
-individualHavePhone.checkYourAnswersLabel = Can we contact you by telephone
+individualHavePhone.checkYourAnswersLabel = Can we contact you by telephone?
 individualHavePhone.p1 = We will call if we have any questions about your reports.
 individualHavePhone.error.required = Select yes if we can contact you by telephone
 individualHavePhone.change.hidden = Change if we can contact you by telephone
