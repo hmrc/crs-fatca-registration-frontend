@@ -177,13 +177,21 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
           .mustBe(controllers.organisation.routes.HaveTradingNameController.onPageLoad(CheckMode))
       }
 
-      "must go from HaveTradingNamePage to BusinessTradingNameWithoutID when user says Yes" in {
+      "must go from HaveTradingNamePage to BusinessTradingNameWithoutID when user says Yes and trading name is missing" in {
+        val userAnswers = emptyUserAnswers
+          .withPage(HaveTradingNamePage, true)
+        navigator
+          .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
+          .mustBe(controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode))
+      }
+
+      "must go from HaveTradingNamePage to CheckYourAnswers when user says Yes and trading name is already provided" in {
         val userAnswers = emptyUserAnswers
           .withPage(HaveTradingNamePage, true)
           .withPage(BusinessTradingNameWithoutIDPage, "someName")
         navigator
           .nextPage(HaveTradingNamePage, CheckMode, userAnswers)
-          .mustBe(controllers.organisation.routes.BusinessTradingNameWithoutIDController.onPageLoad(CheckMode))
+          .mustBe(controllers.routes.CheckYourAnswersController.onPageLoad())
       }
 
       "must go from HaveTradingNamePage to NonUKBusinessAddressWithoutIDPage when user says No and NonUKBusinessAddressWithoutIDPage is not populated" in {
