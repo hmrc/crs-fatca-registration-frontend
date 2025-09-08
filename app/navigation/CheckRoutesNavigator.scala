@@ -128,7 +128,7 @@ trait CheckRoutesNavigator extends Logging {
           SecondContactHavePhoneController.onPageLoad(CheckMode)
         )
     case SecondContactHavePhonePage => secondContactHavePhoneCheckModeNavigation
-    case SecondContactPhonePage => _ => CheckYourAnswersController.onPageLoad()
+    case SecondContactPhonePage     => _ => CheckYourAnswersController.onPageLoad()
 
     case OrganisationContactNamePage      => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
     case OrganisationContactEmailPage     => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
@@ -418,4 +418,5 @@ trait CheckRoutesNavigator extends Logging {
       case None =>
         JourneyRecoveryController.onPageLoad()
     }
+
 }
