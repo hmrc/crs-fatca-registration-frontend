@@ -102,18 +102,11 @@ trait CheckRoutesNavigator extends Logging {
           IndContactEmailPage,
           IndContactEmailController.onPageLoad(NormalMode)
         )
-    case IndContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          IndContactHavePhonePage,
-          IndContactPhoneController.onPageLoad(CheckMode),
-          CheckYourAnswersController.onPageLoad()
-        )
-    case IndContactPhonePage    => _ => CheckYourAnswersController.onPageLoad()
-    case YourContactDetailsPage => _ => ContactNameController.onPageLoad(CheckMode)
-    case ContactHavePhonePage   => contactHavePhoneCheckModeNavigation
-    case ContactPhonePage       => _ => CheckYourAnswersController.onPageLoad()
+    case IndContactHavePhonePage => indContactHavePhoneCheckModeNavigation
+    case IndContactPhonePage     => _ => CheckYourAnswersController.onPageLoad()
+    case YourContactDetailsPage  => _ => ContactNameController.onPageLoad(CheckMode)
+    case ContactHavePhonePage    => contactHavePhoneCheckModeNavigation
+    case ContactPhonePage        => _ => CheckYourAnswersController.onPageLoad()
     case HaveSecondContactPage =>
       userAnswers =>
         yesNoNavigate(
@@ -134,15 +127,8 @@ trait CheckRoutesNavigator extends Logging {
           CheckYourAnswersController.onPageLoad(),
           SecondContactHavePhoneController.onPageLoad(CheckMode)
         )
-    case SecondContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          SecondContactHavePhonePage,
-          SecondContactPhoneController.onPageLoad(CheckMode),
-          CheckYourAnswersController.onPageLoad()
-        )
-    case SecondContactPhonePage => _ => CheckYourAnswersController.onPageLoad()
+    case SecondContactHavePhonePage => secondContactHavePhoneCheckModeNavigation
+    case SecondContactPhonePage     => _ => CheckYourAnswersController.onPageLoad()
 
     case OrganisationContactNamePage      => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
     case OrganisationContactEmailPage     => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
@@ -321,7 +307,12 @@ trait CheckRoutesNavigator extends Logging {
         if (fromBusinessName) {
           businessTradingNameWithoutIDRoutes()(ua)
         } else {
-          BusinessTradingNameWithoutIDController.onPageLoad(CheckMode)
+          checkNextPageForValueThenRoute(
+            ua,
+            BusinessTradingNameWithoutIDPage,
+            BusinessTradingNameWithoutIDController.onPageLoad(CheckMode),
+            CheckYourAnswersController.onPageLoad()
+          )
         }
       case Some(false) =>
         businessAddressWithoutIdRoutes()(ua)
@@ -391,6 +382,36 @@ trait CheckRoutesNavigator extends Logging {
             CheckYourAnswersController.onPageLoad()
           case None =>
             ContactPhoneController.onPageLoad(CheckMode)
+        }
+      case Some(false) =>
+        CheckYourAnswersController.onPageLoad()
+      case None =>
+        JourneyRecoveryController.onPageLoad()
+    }
+
+  private def secondContactHavePhoneCheckModeNavigation(userAnswers: UserAnswers): Call =
+    userAnswers.get(SecondContactHavePhonePage) match {
+      case Some(true) =>
+        userAnswers.get(SecondContactPhonePage) match {
+          case Some(_) =>
+            CheckYourAnswersController.onPageLoad()
+          case None =>
+            SecondContactPhoneController.onPageLoad(CheckMode)
+        }
+      case Some(false) =>
+        CheckYourAnswersController.onPageLoad()
+      case None =>
+        JourneyRecoveryController.onPageLoad()
+    }
+
+  private def indContactHavePhoneCheckModeNavigation(userAnswers: UserAnswers): Call =
+    userAnswers.get(IndContactHavePhonePage) match {
+      case Some(true) =>
+        userAnswers.get(IndContactPhonePage) match {
+          case Some(_) =>
+            CheckYourAnswersController.onPageLoad()
+          case None =>
+            IndContactPhoneController.onPageLoad(CheckMode)
         }
       case Some(false) =>
         CheckYourAnswersController.onPageLoad()
