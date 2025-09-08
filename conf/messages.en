@@ -159,7 +159,7 @@ indContactHavePhone.heading = Can we contact you by telephone?
 indContactHavePhone.p1 = We will call if we have any questions about your reports.
 indContactHavePhone.checkYourAnswersLabel = Can we contact you by telephone?
 indContactHavePhone.error.required = Select yes if we can contact you by telephone
-indContactHavePhone.change.hidden = Change if we contact you by telephone
+indContactHavePhone.change.hidden = Change if we can contact you by telephone
 
 indContactPhone.title = What is your telephone number?
 indContactPhone.heading = What is your telephone number?
