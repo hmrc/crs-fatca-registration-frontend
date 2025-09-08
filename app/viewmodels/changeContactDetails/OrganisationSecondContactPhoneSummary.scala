@@ -40,7 +40,7 @@ object OrganisationSecondContactPhoneSummary {
           actions = Seq(
             changeAction(
               OrganisationSecondContactPhonePage.toString,
-              controllers.changeContactDetails.routes.OrganisationSecondContactHavePhoneController.onPageLoad(CheckMode).url
+              controllers.changeContactDetails.routes.OrganisationSecondContactPhoneController.onPageLoad(CheckMode).url
             )
           )
         )

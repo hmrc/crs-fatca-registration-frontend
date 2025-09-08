@@ -17,28 +17,30 @@
 package viewmodels.changeContactDetails
 
 import models.{CheckMode, UserAnswers}
-import pages.changeContactDetails.OrganisationContactPhonePage
+import pages.changeContactDetails.{IndividualHavePhonePage, OrganisationContactHavePhonePage}
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.Util.changeAction
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object OrganisationContactPhoneSummary {
+object IndividualContactHavePhoneSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
-    val orgContactPhone = answers.get(OrganisationContactPhonePage).getOrElse(messages("checkYourAnswers.notProvided"))
-    SummaryListRowViewModel(
-      key = s"$OrganisationContactPhonePage.checkYourAnswersLabel",
-      value = ValueViewModel(HtmlFormat.escape(orgContactPhone).toString),
-      actions = Seq(
-        changeAction(
-          OrganisationContactPhonePage.toString,
-          controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(CheckMode).url
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(IndividualHavePhonePage).map {
+      answer =>
+        val value = if (answer) "site.yes" else "site.no"
+
+        SummaryListRowViewModel(
+          key = s"$IndividualHavePhonePage.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            changeAction(
+              IndividualHavePhonePage.toString,
+              controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(CheckMode).url
+            )
+          )
         )
-      )
-    )
-  }
+    }
 
 }

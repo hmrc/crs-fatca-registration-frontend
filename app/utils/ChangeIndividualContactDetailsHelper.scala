@@ -17,6 +17,7 @@
 package utils
 
 import models.UserAnswers
+import pages.changeContactDetails.IndividualHavePhonePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.changeContactDetails._
@@ -25,10 +26,17 @@ class ChangeIndividualContactDetailsHelper(userAnswers: UserAnswers)(implicit me
 
   def changeIndividualContactEmail: Option[SummaryListRow] = IndividualContactEmailSummary.row(userAnswers)
 
-  def changeIndividualContactPhone: Option[SummaryListRow] = Option(IndividualContactPhoneSummary.row(userAnswers))
+  def changeIndividualHavePhone: Option[SummaryListRow] = IndividualContactHavePhoneSummary.row(userAnswers)
+
+  def changeIndividualContactPhone: Option[SummaryListRow] =
+    userAnswers.get(IndividualHavePhonePage) match {
+      case Some(true) => Option(IndividualContactPhoneSummary.row(userAnswers))
+      case _          => None
+    }
 
   def changeIndividualContactDetails: Seq[SummaryListRow] = Seq(
     changeIndividualContactEmail,
+    changeIndividualHavePhone,
     changeIndividualContactPhone
   ).flatten
 

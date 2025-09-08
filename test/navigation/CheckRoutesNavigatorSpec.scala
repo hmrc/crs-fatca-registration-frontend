@@ -415,10 +415,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
 
       "must go from IndContactHavePhonePage to IndContactPhonePage when user answers Yes" in {
         val userAnswers = emptyUserAnswers
-          .set(IndContactHavePhonePage, true)
-          .success
-          .value
-
+          .withPage(IndContactHavePhonePage, true)
         navigator
           .nextPage(IndContactHavePhonePage, CheckMode, userAnswers)
           .mustBe(controllers.individual.routes.IndContactPhoneController.onPageLoad(CheckMode))
@@ -705,10 +702,19 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
           .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
       }
 
-      "must go from OrganisationContactHavePhonePage to OrganisationContactPhonePage when user answers yes" in {
+      "must go from OrganisationContactHavePhonePage to OrganisationContactPhonePage when user answers yes and there is no number" in {
         navigator
           .nextPage(OrganisationContactHavePhonePage, CheckMode, emptyUserAnswers.withPage(OrganisationContactHavePhonePage, true))
           .mustBe(controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(CheckMode))
+      }
+      "must go from OrganisationContactHavePhonePage to ChangeOrganisationContactDetailsPage when user answers yes and there is a number" in {
+        navigator
+          .nextPage(
+            OrganisationContactHavePhonePage,
+            CheckMode,
+            emptyUserAnswers.withPage(OrganisationContactHavePhonePage, true).withPage(OrganisationContactPhonePage, "1234567890")
+          )
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
       }
 
       "must go from OrganisationContactPhonePage to ChangeOrganisationContactDetailsPage" in {
@@ -746,11 +752,19 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
           .nextPage(OrganisationSecondContactHavePhonePage, CheckMode, emptyUserAnswers.withPage(OrganisationSecondContactHavePhonePage, false))
           .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
       }
-
-      "must go from OrganisationSecondContactHavePhonePage to OrganisationSecondContactPhonePage when user answers yes" in {
+      "must go from OrganisationSecondContactHavePhonePage to OrganisationSecondContactPhonePage when user answers yes and there is no number" in {
         navigator
           .nextPage(OrganisationSecondContactHavePhonePage, CheckMode, emptyUserAnswers.withPage(OrganisationSecondContactHavePhonePage, true))
           .mustBe(controllers.changeContactDetails.routes.OrganisationSecondContactPhoneController.onPageLoad(CheckMode))
+      }
+      "must go from OrganisationSecondContactHavePhonePage to OrganisationSecondContactPhonePage when user answers yes and there is a number" in {
+        navigator
+          .nextPage(
+            OrganisationSecondContactHavePhonePage,
+            CheckMode,
+            emptyUserAnswers.withPage(OrganisationSecondContactHavePhonePage, true).withPage(OrganisationSecondContactPhonePage, "1234567890")
+          )
+          .mustBe(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad())
       }
 
       "must go from OrganisationSecondContactPhonePage to ChangeOrganisationContactDetailsPage" in {
@@ -772,10 +786,15 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
             .mustBe(controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad())
         }
 
-        "must go from IndividualHavePhonePage to IndividualPhonePage when user answers yes" in {
+        "must go from IndividualHavePhonePage to IndividualPhonePage when user answers yes and there is no number" in {
           navigator
             .nextPage(IndividualHavePhonePage, CheckMode, emptyUserAnswers.withPage(IndividualHavePhonePage, true))
             .mustBe(controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(CheckMode))
+        }
+        "must go from IndividualHavePhonePage to ChangeIndividualContactDetailsPage when user answers yes and there is a number" in {
+          navigator
+            .nextPage(IndividualHavePhonePage, CheckMode, emptyUserAnswers.withPage(IndividualHavePhonePage, true).withPage(IndividualPhonePage, "1234567890"))
+            .mustBe(controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad())
         }
 
         "must go from IndividualPhonePage to ChangeIndividualContactDetailsPage" in {
