@@ -159,7 +159,7 @@ indContactHavePhone.heading = Can we contact you by telephone?
 indContactHavePhone.p1 = We will call if we have any questions about your reports.
 indContactHavePhone.checkYourAnswersLabel = Can we contact you by telephone?
 indContactHavePhone.error.required = Select yes if we can contact you by telephone
-indContactHavePhone.change.hidden = Change if we contact you by telephone?
+indContactHavePhone.change.hidden = Change if we contact you by telephone
 
 indContactPhone.title = What is your telephone number?
 indContactPhone.heading = What is your telephone number?
@@ -168,7 +168,7 @@ indContactPhone.checkYourAnswersLabel = Telephone number
 indContactPhone.error.required = Enter your telephone number
 indContactPhone.error.invalid = The telephone number must only include numbers 0 to 9 and a plus sign, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 indContactPhone.error.length = The telephone number must be 24 characters or less
-indContactPhone.change.hidden = Can we contact you by telephone number
+indContactPhone.change.hidden = Change telephone number
 
 indDateOfBirth.title = What is your date of birth?
 indDateOfBirth.heading = What is your date of birth?

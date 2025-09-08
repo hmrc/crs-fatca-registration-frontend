@@ -102,18 +102,11 @@ trait CheckRoutesNavigator extends Logging {
           IndContactEmailPage,
           IndContactEmailController.onPageLoad(NormalMode)
         )
-    case IndContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          IndContactHavePhonePage,
-          IndContactPhoneController.onPageLoad(CheckMode),
-          CheckYourAnswersController.onPageLoad()
-        )
-    case IndContactPhonePage    => _ => CheckYourAnswersController.onPageLoad()
-    case YourContactDetailsPage => _ => ContactNameController.onPageLoad(CheckMode)
-    case ContactHavePhonePage   => contactHavePhoneCheckModeNavigation
-    case ContactPhonePage       => _ => CheckYourAnswersController.onPageLoad()
+    case IndContactHavePhonePage => indContactHavePhoneCheckModeNavigation
+    case IndContactPhonePage     => _ => CheckYourAnswersController.onPageLoad()
+    case YourContactDetailsPage  => _ => ContactNameController.onPageLoad(CheckMode)
+    case ContactHavePhonePage    => contactHavePhoneCheckModeNavigation
+    case ContactPhonePage        => _ => CheckYourAnswersController.onPageLoad()
     case HaveSecondContactPage =>
       userAnswers =>
         yesNoNavigate(
@@ -137,17 +130,10 @@ trait CheckRoutesNavigator extends Logging {
     case SecondContactHavePhonePage => secondContactHavePhoneCheckModeNavigation
     case SecondContactPhonePage => _ => CheckYourAnswersController.onPageLoad()
     // org pages are these used?
-    case OrganisationContactNamePage  => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
-    case OrganisationContactEmailPage => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
-    case OrganisationContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          OrganisationContactHavePhonePage,
-          controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(CheckMode),
-          controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
-        )
-    case OrganisationContactPhonePage => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    case OrganisationContactNamePage      => _ => controllers.changeContactDetails.routes.OrganisationContactEmailController.onPageLoad(CheckMode)
+    case OrganisationContactEmailPage     => _ => controllers.changeContactDetails.routes.OrganisationContactHavePhoneController.onPageLoad(CheckMode)
+    case OrganisationContactHavePhonePage => organisationContactHavePhoneCheckModeNavigation
+    case OrganisationContactPhonePage     => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
     case OrganisationHaveSecondContactPage =>
       userAnswers =>
         yesNoPage(
@@ -158,27 +144,13 @@ trait CheckRoutesNavigator extends Logging {
         )
     case OrganisationSecondContactNamePage  => _ => controllers.changeContactDetails.routes.OrganisationSecondContactEmailController.onPageLoad(CheckMode)
     case OrganisationSecondContactEmailPage => _ => controllers.changeContactDetails.routes.OrganisationSecondContactHavePhoneController.onPageLoad(CheckMode)
-    case OrganisationSecondContactHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          OrganisationSecondContactHavePhonePage,
-          controllers.changeContactDetails.routes.OrganisationSecondContactPhoneController.onPageLoad(CheckMode),
-          controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
-        )
+    case OrganisationSecondContactHavePhonePage => organisationSecondContactHavePhoneCheckModeNavigation
     case OrganisationSecondContactPhonePage => _ => controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
     // org pages
 
-    case IndividualEmailPage => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(CheckMode)
-    case IndividualHavePhonePage =>
-      userAnswers =>
-        yesNoPage(
-          userAnswers,
-          IndividualHavePhonePage,
-          controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(CheckMode),
-          controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
-        )
-    case IndividualPhonePage => _ => controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
+    case IndividualEmailPage     => _ => controllers.changeContactDetails.routes.IndividualHavePhoneController.onPageLoad(CheckMode)
+    case IndividualHavePhonePage => individualHavePhoneCheckModeNavigation
+    case IndividualPhonePage     => _ => controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
 
     case _ => _ => CheckYourAnswersController.onPageLoad()
   }
@@ -403,6 +375,66 @@ trait CheckRoutesNavigator extends Logging {
         CheckYourAnswersController.onPageLoad()
       case None =>
         JourneyRecoveryController.onPageLoad()
+    }
+
+  private def indContactHavePhoneCheckModeNavigation(userAnswers: UserAnswers): Call =
+    userAnswers.get(IndContactHavePhonePage) match {
+      case Some(true) =>
+        userAnswers.get(IndContactPhonePage) match {
+          case Some(_) =>
+            CheckYourAnswersController.onPageLoad()
+          case None =>
+            IndContactPhoneController.onPageLoad(CheckMode)
+        }
+      case Some(false) =>
+        CheckYourAnswersController.onPageLoad()
+      case None =>
+        JourneyRecoveryController.onPageLoad()
+    }
+
+  private def organisationContactHavePhoneCheckModeNavigation(userAnswers: UserAnswers): Call =
+    userAnswers.get(OrganisationContactHavePhonePage) match {
+      case Some(true) =>
+        userAnswers.get(OrganisationContactPhonePage) match {
+          case Some(_) =>
+            controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+          case None =>
+            controllers.changeContactDetails.routes.OrganisationContactPhoneController.onPageLoad(CheckMode)
+        }
+      case Some(false) =>
+        controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+      case None =>
+        controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad() // Or JourneyRecoveryController.onPageLoad()
+    }
+
+  private def organisationSecondContactHavePhoneCheckModeNavigation(userAnswers: UserAnswers): Call =
+    userAnswers.get(OrganisationSecondContactHavePhonePage) match {
+      case Some(true) =>
+        userAnswers.get(OrganisationSecondContactPhonePage) match {
+          case Some(_) =>
+            controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+          case None =>
+            controllers.changeContactDetails.routes.OrganisationSecondContactPhoneController.onPageLoad(CheckMode)
+        }
+      case Some(false) =>
+        controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+      case None =>
+        controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()
+    }
+
+  private def individualHavePhoneCheckModeNavigation(userAnswers: UserAnswers): Call =
+    userAnswers.get(IndividualHavePhonePage) match {
+      case Some(true) =>
+        userAnswers.get(IndividualPhonePage) match {
+          case Some(_) =>
+            controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
+          case None =>
+            controllers.changeContactDetails.routes.IndividualPhoneController.onPageLoad(CheckMode)
+        }
+      case Some(false) =>
+        controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
+      case None =>
+        controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()
     }
 
 }
