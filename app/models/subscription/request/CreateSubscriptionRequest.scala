@@ -73,5 +73,4 @@ object CreateSubscriptionRequest extends UserAnswersHelper {
 
     businessHasUtr || individualHasNino || individualAddressLookupIsGb || individualManualAddressIsGb
   }
-
 }
