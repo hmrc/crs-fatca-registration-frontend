@@ -36,6 +36,16 @@ object CreateSubscriptionRequest extends UserAnswersHelper {
   implicit val reads: Reads[CreateSubscriptionRequest]   = Json.reads[CreateSubscriptionRequest]
   implicit val writes: Writes[CreateSubscriptionRequest] = Json.writes[CreateSubscriptionRequest]
 
+  private def extractTradingName(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(BusinessNamePage)
+      .orElse(userAnswers.get(BusinessNameWithoutIDPage))
+      .orElse(userAnswers.get(BusinessTradingNameWithoutIDPage))
+      .orElse {
+        userAnswers.get(RegistrationInfoPage).collect {
+          case org: OrgRegistrationInfo => org.name
+        }
+      }
+
   def buildSubscriptionRequest(safeId: SafeId, userAnswers: UserAnswers, affinityGroup: AffinityGroup): Option[CreateSubscriptionRequest] = {
     for {
       primaryContact <- ContactInformation.convertToPrimary(userAnswers)
@@ -45,12 +55,7 @@ object CreateSubscriptionRequest extends UserAnswersHelper {
           CreateSubscriptionRequest(
             idType = IdentifierType.SAFE,
             idNumber = safeId.value,
-            tradingName = (userAnswers.get(BusinessNamePage), userAnswers.get(BusinessTradingNameWithoutIDPage), userAnswers.get(RegistrationInfoPage)) match {
-              case (Some(businessName), _, _)             => Some(businessName)
-              case (_, Some(tradingName), _)              => Some(tradingName)
-              case (_, _, Some(org: OrgRegistrationInfo)) => Some(org.name)
-              case _                                      => None
-            },
+            tradingName = extractTradingName(userAnswers),
             gbUser = isGBUser(userAnswers),
             primaryContact = primaryContact,
             secondaryContact = value

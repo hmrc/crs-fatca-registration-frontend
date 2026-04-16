@@ -137,7 +137,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
           CreateSubscriptionRequest(
             idType = IdentifierType.SAFE,
             idNumber = safeId.value,
-            tradingName = Some(tradingName),
+            tradingName = Some(businessName),
             gbUser = false,
             primaryContact = ContactInformation(
               contactInformation = OrganisationDetails(
@@ -218,7 +218,7 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
           CreateSubscriptionRequest(
             idType = IdentifierType.SAFE,
             idNumber = safeId.value,
-            tradingName = Some(tradingName),
+            tradingName = Some(businessName),
             gbUser = false,
             primaryContact = ContactInformation(
               contactInformation = OrganisationDetails(
