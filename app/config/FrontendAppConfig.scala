@@ -79,6 +79,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val timeout: Int                 = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int               = configuration.get[Int]("timeout-dialog.countdown")
   val enrolmentKey: String         = configuration.get[String]("keys.enrolmentKey.crsFatca")
+  val enrolmentState: String       = configuration.get[String]("keys.enrolmentKey.state")
   val ctEnrolmentKey: String       = configuration.get[String]("keys.enrolmentKey.ct")
   lazy val countryCodeJson: String = configuration.get[String]("json.countries")
 

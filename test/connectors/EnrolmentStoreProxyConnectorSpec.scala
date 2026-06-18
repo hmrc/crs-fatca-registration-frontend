@@ -44,8 +44,8 @@ class EnrolmentStoreProxyConnectorSpec extends SpecBase with WireMockServerHandl
   val enrolmentStoreProxyUrl                       = "/enrolment-store-proxy/enrolment-store/enrolments"
   val enrolmentStoreProxy1200Url                   = "/enrolment-store-proxy/enrolment-store/enrolments/HMRC-FATCA-ORG~FATCAID~xxx200/groups"
   val enrolmentStoreProxy1204Url                   = "/enrolment-store-proxy/enrolment-store/enrolments/HMRC-FATCA-ORG~FATCAID~xxx204/groups"
-  val enrolmentStoreProxy3200Url001                = "/enrolment-store-proxy/enrolment-store/groups/ABCEDEFGI1234567/enrolments?service=HMRC-FATCA-ORG"
-  val enrolmentStoreProxy3200Url002                = "/enrolment-store-proxy/enrolment-store/groups/ABCEDEFGI1234568/enrolments?service=HMRC-FATCA-ORG"
+  val enrolmentStoreProxy3200Url001                = "/enrolment-store-proxy/enrolment-store/groups/ABCEDEFGI1234567/enrolments"
+  val enrolmentStoreProxy3200Url002                = "/enrolment-store-proxy/enrolment-store/groups/ABCEDEFGI1234568/enrolments"
 
   val enrolmentStoreProxyResponseJson: String =
     """{
@@ -92,6 +92,41 @@ class EnrolmentStoreProxyConnectorSpec extends SpecBase with WireMockServerHandl
       |}
       |""".stripMargin
 
+  val es3NonActivedEnrolmentResponseJson: String =
+    """
+      |{
+      |  "startRecord": 1,
+      |  "totalRecords": 2,
+      |  "enrolments": [
+      |    {
+      |      "service": "HMRC-FATCA-ORG",
+      |      "state": "NotYetActivated",
+      |      "friendlyName": "My First Client's SA Enrolment",
+      |      "enrolmentDate": "2018-10-05T14:48:00.000Z",
+      |      "failedActivationCount": 1,
+      |      "activationDate": "2018-10-13T17:36:00.000Z",
+      |      "identifiers": [
+      |        {
+      |          "key": "UTR",
+      |          "value": "1234567890"
+      |        }
+      |      ]
+      |    }
+      |  ]
+      |}
+      |""".stripMargin
+
+  val es3NonEmptyDifferentEnrolmentResponseJson: String =
+    """
+      |{
+      |  "startRecord": 1,
+      |  "totalRecords": 2,
+      |  "enrolments": [
+      |{ "service" : "HMRC-CBC-NONUK-ORG", "friendlyName" : "", "state" : "Activated", "identifiers" : [ { "key" : "cbcId", "value" : "CBC1234566778" } ], "enrolmentDate" : "2026-02-20 11:49:46.881", "activationDate" : "2026-02-20 11:49:46.881", "failedActivationCount" : 0 }
+      |  ]
+      |}
+      |""".stripMargin
+
   val enrolmentStoreProxyResponseNoPrincipalIdJson: String =
     """{
       |  "principalGroupIds": []
@@ -113,6 +148,25 @@ class EnrolmentStoreProxyConnectorSpec extends SpecBase with WireMockServerHandl
       "return 200 and a enrolmentStatus response when enrolments do not exist for matching groups" in {
         val subscriptionID = SubscriptionID("xxx200")
         stubResponse(enrolmentStoreProxy3200Url001, OK, es3EmptyResponseJson)
+        stubResponse(enrolmentStoreProxy3200Url002, OK, es3EmptyResponseJson)
+        stubResponse(enrolmentStoreProxy1200Url, OK, enrolmentStoreProxyResponseJson)
+        val result = connector.enrolmentStatus(subscriptionID)
+        result.value.futureValue mustBe Right(())
+      }
+
+      "return 204 and a enrolmentStatus response when already enrolments exist for matching groups but not activated" in {
+        val subscriptionID = SubscriptionID("xxx200")
+        val groupIds       = Json.parse(enrolmentStoreProxyResponseJson).as[GroupIds]
+        stubResponse(enrolmentStoreProxy3200Url001, OK, es3NonActivedEnrolmentResponseJson)
+        stubResponse(enrolmentStoreProxy3200Url002, OK, es3EmptyResponseJson)
+        stubResponse(enrolmentStoreProxy1200Url, OK, enrolmentStoreProxyResponseJson)
+        val result = connector.enrolmentStatus(subscriptionID)
+        result.value.futureValue mustBe Right(())
+      }
+
+      "return 204 and a enrolmentStatus response when already different enrolments exist for matching groups" in {
+        val subscriptionID = SubscriptionID("xxx200")
+        stubResponse(enrolmentStoreProxy3200Url001, OK, es3NonEmptyDifferentEnrolmentResponseJson)
         stubResponse(enrolmentStoreProxy3200Url002, OK, es3EmptyResponseJson)
         stubResponse(enrolmentStoreProxy1200Url, OK, enrolmentStoreProxyResponseJson)
         val result = connector.enrolmentStatus(subscriptionID)

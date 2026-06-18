@@ -19,7 +19,7 @@ package connectors
 import cats.data.EitherT
 import config.FrontendAppConfig
 import models.SubscriptionID
-import models.enrolment.{EnrolmentResponse, GroupIds}
+import models.enrolment.{Enrolment, EnrolmentResponse, GroupIds}
 import models.error.ApiError
 import models.error.ApiError.{EnrolmentExistsError, MalformedError}
 import play.api.Logging
@@ -74,13 +74,15 @@ class EnrolmentStoreProxyConnector @Inject() (val config: FrontendAppConfig, val
     val groups = groupIds.toSet
     val calls: Set[EitherT[Future, ApiError, Boolean]] = groups.map {
       groupId =>
-        val url = url"${config.enrolmentStoreProxyUrl}/enrolment-store/groups/$groupId/enrolments?service=${config.enrolmentKey}"
+        val url = url"${config.enrolmentStoreProxyUrl}/enrolment-store/groups/$groupId/enrolments"
         val f = http
           .get(url)
           .execute[HttpResponse]
           .map {
             case response if is2xx(response.status) =>
-              val hasEnrolment = response.json.asOpt[EnrolmentResponse].exists(_.enrolments.nonEmpty)
+              val hasEnrolment = response.json.asOpt[EnrolmentResponse].exists(
+                res => isValidEnrolment(res.enrolments)
+              )
               Right(hasEnrolment)
             case response =>
               Left(MalformedError(response.status))
@@ -95,5 +97,13 @@ class EnrolmentStoreProxyConnector @Inject() (val config: FrontendAppConfig, val
         } yield acc || call
     }
   }
+
+  private def isValidEnrolment(enrolments: Seq[Enrolment]): Boolean =
+    enrolments
+      .exists(
+        enrolment =>
+          enrolment.service.equals(config.enrolmentKey)
+            && enrolment.state.equalsIgnoreCase(config.enrolmentState)
+      )
 
 }
