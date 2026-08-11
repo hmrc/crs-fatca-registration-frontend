@@ -6,7 +6,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport
 
 lazy val appName: String = "crs-fatca-registration-frontend"
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "2.13.18"
 
 Global / excludeLintKeys += update / evictionWarningOptions
 

@@ -65,7 +65,6 @@ class CheckYourAnswersController @Inject() (
       }
   }
 
-  // TODO - I have placed the audit event here in the CYA controller as that is where all users finish their registration journey, and also ensures that we can collect all needed info
   def onSubmit(): Action[AnyContent] =
     standardActionSets.identifiedUserWithData().async {
       implicit request =>
