@@ -19,7 +19,7 @@ package services
 import connectors.AuditConnector
 import models.audit.CreateRegistrationAuditRequest
 import models.matching.OrgRegistrationInfo
-import models.{Address, Country, SubscriptionID, UserAnswers}
+import models.{Address, SubscriptionID, UserAnswers}
 import pages._
 import pages.changeContactDetails.{OrganisationSecondContactEmailPage, OrganisationSecondContactNamePage, OrganisationSecondContactPhonePage}
 import play.api.Logging
@@ -42,8 +42,6 @@ class AuditService @Inject() (
     idType: String,
     idValue: String
   )
-//TODO - worth noting this event will only fire if all required fields are found for the audit, of course optional fields being ommitted will cause no issue
-  // and the audit failing will not impact the users journey at all - I have put some simple logging in for now
 
   def sendCreateRegistration(
     userAnswers: UserAnswers,
@@ -83,16 +81,56 @@ class AuditService @Inject() (
     affinityGroup: AffinityGroup
   ): Option[CreateRegistrationAuditRequest] = {
 
-    val isBusiness = isRegisteringAsBusiness(userAnswers)
+    val isBusiness =
+      isRegisteringAsBusiness(userAnswers)
 
     val registrationDetails =
-      extractRegistrationDetails(userAnswers, affinityGroup)
+      extractRegistrationDetails(
+        userAnswers = userAnswers,
+        affinityGroup = affinityGroup
+      )
+
+    val address =
+      extractAddress(
+        userAnswers = userAnswers,
+        registrationType = registrationDetails.registrationType
+      )
 
     for {
-      address           <- extractAddress(userAnswers)
-      firstContactName  <- extractFirstContactName(userAnswers, isBusiness)
-      firstContactEmail <- extractFirstContactEmail(userAnswers, isBusiness)
-    } yield CreateRegistrationAuditRequest(
+      firstContactName <-
+        extractFirstContactName(
+          userAnswers = userAnswers,
+          isBusiness = isBusiness
+        )
+
+      firstContactEmail <-
+        extractFirstContactEmail(
+          userAnswers = userAnswers,
+          isBusiness = isBusiness
+        )
+    } yield createAuditRequest(
+      userAnswers = userAnswers,
+      subscriptionId = subscriptionId,
+      affinityGroup = affinityGroup,
+      registrationDetails = registrationDetails,
+      isBusiness = isBusiness,
+      address = address,
+      firstContactName = firstContactName,
+      firstContactEmail = firstContactEmail
+    )
+  }
+
+  private def createAuditRequest(
+    userAnswers: UserAnswers,
+    subscriptionId: SubscriptionID,
+    affinityGroup: AffinityGroup,
+    registrationDetails: RegistrationDetails,
+    isBusiness: Boolean,
+    address: Option[Address],
+    firstContactName: String,
+    firstContactEmail: String
+  ): CreateRegistrationAuditRequest =
+    CreateRegistrationAuditRequest(
       affinityType = affinityGroup.toString,
       registeringAs = if (isBusiness) "Organisation" else "Individual",
       registrationType = registrationDetails.registrationType,
@@ -100,24 +138,34 @@ class AuditService @Inject() (
       idValue = registrationDetails.idValue,
       tradingName = extractTradingName(userAnswers),
       businessName = extractBusinessName(userAnswers),
-      addressLine1 = address.addressLine1,
-      addressLine2 = address.addressLine2,
-      city = address.addressLine3,
-      region = address.addressLine4,
-      postcode = address.postCode,
-      country = address.country.description,
+      addressLine1 =
+        address
+          .map(_.addressLine1)
+          .flatMap(optionalNonEmpty),
+      addressLine2 =
+        address
+          .flatMap(_.addressLine2)
+          .flatMap(optionalNonEmpty),
+      city =
+        address
+          .map(_.addressLine3)
+          .flatMap(optionalNonEmpty),
+      region =
+        address
+          .flatMap(_.addressLine4)
+          .flatMap(optionalNonEmpty),
+      postcode = address.flatMap(_.postCode).flatMap(optionalNonEmpty),
+      country = address.map(_.country.code).flatMap(optionalNonEmpty),
       uprn = None,
       dateOfBirth = extractDateOfBirth(userAnswers),
       firstContactName = firstContactName,
       firstContactEmail = firstContactEmail,
-      firstContactTelephone =
-        extractFirstContactTelephone(userAnswers, isBusiness),
+      firstContactTelephone = extractFirstContactTelephone(userAnswers = userAnswers, isBusiness = isBusiness),
       secondContactName = extractSecondContactName(userAnswers),
       secondContactEmail = extractSecondContactEmail(userAnswers),
       secondContactTelephone = extractSecondContactTelephone(userAnswers),
       fatcaId = subscriptionId.value
     )
-  }
 
   private def extractRegistrationDetails(
     userAnswers: UserAnswers,
@@ -130,9 +178,11 @@ class AuditService @Inject() (
         .map(_.uniqueTaxPayerReference)
         .flatMap(optionalNonEmpty)
 
-    val nino = extractNino(userAnswers)
-    val utr  = extractUtr(userAnswers)
-//TODO - debated making registrationType its own ADT, may still do that just to make the modeling a little clearer
+    val nino =
+      extractNino(userAnswers)
+
+    val utr =
+      extractUtr(userAnswers)
 
     (autoMatchedUtr, nino, utr) match {
       case (Some(value), _, _) =>
@@ -156,23 +206,27 @@ class AuditService @Inject() (
           idValue = value
         )
 
-      case (None, None, None) if affinityGroup == AffinityGroup.Individual =>
-        RegistrationDetails(
-          registrationType = "IndividualWithoutID",
-          idType = "NotProvided",
-          idValue = "NotProvided"
-        )
-
       case _ =>
-        RegistrationDetails(
-          registrationType = "OrgWithoutID",
-          idType = "NotProvided",
-          idValue = "NotProvided"
-        )
+        extractWithoutIdRegistrationDetails(affinityGroup)
     }
   }
-//TODO - this wall of extract functions I debated moving out of the service but I felt clicking between files may have been harder to digest
-  // There are plenty of 'gets' here which may seem risky but, we can determine that the user would of entered at least *one* of these pages or had the data pulled from somewhere by the time of CYA completion.
+
+  private def extractWithoutIdRegistrationDetails(
+    affinityGroup: AffinityGroup
+  ): RegistrationDetails =
+    if (affinityGroup == AffinityGroup.Individual) {
+      RegistrationDetails(
+        registrationType = "IndividualWithoutID",
+        idType = "NotProvided",
+        idValue = "NotProvided"
+      )
+    } else {
+      RegistrationDetails(
+        registrationType = "OrgWithoutID",
+        idType = "NotProvided",
+        idValue = "NotProvided"
+      )
+    }
 
   private def extractNino(
     userAnswers: UserAnswers
@@ -195,7 +249,9 @@ class AuditService @Inject() (
   ): Option[String] =
     userAnswers
       .get(BusinessTradingNameWithoutIDPage)
-      .orElse(userAnswers.get(BusinessNamePage))
+      .orElse(
+        userAnswers.get(BusinessNamePage)
+      )
       .flatMap(optionalNonEmpty)
 
   private def extractBusinessName(
@@ -218,7 +274,9 @@ class AuditService @Inject() (
   ): Option[String] =
     userAnswers
       .get(IndDateOfBirthPage)
-      .orElse(userAnswers.get(DateOfBirthWithoutIdPage))
+      .orElse(
+        userAnswers.get(DateOfBirthWithoutIdPage)
+      )
       .map(_.toString)
       .flatMap(optionalNonEmpty)
 
@@ -233,7 +291,9 @@ class AuditService @Inject() (
     } else {
       userAnswers
         .get(IndWhatIsYourNamePage)
-        .orElse(userAnswers.get(WhatIsYourNamePage))
+        .orElse(
+          userAnswers.get(WhatIsYourNamePage)
+        )
         .map(_.fullName)
         .flatMap(optionalNonEmpty)
     }
@@ -271,7 +331,9 @@ class AuditService @Inject() (
   ): Option[String] =
     userAnswers
       .get(OrganisationSecondContactNamePage)
-      .orElse(userAnswers.get(SecondContactNamePage))
+      .orElse(
+        userAnswers.get(SecondContactNamePage)
+      )
       .flatMap(optionalNonEmpty)
 
   private def extractSecondContactEmail(
@@ -279,7 +341,9 @@ class AuditService @Inject() (
   ): Option[String] =
     userAnswers
       .get(OrganisationSecondContactEmailPage)
-      .orElse(userAnswers.get(SecondContactEmailPage))
+      .orElse(
+        userAnswers.get(SecondContactEmailPage)
+      )
       .flatMap(optionalNonEmpty)
 
   private def extractSecondContactTelephone(
@@ -287,64 +351,51 @@ class AuditService @Inject() (
   ): Option[String] =
     userAnswers
       .get(OrganisationSecondContactPhonePage)
-      .orElse(userAnswers.get(SecondContactPhonePage))
+      .orElse(
+        userAnswers.get(SecondContactPhonePage)
+      )
       .flatMap(optionalNonEmpty)
 
   private def extractAddress(
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    registrationType: String
   ): Option[Address] =
-    if (isRegisteringAsBusiness(userAnswers)) {
-      extractBusinessAddress(userAnswers)
-    } else {
-      extractIndividualAddress(userAnswers)
-    }
+    registrationType match {
+      case "IndividualWithoutID" =>
+        extractIndividualAddress(userAnswers)
 
-//TODO - So this extracts the business address, the only snag i've found is that when the address
-//  is a matched one, it is returned as this type AddressResponse instead of Address, meaning what values are optional differ, mainly addressline3 and the country - welcome any suggestions here
+      case "OrgWithoutID" =>
+        extractBusinessAddress(userAnswers)
+
+      case _ =>
+        None
+    }
 
   private def extractBusinessAddress(
     userAnswers: UserAnswers
   ): Option[Address] =
     userAnswers
       .get(NonUKBusinessAddressWithoutIDPage)
-      .orElse {
-        userAnswers
-          .get(RegistrationInfoPage)
-          .collect {
-            case OrgRegistrationInfo(_, _, address) =>
-              Address(
-                addressLine1 = address.addressLine1,
-                addressLine2 = address.addressLine2,
-                addressLine3 = address.addressLine3.getOrElse(""),
-                addressLine4 = address.addressLine4,
-                postCode = address.postalCode,
-                country = address.country.getOrElse(
-                  Country(
-                    code = address.countryCode,
-                    description = ""
-                  )
-                )
-              )
-          }
-      }
 
   private def extractIndividualAddress(
     userAnswers: UserAnswers
   ): Option[Address] =
-    userAnswers.get(IndWhereDoYouLivePage) match {
+    userAnswers
+      .get(IndWhereDoYouLivePage) match {
       case Some(true) =>
         userAnswers
           .get(IndSelectedAddressLookupPage)
           .flatMap(_.toAddress)
           .orElse {
-            userAnswers.get(IndUKAddressWithoutIdPage)
+            userAnswers
+              .get(IndUKAddressWithoutIdPage)
           }
 
       case _ =>
-        userAnswers.get(IndNonUKAddressWithoutIdPage)
+        userAnswers
+          .get(IndNonUKAddressWithoutIdPage)
     }
 
-  // TODO - purpose of this helper is to make sure no unintentional empty strings ("") or empty quotes slip through as a valid string entry rather then None
   private def optionalNonEmpty(
     value: String
   ): Option[String] =
