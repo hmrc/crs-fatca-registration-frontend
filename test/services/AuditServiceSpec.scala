@@ -20,7 +20,6 @@ import base.SpecBase
 import connectors.AuditConnector
 import generators.{ModelGenerators, UserAnswersGenerator}
 import models.audit.CreateRegistrationAuditRequest
-import models.matching.OrgRegistrationInfo
 import models.{Address, Country, Name, ReporterType, SubscriptionID, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -172,11 +171,11 @@ class AuditServiceSpec
           false
         )
         .withPage(
-          IndWhatIsYourNamePage,
+          WhatIsYourNamePage,
           individualName
         )
         .withPage(
-          IndDateOfBirthPage,
+          DateOfBirthWithoutIdPage,
           individualDateOfBirth
         )
         .withPage(
@@ -378,11 +377,6 @@ class AuditServiceSpec
             .get(WhatIsYourUTRPage)
             .value
 
-        val registrationInfo =
-          generatedUserAnswers
-            .get(RegistrationInfoPage)
-            .value
-
         val userAnswers =
           emptyUserAnswers
             .withPage(
@@ -392,10 +386,6 @@ class AuditServiceSpec
             .withPage(
               WhatIsYourUTRPage,
               utr
-            )
-            .withPage(
-              RegistrationInfoPage,
-              registrationInfo
             )
             .withPage(
               ContactNamePage,
@@ -431,17 +421,8 @@ class AuditServiceSpec
         result.idValue mustBe
           utr.uniqueTaxPayerReference
 
-        registrationInfo match {
-          case OrgRegistrationInfo(_, name, _) =>
-            result.businessName mustBe
-              Some(name.trim)
-                .filter(_.nonEmpty)
-
-          case other =>
-            fail(
-              s"Expected OrgRegistrationInfo but found $other"
-            )
-        }
+        result.businessName mustBe
+          None
 
         result.firstContactName mustBe
           organisationContactName
@@ -549,11 +530,6 @@ class AuditServiceSpec
             .get(WhatIsYourUTRPage)
             .value
 
-        val registrationInfo =
-          generatedUserAnswers
-            .get(RegistrationInfoPage)
-            .value
-
         val userAnswers =
           emptyUserAnswers
             .withPage(
@@ -563,10 +539,6 @@ class AuditServiceSpec
             .withPage(
               AutoMatchedUTRPage,
               utr
-            )
-            .withPage(
-              RegistrationInfoPage,
-              registrationInfo
             )
             .withPage(
               ContactNamePage,
@@ -586,6 +558,9 @@ class AuditServiceSpec
             userAnswers = userAnswers,
             affinityGroup = AffinityGroup.Organisation
           )
+
+        result.affinityType mustBe
+          AffinityGroup.Organisation.toString
 
         result.registeringAs mustBe
           "Organisation"
