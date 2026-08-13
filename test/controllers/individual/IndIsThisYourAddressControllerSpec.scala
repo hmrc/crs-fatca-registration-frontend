@@ -36,8 +36,10 @@ class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new IndIsThisYourAddressFormProvider()
   val form         = formProvider()
+  val uprn         = 123456789121L
 
   val addressLookup = AddressLookup(
+    uprn,
     addressLine1 = Some("123 Main Street"),
     addressLine2 = Some("Apt 4B"),
     addressLine3 = Some("test 1"),
@@ -49,7 +51,7 @@ class IndIsThisYourAddressControllerSpec extends SpecBase with MockitoSugar {
   )
 
   val addresses: Seq[AddressLookup] = Seq(
-    AddressLookup(Some("123 Main Street"), Some("Apt 4B"), Some("test 1"), Some("test 2"), "London", Some("Greater London"), "SW1A 1AA", Some(Country.GB))
+    AddressLookup(uprn, Some("123 Main Street"), Some("Apt 4B"), Some("test 1"), Some("test 2"), "London", Some("Greater London"), "SW1A 1AA", Some(Country.GB))
   )
 
   lazy val isThisYourAddressRoute = controllers.individual.routes.IndIsThisYourAddressController.onPageLoad(NormalMode).url

@@ -37,6 +37,7 @@ class IndWhatIsYourPostcodeControllerSpec extends SpecBase with UserAnswersGener
 
   val formProvider = new IndWhatIsYourPostcodeFormProvider()
   val form         = formProvider()
+  val uprn         = 123456789121L
 
   lazy val indWhatIsYourPostcodeRoute = routes.IndWhatIsYourPostcodeController.onPageLoad(NormalMode).url
 
@@ -95,8 +96,8 @@ class IndWhatIsYourPostcodeControllerSpec extends SpecBase with UserAnswersGener
     "must redirect to the next page when valid data is submitted" in {
 
       val addresses: Seq[AddressLookup] = Seq(
-        AddressLookup(Some("1 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ", Some(Country.GB)),
-        AddressLookup(Some("2 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ", Some(Country.GB))
+        AddressLookup(uprn, Some("1 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ", Some(Country.GB)),
+        AddressLookup(uprn, Some("2 Address line 1"), None, None, None, "Town", None, "ZZ1 1ZZ", Some(Country.GB))
       )
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)

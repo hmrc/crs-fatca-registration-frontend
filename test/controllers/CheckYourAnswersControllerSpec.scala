@@ -23,6 +23,7 @@ import connectors.AddressLookupConnector
 import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures._
 import models.ReporterType.{Individual, LimitedCompany, Sole}
+import models.audit.AuditResult.AuditSent
 import models.enrolment.GroupIds
 import models.error.ApiError
 import models.error.ApiError._
@@ -83,7 +84,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
         any(),
         any()
       )(any())
-    ).thenReturn(Future.successful(()))
+    ).thenReturn(Future.successful(AuditSent))
 
     super.beforeEach()
   }

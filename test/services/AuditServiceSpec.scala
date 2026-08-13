@@ -19,6 +19,7 @@ package services
 import base.SpecBase
 import connectors.AuditConnector
 import generators.{ModelGenerators, UserAnswersGenerator}
+import models.audit.AuditResult.{AuditFailed, AuditNotSent, AuditSent}
 import models.audit.CreateRegistrationAuditRequest
 import models.{Address, Country, Name, ReporterType, SubscriptionID, UserAnswers}
 import org.mockito.ArgumentCaptor
@@ -105,7 +106,7 @@ class AuditServiceSpec
         subscriptionId = subscriptionId,
         affinityGroup = affinityGroup
       )
-      .futureValue mustBe ()
+      .futureValue mustBe AuditSent
 
     val captor =
       ArgumentCaptor.forClass(
@@ -710,7 +711,7 @@ class AuditServiceSpec
             affinityGroup = AffinityGroup.Organisation
           )
 
-        result.futureValue mustBe ()
+        result.futureValue mustBe AuditFailed
 
         verify(mockAuditConnector)
           .sendCreateRegistration(
@@ -727,7 +728,7 @@ class AuditServiceSpec
             affinityGroup = AffinityGroup.Individual
           )
 
-        result.futureValue mustBe ()
+        result.futureValue mustBe AuditNotSent
 
         verify(
           mockAuditConnector,

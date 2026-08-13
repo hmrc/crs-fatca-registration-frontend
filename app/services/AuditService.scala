@@ -17,8 +17,8 @@
 package services
 
 import connectors.AuditConnector
-import models.audit.CreateRegistrationAuditRequest
-import models.matching.OrgRegistrationInfo
+import models.audit.AuditResult.{AuditFailed, AuditNotSent, AuditSent}
+import models.audit.{AuditResult, CreateRegistrationAuditRequest}
 import models.{Address, SubscriptionID, UserAnswers}
 import pages._
 import pages.changeContactDetails.{OrganisationSecondContactEmailPage, OrganisationSecondContactNamePage, OrganisationSecondContactPhonePage}
@@ -47,7 +47,7 @@ class AuditService @Inject() (
     userAnswers: UserAnswers,
     subscriptionId: SubscriptionID,
     affinityGroup: AffinityGroup
-  )(implicit hc: HeaderCarrier): Future[Unit] =
+  )(implicit hc: HeaderCarrier): Future[AuditResult] =
     buildCreateRegistration(
       userAnswers = userAnswers,
       subscriptionId = subscriptionId,
@@ -57,7 +57,7 @@ class AuditService @Inject() (
         auditConnector
           .sendCreateRegistration(auditRequest)
           .map(
-            _ => ()
+            _ => AuditSent
           )
           .recover {
             case exception =>
@@ -65,14 +65,18 @@ class AuditService @Inject() (
                 "Failed to send CreateRegistration audit event",
                 exception
               )
-              ()
+
+              AuditFailed
           }
 
       case None =>
         logger.error(
           "CreateRegistration audit was not sent because required audit information was missing"
         )
-        Future.successful(())
+
+        Future.successful(
+          AuditNotSent
+        )
     }
 
   private def buildCreateRegistration(
@@ -156,7 +160,10 @@ class AuditService @Inject() (
           .flatMap(optionalNonEmpty),
       postcode = address.flatMap(_.postCode).flatMap(optionalNonEmpty),
       country = address.map(_.country.code).flatMap(optionalNonEmpty),
-      uprn = None,
+      uprn = extractUprn(
+        userAnswers = userAnswers,
+        registrationType = registrationDetails.registrationType
+      ),
       dateOfBirth = extractDateOfBirth(userAnswers),
       firstContactName = firstContactName,
       firstContactEmail = firstContactEmail,
@@ -214,15 +221,15 @@ class AuditService @Inject() (
   private def extractWithoutIdRegistrationDetails(
     affinityGroup: AffinityGroup
   ): RegistrationDetails =
-    if (affinityGroup == AffinityGroup.Individual) {
+    if (affinityGroup == AffinityGroup.Organisation) {
       RegistrationDetails(
-        registrationType = "IndividualWithoutID",
+        registrationType = "OrgWithoutID",
         idType = "NotProvided",
         idValue = "NotProvided"
       )
     } else {
       RegistrationDetails(
-        registrationType = "OrgWithoutID",
+        registrationType = "IndividualWithoutID",
         idType = "NotProvided",
         idValue = "NotProvided"
       )
@@ -249,9 +256,6 @@ class AuditService @Inject() (
   ): Option[String] =
     userAnswers
       .get(BusinessTradingNameWithoutIDPage)
-      .orElse(
-        userAnswers.get(BusinessNamePage)
-      )
       .flatMap(optionalNonEmpty)
 
   private def extractBusinessName(
@@ -259,14 +263,9 @@ class AuditService @Inject() (
   ): Option[String] =
     userAnswers
       .get(BusinessNameWithoutIDPage)
-      .orElse {
-        userAnswers
-          .get(RegistrationInfoPage)
-          .collect {
-            case OrgRegistrationInfo(_, name, _) =>
-              name
-          }
-      }
+      .orElse(
+        userAnswers.get(BusinessNamePage)
+      )
       .flatMap(optionalNonEmpty)
 
   private def extractDateOfBirth(
@@ -394,6 +393,18 @@ class AuditService @Inject() (
       case _ =>
         userAnswers
           .get(IndNonUKAddressWithoutIdPage)
+    }
+
+  private def extractUprn(
+    userAnswers: UserAnswers,
+    registrationType: String
+  ): Option[String] =
+    if (registrationType == "IndividualWithoutID") {
+      userAnswers
+        .get(IndSelectedAddressLookupPage)
+        .map(_.uprn.toString)
+    } else {
+      None
     }
 
   private def optionalNonEmpty(

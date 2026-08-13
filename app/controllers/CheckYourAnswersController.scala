@@ -81,18 +81,18 @@ class CheckYourAnswersController @Inject() (
             )
           )
 
-          _ <- EitherT.right[ApiError](
-            auditService.sendCreateRegistration(
-              userAnswers = request.userAnswers,
-              subscriptionId = subscriptionID,
-              affinityGroup = request.affinityGroup
-            )
-          )
-
           result <- EitherT.right[ApiError](
             controllerHelper.updateSubscriptionIdAndCreateEnrolment(
               safeId,
               subscriptionID
+            )
+          )
+
+          _ = EitherT.right[ApiError](
+            auditService.sendCreateRegistration(
+              userAnswers = request.userAnswers,
+              subscriptionId = subscriptionID,
+              affinityGroup = request.affinityGroup
             )
           )
         } yield result
