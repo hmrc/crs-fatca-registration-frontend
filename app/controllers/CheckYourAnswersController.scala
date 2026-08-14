@@ -30,7 +30,7 @@ import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
-import services.{BusinessMatchingWithoutIdService, SubscriptionService}
+import services.{AuditService, BusinessMatchingWithoutIdService, SubscriptionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.{CheckYourAnswersValidator, CountryListFactory, UserAnswersHelper}
@@ -49,7 +49,8 @@ class CheckYourAnswersController @Inject() (
   checkForSubmission: CheckForSubmissionAction,
   registrationService: BusinessMatchingWithoutIdService,
   view: CheckYourAnswersView,
-  errorView: ThereIsAProblemView
+  errorView: ThereIsAProblemView,
+  auditService: AuditService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -64,16 +65,40 @@ class CheckYourAnswersController @Inject() (
       }
   }
 
-  def onSubmit(): Action[AnyContent] = standardActionSets.identifiedUserWithData().async {
-    implicit request =>
-      val result = for {
-        safeId         <- EitherT(getSafeIdFromRegistration())
-        subscriptionID <- EitherT(subscriptionService.checkAndCreateSubscription(safeId, request.userAnswers, request.affinityGroup))
-        result         <- EitherT.right[ApiError](controllerHelper.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionID))
-      } yield result
+  def onSubmit(): Action[AnyContent] =
+    standardActionSets.identifiedUserWithData().async {
+      implicit request =>
+        val result = for {
+          safeId <- EitherT(
+            getSafeIdFromRegistration()
+          )
 
-      handleErrorResult(result, request.userAnswers)
-  }
+          subscriptionID <- EitherT(
+            subscriptionService.checkAndCreateSubscription(
+              safeId,
+              request.userAnswers,
+              request.affinityGroup
+            )
+          )
+
+          result <- EitherT.right[ApiError](
+            controllerHelper.updateSubscriptionIdAndCreateEnrolment(
+              safeId,
+              subscriptionID
+            )
+          )
+
+          _ = EitherT.right[ApiError](
+            auditService.sendCreateRegistration(
+              userAnswers = request.userAnswers,
+              subscriptionId = subscriptionID,
+              affinityGroup = request.affinityGroup
+            )
+          )
+        } yield result
+
+        handleErrorResult(result, request.userAnswers)
+    }
 
   private def handleErrorResult(result: EitherT[Future, ApiError, Result], userAnswers: UserAnswers)(implicit
     messages: Messages,

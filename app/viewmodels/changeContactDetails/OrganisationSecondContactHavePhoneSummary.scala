@@ -17,7 +17,7 @@
 package viewmodels.changeContactDetails
 
 import models.{CheckMode, UserAnswers}
-import pages.changeContactDetails.{OrganisationContactHavePhonePage, OrganisationSecondContactHavePhonePage}
+import pages.changeContactDetails.OrganisationSecondContactHavePhonePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.Util.changeAction
