@@ -30,7 +30,7 @@ import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
-import services.{AuditService, BusinessMatchingWithoutIdService, SubscriptionService}
+import services.{BusinessMatchingWithoutIdService, SubscriptionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.{CheckYourAnswersValidator, CountryListFactory, UserAnswersHelper}
@@ -49,8 +49,7 @@ class CheckYourAnswersController @Inject() (
   checkForSubmission: CheckForSubmissionAction,
   registrationService: BusinessMatchingWithoutIdService,
   view: CheckYourAnswersView,
-  errorView: ThereIsAProblemView,
-  auditService: AuditService
+  errorView: ThereIsAProblemView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -85,14 +84,6 @@ class CheckYourAnswersController @Inject() (
             controllerHelper.updateSubscriptionIdAndCreateEnrolment(
               safeId,
               subscriptionID
-            )
-          )
-
-          _ = EitherT.right[ApiError](
-            auditService.sendCreateRegistration(
-              userAnswers = request.userAnswers,
-              subscriptionId = subscriptionID,
-              affinityGroup = request.affinityGroup
             )
           )
         } yield result

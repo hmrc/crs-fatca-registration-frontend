@@ -23,7 +23,6 @@ import connectors.AddressLookupConnector
 import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures._
 import models.ReporterType.{Individual, LimitedCompany, Sole}
-import models.audit.AuditResult.AuditSent
 import models.enrolment.GroupIds
 import models.error.ApiError
 import models.error.ApiError._
@@ -43,7 +42,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{RequestHeader, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.{AuditService, BusinessMatchingWithoutIdService, SubscriptionService, TaxEnrolmentService}
+import services.{BusinessMatchingWithoutIdService, SubscriptionService, TaxEnrolmentService}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.ThereIsAProblemView
 
@@ -68,23 +67,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
   val secondContactPhone                            = "+44 0808 157 0193"
   val mockSubscriptionService: SubscriptionService  = mock[SubscriptionService]
   val mockTaxEnrolmentsService: TaxEnrolmentService = mock[TaxEnrolmentService]
-  val mockAuditService: AuditService                = mock[AuditService]
 
   override def beforeEach(): Unit = {
     reset(
       mockSubscriptionService,
       mockRegistrationService,
-      mockTaxEnrolmentsService,
-      mockAuditService
+      mockTaxEnrolmentsService
     )
-
-    when(
-      mockAuditService.sendCreateRegistration(
-        any(),
-        any(),
-        any()
-      )(any())
-    ).thenReturn(Future.successful(AuditSent))
 
     super.beforeEach()
   }
@@ -408,8 +397,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
               bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
               bind[SubscriptionService].toInstance(mockSubscriptionService),
               bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-              bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-              bind[AuditService].toInstance(mockAuditService)
+              bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
             )
             .build()
 
@@ -425,12 +413,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
               .onPageLoad()
               .url
 
-          verify(mockAuditService)
-            .sendCreateRegistration(
-              userAnswers = eqTo(userAnswers),
-              subscriptionId = eqTo(SubscriptionID(UserAnswersId)),
-              affinityGroup = eqTo(AffinityGroup.Individual)
-            )(any())
         }
       }
 
@@ -450,8 +432,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
           )
           .build()
 
@@ -481,8 +462,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
           )
           .build()
 
@@ -512,8 +492,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
           )
           .build()
 
@@ -547,8 +526,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
           )
           .build()
 
@@ -608,8 +586,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
             bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
             bind[Navigator].toInstance(fakeNavigator),
-            bind[AddressLookupConnector].toInstance(mockAddressLookupConnector),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[AddressLookupConnector].toInstance(mockAddressLookupConnector)
           )
           .build()
 
@@ -642,8 +619,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
           )
           .build()
 
@@ -673,8 +649,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
           )
           .build()
 
@@ -707,8 +682,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
           )
           .build()
 
@@ -734,8 +708,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
-            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService)
           )
           .build()
         running(application) {
@@ -759,8 +732,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with ControllerMockFixture
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SubscriptionService].toInstance(mockSubscriptionService),
             bind[BusinessMatchingWithoutIdService].toInstance(mockRegistrationService),
-            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService),
-            bind[AuditService].toInstance(mockAuditService)
+            bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentsService)
           )
           .build()
 

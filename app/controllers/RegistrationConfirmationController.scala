@@ -22,6 +22,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.AuditService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{PageUnavailableView, RegistrationConfirmationView}
 
@@ -34,7 +35,8 @@ class RegistrationConfirmationController @Inject() (
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
   view: RegistrationConfirmationView,
-  errorView: PageUnavailableView
+  errorView: PageUnavailableView,
+  auditService: AuditService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -45,8 +47,10 @@ class RegistrationConfirmationController @Inject() (
         subscriptionId <- Future.successful(request.userAnswers.get(SubscriptionIDPage))
         clearSession   <- sessionRepository.set(request.userAnswers.copy(data = Json.obj()))
       } yield (subscriptionId, clearSession) match {
-        case (Some(fatcaId), true) => Ok(view(fatcaId.value))
-        case _                     => Ok(errorView(routes.IndexController.onPageLoad.url))
+        case (Some(fatcaId), true) =>
+          auditService.sendCreateRegistration(request.userAnswers, fatcaId, request.affinityGroup)
+          Ok(view(fatcaId.value))
+        case _ => Ok(errorView(routes.IndexController.onPageLoad.url))
       }
   }
 
