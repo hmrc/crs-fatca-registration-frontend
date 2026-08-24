@@ -67,11 +67,12 @@ class SubscriptionRepositorySpec
   implicit private val crypto: Encrypter with Decrypter =
     SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
 
-  override protected val repository = new SubscriptionRepository(
-    mongoComponent = mongoComponent,
-    appConfig = mockAppConfig,
-    clock = stubClock
-  )
+  override protected val repository: SubscriptionRepository =
+    new SubscriptionRepository(
+      mongoComponent = mongoComponent,
+      appConfig = mockAppConfig,
+      clock = stubClock
+    )
 
   ".set" - {
     "must set the last updated time on the supplied user subscription to `now`, and save them" in {

@@ -16,11 +16,12 @@
 
 package controllers.changeContactDetails
 
-import controllers.actions._
+import controllers.actions.*
 import forms.changeContactDetails.IndividualHavePhoneFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.changeContactDetails.IndividualHavePhonePage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -34,9 +35,6 @@ class IndividualHavePhoneController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   formProvider: IndividualHavePhoneFormProvider,
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
@@ -45,7 +43,7 @@ class IndividualHavePhoneController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRequiredForIndividual() {
     implicit request =>

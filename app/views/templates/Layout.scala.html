@@ -17,7 +17,7 @@
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcAccessibleAutocompleteCss, HmrcAccessibleAutocompleteJavascript, HmrcStandardPage}
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.{Banners => StandardPageBanners, _}
 @import views.html.helper.CSPNonce
 
 @this(
@@ -40,9 +40,9 @@
         countdown           = Some(appConfig.countdown),
         keepAliveUrl        = Some(routes.KeepAliveController.keepAlive.url),
         keepAliveButtonText = Some(messages("timeout.keepAlive")),
-        signOutUrl          = controllers.auth.routes.AuthController.signOut.url,
+        signOutUrl          = controllers.auth.routes.AuthController.signOut().url,
         signOutButtonText   = Some(messages("timeout.signOut")),
-        timeoutUrl          = Some(controllers.auth.routes.AuthController.signOutNoSurvey.url),
+        timeoutUrl          = Some(controllers.auth.routes.AuthController.signOutNoSurvey().url),
         title               = Some(messages("timeout.title")),
         message             = Some(messages("timeout.message"))
     )
@@ -68,9 +68,9 @@
     HmrcStandardPageParams(
         serviceURLs = ServiceURLs(
             serviceUrl = Some(routes.IndexController.onPageLoad.url),
-            signOutUrl = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut.url) else None,
+            signOutUrl = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
         ),
-        banners = Banners(
+        banners = StandardPageBanners(
             phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
         ),
         pageTitle = Some(pageTitle),

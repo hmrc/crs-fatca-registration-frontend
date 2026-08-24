@@ -22,8 +22,8 @@ GET         /register/problem/signed-out                                        
 GET         /register/problem/some-information-is-missing                        controllers.InformationMissingController.onPageLoad()
 GET         /register/problem/contact-details-are-missing                        controllers.ContactDetailsMissingController.onPageLoad()
 
-GET         /account/sign-out-survey                                             controllers.auth.AuthController.signOut
-GET         /account/sign-out                                                    controllers.auth.AuthController.signOutNoSurvey
+GET         /account/sign-out-survey                                             controllers.auth.AuthController.signOut()
+GET         /account/sign-out                                                    controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                                                  controllers.auth.SignedOutController.onPageLoad
 
 GET         /unauthorised                                                        controllers.UnauthorisedController.onPageLoad

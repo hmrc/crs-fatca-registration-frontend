@@ -23,7 +23,7 @@ import queries.{Gettable, Settable}
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-
+import scala.language.implicitConversions
 import java.time.Instant
 import scala.util.{Failure, Success, Try}
 
@@ -90,7 +90,9 @@ object UserAnswers {
         (__ \ "_id").write[String] and
           (__ \ "data").write[JsObject] and
           (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-      )(unlift(UserAnswers.unapply))
+      )(
+        userAnswers => (userAnswers.id, userAnswers.data, userAnswers.lastUpdated)
+      )
 
     OFormat(reads, writes)
   }

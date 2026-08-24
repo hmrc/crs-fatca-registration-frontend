@@ -46,7 +46,7 @@ class TaxEnrolmentServiceSpec extends SpecBase {
       .overrides(bind[TaxEnrolmentsConnector].toInstance(mockTaxEnrolmentsConnector))
       .overrides(bind[EnrolmentStoreProxyConnector].toInstance(mockEnrolmentStoreProxyConnector))
 
-  val service: TaxEnrolmentService = application.injector.instanceOf[TaxEnrolmentService]
+  val service: TaxEnrolmentService = application.injector().instanceOf[TaxEnrolmentService]
 
   override def beforeEach(): Unit = {
     reset(mockTaxEnrolmentsConnector, mockEnrolmentStoreProxyConnector)

@@ -27,7 +27,8 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
-
+import models.requests.IdentifierRequest
+import play.api.mvc.AnyContent
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,7 +37,8 @@ class AuthActionSpec extends SpecBase {
   class Harness(authAction: IdentifierAction) {
 
     def onPageLoad() = authAction() {
-      _ => Results.Ok
+      (_: IdentifierRequest[AnyContent]) =>
+        Results.Ok
     }
 
   }

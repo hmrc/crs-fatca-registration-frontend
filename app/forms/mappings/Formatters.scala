@@ -112,7 +112,6 @@ trait Formatters extends Transforms {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
       dataFormatter
         .bind(key, data)
-        .right
         .flatMap {
           case str if !str.matches(validFormatRegex) => Left(Seq(FormError(key, invalidKey)))
           case str                                   => Right(str)
@@ -225,7 +224,6 @@ trait Formatters extends Transforms {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
       dataFormatter
         .bind(key, data)
-        .right
         .flatMap {
           case str if str.length > maxLength => Left(Seq(FormError(key, lengthKey)))
           case str                           => Right(str)

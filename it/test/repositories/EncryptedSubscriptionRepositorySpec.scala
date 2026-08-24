@@ -72,11 +72,12 @@ class EncryptedSubscriptionRepositorySpec
   implicit val sensitiveFormat: Format[SensitiveString] =
     JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
 
-  override protected val repository = new SubscriptionRepository(
-    mongoComponent = mongoComponent,
-    appConfig = mockAppConfig,
-    clock = stubClock
-  )
+  override protected val repository: SubscriptionRepository =
+    new SubscriptionRepository(
+      mongoComponent = mongoComponent,
+      appConfig = mockAppConfig,
+      clock = stubClock
+    )
 
   ".set" - {
 

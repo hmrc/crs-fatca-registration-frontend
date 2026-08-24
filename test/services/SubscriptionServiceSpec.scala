@@ -58,7 +58,7 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
     super.beforeEach()
   }
 
-  val service: SubscriptionService = application.injector.instanceOf[SubscriptionService]
+  val service: SubscriptionService = application.injector().instanceOf[SubscriptionService]
 
   "SubscriptionService" - {
     "must return 'SubscriptionID' on creating subscription" in {

@@ -50,7 +50,7 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
 
   override def beforeEach(): Unit = {
     reset(mockSubscriptionService)
-    super.beforeEach
+    super.beforeEach()
   }
 
   "ChangeOrganisationContactDetails Controller" - {

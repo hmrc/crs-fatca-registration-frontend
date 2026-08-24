@@ -43,7 +43,9 @@ class IndContactNameFormProvider @Inject() extends Mappings with RegexConstants 
         individualNameRegex,
         maxLength
       )
-    )(Name.apply)(Name.unapply)
+    )(Name.apply)(
+      name => Some((name.firstName, name.lastName))
+    )
   )
 
 }

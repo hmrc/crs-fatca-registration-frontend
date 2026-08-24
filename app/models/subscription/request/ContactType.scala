@@ -20,7 +20,6 @@ import models.UserAnswers
 import models.error.ApiError
 import models.error.ApiError.MandatoryInformationMissingError
 import pages._
-import play.api.libs.functional.syntax.unlift
 import play.api.libs.json._
 import uk.gov.hmrc.auth.core.AffinityGroup
 import utils.UserAnswersHelper
@@ -62,7 +61,9 @@ object OrganisationDetails {
   }
 
   implicit val writes: Writes[OrganisationDetails] =
-    (__ \ "organisation" \ "name").write[String] contramap unlift(OrganisationDetails.unapply)
+    (__ \ "organisation" \ "name").write[String] contramap (
+      organisationDetails => organisationDetails.name
+    )
 
   def convertTo(contactName: Option[String]): Option[OrganisationDetails] =
     contactName.map(OrganisationDetails(_))
@@ -83,7 +84,9 @@ object IndividualDetails {
 
   implicit val writes: OWrites[IndividualDetails] =
     ((__ \ "individual" \ "firstName").write[String] and
-      (__ \ "individual" \ "lastName").write[String])(unlift(IndividualDetails.unapply))
+      (__ \ "individual" \ "lastName").write[String])(
+      individualDetails => (individualDetails.firstName, individualDetails.lastName)
+    )
 
   def convertTo(userAnswers: UserAnswers): Option[IndividualDetails] =
     (userAnswers.get(IndWhatIsYourNamePage), userAnswers.get(IndContactNamePage), userAnswers.get(WhatIsYourNamePage)) match {
@@ -114,7 +117,9 @@ object ContactInformation extends UserAnswersHelper {
       __.write[ContactType] and
         (__ \ "email").write[String] and
         (__ \ "phone").writeNullable[String]
-    )(unlift(ContactInformation.unapply))
+    )(
+      contactInformation => (contactInformation.contactInformation, contactInformation.email, contactInformation.phone)
+    )
   }
 
   def convertToPrimary(userAnswers: UserAnswers): Option[ContactInformation] = {

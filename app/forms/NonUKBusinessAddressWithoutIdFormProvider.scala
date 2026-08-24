@@ -73,7 +73,9 @@ class NonUKBusinessAddressWithoutIdFormProvider @Inject() extends Mappings with 
               .getOrElse(throw new IllegalStateException(s"Failed to derive country given code [$value]")),
           country => country.code
         )
-    )(Address.apply)(Address.unapply)
+    )(Address.apply)(
+      address => Some((address.addressLine1, address.addressLine2, address.addressLine3, address.addressLine4, address.postCode, address.country))
+    )
   )
 
 }

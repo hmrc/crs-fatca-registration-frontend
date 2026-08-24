@@ -73,11 +73,12 @@ class EncryptedSessionRepositorySpec
   implicit val sensitiveFormat: Format[SensitiveJsObject] =
     JsonEncryption.sensitiveEncrypterDecrypter(SensitiveJsObject.apply)
 
-  override protected val repository = new SessionRepository(
-    mongoComponent = mongoComponent,
-    appConfig = mockAppConfig,
-    clock = stubClock
-  )
+  override protected val repository: SessionRepository =
+    new SessionRepository(
+      mongoComponent = mongoComponent,
+      appConfig = mockAppConfig,
+      clock = stubClock
+    )
 
   ".set" - {
 

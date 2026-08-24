@@ -22,7 +22,7 @@ import uk.gov.hmrc.crypto.Sensitive.SensitiveString
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-
+import scala.language.implicitConversions
 import java.time.Instant
 
 final case class UserSubscription(
@@ -49,7 +49,9 @@ object UserSubscription {
         (__ \ "_id").write[String] and
           (__ \ "subscriptionID").write[SubscriptionID] and
           (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-      )(unlift(UserSubscription.unapply))
+      )(
+        userSubscription => (userSubscription.id, userSubscription.subscriptionID, userSubscription.lastUpdated)
+      )
 
     OFormat(reads, writes)
   }

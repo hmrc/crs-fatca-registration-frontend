@@ -30,7 +30,7 @@ class WhatIsYourUTRFormProvider @Inject() extends Mappings with RegexConstants {
       mapping("value" -> validatedUTR("whatIsYourUTR.error.required", "whatIsYourUTR.error.invalid", "whatIsYourUTR.error.invalidFormat", utrRegex, taxType))(
         UniqueTaxpayerReference.apply
       )(
-        UniqueTaxpayerReference.unapply
+        uniqueTaxPayerReference => Some(uniqueTaxPayerReference.uniqueTaxPayerReference)
       )
     )
 

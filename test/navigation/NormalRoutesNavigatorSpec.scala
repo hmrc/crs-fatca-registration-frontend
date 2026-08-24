@@ -277,13 +277,13 @@ class NormalRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks 
       "must go from SecondContactHavePhonePage to CheckYourAnswersPage when user answers no" in {
 
         val userAnswers = emptyUserAnswers.set(SecondContactHavePhonePage, false).success.value
-        navigator.nextPage(SecondContactHavePhonePage, NormalMode, userAnswers) mustBe controllers.routes.CheckYourAnswersController.onPageLoad
+        navigator.nextPage(SecondContactHavePhonePage, NormalMode, userAnswers) mustBe controllers.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from SecondContactPhonePage to CheckYourAnswersPage" in {
 
         val userAnswers = emptyUserAnswers.set(SecondContactPhonePage, "123456789").success.value
-        navigator.nextPage(SecondContactPhonePage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
+        navigator.nextPage(SecondContactPhonePage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
       }
       "must go from IndContactEmailPage to IndContactHavePhonePage" in {
 
@@ -295,7 +295,7 @@ class NormalRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks 
       "must go from IndContactPhonePage to CheckYourAnswersPage" in {
 
         val userAnswers = emptyUserAnswers.set(IndContactPhonePage, "123456789").success.value
-        navigator.nextPage(IndContactPhonePage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad
+        navigator.nextPage(IndContactPhonePage, NormalMode, userAnswers) mustBe routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from IsThisYourBusinessPage" - {

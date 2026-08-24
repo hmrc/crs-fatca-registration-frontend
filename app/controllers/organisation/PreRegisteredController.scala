@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import controllers.actions._
 
 import javax.inject.Inject
@@ -29,8 +28,7 @@ class PreRegisteredController @Inject() (
   override val messagesApi: MessagesApi,
   standardActionSets: StandardActionSets,
   val controllerComponents: MessagesControllerComponents,
-  view: PreRegisteredView,
-  frontendAppConfig: FrontendAppConfig
+  view: PreRegisteredView
 ) extends FrontendBaseController
     with I18nSupport {
 

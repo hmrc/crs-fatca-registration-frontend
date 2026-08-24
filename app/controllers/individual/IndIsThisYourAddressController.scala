@@ -38,7 +38,6 @@ class IndIsThisYourAddressController @Inject() (
   navigator: Navigator,
   standardActionSets: StandardActionSets,
   formProvider: IndIsThisYourAddressFormProvider,
-  checkForSubmission: CheckForSubmissionAction,
   val controllerComponents: MessagesControllerComponents,
   view: IndIsThisYourAddressView,
   errorView: ThereIsAProblemView

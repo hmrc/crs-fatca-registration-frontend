@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import controllers.actions._
 import forms.DoYouHaveUniqueTaxPayerReferenceFormProvider
 import models.Mode
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DoYouHaveUniqueTaxPayerReferenceController @Inject() (
   override val messagesApi: MessagesApi,
-  appConfig: FrontendAppConfig,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   standardActionSets: StandardActionSets,

@@ -45,7 +45,7 @@ class SubscriptionRepository @Inject() (
           Indexes.ascending("lastUpdated"),
           IndexOptions()
             .name("subscriptionLastUpdatedIdx")
-            .expireAfter(appConfig.subscriptionTtl, java.util.concurrent.TimeUnit.SECONDS)
+            .expireAfter(appConfig.subscriptionTtl.toLong, java.util.concurrent.TimeUnit.SECONDS)
         )
       )
     ) {

@@ -27,7 +27,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CountryListFactory
-import views.html.ThereIsAProblemView
 import views.html.organisation.NonUKBusinessAddressWithoutIDView
 
 import javax.inject.Inject
@@ -41,7 +40,6 @@ class NonUKBusinessAddressWithoutIDController @Inject() (
   standardActionSets: StandardActionSets,
   formProvider: NonUKBusinessAddressWithoutIdFormProvider,
   checkForSubmission: CheckForSubmissionAction,
-  errorView: ThereIsAProblemView,
   val controllerComponents: MessagesControllerComponents,
   view: NonUKBusinessAddressWithoutIDView
 )(implicit ec: ExecutionContext)

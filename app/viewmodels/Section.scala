@@ -16,7 +16,7 @@
 
 package viewmodels
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{__, OWrites}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 
@@ -28,6 +28,8 @@ object Section {
     (
       (__ \ "sectionName").write[String] and
         (__ \ "rows").write[Seq[SummaryListRow]]
-    )(unlift(Section.unapply))
+    )(
+      section => (section.sectionName, section.rows)
+    )
 
 }

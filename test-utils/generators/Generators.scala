@@ -122,10 +122,10 @@ trait Generators extends RegexConstants {
   } yield chars.mkString
 
   def validNino: Gen[String] = for {
-    first   <- Gen.oneOf("ACEHJLMOPRSWXY".toCharArray)
-    second  <- Gen.oneOf("ABCEGHJKLMNPRSTWXYZ".toCharArray)
+    first   <- Gen.oneOf("ACEHJLMOPRSWXY".toIndexedSeq)
+    second  <- Gen.oneOf("ABCEGHJKLMNPRSTWXYZ".toIndexedSeq)
     numbers <- listOfN(6, Gen.oneOf(List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)))
-    last    <- Gen.oneOf("ABCD".toCharArray)
+    last    <- Gen.oneOf("ABCD".toIndexedSeq)
   } yield s"$first$second${numbers.mkString}$last"
 
   def oneOf[T](xs: Seq[Gen[T]]): Gen[T] =

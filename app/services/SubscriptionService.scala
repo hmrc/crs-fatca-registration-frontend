@@ -245,7 +245,6 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
       case individual: IndividualDetails =>
         val individualName = Name(individual.firstName, individual.lastName).fullName
         userAnswers.set(contactTypePage.contactNamePage, individualName)
-      case _ => Try(userAnswers)
     }
 
 }

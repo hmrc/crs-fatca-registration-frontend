@@ -46,7 +46,7 @@ class BusinessMatchingWithIdServiceSpec extends SpecBase {
   private val application = applicationBuilder()
     .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
 
-  val service: BusinessMatchingWithIdService = application.injector.instanceOf[BusinessMatchingWithIdService]
+  val service: BusinessMatchingWithIdService = application.injector().instanceOf[BusinessMatchingWithIdService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockRegistrationConnector)

@@ -43,7 +43,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from ReporterTypePage - Individual" - {
@@ -51,7 +51,7 @@ class CheckRoutesNavigatorSpec extends SpecBase with TableDrivenPropertyChecks w
         "to Check Your Answers if Individual is unchanged" in {
           val answers = ua.withPage(IndDoYouHaveNINumberPage, true)
             .withPage(IndWhatIsYourNINumberPage, Nino(validNino.sample.get))
-          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad
+          navigator.nextPage(ReporterTypePage, CheckMode, answers) mustBe routes.CheckYourAnswersController.onPageLoad()
         }
         "to IndDoYouHaveNINumber if reportYpe changed to Individual" in {
           navigator.nextPage(ReporterTypePage, CheckMode, ua) mustBe controllers.individual.routes.IndDoYouHaveNINumberController.onPageLoad(CheckMode)
