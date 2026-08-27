@@ -134,7 +134,7 @@ class AuditConnectorSpec
       }
     }
 
-    "must return an error response when the backend returns an error response" in {
+    "must fail when the backend returns an error response" in {
 
       wireMockServer.stubFor(
         post(urlEqualTo("/audit/create-registration"))
@@ -162,15 +162,16 @@ class AuditConnectorSpec
             config = mockConfig
           )
 
-        val result =
-          await(
-            connector.sendCreateRegistration(auditRequest)
-          )
+        val exception =
+          intercept[UpstreamErrorResponse] {
+            await(
+              connector.sendCreateRegistration(auditRequest)
+            )
+          }
 
-        result.status mustBe INTERNAL_SERVER_ERROR
+        exception.statusCode mustBe INTERNAL_SERVER_ERROR
       }
     }
-
   }
 
 }
