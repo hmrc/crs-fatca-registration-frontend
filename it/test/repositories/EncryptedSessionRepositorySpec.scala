@@ -55,7 +55,7 @@ class EncryptedSessionRepositorySpec
   private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
-  when(mockAppConfig.cacheTtl) thenReturn 1
+  when(mockAppConfig.cacheTtl) thenReturn 1L
   when(mockAppConfig.mongoEncryptionEnabled) thenReturn true
 
   private val aesKey = {

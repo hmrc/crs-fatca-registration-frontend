@@ -83,7 +83,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val ctEnrolmentKey: String       = configuration.get[String]("keys.enrolmentKey.ct")
   lazy val countryCodeJson: String = configuration.get[String]("json.countries")
 
-  val cacheTtl: Int        = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  val cacheTtl: Long       = configuration.get[Long]("mongodb.timeToLiveInSeconds")
   val subscriptionTtl: Int = configuration.get[Int]("mongodb.subscriptionTimeToLiveInSeconds")
 
   val mongoEncryptionEnabled: Boolean = configuration.get[Boolean]("mongodb.encryptionEnabled")
