@@ -16,8 +16,9 @@
 
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcAccessibleAutocompleteCss, HmrcAccessibleAutocompleteJavascript, HmrcStandardPage}
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.{Banners => StandardPageBanners, _}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcAccessibleAutocompleteCss, HmrcAccessibleAutocompleteJavascript}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+
 @import views.html.helper.CSPNonce
 
 @this(
@@ -70,7 +71,7 @@
             serviceUrl = Some(routes.IndexController.onPageLoad.url),
             signOutUrl = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
         ),
-        banners = StandardPageBanners(
+        banners = Banners(
             phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
         ),
         pageTitle = Some(pageTitle),
