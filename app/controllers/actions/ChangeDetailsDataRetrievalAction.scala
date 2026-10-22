@@ -43,7 +43,7 @@ class ChangeDetailsDataRetrievalActionProvider @Inject() (
     sessionRepository.get(request.userId).map {
       maybeUserAnswers =>
         val userAnswers = maybeUserAnswers.getOrElse(UserAnswers(request.userId))
-        DataRequestWithUserAnswers(request.request, request.userId, request.subscriptionId, userAnswers)
+        DataRequestWithUserAnswers(request.request, request.userId, request.subscriptionId, request.affinityGroup, userAnswers)
     }
 
 }

@@ -17,23 +17,23 @@
 package controllers.changeContactDetails
 
 import config.FrontendAppConfig
-import controllers.actions._
+import controllers.actions.*
 import controllers.{routes, ContactDetailsMissingController}
 import models.requests.DataRequestWithUserAnswers
-import models.subscription.response.DisplaySubscriptionResponse
+import models.subscription.response.{DisplaySubscriptionResponse, IndividualRegistrationType}
 import models.{CheckMode, UserAnswers}
 import pages.changeContactDetails.ChangeContactDetailsInProgressPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.SubscriptionService
+import services.{AuditService, SubscriptionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.{ChangeIndividualContactDetailsHelper, CheckYourAnswersValidator}
-import viewmodels.govuk.summarylist._
+import viewmodels.govuk.summarylist.*
 import views.html.ThereIsAProblemView
 import views.html.changeContactDetails.ChangeIndividualContactDetailsView
-
+import scala.util.control.NonFatal
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,7 +45,8 @@ class ChangeIndividualContactDetailsController @Inject() (
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: ChangeIndividualContactDetailsView,
-  errorView: ThereIsAProblemView
+  errorView: ThereIsAProblemView,
+  auditService: AuditService
 )(implicit executionContext: ExecutionContext) extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -77,11 +78,32 @@ class ChangeIndividualContactDetailsController @Inject() (
 
   def onSubmit: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRetrievalForIndividual().async {
     implicit request =>
-      subscriptionService.updateIndContactDetails(request.subscriptionId, request.userAnswers) map {
-        case true =>
+      subscriptionService.updateContactDetailsWithAuditData(
+        request.subscriptionId,
+        request.userAnswers,
+        IndividualRegistrationType
+      ).map {
+        case Some(update) =>
+          try
+            auditService.buildIndividualUpdateContactDetails(
+              update.original,
+              update.updated,
+              request.subscriptionId,
+              request.affinityGroup
+            ).foreach {
+              auditRequest =>
+                auditService.sendUpdateContactDetails(auditRequest)
+            }
+          catch {
+            case NonFatal(exception) =>
+              logger.error("Unable to initiate UpdateContactDetails audit event", exception)
+          }
+
           sessionRepository.clear(request.userId)
           Redirect(controllers.routes.DetailsUpdatedController.onPageLoad())
-        case false => InternalServerError(errorView())
+
+        case None =>
+          InternalServerError(errorView())
       }
   }
 

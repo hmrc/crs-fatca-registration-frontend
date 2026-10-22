@@ -16,8 +16,8 @@
 
 package controllers.changeContactDetails
 
-import base.SpecBase
-import controllers.actions._
+import base.{SpecBase, TestValues}
+import controllers.actions.*
 import forms.changeContactDetails.IndividualPhoneFormProvider
 import helpers.JsonFixtures.{subscriptionId, TestEmail, TestMobilePhoneNumber}
 import models.subscription.response.IndividualRegistrationType
@@ -30,7 +30,8 @@ import pages.changeContactDetails.{IndividualEmailPage, IndividualHavePhonePage,
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.IndividualPhoneView
 
 import scala.concurrent.Future
@@ -52,7 +53,7 @@ class IndividualPhoneControllerSpec extends SpecBase with MockitoSugar {
 
   "IndividualPhone Controller" - {
     when(mockSubscriptionIdRetrievalAction.apply(Some(IndividualRegistrationType)))
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, AffinityGroup.Individual))
 
     "must return OK and the correct view for a GET" in {
       val userAnswers = emptyUserAnswers

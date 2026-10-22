@@ -23,7 +23,8 @@ import org.jsoup.Jsoup
 import org.mockito.MockitoSugar.when
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.DetailsUpdatedView
 
 class DetailsUpdatedControllerSpec extends SpecBase {
@@ -33,7 +34,7 @@ class DetailsUpdatedControllerSpec extends SpecBase {
   "detailsUpdated Controller" - {
 
     when(mockSubscriptionIdRetrievalAction.apply())
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, AffinityGroup.Organisation))
 
     "must return OK and the correct view for a GET" in {
 

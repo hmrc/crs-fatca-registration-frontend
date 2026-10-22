@@ -16,12 +16,15 @@
 
 package controllers.changeContactDetails
 
-import base.SpecBase
+import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController
 import controllers.routes
 import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures.subscriptionId
+import models.audit.AuditResult.AuditSent
+import models.audit.UpdateContactDetailsAuditRequest
+import models.subscription.request.UpdateSubscriptionRequest
 import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse, IndividualRegistrationType}
 import models.{SubscriptionID, UserAnswers}
 import org.jsoup.Jsoup
@@ -36,7 +39,8 @@ import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.SubscriptionService
+import services.{AuditService, SubscriptionService}
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.ThereIsAProblemView
 
@@ -46,16 +50,17 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
     with ModelGenerators {
 
   private val mockSubscriptionService           = mock[SubscriptionService]
+  private val mockAuditService                  = mock[AuditService]
   private val mockSubscriptionIdRetrievalAction = mock[SubscriptionIdRetrievalAction]
 
   override def beforeEach(): Unit = {
-    reset(mockSubscriptionService)
+    reset(mockSubscriptionService, mockAuditService)
     super.beforeEach()
   }
 
   "ChangeIndividualContactDetails Controller" - {
     when(mockSubscriptionIdRetrievalAction.apply(Some(IndividualRegistrationType)))
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, AffinityGroup.Individual))
 
     "onPageLoad" - {
       "must return OK and show 'confirm and send' button for a GET request when there is no change to the contact details" in {
@@ -181,13 +186,38 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
           .withPage(IndividualPhonePage, validPhoneNumber(11).toString)
           .withPage(ChangeContactDetailsInProgressPage, true))
 
-        when(mockSubscriptionService.updateIndContactDetails(mEq(subscriptionId), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
-          .thenReturn(Future.successful(true))
+        val original = mock[DisplaySubscriptionResponse]
+        val updated  = mock[UpdateSubscriptionRequest]
+        val update   = new mockSubscriptionService.SuccessfulContactDetailsUpdate(original, updated)
+
+        val auditRequest = UpdateContactDetailsAuditRequest(
+          fatcaId = subscriptionId.value,
+          affinityType = AffinityGroup.Individual.toString,
+          email = Some("new@test.com")
+        )
+
+        when(mockSubscriptionService.updateContactDetailsWithAuditData(
+          mEq(subscriptionId),
+          any[UserAnswers](),
+          mEq(IndividualRegistrationType)
+        )(any[HeaderCarrier](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(Some(update)))
+
+        when(mockAuditService.buildIndividualUpdateContactDetails(
+          original,
+          updated,
+          subscriptionId,
+          AffinityGroup.Individual
+        )).thenReturn(Some(auditRequest))
+        when(mockAuditService.sendUpdateContactDetails(mEq(auditRequest))(any[HeaderCarrier]()))
+          .thenReturn(Future.successful(AuditSent))
+
         when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
         when(mockSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
         val application = applicationBuilder(userAnswers)
           .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
+          .overrides(bind[AuditService].toInstance(mockAuditService))
           .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
           .build()
 
@@ -199,18 +229,30 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.routes.DetailsUpdatedController.onPageLoad().url
           verify(mockSessionRepository, times(1)).clear(any())
+          verify(mockAuditService, times(1)).buildIndividualUpdateContactDetails(
+            original,
+            updated,
+            subscriptionId,
+            AffinityGroup.Individual
+          )
+          verify(mockAuditService, times(1)).sendUpdateContactDetails(mEq(auditRequest))(any[HeaderCarrier]())
         }
 
       }
       "return 'technical difficulties' page on failing to update ContactDetails" in {
         val userAnswers = Some(emptyUserAnswers)
 
-        when(mockSubscriptionService.updateIndContactDetails(any[SubscriptionID](), any[UserAnswers])(any[HeaderCarrier](), any[ExecutionContext]()))
-          .thenReturn(Future.successful(false))
+        when(mockSubscriptionService.updateContactDetailsWithAuditData(
+          any[SubscriptionID](),
+          any[UserAnswers](),
+          mEq(IndividualRegistrationType)
+        )(any[HeaderCarrier](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(None))
         when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswers))
 
         val application = applicationBuilder(userAnswers)
           .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
+          .overrides(bind[AuditService].toInstance(mockAuditService))
           .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
           .build()
 
@@ -222,6 +264,7 @@ class ChangeIndividualContactDetailsControllerSpec extends SpecBase with Mockito
 
           status(result) mustEqual INTERNAL_SERVER_ERROR
           contentAsString(result) mustEqual view()(request, messages(application)).toString
+          verify(mockAuditService, times(0)).sendUpdateContactDetails(any[UpdateContactDetailsAuditRequest]())(any[HeaderCarrier]())
         }
       }
 

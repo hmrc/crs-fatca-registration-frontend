@@ -35,7 +35,7 @@ class ContactDetailsMissingControllerSpec extends SpecBase with TestValues {
   "ContactDetailsMissing Controller" - {
 
     when(mockSubscriptionIdRetrievalAction.apply())
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, testAffinityGroupOrganisation))
     when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(emptyUserAnswers)))
 
     "must return OK and the correct view with default continue url for a GET" in {
