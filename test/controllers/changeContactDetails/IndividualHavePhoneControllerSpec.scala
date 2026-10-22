@@ -55,7 +55,7 @@ class IndividualHavePhoneControllerSpec extends SpecBase with TestValues with Mo
 
   "IndividualHavePhone Controller" - {
     when(mockSubscriptionIdRetrievalAction.apply(Some(IndividualRegistrationType)))
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, testAffinityGroupIndividual))
 
     "must return OK and the correct view for a GET" in {
       val userAnswers = emptyUserAnswers

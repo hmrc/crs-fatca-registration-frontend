@@ -32,7 +32,7 @@ class ChangeDetailsDataRequiredActionImpl @Inject() (
   override protected def refine[A](request: DataRequestWithSubscriptionId[A]): Future[Either[Result, DataRequestWithUserAnswers[A]]] =
     sessionRepository.get(request.userId).map {
       case Some(userAnswers) =>
-        Right(DataRequestWithUserAnswers(request.request, request.userId, request.subscriptionId, userAnswers))
+        Right(DataRequestWithUserAnswers(request.request, request.userId, request.subscriptionId, request.affinityGroup, userAnswers))
       case None => Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
 

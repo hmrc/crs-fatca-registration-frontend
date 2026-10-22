@@ -16,7 +16,7 @@
 
 package controllers.changeContactDetails
 
-import base.SpecBase
+import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.routes
 import forms.changeContactDetails.IndividualEmailFormProvider
@@ -53,7 +53,7 @@ class IndividualEmailControllerSpec extends SpecBase with MockitoSugar {
 
   "IndividualEmail Controller" - {
     when(mockSubscriptionIdRetrievalAction.apply(Some(IndividualRegistrationType)))
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, testAffinityGroupIndividual))
 
     "must populate the view correctly on a GET with existing answer" in {
 

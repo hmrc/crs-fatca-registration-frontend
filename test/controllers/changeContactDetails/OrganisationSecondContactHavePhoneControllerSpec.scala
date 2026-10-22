@@ -44,7 +44,7 @@ class OrganisationSecondContactHavePhoneControllerSpec extends SpecBase with Moc
 
   "Change Organisation SecondContactHavePhone Controller" - {
     when(mockSubscriptionIdRetrievalAction.apply(Some(OrganisationRegistrationType)))
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, testAffinityGroupOrganisation))
 
     "must return OK and the correct view for a GET" in {
 

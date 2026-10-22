@@ -19,7 +19,9 @@ package services
 import connectors.AuditConnector
 import models.ReporterType.{Individual, LimitedCompany, LimitedPartnership, Partnership, Sole, UnincorporatedAssociation}
 import models.audit.AuditResult.{AuditFailed, AuditNotSent, AuditSent}
-import models.audit.{AuditResult, CreateRegistrationAuditRequest}
+import models.subscription.request.{ContactInformation, OrganisationDetails, UpdateSubscriptionRequest}
+import models.subscription.response.DisplaySubscriptionResponse
+import models.audit.{AuditResult, CreateRegistrationAuditRequest, UpdateContactDetailsAuditRequest}
 import models.{Address, ReporterType, SubscriptionID, UserAnswers}
 import pages._
 import pages.changeContactDetails.{OrganisationSecondContactEmailPage, OrganisationSecondContactNamePage, OrganisationSecondContactPhonePage}
@@ -77,6 +79,73 @@ class AuditService @Inject() (
           AuditNotSent
         )
     }
+
+  def sendUpdateContactDetails(
+    auditRequest: UpdateContactDetailsAuditRequest
+  )(implicit hc: HeaderCarrier): Future[AuditResult] =
+    auditConnector
+      .sendUpdateContactDetails(auditRequest)
+      .map(
+        _ => AuditSent
+      )
+      .recover {
+        case exception =>
+          logger.error(
+            "Failed to send UpdateContactDetails audit event",
+            exception
+          )
+
+          AuditFailed
+      }
+
+  def buildOrganisationUpdateContactDetails(
+    original: DisplaySubscriptionResponse,
+    updated: UpdateSubscriptionRequest,
+    subscriptionId: SubscriptionID,
+    affinityGroup: AffinityGroup
+  ): Option[UpdateContactDetailsAuditRequest] = {
+
+    val originalDetails  = original.success.crfaSubscriptionDetails
+    val updatedPrimary   = updated.primaryContact
+    val updatedSecondary = updated.secondaryContact
+
+    val hasChanges =
+      originalDetails.primaryContact != updatedPrimary ||
+        originalDetails.secondaryContact != updatedSecondary
+
+    Option.when(hasChanges) {
+      UpdateContactDetailsAuditRequest(
+        fatcaId = subscriptionId.value,
+        affinityType = affinityGroup.toString,
+        firstContactName = organisationContactName(updatedPrimary),
+        firstContactEmail = Some(updatedPrimary.email),
+        firstContactTelephone = updatedPrimary.phone,
+        secondContactName = updatedSecondary.flatMap(organisationContactName),
+        secondContactEmail = updatedSecondary.map(_.email),
+        secondContactTelephone = updatedSecondary.flatMap(_.phone)
+      )
+    }
+  }
+
+  def buildIndividualUpdateContactDetails(
+    original: DisplaySubscriptionResponse,
+    updated: UpdateSubscriptionRequest,
+    subscriptionId: SubscriptionID,
+    affinityGroup: AffinityGroup
+  ): Option[UpdateContactDetailsAuditRequest] = {
+
+    val originalContact = original.success.crfaSubscriptionDetails.primaryContact
+    val updatedContact  = updated.primaryContact
+
+    Option.when(originalContact != updatedContact) {
+      UpdateContactDetailsAuditRequest(
+        fatcaId = subscriptionId.value,
+        affinityType = affinityGroup.toString,
+        email = Some(updatedContact.email),
+        telephone = updatedContact.phone
+      )
+    }
+  }
 
   private def buildCreateRegistration(
     userAnswers: UserAnswers,
@@ -483,5 +552,13 @@ class AuditService @Inject() (
     Option(value)
       .map(_.trim)
       .filter(_.nonEmpty)
+
+  private def organisationContactName(
+    contact: ContactInformation
+  ): Option[String] =
+    contact.contactInformation match {
+      case OrganisationDetails(name) => Some(name)
+      case _                         => None
+    }
 
 }

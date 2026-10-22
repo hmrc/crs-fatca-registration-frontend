@@ -23,7 +23,13 @@ import models.error.ApiError
 import models.error.ApiError.MandatoryInformationMissingError
 import models.matching.SafeId
 import models.subscription.request._
-import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse}
+import models.subscription.response.{
+  DisplayResponseDetail,
+  DisplaySubscriptionResponse,
+  IndividualRegistrationType,
+  OrganisationRegistrationType,
+  RegistrationType
+}
 import models.{Name, SubscriptionID, UserAnswers}
 import pages.changeContactDetails.{OrganisationHaveSecondContactPage, OrganisationSecondContactNamePage}
 import play.api.Logging
@@ -41,35 +47,28 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
     subscriptionId: SubscriptionID,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    getSubscription(subscriptionId).flatMap {
-      case Some(displaySubscriptionResponse) =>
-        UpdateSubscriptionRequest.convertToRequestOrg(displaySubscriptionResponse, userAnswers) match {
-          case Some(updateSubscriptionRequest) => subscriptionConnector.updateSubscription(updateSubscriptionRequest)
-          case _ =>
-            logger.warn("updateContactDetails: failed to convert userAnswers to RequestDetailForUpdate")
-            Future.successful(false)
-        }
-      case _ =>
-        logger.warn("updateContactDetails: readSubscription call failed to fetch data")
-        Future.successful(false)
-    }
+    updateContactDetails(subscriptionId, userAnswers, UpdateSubscriptionRequest.convertToRequestOrg)
+      .map(_.isDefined)
 
   def updateIndContactDetails(
     subscriptionId: SubscriptionID,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    getSubscription(subscriptionId).flatMap {
-      case Some(displaySubscriptionResponse) =>
-        UpdateSubscriptionRequest.convertToRequestInd(displaySubscriptionResponse, userAnswers) match {
-          case Some(updateSubscriptionRequest) => subscriptionConnector.updateSubscription(updateSubscriptionRequest)
-          case _ =>
-            logger.warn("updateContactDetails: failed to convert userAnswers to RequestDetailForUpdate")
-            Future.successful(false)
-        }
-      case _ =>
-        logger.warn("updateContactDetails: readSubscription call failed to fetch data")
-        Future.successful(false)
+    updateContactDetails(subscriptionId, userAnswers, UpdateSubscriptionRequest.convertToRequestInd)
+      .map(_.isDefined)
+
+  def updateContactDetailsWithAuditData(
+    subscriptionId: SubscriptionID,
+    userAnswers: UserAnswers,
+    registrationType: RegistrationType
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SuccessfulContactDetailsUpdate]] = {
+    val buildRequest: (DisplaySubscriptionResponse, UserAnswers) => Option[UpdateSubscriptionRequest] = registrationType match {
+      case OrganisationRegistrationType => UpdateSubscriptionRequest.convertToRequestOrg
+      case IndividualRegistrationType   => UpdateSubscriptionRequest.convertToRequestInd
     }
+
+    updateContactDetails(subscriptionId, userAnswers, buildRequest)
+  }
 
   def checkAndCreateSubscription(
     safeId: SafeId,
@@ -246,5 +245,32 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
         val individualName = Name(individual.firstName, individual.lastName).fullName
         userAnswers.set(contactTypePage.contactNamePage, individualName)
     }
+
+  private def updateContactDetails(
+    subscriptionId: SubscriptionID,
+    userAnswers: UserAnswers,
+    buildRequest: (DisplaySubscriptionResponse, UserAnswers) => Option[UpdateSubscriptionRequest]
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SuccessfulContactDetailsUpdate]] =
+    getSubscription(subscriptionId).flatMap {
+      case Some(original) =>
+        buildRequest(original, userAnswers) match {
+          case Some(updated) =>
+            subscriptionConnector.updateSubscription(updated).map {
+              case true  => Some(SuccessfulContactDetailsUpdate(original, updated))
+              case false => None
+            }
+          case None =>
+            logger.warn("updateContactDetails: failed to convert userAnswers to RequestDetailForUpdate")
+            Future.successful(None)
+        }
+      case None =>
+        logger.warn("updateContactDetails: readSubscription call failed to fetch data")
+        Future.successful(None)
+    }
+
+  case class SuccessfulContactDetailsUpdate(
+    original: DisplaySubscriptionResponse,
+    updated: UpdateSubscriptionRequest
+  )
 
 }

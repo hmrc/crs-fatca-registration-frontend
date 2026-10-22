@@ -20,14 +20,17 @@ import base.SpecBase
 import connectors.AuditConnector
 import generators.{ModelGenerators, UserAnswersGenerator}
 import models.audit.AuditResult.{AuditFailed, AuditNotSent, AuditSent}
-import models.audit.CreateRegistrationAuditRequest
+import models.audit.{CreateRegistrationAuditRequest, UpdateContactDetailsAuditRequest}
+import models.subscription.request.{ContactInformation, IndividualDetails, OrganisationDetails, UpdateSubscriptionRequest}
+import models.subscription.response.DisplaySubscriptionResponse
 import models.{Address, Country, Name, ReporterType, SubscriptionID, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => mEq}
 import org.mockito.MockitoSugar.{never, reset, verify, when}
 import org.scalacheck.Arbitrary
 import pages._
 import play.api.http.Status.NO_CONTENT
+import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpResponse
@@ -241,6 +244,51 @@ class AuditServiceSpec
         ContactPhonePage,
         organisationContactPhone
       )
+
+  private def individualContact(
+    email: String,
+    phone: Option[String]
+  ): ContactInformation =
+    ContactInformation(
+      IndividualDetails("John", "Smith"),
+      email,
+      phone
+    )
+
+  private def organisationContact(
+    name: String,
+    email: String,
+    phone: Option[String]
+  ): ContactInformation =
+    ContactInformation(
+      OrganisationDetails(name),
+      email,
+      phone
+    )
+
+  private def originalSubscription(
+    primary: ContactInformation,
+    secondary: Option[ContactInformation] = None
+  ): DisplaySubscriptionResponse = {
+    val response = org.mockito.Mockito.mock(
+      classOf[DisplaySubscriptionResponse],
+      org.mockito.Mockito.RETURNS_DEEP_STUBS
+    )
+
+    when(response.success.crfaSubscriptionDetails.primaryContact).thenReturn(primary)
+    when(response.success.crfaSubscriptionDetails.secondaryContact).thenReturn(secondary)
+    response
+  }
+
+  private def updatedSubscription(
+    primary: ContactInformation,
+    secondary: Option[ContactInformation] = None
+  ): UpdateSubscriptionRequest = {
+    val request = mock[UpdateSubscriptionRequest]
+    when(request.primaryContact).thenReturn(primary)
+    when(request.secondaryContact).thenReturn(secondary)
+    request
+  }
 
   "AuditService" - {
 
@@ -1034,6 +1082,195 @@ class AuditServiceSpec
         result.tradingName mustBe None
 
         result.firstContactTelephone mustBe None
+      }
+    }
+
+    "buildIndividualUpdateContactDetails" - {
+
+      "must include all current individual contact details when only the email changes" in {
+        val original = originalSubscription(individualContact("old@test.com", Some(individualPhone)))
+        val updated  = updatedSubscription(individualContact("new@test.com", Some(individualPhone)))
+
+        val audit = service.buildIndividualUpdateContactDetails(
+          original,
+          updated,
+          subscriptionId,
+          AffinityGroup.Individual
+        ).value
+
+        audit mustBe UpdateContactDetailsAuditRequest(
+          fatcaId = subscriptionId.value,
+          affinityType = AffinityGroup.Individual.toString,
+          email = Some("new@test.com"),
+          telephone = Some(individualPhone)
+        )
+      }
+
+      "must audit removal of the phone while omitting it from the payload" in {
+        val original = originalSubscription(individualContact(individualEmail, Some(individualPhone)))
+        val updated  = updatedSubscription(individualContact(individualEmail, None))
+
+        val audit = service.buildIndividualUpdateContactDetails(
+          original,
+          updated,
+          subscriptionId,
+          AffinityGroup.Individual
+        ).value
+
+        audit.email mustBe Some(individualEmail)
+        audit.telephone mustBe None
+        (Json.toJson(audit) \ "telephone").toOption mustBe None
+        (Json.toJson(audit) \ "email").as[String] mustBe individualEmail
+      }
+
+      "must not build an audit when individual contact details have not changed" in {
+        val contact = individualContact(individualEmail, Some(individualPhone))
+
+        service.buildIndividualUpdateContactDetails(
+          originalSubscription(contact),
+          updatedSubscription(contact),
+          subscriptionId,
+          AffinityGroup.Individual
+        ) mustBe None
+      }
+    }
+
+    "buildOrganisationUpdateContactDetails" - {
+
+      "must include all first and second contact fields even if only one value changed" in {
+        val primaryBefore = organisationContact("First Contact", "old@test.com", Some("11111"))
+        val primaryAfter  = organisationContact("First Contact", "new@test.com", Some("11111"))
+        val second        = organisationContact("Second Contact", "second@test.com", Some("22222"))
+
+        val audit = service.buildOrganisationUpdateContactDetails(
+          originalSubscription(primaryBefore, Some(second)),
+          updatedSubscription(primaryAfter, Some(second)),
+          subscriptionId,
+          AffinityGroup.Organisation
+        ).value
+
+        audit mustBe UpdateContactDetailsAuditRequest(
+          fatcaId = subscriptionId.value,
+          affinityType = AffinityGroup.Organisation.toString,
+          firstContactName = Some("First Contact"),
+          firstContactEmail = Some("new@test.com"),
+          firstContactTelephone = Some("11111"),
+          secondContactName = Some("Second Contact"),
+          secondContactEmail = Some("second@test.com"),
+          secondContactTelephone = Some("22222")
+        )
+      }
+
+      "must omit all second contact fields when the entire contact is removed" in {
+        val first  = organisationContact("First Contact", "first@test.com", Some("11111"))
+        val second = organisationContact("Second Contact", "second@test.com", Some("22222"))
+
+        val audit = service.buildOrganisationUpdateContactDetails(
+          originalSubscription(first, Some(second)),
+          updatedSubscription(first, None),
+          subscriptionId,
+          AffinityGroup.Organisation
+        ).value
+
+        audit.firstContactName mustBe Some("First Contact")
+        audit.firstContactEmail mustBe Some("first@test.com")
+        audit.secondContactName mustBe None
+        audit.secondContactEmail mustBe None
+        audit.secondContactTelephone mustBe None
+
+        val json = Json.toJson(audit)
+        (json \ "secondContactName").toOption mustBe None
+        (json \ "secondContactEmail").toOption mustBe None
+        (json \ "secondContactTelephone").toOption mustBe None
+      }
+
+      "must retain secondary name and email when its telephone is removed" in {
+        val first        = organisationContact("First Contact", "first@test.com", None)
+        val secondBefore = organisationContact("Second Contact", "second@test.com", Some("22222"))
+        val secondAfter  = organisationContact("Second Contact", "second@test.com", None)
+
+        val audit = service.buildOrganisationUpdateContactDetails(
+          originalSubscription(first, Some(secondBefore)),
+          updatedSubscription(first, Some(secondAfter)),
+          subscriptionId,
+          AffinityGroup.Organisation
+        ).value
+
+        audit.secondContactName mustBe Some("Second Contact")
+        audit.secondContactEmail mustBe Some("second@test.com")
+        audit.secondContactTelephone mustBe None
+        (Json.toJson(audit) \ "secondContactTelephone").toOption mustBe None
+      }
+
+      "must include a newly added secondary contact" in {
+        val first  = organisationContact("First Contact", "first@test.com", None)
+        val second = organisationContact("Second Contact", "second@test.com", Some("22222"))
+
+        val audit = service.buildOrganisationUpdateContactDetails(
+          originalSubscription(first, None),
+          updatedSubscription(first, Some(second)),
+          subscriptionId,
+          AffinityGroup.Organisation
+        ).value
+
+        audit.secondContactName mustBe Some("Second Contact")
+        audit.secondContactEmail mustBe Some("second@test.com")
+        audit.secondContactTelephone mustBe Some("22222")
+      }
+
+      "must use the authenticated Agent affinity rather than hardcoding Organisation" in {
+        val original = organisationContact("First Contact", "old@test.com", None)
+        val updated  = organisationContact("First Contact", "new@test.com", None)
+
+        val audit = service.buildOrganisationUpdateContactDetails(
+          originalSubscription(original),
+          updatedSubscription(updated),
+          subscriptionId,
+          AffinityGroup.Agent
+        ).value
+
+        audit.affinityType mustBe AffinityGroup.Agent.toString
+      }
+
+      "must not build an audit when organisation contact details have not changed" in {
+        val first  = organisationContact("First Contact", "first@test.com", Some("11111"))
+        val second = organisationContact("Second Contact", "second@test.com", None)
+
+        service.buildOrganisationUpdateContactDetails(
+          originalSubscription(first, Some(second)),
+          updatedSubscription(first, Some(second)),
+          subscriptionId,
+          AffinityGroup.Organisation
+        ) mustBe None
+      }
+    }
+
+    "sendUpdateContactDetails" - {
+
+      val auditRequest = UpdateContactDetailsAuditRequest(
+        fatcaId = subscriptionId.value,
+        affinityType = AffinityGroup.Organisation.toString,
+        firstContactEmail = Some("new@test.com")
+      )
+
+      "must send the audit request to the connector successfully" in {
+        when(
+          mockAuditConnector.sendUpdateContactDetails(any())(any(), any())
+        ).thenReturn(Future.successful(HttpResponse(status = NO_CONTENT, body = "")))
+
+        service.sendUpdateContactDetails(auditRequest).futureValue mustBe AuditSent
+
+        verify(mockAuditConnector).sendUpdateContactDetails(mEq(auditRequest))(any(), any())
+      }
+
+      "must return AuditFailed when the connector fails" in {
+        when(
+          mockAuditConnector.sendUpdateContactDetails(any())(any(), any())
+        ).thenReturn(Future.failed(new RuntimeException("Audit endpoint unavailable")))
+
+        service.sendUpdateContactDetails(auditRequest).futureValue mustBe AuditFailed
+
+        verify(mockAuditConnector).sendUpdateContactDetails(mEq(auditRequest))(any(), any())
       }
     }
   }

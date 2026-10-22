@@ -74,8 +74,8 @@ class SubscriptionIdRetrievalActionExtractor @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised(AuthProviders(GovernmentGateway) and ConfidenceLevel.L50)
-      .retrieve(Retrievals.internalId and Retrievals.allEnrolments) {
-        case Some(internalId) ~ enrolments =>
+      .retrieve(Retrievals.internalId and Retrievals.allEnrolments and Retrievals.affinityGroup) {
+        case Some(internalId) ~ enrolments ~ Some(affinityGroup) =>
           getSubscriptionId(enrolments) match {
             case Some(subscriptionId) =>
               subscriptionService.getSubscription(SubscriptionID(subscriptionId)).flatMap {
@@ -84,7 +84,7 @@ class SubscriptionIdRetrievalActionExtractor @Inject() (
                       Future.successful(Redirect(controllers.changeContactDetails.routes.ChangeIndividualContactDetailsController.onPageLoad()))
                     case (Some(IndividualRegistrationType), OrganisationRegistrationType) =>
                       Future.successful(Redirect(controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController.onPageLoad()))
-                    case _ => block(DataRequestWithSubscriptionId(request, internalId, SubscriptionID(subscriptionId)))
+                    case _ => block(DataRequestWithSubscriptionId(request, internalId, affinityGroup, SubscriptionID(subscriptionId)))
                   }
                 case None =>
                   val errorMessage = s"User is enrolled but we can't retrieve subscription: $subscriptionId"
@@ -94,7 +94,7 @@ class SubscriptionIdRetrievalActionExtractor @Inject() (
             case None => Future.successful(Redirect(routes.IndexController.onPageLoad))
           }
         case _ =>
-          val msg = "Unable to retrieve internal id"
+          val msg = "Unable to retrieve internal id or affinity group"
           logger.warn(msg)
           throw AuthorisationException.fromString(msg)
       } recover {

@@ -34,7 +34,9 @@ import utils.{ChangeOrganisationContactDetailsHelper, CheckYourAnswersValidator,
 import viewmodels.govuk.summarylist._
 import views.html.ThereIsAProblemView
 import views.html.changeContactDetails.ChangeOrganisationContactDetailsView
-
+import models.subscription.response.OrganisationRegistrationType
+import services.AuditService
+import scala.util.control.NonFatal
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -47,7 +49,8 @@ class ChangeOrganisationContactDetailsController @Inject() (
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: ChangeOrganisationContactDetailsView,
-  errorView: ThereIsAProblemView
+  errorView: ThereIsAProblemView,
+  auditService: AuditService
 )(implicit executionContext: ExecutionContext) extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -79,11 +82,32 @@ class ChangeOrganisationContactDetailsController @Inject() (
 
   def onSubmit: Action[AnyContent] = standardActionSets.subscriptionIdWithChangeDetailsRetrievalForOrgOrAgent().async {
     implicit request =>
-      subscriptionService.updateOrgContactDetails(request.subscriptionId, request.userAnswers) map {
-        case true =>
+      subscriptionService.updateContactDetailsWithAuditData(
+        request.subscriptionId,
+        request.userAnswers,
+        OrganisationRegistrationType
+      ).map {
+        case Some(update) =>
+          try
+            auditService.buildOrganisationUpdateContactDetails(
+              update.original,
+              update.updated,
+              request.subscriptionId,
+              request.affinityGroup
+            ).foreach {
+              auditRequest =>
+                auditService.sendUpdateContactDetails(auditRequest)
+            }
+          catch {
+            case NonFatal(exception) =>
+              logger.error("Unable to initiate UpdateContactDetails audit event", exception)
+          }
+
           sessionRepository.clear(request.userId)
           Redirect(controllers.routes.DetailsUpdatedController.onPageLoad())
-        case false => InternalServerError(errorView())
+
+        case None =>
+          InternalServerError(errorView())
       }
   }
 

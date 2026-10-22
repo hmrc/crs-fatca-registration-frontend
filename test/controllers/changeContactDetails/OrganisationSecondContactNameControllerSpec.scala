@@ -16,7 +16,7 @@
 
 package controllers.changeContactDetails
 
-import base.SpecBase
+import base.{SpecBase, TestValues}
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import forms.changeContactDetails.OrganisationSecondContactNameFormProvider
 import helpers.JsonFixtures.subscriptionId
@@ -29,7 +29,8 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.changeContactDetails.OrganisationSecondContactNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.OrganisationSecondContactNameView
 
 import scala.concurrent.Future
@@ -45,7 +46,7 @@ class OrganisationSecondContactNameControllerSpec extends SpecBase with MockitoS
 
   "Change Organisation SecondContactName Controller" - {
     when(mockSubscriptionIdRetrievalAction.apply(Some(OrganisationRegistrationType)))
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, AffinityGroup.Organisation))
 
     "must return OK and the correct view for a GET" in {
 
