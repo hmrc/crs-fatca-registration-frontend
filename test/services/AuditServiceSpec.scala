@@ -245,7 +245,6 @@ class AuditServiceSpec
         organisationContactPhone
       )
 
-  // Keep the fixtures focused on the fields that the audit builders read.
   private def individualContact(
     email: String,
     phone: Option[String]
@@ -271,7 +270,6 @@ class AuditServiceSpec
     primary: ContactInformation,
     secondary: Option[ContactInformation] = None
   ): DisplaySubscriptionResponse = {
-    // No need to build an entire subscription response: the builder only reads these contacts.
     val response = org.mockito.Mockito.mock(
       classOf[DisplaySubscriptionResponse],
       org.mockito.Mockito.RETURNS_DEEP_STUBS
