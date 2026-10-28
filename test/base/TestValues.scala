@@ -18,6 +18,7 @@ package base
 
 import models.matching.SafeId
 import models.{IndContactName, Name, SubscriptionID, UniqueTaxpayerReference}
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 trait TestValues {
 
@@ -52,5 +53,8 @@ trait TestValues {
   val name: Name = Name(FirstName, LastName)
 
   val individualContactName: IndContactName = IndContactName(FirstName, LastName)
+
+  val testAffinityGroupIndividual: AffinityGroup   = AffinityGroup.Individual
+  val testAffinityGroupOrganisation: AffinityGroup = AffinityGroup.Organisation
 
 }

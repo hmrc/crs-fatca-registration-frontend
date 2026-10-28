@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.audit.CreateRegistrationAuditRequest
+import models.audit.{CreateRegistrationAuditRequest, UpdateContactDetailsAuditRequest}
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -48,6 +48,22 @@ class AuditConnector @Inject() (
 
     val auditUrl =
       url"${config.businessMatchingUrl}/audit/create-registration"
+
+    http
+      .post(auditUrl)
+      .withBody(Json.toJson(auditRequest))
+      .execute[HttpResponse]
+  }
+
+  def sendUpdateContactDetails(
+    auditRequest: UpdateContactDetailsAuditRequest
+  )(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[HttpResponse] = {
+
+    val auditUrl =
+      url"${config.businessMatchingUrl}/audit/update-contact-details"
 
     http
       .post(auditUrl)

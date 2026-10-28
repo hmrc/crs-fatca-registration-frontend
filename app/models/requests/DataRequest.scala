@@ -29,11 +29,13 @@ case class DataRequestWithUserAnswers[A](
   request: Request[A],
   userId: String,
   subscriptionId: SubscriptionID,
+  affinityGroup: AffinityGroup,
   userAnswers: UserAnswers
 ) extends WrappedRequest[A](request)
 
 case class DataRequestWithSubscriptionId[A](
   request: Request[A],
   userId: String,
+  affinityGroup: AffinityGroup,
   subscriptionId: SubscriptionID
 ) extends WrappedRequest[A](request)

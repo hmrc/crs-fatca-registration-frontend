@@ -20,14 +20,16 @@ import helpers.JsonFixtures.UserAnswersId
 import models.SubscriptionID
 import models.requests.DataRequestWithSubscriptionId
 import models.subscription.response.RegistrationType
-import play.api.mvc._
+import play.api.mvc.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeSubscriptionIdRetrievalAction @Inject() (
   subscriptionId: SubscriptionID,
-  bodyParsers: PlayBodyParsers
+  bodyParsers: PlayBodyParsers,
+  affinityGroup: AffinityGroup
 ) extends SubscriptionIdRetrievalAction
     with ActionBuilder[DataRequestWithSubscriptionId, AnyContent]
     with ActionFunction[Request, DataRequestWithSubscriptionId] {
@@ -36,7 +38,8 @@ class FakeSubscriptionIdRetrievalAction @Inject() (
     val requestWithSubscriptionId = DataRequestWithSubscriptionId(
       request = request,
       userId = UserAnswersId,
-      subscriptionId = subscriptionId
+      subscriptionId = subscriptionId,
+      affinityGroup = affinityGroup
     )
     block(requestWithSubscriptionId)
   }

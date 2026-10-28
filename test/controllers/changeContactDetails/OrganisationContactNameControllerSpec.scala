@@ -31,6 +31,7 @@ import pages.changeContactDetails.OrganisationContactNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.changeContactDetails.OrganisationContactNameView
 
 import scala.concurrent.Future
@@ -46,7 +47,7 @@ class OrganisationContactNameControllerSpec extends SpecBase with MockitoSugar {
 
   "OrganisationContactName Controller" - {
     when(mockSubscriptionIdRetrievalAction.apply(Some(OrganisationRegistrationType)))
-      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers))
+      .thenReturn(new FakeSubscriptionIdRetrievalAction(subscriptionId, injectedParsers, AffinityGroup.Organisation))
 
     "must return OK and the correct view for a GET" in {
 
