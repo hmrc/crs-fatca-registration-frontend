@@ -16,8 +16,9 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import pages.SubscriptionIDPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
