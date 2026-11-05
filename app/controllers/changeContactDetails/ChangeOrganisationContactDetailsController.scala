@@ -17,34 +17,31 @@
 package controllers.changeContactDetails
 
 import config.FrontendAppConfig
-import controllers.actions._
+import controllers.actions.*
 import controllers.{routes, ContactDetailsMissingController}
 import models.requests.DataRequestWithUserAnswers
-import models.subscription.response.DisplaySubscriptionResponse
+import models.subscription.response.{DisplaySubscriptionResponse, OrganisationRegistrationType}
 import models.{CheckMode, UserAnswers}
-import pages._
-import pages.changeContactDetails._
+import pages.*
+import pages.changeContactDetails.*
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.SubscriptionService
+import services.{AuditService, SubscriptionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{ChangeOrganisationContactDetailsHelper, CheckYourAnswersValidator, CountryListFactory}
-import viewmodels.govuk.summarylist._
+import utils.{ChangeOrganisationContactDetailsHelper, CheckYourAnswersValidator}
+import viewmodels.govuk.summarylist.*
 import views.html.ThereIsAProblemView
 import views.html.changeContactDetails.ChangeOrganisationContactDetailsView
-import models.subscription.response.OrganisationRegistrationType
-import services.AuditService
-import scala.util.control.NonFatal
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class ChangeOrganisationContactDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   frontendAppConfig: FrontendAppConfig,
   standardActionSets: StandardActionSets,
-  countryFactory: CountryListFactory,
   subscriptionService: SubscriptionService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
@@ -115,7 +112,7 @@ class ChangeOrganisationContactDetailsController @Inject() (
     userAnswers: UserAnswers,
     subscriptionResponse: DisplaySubscriptionResponse
   )(implicit request: DataRequestWithUserAnswers[AnyContent]): Future[Result] = {
-    val helper               = new ChangeOrganisationContactDetailsHelper(userAnswers, countryFactory)
+    val helper               = new ChangeOrganisationContactDetailsHelper(userAnswers)
     val primaryContactList   = SummaryListViewModel(helper.changeOrganisationPrimaryContactDetails)
     val secondaryContactList = SummaryListViewModel(helper.changeOrganisationSecondaryContactDetails)
 
