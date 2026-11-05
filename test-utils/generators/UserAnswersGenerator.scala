@@ -408,8 +408,6 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
         IndContactHavePhonePage,
         IndWhatIsYourPostcodePage,
         IndUKAddressWithoutIdPage,
-        IndNonUKAddressWithoutIdPage,
-        IndSelectAddressPage,
         IndContactPhonePage
       )
     )
