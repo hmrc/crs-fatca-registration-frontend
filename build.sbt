@@ -50,6 +50,9 @@ lazy val root = (project in file("."))
       "-Wconf:src=target/.*:s"
     ),
     scalacOptions ~= (_.distinct),
+    javaOptions ++= Seq(
+      "-XX:+EnableDynamicAgentLoading"
+    ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     update / evictionWarningOptions :=

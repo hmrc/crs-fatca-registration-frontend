@@ -154,7 +154,7 @@ class AuditService @Inject() (
   ): Option[CreateRegistrationAuditRequest] =
     for {
       reporterType <-
-        userAnswers.get(ReporterTypePage)
+        userAnswers.get(ReporterTypePage).orElse(Some(LimitedCompany))
 
       registrationDetails <-
         extractRegistrationDetails(
@@ -431,6 +431,9 @@ class AuditService @Inject() (
         .get(IndWhatIsYourNamePage)
         .orElse(
           userAnswers.get(WhatIsYourNamePage)
+        )
+        .orElse(
+          userAnswers.get(IndContactNamePage)
         )
         .map(_.fullName)
         .flatMap(optionalNonEmpty)

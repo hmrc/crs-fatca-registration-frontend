@@ -20,9 +20,9 @@ import models.UserAnswers
 import pages.changeContactDetails.{OrganisationContactHavePhonePage, OrganisationSecondContactHavePhonePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.changeContactDetails._
+import viewmodels.changeContactDetails.*
 
-class ChangeOrganisationContactDetailsHelper(userAnswers: UserAnswers, countryListFactory: CountryListFactory)(implicit messages: Messages) {
+class ChangeOrganisationContactDetailsHelper(userAnswers: UserAnswers)(implicit messages: Messages) {
 
   def changeOrganisationContactName: Option[SummaryListRow] = OrganisationContactNameSummary.row(userAnswers)
 

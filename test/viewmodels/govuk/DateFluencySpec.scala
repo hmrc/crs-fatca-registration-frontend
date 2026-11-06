@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.govUk
+package viewmodels.govuk
 
 import forms.mappings.Mappings
 import models.DateHelper.today

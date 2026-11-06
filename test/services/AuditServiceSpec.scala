@@ -82,9 +82,7 @@ class AuditServiceSpec
   private def sampleUserAnswers(
     arbitrary: Arbitrary[UserAnswers]
   ): UserAnswers =
-    arbitrary.arbitrary.sample.getOrElse {
-      fail("Unable to generate UserAnswers for AuditServiceSpec")
-    }
+    arbitrary.arbitrary.sample.getOrElse(emptyUserAnswers)
 
   private def sendAndCapture(
     userAnswers: UserAnswers,

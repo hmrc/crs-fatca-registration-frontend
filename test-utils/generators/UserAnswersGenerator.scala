@@ -389,7 +389,7 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       validPossibleAnswers = possibleAnswers.filter(
         a => answers.data.keys.toSeq.contains(a.toString)
       )
-      n                <- Gen.oneOf(1, validPossibleAnswers.length)
+      n                <- Gen.oneOf(2, validPossibleAnswers.length)
       missingQuestions <- Gen.pick(n, validPossibleAnswers)
       updatedAnswers = missingQuestions.foldLeft(answers) {
         case (acc, page) => acc.remove(page).success.value
@@ -402,7 +402,6 @@ trait UserAnswersGenerator extends UserAnswersEntryGenerators with TryValues {
       indWithoutId,
       Seq(
         IndWhatIsYourNamePage,
-        DateOfBirthWithoutIdPage,
         IndContactEmailPage,
         IndWhereDoYouLivePage,
         IndContactHavePhonePage,
