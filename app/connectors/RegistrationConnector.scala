@@ -98,13 +98,10 @@ class RegistrationConnector @Inject() (val config: FrontendAppConfig, val http: 
   def handleError[A](responseMessage: HttpResponse, endpoint: URL): Either[ApiError, A] =
     responseMessage.status match {
       case NOT_FOUND =>
-        logger.warn(s"Error in registration with $endpoint: not found.")
         Left(NotFoundError)
       case BAD_REQUEST =>
-        logger.warn(s"Error in registration with $endpoint: invalid.")
         Left(BadRequestError)
       case responseMessage =>
-        logger.warn(s"Error in registration with $endpoint: $responseMessage.")
         Left(ServiceUnavailableError)
     }
 

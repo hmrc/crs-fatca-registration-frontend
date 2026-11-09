@@ -48,7 +48,7 @@ class EnrolmentStoreProxyConnector @Inject() (val config: FrontendAppConfig, val
             case NO_CONTENT    => Future.successful(Right(()))
             case s if is2xx(s) => parseAndAssertNoExisting(response.json).value
             case other =>
-              logger.error(s"ES1: Enrolment Store Proxy error: ${response.status} - ${response.body}")
+              logger.error(s"ES1: Enrolment Store Proxy error: ${response.status}")
               Future.successful(Left(MalformedError(other)))
           }
         case Left(error) =>

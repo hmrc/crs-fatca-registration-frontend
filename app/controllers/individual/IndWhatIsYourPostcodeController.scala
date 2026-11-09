@@ -17,7 +17,7 @@
 package controllers.individual
 
 import connectors.AddressLookupConnector
-import controllers.actions._
+import controllers.actions.*
 import forms.IndWhatIsYourPostcodeFormProvider
 
 import javax.inject.Inject
@@ -28,6 +28,7 @@ import play.api.data.FormError
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import uk.gov.hmrc.http.{HttpException, InternalServerException}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.individual.IndWhatIsYourPostcodeView
 
@@ -78,6 +79,9 @@ class IndWhatIsYourPostcodeController @Inject() (
                   updatedAnswersWithAddress <- Future.fromTry(updatedAnswers.set(AddressLookupPage, addresses))
                   _                         <- sessionRepository.set(updatedAnswersWithAddress)
                 } yield Redirect(navigator.nextPage(IndWhatIsYourPostcodePage, mode, updatedAnswersWithAddress))
+            }.recover{
+              case _ : HttpException | _ : InternalServerException =>
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url)
             }
         )
   }
