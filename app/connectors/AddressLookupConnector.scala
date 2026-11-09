@@ -61,7 +61,7 @@ class AddressLookupConnector @Inject() (http: HttpClientV2, config: FrontendAppC
       } recoverWith {
       case e: Exception =>
         logger.error(s"Exception in Address Lookup with message ${e.getMessage}")
-       Future.failed(InternalServerException(e.getMessage))
+        Future.failed(InternalServerException(e.getMessage))
     }
   }
 

@@ -79,8 +79,8 @@ class IndWhatIsYourPostcodeController @Inject() (
                   updatedAnswersWithAddress <- Future.fromTry(updatedAnswers.set(AddressLookupPage, addresses))
                   _                         <- sessionRepository.set(updatedAnswersWithAddress)
                 } yield Redirect(navigator.nextPage(IndWhatIsYourPostcodePage, mode, updatedAnswersWithAddress))
-            }.recover{
-              case _ : HttpException | _ : InternalServerException =>
+            }.recover {
+              case _: HttpException | _: InternalServerException =>
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url)
             }
         )

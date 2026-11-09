@@ -179,11 +179,10 @@ class IndWhatIsYourPostcodeControllerSpec extends SpecBase with UserAnswersGener
 
     "must redirect to Journey Recovery for a POST if address lookup returns a valid payload with an invalid status" in {
 
-
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[AddressLookupConnector].toInstance(mockAddressLookupConnector),
+            bind[AddressLookupConnector].toInstance(mockAddressLookupConnector)
           )
           .build()
 
@@ -199,30 +198,29 @@ class IndWhatIsYourPostcodeControllerSpec extends SpecBase with UserAnswersGener
 
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+
+    "must redirect to Journey Recovery for a POST if address lookup returns an invalid payload" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[AddressLookupConnector].toInstance(mockAddressLookupConnector)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, indWhatIsYourPostcodeRoute)
+            .withFormUrlEncodedBody(("postCode", "AA1 1AA"))
+        when(mockAddressLookupConnector.addressLookupByPostcode(any[String])(any(), any()))
+          .thenReturn(Future.failed(InternalServerException("")))
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
-
-
-      "must redirect to Journey Recovery for a POST if address lookup returns an invalid payload" in {
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[AddressLookupConnector].toInstance(mockAddressLookupConnector),
-            )
-            .build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, indWhatIsYourPostcodeRoute)
-              .withFormUrlEncodedBody(("postCode", "AA1 1AA"))
-          when(mockAddressLookupConnector.addressLookupByPostcode(any[String])(any(), any()))
-            .thenReturn(Future.failed(InternalServerException("")))
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
+    }
 
   }
 

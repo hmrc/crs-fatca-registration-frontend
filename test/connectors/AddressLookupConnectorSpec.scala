@@ -77,6 +77,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
        |}]""".stripMargin
 
   val invalidResponses: Seq[Int] = List(NOT_FOUND, BAD_REQUEST, METHOD_NOT_ALLOWED, INTERNAL_SERVER_ERROR)
+
   "connectors.AddressLookupConnector" - {
     "when calling addressLookupByPostcode" - {
       "must return 200 (OK) status and an empty list if no match found" in {
@@ -115,7 +116,7 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
         stubResponse(addressLookupUrl, status, addressesJson)
 
         val result = connector.addressLookupByPostcode(postcode)
-        
+
         val exception = result.failed.futureValue
         exception mustBe a[HttpException]
         exception.getMessage mustEqual s"Address Lookup failed with status $status"
