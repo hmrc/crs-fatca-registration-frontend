@@ -53,10 +53,8 @@ class TaxEnrolmentsConnector @Inject() (
           case responseMessage if is2xx(responseMessage.status) =>
             Right(responseMessage.status)
           case responseMessage if is4xx(responseMessage.status) =>
-            logger.error(s"Error with tax-enrolments call  ${responseMessage.status} : ${responseMessage.body}")
             Left(UnableToCreateEnrolmentError)
           case responseMessage =>
-            logger.error(s"Service error when creating enrolment  ${responseMessage.status} : ${responseMessage.body}")
             Left(ServiceUnavailableError)
         }
         .recover {

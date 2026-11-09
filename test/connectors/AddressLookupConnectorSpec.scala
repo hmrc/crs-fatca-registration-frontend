@@ -24,10 +24,12 @@ import helpers.WireMockServerHandler
 import models.{AddressLookup, Country}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.guice.GuiceApplicationBuilder
+import uk.gov.hmrc.http.{HttpException, InternalServerException}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Random
 
 class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
@@ -74,6 +76,8 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
        |  "language": "en"
        |}]""".stripMargin
 
+  val invalidResponses: Seq[Int] = List(NOT_FOUND, BAD_REQUEST, METHOD_NOT_ALLOWED, INTERNAL_SERVER_ERROR)
+
   "connectors.AddressLookupConnector" - {
     "when calling addressLookupByPostcode" - {
       "must return 200 (OK) status and an empty list if no match found" in {
@@ -95,44 +99,27 @@ class AddressLookupConnectorSpec extends SpecBase with WireMockServerHandler wit
         result.futureValue mustBe addressLookupResult
       }
 
-      "must throw an exception when address lookup returns a 400 (BAD_REQUEST) status" in {
-        stubResponse(addressLookupUrl, BAD_REQUEST, "Some error")
+      "must throw an InternalServerException when address lookup returns an invalid payload" in {
+        lazy val status = invalidResponses(Random.nextInt(invalidResponses.size))
+        stubResponse(addressLookupUrl, status, "Some error")
 
         val result = connector.addressLookupByPostcode(postcode)
 
-        assertThrows[Exception] {
-          result.futureValue
-        }
+        val exception = result.failed.futureValue
+
+        exception mustBe a[InternalServerException]
+        exception.getMessage mustEqual s"Address Lookup failed with status $status"
       }
 
-      "must throw an exception when address lookup returns a 404 (NOT_FOUND) status" in {
-        stubResponse(addressLookupUrl, NOT_FOUND, "Some error")
+      "must throw an HttpException when address lookup returns an invalid response" in {
+        lazy val status = invalidResponses(Random.nextInt(invalidResponses.size))
+        stubResponse(addressLookupUrl, status, addressesJson)
 
         val result = connector.addressLookupByPostcode(postcode)
 
-        assertThrows[Exception] {
-          result.futureValue
-        }
-      }
-
-      "must throw an exception when address lookup returns a 405 (METHOD_NOT_ALLOWED) status" in {
-        stubResponse(addressLookupUrl, METHOD_NOT_ALLOWED, "Some error")
-
-        val result = connector.addressLookupByPostcode(postcode)
-
-        assertThrows[Exception] {
-          result.futureValue
-        }
-      }
-
-      "must throw an exception when address lookup returns a 500 (INTERNAL_SERVER_ERROR) status" in {
-        stubResponse(addressLookupUrl, INTERNAL_SERVER_ERROR, "Some error")
-
-        val result = connector.addressLookupByPostcode(postcode)
-
-        assertThrows[Exception] {
-          result.futureValue
-        }
+        val exception = result.failed.futureValue
+        exception mustBe a[HttpException]
+        exception.getMessage mustEqual s"Address Lookup failed with status $status"
       }
 
       def addressesJson: String =

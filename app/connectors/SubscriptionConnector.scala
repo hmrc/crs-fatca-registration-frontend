@@ -52,7 +52,6 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
           responseMessage.json
             .asOpt[DisplaySubscriptionResponse]
         case errorStatus =>
-          logger.warn(s"Status $errorStatus has been thrown when display subscription was called")
           None
       }
       .recover {
@@ -70,7 +69,6 @@ class SubscriptionConnector @Inject() (val config: FrontendAppConfig, val http: 
       .execute[HttpResponse]
       .map {
         responseMessage =>
-          logger.info(s"updateSubscription: Status ${responseMessage.status} has been received when update subscription was called")
           is2xx(responseMessage.status)
       }
   }
