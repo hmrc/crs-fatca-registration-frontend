@@ -87,4 +87,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val subscriptionTtl: Int = configuration.get[Int]("mongodb.subscriptionTimeToLiveInSeconds")
 
   val mongoEncryptionEnabled: Boolean = configuration.get[Boolean]("mongodb.encryptionEnabled")
+  val emailUrl: String                = s"${configuration.get[Service]("microservice.services.email").baseUrl}/hmrc/email"
+  val emailSendForce: Boolean         = configuration.get[Boolean]("microservice.services.email.force")
 }

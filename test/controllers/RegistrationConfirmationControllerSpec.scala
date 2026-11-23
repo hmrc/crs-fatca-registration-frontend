@@ -21,7 +21,7 @@ import generators.UserAnswersGenerator
 import models.audit.AuditResult
 import models.audit.AuditResult.AuditSent
 import models.{SubscriptionID, UserAnswers}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.MockitoSugar.{atLeastOnce, never, reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
