@@ -16,16 +16,18 @@
 
 package controllers
 
+import cats.syntax.all.*
+import models.email.ContactEmailInfo
 import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingError, ServiceUnavailableError}
 import models.matching.SafeId
 import models.requests.DataRequest
 import models.{ReporterType, SubscriptionID, UserAnswers, UserSubscription}
-import pages.{ReporterTypePage, SubscriptionIDPage}
+import pages.*
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Result}
 import repositories.{SessionRepository, SubscriptionRepository}
-import services.TaxEnrolmentService
+import services.{EmailService, TaxEnrolmentService}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -39,11 +41,18 @@ class ControllerHelper @Inject() (
   taxEnrolmentService: TaxEnrolmentService,
   errorView: ThereIsAProblemView,
   sessionRepository: SessionRepository,
-  subscriptionRepository: SubscriptionRepository
+  subscriptionRepository: SubscriptionRepository,
+  emailService: EmailService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
+
+  private lazy val getContactEmailInfo: (Option[String], Option[String]) => Option[ContactEmailInfo] =
+    (maybeName, maybeEmail) =>
+      (maybeName, maybeEmail).mapN(
+        (name, email) => ContactEmailInfo(name, email)
+      )
 
   private def indAlreadyRegistered(implicit request: DataRequest[AnyContent]) = {
 
@@ -58,6 +67,17 @@ class ControllerHelper @Inject() (
   ): Future[Result] =
     taxEnrolmentService.checkAndCreateEnrolment(userAnswers, subscriptionId) flatMap {
       case Right(_) =>
+        val possibleEmailAddresses = List(
+          getContactEmailInfo(userAnswers.get(IndContactNamePage).map(_.fullName), userAnswers.get(IndContactEmailPage)),
+          getContactEmailInfo(userAnswers.get(ContactNamePage), userAnswers.get(ContactEmailPage)),
+          getContactEmailInfo(userAnswers.get(SecondContactNamePage), userAnswers.get(SecondContactEmailPage))
+        ).flatten
+
+        val _ = emailService.sendEmails(possibleEmailAddresses).leftMap {
+          error =>
+            logger.warn("ControllerHelper Failed to send email, ignoring failure")
+        }
+
         subscriptionRepository.clear(safeId.value).map(
           _ => Redirect(routes.RegistrationConfirmationController.onPageLoad())
         )
@@ -79,7 +99,6 @@ class ControllerHelper @Inject() (
           .map(
             _ => Redirect(routes.InformationMissingController.onPageLoad())
           )
-
       case Left(error) =>
         logger.warn(s"Error received from API: $error")
         error match {

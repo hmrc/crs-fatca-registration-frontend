@@ -17,7 +17,9 @@
 package controllers
 
 import base.{ControllerMockFixtures, SpecBase}
-import helpers.JsonFixtures._
+import cats.data.EitherT
+import helpers.JsonFixtures.*
+import models.email.ContactEmailInfo
 import models.enrolment.GroupIds
 import models.error.ApiError
 import models.error.ApiError.{EnrolmentExistsError, MandatoryInformationMissingError}
@@ -25,16 +27,16 @@ import models.matching.OrgRegistrationInfo
 import models.register.response.details.AddressResponse
 import models.requests.DataRequest
 import models.{ReporterType, SubscriptionID, UserAnswers}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.MockitoSugar.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers.shouldBe
-import pages._
+import pages.*
 import play.api.inject.bind
 import play.api.mvc.{AnyContent, Result}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SubscriptionRepository
-import services.TaxEnrolmentService
+import services.{EmailService, TaxEnrolmentService}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -44,13 +46,15 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
 
   val mockTaxEnrolmentService: TaxEnrolmentService       = mock[TaxEnrolmentService]
   val mockSubscriptionRepository: SubscriptionRepository = mock[SubscriptionRepository]
+  val mockEmailService: EmailService                     = mock[EmailService]
 
   override def beforeEach(): Unit =
-    reset(mockTaxEnrolmentService, mockSubscriptionRepository)
+    reset(mockTaxEnrolmentService, mockSubscriptionRepository, mockEmailService)
 
   private val application = applicationBuilder()
     .overrides(bind[TaxEnrolmentService].toInstance(mockTaxEnrolmentService))
     .overrides(bind[SubscriptionRepository].toInstance(mockSubscriptionRepository))
+    .overrides(bind[EmailService].toInstance(mockEmailService))
     .build()
 
   val controller: ControllerHelper = application.injector.instanceOf[ControllerHelper]
@@ -73,12 +77,40 @@ class ControllerHelperSpec extends SpecBase with ControllerMockFixtures with Bef
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
       when(mockSubscriptionRepository.clear(any())).thenReturn(Future.successful(true))
 
+      when(mockEmailService.sendEmails(any())(any())).thenReturn(EitherT(Future.successful(Right(()))))
+
       val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some(routes.RegistrationConfirmationController.onPageLoad().url)
 
+      val expectedContactInfo = List(ContactEmailInfo("", TestEmail))
+
       verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
+      verify(mockEmailService, times(1)).sendEmails(eqTo(expectedContactInfo))(any())
+    }
+
+    "update the subscription ID in user answers and create an enrolment even if sendEmails fails" in {
+
+      val affinityGroup: AffinityGroup         = AffinityGroup.Individual
+      val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, UserAnswersId, affinityGroup, userAnswers)
+
+      when(mockTaxEnrolmentService.checkAndCreateEnrolment(any(), any())(any(), any()))
+        .thenReturn(Future.successful(Right(1)))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockSubscriptionRepository.clear(any())).thenReturn(Future.successful(true))
+
+      when(mockEmailService.sendEmails(any())(any())).thenReturn(EitherT(Future.failed(new RuntimeException("bang"))))
+
+      val result: Future[Result] = controller.updateSubscriptionIdAndCreateEnrolment(safeId, subscriptionId)(HeaderCarrier(), dataRequest)
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some(routes.RegistrationConfirmationController.onPageLoad().url)
+
+      val expectedContactInfo = List(ContactEmailInfo("", TestEmail))
+
+      verify(mockTaxEnrolmentService, times(1)).checkAndCreateEnrolment(any(), any())(any(), any())
+      verify(mockEmailService, times(1)).sendEmails(eqTo(expectedContactInfo))(any())
     }
 
     "Redirect to Individual already registered when tax enrolments returns EnrolmentExists error for Affinity Group Individual" in {
