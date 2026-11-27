@@ -76,7 +76,16 @@ class TaxEnrolmentsConnectorSpec extends SpecBase with WireMockServerHandler wit
         }
       }
 
-      "must return status ServiceUnavailable Error" in {
+      "must return ServiceUnavailableError when future fails" in {
+        server.stop()
+        val enrolmentInfo = SubscriptionInfo(postCode = Some("postCode"), abroadFlag = Some("abroadFlag"), id = "subID")
+
+        val result = connector.createEnrolment(enrolmentInfo).value.futureValue
+
+        result mustBe Left(ServiceUnavailableError)
+      }
+
+      "must return ServiceUnavailable Error" in {
         forAll(validPostCodes, validSubscriptionID, validAbroadFlag) {
           (postCode, subID, abroadFlag) =>
             val enrolmentInfo = SubscriptionInfo(postCode = Some(postCode), abroadFlag = Some(abroadFlag), id = subID)

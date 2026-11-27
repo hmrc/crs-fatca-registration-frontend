@@ -18,17 +18,19 @@ package models.subscription
 
 import base.SpecBase
 import generators.ModelGenerators
-import helpers.JsonFixtures._
+import helpers.JsonFixtures.*
 import models.subscription.request.{ContactInformation, CreateSubscriptionRequest, IndividualDetails, OrganisationDetails}
 import models.{Address, AddressLookup, Country, IdentifierType, ReporterType, UniqueTaxpayerReference, UserAnswers}
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages._
+import pages.*
+import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.AffinityGroup
 
 class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChecks with ModelGenerators {
 
-  val nameGen: Gen[String] = stringsLongerThan(10)
+  private inline val minimumStringLength = 10
+  val nameGen: Gen[String]               = stringsLongerThan(minimumStringLength)
 
   "buildSubscriptionRequest" - {
 
@@ -459,6 +461,89 @@ class CreateSubscriptionRequestSpec extends SpecBase with ScalaCheckPropertyChec
 
     }
 
+  }
+
+  "reads" - {
+    val contactName = arbitraryName.arbitrary.sample.value
+
+    "must deserialise valid JSON with individual primary contact and no optional fields" in {
+      val json = Json.obj(
+        "idType"   -> IdentifierType.SAFE,
+        "idNumber" -> safeId.value,
+        "gbUser"   -> true,
+        "primaryContact" -> Json.obj(
+          "individual" -> Json.obj(
+            "firstName" -> contactName.firstName,
+            "lastName"  -> contactName.lastName
+          ),
+          "email" -> TestEmail
+        )
+      )
+
+      json.as[CreateSubscriptionRequest] mustBe CreateSubscriptionRequest(
+        idType = IdentifierType.SAFE,
+        idNumber = safeId.value,
+        tradingName = None,
+        gbUser = true,
+        primaryContact = ContactInformation(
+          contactInformation = IndividualDetails(
+            firstName = contactName.firstName,
+            lastName = contactName.lastName
+          ),
+          email = TestEmail,
+          phone = None
+        ),
+        secondaryContact = None
+      )
+    }
+
+    "must deserialise valid JSON with organisation contacts and all optional fields" in {
+      val json = Json.obj(
+        "idType"      -> IdentifierType.SAFE,
+        "idNumber"    -> safeId.value,
+        "tradingName" -> "Acme Trading Ltd",
+        "gbUser"      -> false,
+        "primaryContact" -> Json.obj(
+          "organisation" -> Json.obj(
+            "name" -> "Acme Ltd"
+          ),
+          "email" -> TestEmail,
+          "phone" -> TestPhoneNumber
+        ),
+        "secondaryContact" -> Json.obj(
+          "individual" -> Json.obj(
+            "firstName" -> contactName.firstName,
+            "lastName"  -> contactName.lastName
+          ),
+          "email" -> "secondary@domain.com",
+          "phone" -> "09876543210"
+        )
+      )
+
+      json.as[CreateSubscriptionRequest] mustBe CreateSubscriptionRequest(
+        idType = IdentifierType.SAFE,
+        idNumber = safeId.value,
+        tradingName = Some("Acme Trading Ltd"),
+        gbUser = false,
+        primaryContact = ContactInformation(
+          contactInformation = OrganisationDetails(
+            name = "Acme Ltd"
+          ),
+          email = TestEmail,
+          phone = Some(TestPhoneNumber)
+        ),
+        secondaryContact = Some(
+          ContactInformation(
+            contactInformation = IndividualDetails(
+              firstName = contactName.firstName,
+              lastName = contactName.lastName
+            ),
+            email = "secondary@domain.com",
+            phone = Some("09876543210")
+          )
+        )
+      )
+    }
   }
 
 }
