@@ -77,12 +77,12 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
 
         val address = Address("", None, "", None, None, Country("GB", "United Kingdom"))
         val userAnswers = UserAnswers("")
-          .set(ReporterTypePage, ReporterType.Individual).success.value
-          .set(IndDoYouHaveNINumberPage, false).success.value
-          .set(IndWhatIsYourNamePage, name).success.value
-          .set(IndContactEmailPage, TestEmail).success.value
-          .set(IndContactHavePhonePage, false).success.value
-          .set(IndUKAddressWithoutIdPage, address).success.value
+          .withPage(ReporterTypePage, ReporterType.Individual)
+          .withPage(IndDoYouHaveNINumberPage, false)
+          .withPage(IndWhatIsYourNamePage, name)
+          .withPage(IndContactEmailPage, TestEmail)
+          .withPage(IndContactHavePhonePage, false)
+          .withPage(IndUKAddressWithoutIdPage, address)
 
         val result = service.checkAndCreateSubscription(safeId, userAnswers, AffinityGroup.Individual)
         result.futureValue mustBe Right(SubscriptionID("id"))
@@ -100,12 +100,12 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
 
         val address = Address("", None, "", None, None, Country("GB", "United Kingdom"))
         val userAnswers = UserAnswers("")
-          .set(ReporterTypePage, ReporterType.Individual).success.value
-          .set(IndDoYouHaveNINumberPage, false).success.value
-          .set(IndWhatIsYourNamePage, name).success.value
-          .set(IndContactEmailPage, TestEmail).success.value
-          .set(ContactHavePhonePage, false).success.value
-          .set(IndUKAddressWithoutIdPage, address).success.value
+          .withPage(ReporterTypePage, ReporterType.Individual)
+          .withPage(IndDoYouHaveNINumberPage, false)
+          .withPage(IndWhatIsYourNamePage, name)
+          .withPage(IndContactEmailPage, TestEmail)
+          .withPage(ContactHavePhonePage, false)
+          .withPage(IndUKAddressWithoutIdPage, address)
 
         val result = service.checkAndCreateSubscription(safeId, userAnswers, AffinityGroup.Individual)
         result.futureValue mustBe Right(SubscriptionID("id"))
@@ -139,11 +139,11 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
         val errors = Seq(NotFoundError, BadRequestError, DuplicateSubmissionError, UnableToCreateEMTPSubscriptionError)
         for (error <- errors) {
           val userAnswers = UserAnswers("id")
-            .set(DoYouHaveUniqueTaxPayerReferencePage, true).success.value
-            .set(ContactEmailPage, TestEmail).success.value
-            .set(ContactNamePage, s"$FirstName $LastName").success.value
-            .set(ContactHavePhonePage, false).success.value
-            .set(HaveSecondContactPage, false).success.value
+            .withPage(DoYouHaveUniqueTaxPayerReferencePage, true)
+            .withPage(ContactEmailPage, TestEmail)
+            .withPage(ContactNamePage, s"$FirstName $LastName")
+            .withPage(ContactHavePhonePage, false)
+            .withPage(HaveSecondContactPage, false)
 
           val response: EitherT[Future, ApiError, SubscriptionID] = EitherT.fromEither[Future](Left(error))
           when(mockSubscriptionRepository.get(any())).thenReturn(Future.successful(None))
@@ -194,139 +194,6 @@ class SubscriptionServiceSpec extends SpecBase with ScalaCheckPropertyChecks wit
           val result = service.getSubscription(subscriptionId)
           result.futureValue mustBe None
         }
-      }
-    }
-
-    "updateOrgContactDetails" - {
-
-      "must return true when primary contact details are updated" in {
-        forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails], validPhoneNumber(PhoneNumberLength)) {
-          (subscription, organisationDetails, contactPhoneNumber) =>
-            val subscriptionResponse = subscription
-              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation).setTo(organisationDetails)
-              .modify(_.success.crfaSubscriptionDetails.secondaryContact).setTo(None)
-
-            val userAnswers = emptyUserAnswers
-              .withPage(OrganisationContactNamePage, name.fullName)
-              .withPage(OrganisationContactEmailPage, subscription.success.crfaSubscriptionDetails.primaryContact.email)
-              .withPage(OrganisationContactHavePhonePage, true)
-              .withPage(OrganisationContactPhonePage, contactPhoneNumber)
-              .withPage(OrganisationHaveSecondContactPage, false)
-
-            when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(Some(subscriptionResponse)))
-            when(mockSubscriptionConnector.updateSubscription(any())(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(true))
-
-            service.updateOrgContactDetails(subscriptionId, userAnswers).futureValue mustBe true
-        }
-      }
-
-      "must return false when unable to update contact details" in {
-        forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails]) {
-          (subscription, organisationDetails) =>
-            val subscriptionResponse = subscription
-              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation)
-              .setTo(organisationDetails)
-
-            val userAnswers = emptyUserAnswers
-              .withPage(OrganisationContactNamePage, name.fullName)
-              .withPage(OrganisationContactEmailPage, subscription.success.crfaSubscriptionDetails.primaryContact.email)
-              .withPage(OrganisationContactHavePhonePage, true)
-              .withPage(OrganisationHaveSecondContactPage, false)
-
-            when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(Some(subscriptionResponse)))
-            when(mockSubscriptionConnector.updateSubscription(any())(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(false))
-
-            service.updateOrgContactDetails(subscriptionId, userAnswers).futureValue mustBe false
-        }
-      }
-
-      "must return false when userAnswers cannot be converted to an organisation update request" in {
-        forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[OrganisationDetails]) {
-          (subscription, organisationDetails) =>
-            val subscriptionResponse = subscription
-              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation)
-              .setTo(organisationDetails)
-
-            val userAnswers = emptyUserAnswers
-              .withPage(OrganisationContactNamePage, name.fullName)
-
-            when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(Some(subscriptionResponse)))
-
-            service.updateOrgContactDetails(subscriptionId, userAnswers).futureValue mustBe false
-        }
-      }
-
-      "must return false when the connector returns None when retrieving the subscription" in {
-        when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
-          .thenReturn(Future.successful(None))
-
-        service.updateOrgContactDetails(subscriptionId, emptyUserAnswers).futureValue mustBe false
-      }
-    }
-
-    "updateIndContactDetails" - {
-
-      "must return true when individual contact details are updated with phone number" in {
-        forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[IndividualDetails], validPhoneNumber(PhoneNumberLength)) {
-          (subscription, individualDetails, contactPhoneNumber) =>
-            val subscriptionResponse = subscription
-              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation).setTo(individualDetails)
-              .modify(_.success.crfaSubscriptionDetails.secondaryContact).setTo(None)
-
-            val userAnswers = emptyUserAnswers
-              .withPage(indPages.contactEmailPage, subscription.success.crfaSubscriptionDetails.primaryContact.email)
-              .withPage(indPages.havePhoneNumberPage, true)
-              .withPage(indPages.contactPhoneNumberPage, contactPhoneNumber)
-
-            when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(Some(subscriptionResponse)))
-            when(mockSubscriptionConnector.updateSubscription(any())(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(true))
-
-            service.updateIndContactDetails(subscriptionId, userAnswers).futureValue mustBe true
-        }
-      }
-
-      "must return false when connector fails to update individual contact details" in {
-        forAll(arbitrary[DisplaySubscriptionResponse], arbitrary[IndividualDetails]) {
-          (subscription, individualDetails) =>
-            val subscriptionResponse = subscription
-              .modify(_.success.crfaSubscriptionDetails.primaryContact.contactInformation).setTo(individualDetails)
-              .modify(_.success.crfaSubscriptionDetails.secondaryContact).setTo(None)
-
-            val userAnswers = emptyUserAnswers
-              .withPage(indPages.contactEmailPage, subscription.success.crfaSubscriptionDetails.primaryContact.email)
-              .withPage(indPages.havePhoneNumberPage, false)
-
-            when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(Some(subscriptionResponse)))
-            when(mockSubscriptionConnector.updateSubscription(any())(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(false))
-
-            service.updateIndContactDetails(subscriptionId, userAnswers).futureValue mustBe false
-        }
-      }
-
-      "must return false when userAnswers cannot be converted to an individual update request" in {
-        forAll(arbitrary[DisplaySubscriptionResponse]) {
-          subscriptionResponse =>
-            when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
-              .thenReturn(Future.successful(Some(subscriptionResponse)))
-
-            service.updateIndContactDetails(subscriptionId, emptyUserAnswers).futureValue mustBe false
-        }
-      }
-
-      "must return false when readSubscription returns None" in {
-        when(mockSubscriptionConnector.readSubscription(any[ReadSubscriptionRequest])(any[HeaderCarrier](), any[ExecutionContext]()))
-          .thenReturn(Future.successful(None))
-
-        service.updateIndContactDetails(subscriptionId, emptyUserAnswers).futureValue mustBe false
       }
     }
 

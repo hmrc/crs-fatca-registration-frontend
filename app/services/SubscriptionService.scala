@@ -37,20 +37,6 @@ import scala.util.Try
 
 class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConnector, val subscriptionRepository: SubscriptionRepository) extends Logging {
 
-  def updateOrgContactDetails( // TODO remove as only used in tests
-    subscriptionId: SubscriptionID,
-    userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    updateContactDetails(subscriptionId, userAnswers, UpdateSubscriptionRequest.convertToRequestOrg)
-      .map(_.isDefined)
-
-  def updateIndContactDetails( // TODO remove as only used in tests
-    subscriptionId: SubscriptionID,
-    userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    updateContactDetails(subscriptionId, userAnswers, UpdateSubscriptionRequest.convertToRequestInd)
-      .map(_.isDefined)
-
   def updateContactDetailsWithAuditData(
     subscriptionId: SubscriptionID,
     userAnswers: UserAnswers,
