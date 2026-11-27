@@ -105,6 +105,24 @@ trait ModelGenerators extends RegexConstants with Generators {
     } yield ReadSubscriptionRequest(idNumber)
   }
 
+  implicit val arbitraryUpdateSubscriptionRequest: Arbitrary[UpdateSubscriptionRequest] = Arbitrary {
+    for {
+      idType           <- nonEmptyString
+      idNumber         <- nonEmptyString
+      tradingName      <- Gen.option(nonEmptyString)
+      gbUser           <- arbitrary[Boolean]
+      primaryContact   <- arbitrary[ContactInformation]
+      secondaryContact <- Gen.option(arbitrary[ContactInformation])
+    } yield UpdateSubscriptionRequest(
+      idType,
+      idNumber,
+      tradingName,
+      gbUser,
+      primaryContact,
+      secondaryContact
+    )
+  }
+
   implicit lazy val arbitraryCountry: Arbitrary[Country] =
     Arbitrary {
       for {

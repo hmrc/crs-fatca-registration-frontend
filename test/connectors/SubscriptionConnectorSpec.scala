@@ -18,14 +18,14 @@ package connectors
 
 import base.SpecBase
 import cats.data.EitherT
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, put, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.ModelGenerators
 import helpers.JsonFixtures.{safeId, TestEmail, TestPhoneNumber}
 import helpers.WireMockServerHandler
 import models.error.ApiError
 import models.error.ApiError.{AlreadyRegisteredError, UnableToCreateEMTPSubscriptionError}
-import models.subscription.request.{ContactInformation, CreateSubscriptionRequest, IndividualDetails, ReadSubscriptionRequest}
+import models.subscription.request.{ContactInformation, CreateSubscriptionRequest, IndividualDetails, ReadSubscriptionRequest, UpdateSubscriptionRequest}
 import models.subscription.response.DisplaySubscriptionResponse
 import models.{IdentifierType, SubscriptionID}
 import org.scalacheck.Arbitrary.arbitrary
@@ -83,6 +83,28 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         val result = connector.readSubscription(request)
         result.futureValue mustBe None
+      }
+    }
+
+    "updateSubscription" - {
+      "must return true when update subscription succeeds with a 2xx status" in {
+        val request       = arbitrary[UpdateSubscriptionRequest].sample.value
+        val successStatus = Gen.oneOf(OK, CREATED, ACCEPTED, NO_CONTENT).sample.value
+
+        stubPutResponse("/update-subscription", successStatus, "")
+
+        val result = connector.updateSubscription(request)
+        result.futureValue mustBe true
+      }
+
+      "must return false when update subscription fails with a non-2xx status" in {
+        val request     = arbitrary[UpdateSubscriptionRequest].sample.value
+        val errorStatus = Gen.oneOf(BAD_REQUEST, NOT_FOUND, UNPROCESSABLE_ENTITY, INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE).sample.value
+
+        stubPutResponse("/update-subscription", errorStatus, "")
+
+        val result = connector.updateSubscription(request)
+        result.futureValue mustBe false
       }
     }
 
@@ -295,6 +317,16 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
   private def stubPostResponse(expectedEndpoint: String, expectedStatus: Int, expectedBody: String): StubMapping =
     server.stubFor(
       post(urlEqualTo(s"$subscriptionUrl$expectedEndpoint"))
+        .willReturn(
+          aResponse()
+            .withStatus(expectedStatus)
+            .withBody(expectedBody)
+        )
+    )
+
+  private def stubPutResponse(expectedEndpoint: String, expectedStatus: Int, expectedBody: String): StubMapping =
+    server.stubFor(
+      put(urlEqualTo(s"$subscriptionUrl$expectedEndpoint"))
         .willReturn(
           aResponse()
             .withStatus(expectedStatus)

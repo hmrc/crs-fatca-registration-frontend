@@ -16,27 +16,30 @@
 
 package connectors
 
+import base.TestValues
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalToJson, post, postRequestedFor, urlEqualTo}
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import config.FrontendAppConfig
-import models.audit.CreateRegistrationAuditRequest
+import models.audit.{CreateRegistrationAuditRequest, UpdateContactDetailsAuditRequest}
 import org.mockito.MockitoSugar.{mock, when}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.UpstreamErrorResponse
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuditConnectorSpec
     extends AnyFreeSpec
     with Matchers
-    with BeforeAndAfterAll {
+    with BeforeAndAfterAll with TestValues {
 
   private val wireMockServer =
     new WireMockServer(options().dynamicPort())
@@ -54,7 +57,7 @@ class AuditConnectorSpec
     super.afterAll()
   }
 
-  private val auditRequest =
+  private val createAuditRequest =
     CreateRegistrationAuditRequest(
       affinityType = "Organisation",
       registeringAs = "Organisation",
@@ -78,6 +81,13 @@ class AuditConnectorSpec
       secondContactEmail = Some("second@example.com"),
       secondContactTelephone = Some("07987654321"),
       fatcaId = "FATCA123456"
+    )
+
+  private val updateContactDetailsAuditRequest =
+    UpdateContactDetailsAuditRequest(
+      fatcaId = subscriptionId.value,
+      affinityType = AffinityGroup.Individual.toString,
+      email = Some("new@test.com")
     )
 
   "sendCreateRegistration" - {
@@ -115,7 +125,7 @@ class AuditConnectorSpec
 
         val result =
           await(
-            connector.sendCreateRegistration(auditRequest)
+            connector.sendCreateRegistration(createAuditRequest)
           )
 
         result.status mustBe NO_CONTENT
@@ -126,7 +136,7 @@ class AuditConnectorSpec
           ).withRequestBody(
             equalToJson(
               Json.stringify(
-                Json.toJson(auditRequest)
+                Json.toJson(createAuditRequest)
               )
             )
           )
@@ -165,7 +175,103 @@ class AuditConnectorSpec
         val exception =
           intercept[UpstreamErrorResponse] {
             await(
-              connector.sendCreateRegistration(auditRequest)
+              connector.sendCreateRegistration(createAuditRequest)
+            )
+          }
+
+        exception.statusCode mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+
+  "sendUpdateContactDetails" - {
+
+    val updateContactDetailsAuditUrl = "/audit/update-contact-details"
+
+    "must POST the CreateRegistration audit request to the backend" in {
+
+      wireMockServer.stubFor(
+        post(urlEqualTo(updateContactDetailsAuditUrl))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      val application =
+        new GuiceApplicationBuilder()
+          .build()
+
+      running(application) {
+
+        val mockConfig =
+          mock[FrontendAppConfig]
+
+        when(mockConfig.businessMatchingUrl)
+          .thenReturn(wireMockServer.baseUrl())
+
+        val http =
+          application.injector.instanceOf[HttpClientV2]
+
+        val connector =
+          new AuditConnector(
+            http = http,
+            config = mockConfig
+          )
+
+        val result =
+          await(
+            connector.sendUpdateContactDetails(updateContactDetailsAuditRequest)
+          )
+
+        result.status mustBe NO_CONTENT
+
+        wireMockServer.verify(
+          postRequestedFor(
+            urlEqualTo(updateContactDetailsAuditUrl)
+          ).withRequestBody(
+            equalToJson(
+              Json.stringify(
+                Json.toJson(updateContactDetailsAuditRequest)
+              )
+            )
+          )
+        )
+      }
+    }
+
+    "must fail when the backend returns an error response" in {
+
+      wireMockServer.stubFor(
+        post(urlEqualTo(updateContactDetailsAuditUrl))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      val application =
+        new GuiceApplicationBuilder()
+          .build()
+
+      running(application) {
+
+        val mockConfig =
+          mock[FrontendAppConfig]
+
+        when(mockConfig.businessMatchingUrl)
+          .thenReturn(wireMockServer.baseUrl())
+
+        val connector =
+          new AuditConnector(
+            http = application.injector.instanceOf[HttpClientV2],
+            config = mockConfig
+          )
+
+        val exception =
+          intercept[UpstreamErrorResponse] {
+            await(
+              connector.sendUpdateContactDetails(updateContactDetailsAuditRequest)
             )
           }
 

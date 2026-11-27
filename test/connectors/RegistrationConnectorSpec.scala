@@ -20,8 +20,8 @@ import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
-import helpers.JsonFixtures._
-import helpers.RegisterHelper._
+import helpers.JsonFixtures.*
+import helpers.RegisterHelper.*
 import helpers.WireMockServerHandler
 import models.IdentifierType.{NINO, UTR}
 import models.{Name, Regime}
@@ -29,13 +29,15 @@ import models.ReporterType.Partnership
 import models.error.ApiError
 import models.error.ApiError.{NotFoundError, ServiceUnavailableError}
 import models.matching.SafeId
-import models.register.request._
+import models.register.request.*
 import models.register.request.details.{Individual, NoIdOrganisation, WithIDIndividual, WithIDOrganisation}
+import models.register.response.{RegisterWithIDResponse, RegisterWithIDResponseDetail, RegistrationWithIDResponse}
 import models.shared.Parameters
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.http.Status.{NOT_FOUND, OK, SERVICE_UNAVAILABLE}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -119,6 +121,14 @@ class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with
         result.value.futureValue mustBe Right(registrationWithIDIndividualResponse)
       }
 
+      "return 200 and a registration response when individual is matched by nino (model to json)" in {
+
+        stubResponse("/individual/nino", OK, Json.toJson(registrationWithIDIndividualResponse).toString)
+
+        val result = connector.withIndividualNino(registrationWithIndividualIDPayload)
+        result.value.futureValue mustBe Right(registrationWithIDIndividualResponse)
+      }
+
       "return 404 and NotFoundError when there is no match" in {
 
         stubResponse("/individual/nino", NOT_FOUND, withIDIndividualResponse)
@@ -142,6 +152,14 @@ class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with
       "return 200 and a registration response when organisation is matched by utr" in {
 
         stubResponse("/organisation/utr", OK, withIDOrganisationResponse)
+
+        val result = connector.withOrganisationUtr(registrationWithOrganisationIDPayload)
+        result.value.futureValue mustBe Right(registrationWithIDOrganisationResponse)
+      }
+
+      "return 200 and a registration response when organisation is matched by utr (model to json)" in {
+
+        stubResponse("/organisation/utr", OK, Json.toJson(registrationWithIDOrganisationResponse).toString)
 
         val result = connector.withOrganisationUtr(registrationWithOrganisationIDPayload)
         result.value.futureValue mustBe Right(registrationWithIDOrganisationResponse)

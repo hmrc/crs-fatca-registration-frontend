@@ -22,14 +22,8 @@ import connectors.SubscriptionConnector
 import models.error.ApiError
 import models.error.ApiError.MandatoryInformationMissingError
 import models.matching.SafeId
-import models.subscription.request._
-import models.subscription.response.{
-  DisplayResponseDetail,
-  DisplaySubscriptionResponse,
-  IndividualRegistrationType,
-  OrganisationRegistrationType,
-  RegistrationType
-}
+import models.subscription.request.*
+import models.subscription.response.*
 import models.{Name, SubscriptionID, UserAnswers}
 import pages.changeContactDetails.{OrganisationHaveSecondContactPage, OrganisationSecondContactNamePage}
 import play.api.Logging
@@ -43,14 +37,14 @@ import scala.util.Try
 
 class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConnector, val subscriptionRepository: SubscriptionRepository) extends Logging {
 
-  def updateOrgContactDetails(
+  def updateOrgContactDetails( // TODO remove as only used in tests
     subscriptionId: SubscriptionID,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
     updateContactDetails(subscriptionId, userAnswers, UpdateSubscriptionRequest.convertToRequestOrg)
       .map(_.isDefined)
 
-  def updateIndContactDetails(
+  def updateIndContactDetails( // TODO remove as only used in tests
     subscriptionId: SubscriptionID,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
@@ -122,7 +116,7 @@ class SubscriptionService @Inject() (val subscriptionConnector: SubscriptionConn
   )(implicit contactTypePage: T): Option[UserAnswers] = {
     val userAnswersWithContactInfoPopulated = for {
       emailSet       <- userAnswers.set(contactTypePage.contactEmailPage, contactInfo.email)
-      phoneNumberSet <- emailSet.set(contactTypePage.contactPhoneNumberPage, contactInfo.phone.getOrElse("Not providedd"))
+      phoneNumberSet <- emailSet.set(contactTypePage.contactPhoneNumberPage, contactInfo.phone.getOrElse("Not provided"))
       updatedAnswers <- phoneNumberSet.set(contactTypePage.havePhoneNumberPage, contactInfo.phone.exists(_.nonEmpty))
     } yield updatedAnswers
 

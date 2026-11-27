@@ -16,29 +16,29 @@
 
 package controllers.changeContactDetails
 
-import base.{SpecBase, TestValues}
+import base.SpecBase
 import controllers.actions.{FakeSubscriptionIdRetrievalAction, SubscriptionIdRetrievalAction}
 import controllers.changeContactDetails.routes.ChangeOrganisationContactDetailsController
-import controllers.routes
+import controllers.{routes, ContactDetailsMissingController}
 import generators.{ModelGenerators, UserAnswersGenerator}
 import helpers.JsonFixtures.subscriptionId
 import models.audit.AuditResult.AuditSent
 import models.audit.UpdateContactDetailsAuditRequest
 import models.subscription.request.UpdateSubscriptionRequest
 import models.subscription.response.{DisplayResponseDetail, DisplaySubscriptionResponse, OrganisationRegistrationType}
-import models.{SubscriptionID, UserAnswers}
+import models.{CheckMode, SubscriptionID, UserAnswers}
 import org.jsoup.Jsoup
-import org.mockito.ArgumentMatchers.{any, eq => mEq}
+import org.mockito.ArgumentMatchers.{any, eq as mEq}
 import org.mockito.Mockito.verify
 import org.mockito.MockitoSugar.{reset, times, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.changeContactDetails.{ChangeContactDetailsInProgressPage, OrganisationContactPhonePage}
+import pages.changeContactDetails.*
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK, SEE_OTHER}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.{AuditService, SubscriptionService}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
@@ -98,6 +98,39 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
         }
       }
 
+      "must return InternalServerError when there is no change to the contact details and checkIfOrgContactDetailsHasChanged returns None" in {
+        forAll(arbitrary[DisplaySubscriptionResponse], orgChangeContact.arbitrary) {
+          (subscription, userAnswers) =>
+            val userAnswersOpt = Some(userAnswers)
+
+            when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
+              .thenReturn(Future.successful(Option(subscription)))
+            when(mockSubscriptionService.populateUserAnswersFromOrgSubscription(any[UserAnswers](), any[DisplayResponseDetail]()))
+              .thenReturn(userAnswersOpt)
+            when(mockSubscriptionService.checkIfOrgContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
+              .thenReturn(None)
+
+            when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswersOpt))
+
+            when(mockSessionRepository.set(userAnswers.withPage(ChangeContactDetailsInProgressPage, true)))
+              .thenReturn(Future.successful(true))
+
+            val application = applicationBuilder(userAnswersOpt)
+              .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
+              .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(GET, ChangeOrganisationContactDetailsController.onPageLoad().url)
+
+              val result = route(application, request).value
+
+              status(result) mustEqual INTERNAL_SERVER_ERROR
+
+            }
+        }
+      }
+
       "must not populate userAnswers with subscription from backend when change contact details is in progress" in {
         forAll(arbitrary[DisplaySubscriptionResponse], orgChangeContact.arbitrary) {
           (subscription, userAnswers) =>
@@ -133,10 +166,13 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
 
             when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
               .thenReturn(Future.successful(Option(subscription)))
+
             when(mockSubscriptionService.populateUserAnswersFromOrgSubscription(any[UserAnswers](), any[DisplayResponseDetail]()))
               .thenReturn(userAnswersOpt)
+
             when(mockSubscriptionService.checkIfOrgContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
               .thenReturn(Some(false))
+
             when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswersOpt))
             when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -154,6 +190,69 @@ class ChangeOrganisationContactDetailsControllerSpec extends SpecBase with Mocki
               val page = Jsoup.parse(contentAsString(result))
               page.getElementsContainingText("Confirm and send").isEmpty mustBe true
             }
+        }
+      }
+
+      "must redirect to ContactDetailsMissingController with OrganisationHaveSecondContactController continueUrl when second contact details are missing" in {
+        val incompleteSecondContactAnswers =
+          emptyUserAnswers
+            .withPage(ChangeContactDetailsInProgressPage, true)
+            .withPage(OrganisationContactNamePage, "Test Name")
+            .withPage(OrganisationContactEmailPage, "test@example.com")
+            .withPage(OrganisationContactHavePhonePage, false)
+
+        val subscription = arbitrary[DisplaySubscriptionResponse].sample.value
+
+        when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(Option(subscription)))
+
+        when(mockSubscriptionService.checkIfOrgContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
+          .thenReturn(Some(true))
+
+        when(mockSessionRepository.get(any())).thenReturn(Future.successful(Some(incompleteSecondContactAnswers)))
+
+        val application = applicationBuilder(Some(incompleteSecondContactAnswers))
+          .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
+          .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, ChangeOrganisationContactDetailsController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.ContactDetailsMissingController.onPageLoad().url
+
+          flash(result).get(ContactDetailsMissingController.continueUrlKey).value mustEqual
+            controllers.changeContactDetails.routes.OrganisationHaveSecondContactController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to ContactDetailsMissingController with OrganisationContactNameController continueUrl when primary contact details are missing" in {
+        val subscription   = arbitrary[DisplaySubscriptionResponse].sample.value
+        val userAnswersOpt = Some(emptyUserAnswers.withPage(ChangeContactDetailsInProgressPage, true))
+
+        when(mockSubscriptionService.getSubscription(mEq(subscriptionId))(any[HeaderCarrier](), any[ExecutionContext]()))
+          .thenReturn(Future.successful(Option(subscription)))
+        when(mockSubscriptionService.checkIfOrgContactDetailsHasChanged(any[DisplaySubscriptionResponse](), any[UserAnswers]()))
+          .thenReturn(Some(true))
+        when(mockSessionRepository.get(any())).thenReturn(Future.successful(userAnswersOpt))
+
+        val application = applicationBuilder(userAnswersOpt)
+          .overrides(bind[SubscriptionService].toInstance(mockSubscriptionService))
+          .overrides(bind[SubscriptionIdRetrievalAction].toInstance(mockSubscriptionIdRetrievalAction))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, ChangeOrganisationContactDetailsController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.ContactDetailsMissingController.onPageLoad().url
+          flash(result).get(ContactDetailsMissingController.continueUrlKey).value mustEqual
+            controllers.changeContactDetails.routes.OrganisationContactNameController.onPageLoad(CheckMode).url
         }
       }
 
